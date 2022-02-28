@@ -3,6 +3,7 @@
 // hpp
 #include <space/game/game_instance.hpp>
 // libv
+#include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/event_hub.hpp>

@@ -1,341 +1,277 @@
-// Project: libv, File: app/space/message/cto.hpp
+//
+// Generated source code
+// Generator version: v3.1.1
+// Input file: app/space/message/cto.in.lua
 
 #pragma once
 
-// fwd
-#include <space/fwd.hpp>
-// libv
-#include <libv/math/vec.hpp>
-#include <libv/math/vec_serial.hpp>
-#include <libv/meta/reflection_access.hpp>
-#include <libv/serial/codec_message_id.hpp>
-#include <libv/serial/enable.hpp>
-#include <libv/serial/reflection.hpp>
-#include <libv/serial/types/std_chrono.hpp>
-#include <libv/serial/types/std_string.hpp>
-#include <libv/serial/types/std_vector.hpp>
-// std
+//
 #include <chrono>
 #include <cstdint>
-#include <string>
-// pro
+#include <libv/math/vec.hpp>
+#include <libv/serial/archive/binary_fwd.hpp>
+#include <libv/serial/codec_message_id.hpp>
 #include <space/sim/ids.hpp>
+#include <string>
+#include <vector>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-/// CTO - Command Transfer Object
-///
-/// Main group of CTO messages:
-/// 	Lobby: Lobby messages relate to the network lobby state replication to clients. All info comes from the host
-///				Delay acceptable
-/// 	State:
-///				Delay not acceptable, always highest priority messages
-/// 	Tracking: WIP: Camera position, Selections and other view related tracking information
-///				Delay acceptable
-
-// -------------------------------------------------------------------------------------------------
-
 struct CTO_Introduction {
-//	using lobby_command = void;
 	static constexpr libv::serial::CodecMessageID id{0};
 
-	//	UserID userID;
 	std::string user_name;
 	uint64_t version;
 
-	LIBV_REFLECTION_ACCESS(user_name);
-	LIBV_REFLECTION_ACCESS(version);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_Introduction() = default;
+	explicit inline CTO_Introduction(std::string user_name, uint64_t version) : user_name(std::move(user_name)), version(version) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
-// -------------------------------------------------------------------------------------------------
-
 struct CTO_ClientJoined {
-	using lobby_command = void;
 	static constexpr libv::serial::CodecMessageID id{20};
 
-	UserID userID;
+	UserID userID = invalidUserID;
 	std::string user_name;
 	std::chrono::system_clock::time_point joined_at;
-//	Timestamp joined_at;
 	uint64_t version;
 
-	LIBV_REFLECTION_ACCESS(userID);
-	LIBV_REFLECTION_ACCESS(user_name);
-	LIBV_REFLECTION_ACCESS(joined_at);
-	LIBV_REFLECTION_ACCESS(version);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_ClientJoined() = default;
+	explicit inline CTO_ClientJoined(UserID userID, std::string user_name, std::chrono::system_clock::time_point joined_at, uint64_t version) : userID(userID), user_name(std::move(user_name)), joined_at(joined_at), version(version) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_ClientLeave {
-	using lobby_command = void;
 	static constexpr libv::serial::CodecMessageID id{21};
 
-	UserID userID;
-	//	Timestamp timestamp;
+	UserID userID = invalidUserID;
 
-	LIBV_REFLECTION_ACCESS(userID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_ClientLeave() = default;
+	explicit inline CTO_ClientLeave(UserID userID) : userID(userID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
-//struct CTO_ClientKick {
-//	using lobby_command = void;
-//	static constexpr libv::serial::CodecMessageID id{21};
-//
-//	UserID userID;
-//
-//	LIBV_REFLECTION_ACCESS(userID);
-//	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-//};
-
 struct CTO_ChatMessage {
-	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{22};
+	static constexpr libv::serial::CodecMessageID id{23};
 
-	UserID userID;
+	UserID userID = invalidUserID;
 	std::chrono::system_clock::time_point sent_at;
-	//	Timestamp sent_at;
 	std::string message;
-//	libv::serial::limit<std::string, 64 * 1024> message;
 
-	LIBV_REFLECTION_ACCESS(userID);
-	LIBV_REFLECTION_ACCESS(sent_at);
-	LIBV_REFLECTION_ACCESS(message);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_ChatMessage() = default;
+	explicit inline CTO_ChatMessage(UserID userID, std::chrono::system_clock::time_point sent_at, std::string message) : userID(userID), sent_at(sent_at), message(std::move(message)) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_LobbyStatus {
-	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{23};
-
 	struct Entry {
-		UserID userID;
+		UserID userID = invalidUserID;
 		float ping;
-//		float jitter;
-//		float packet_loss;
 
-		LIBV_REFLECTION_ACCESS(userID);
-		LIBV_REFLECTION_ACCESS(ping);
-//		LIBV_REFLECTION_ACCESS(jitter);
-//		LIBV_REFLECTION_ACCESS(packet_loss);
-		LIBV_SERIALIZATION_ENABLE_REFLECTION();
+		Entry() = default;
+		explicit inline Entry(UserID userID, float ping) : userID(userID), ping(ping) {}
+		void save(libv::archive::BinaryOutput& ar) const;
+		void load(libv::archive::BinaryInput& ar);
 	};
+
+	static constexpr libv::serial::CodecMessageID id{24};
 
 	std::vector<Entry> pings;
 
-	LIBV_REFLECTION_ACCESS(pings);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_LobbyStatus() = default;
+	explicit inline CTO_LobbyStatus(std::vector<Entry> pings) : pings(std::move(pings)) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
-//struct CTO_LobbyClose {
-//	using lobby_command = void;
-//	static constexpr libv::serial::CodecMessageID id{24};
-//
-//	LIBV_REFLECTION_EMPTY();
-//	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-//};
+struct CTO_LobbyClose {
+	static constexpr libv::serial::CodecMessageID id{25};
 
-// -------------------------------------------------------------------------------------------------
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
+};
 
 struct CTO_FleetSpawn {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{30};
 
-//	FactionID factionID;
-//	FleetID fleetID;
 	libv::vec3f position;
 
-	LIBV_REFLECTION_ACCESS(position);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetSpawn() = default;
+	explicit inline CTO_FleetSpawn(libv::vec3f position) : position(position) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetSelect {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{31};
 
-	FleetID fleetID;
+	FleetID fleetID = invalidFleetID;
 
-	LIBV_REFLECTION_ACCESS(fleetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetSelect() = default;
+	explicit inline CTO_FleetSelect(FleetID fleetID) : fleetID(fleetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetSelectAdd {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{32};
 
-	FleetID fleetID;
+	FleetID fleetID = invalidFleetID;
 
-	LIBV_REFLECTION_ACCESS(fleetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetSelectAdd() = default;
+	explicit inline CTO_FleetSelectAdd(FleetID fleetID) : fleetID(fleetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetClearSelection {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{33};
 
-	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetSelectBox {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{34};
 
 	std::vector<FleetID> fleetIDs;
 
-	LIBV_REFLECTION_ACCESS(fleetIDs);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetSelectBox() = default;
+	explicit inline CTO_FleetSelectBox(std::vector<FleetID> fleetIDs) : fleetIDs(std::move(fleetIDs)) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetMove {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{35};
 
 	libv::vec3f target_position;
 
-	LIBV_REFLECTION_ACCESS(target_position);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetMove() = default;
+	explicit inline CTO_FleetMove(libv::vec3f target_position) : target_position(target_position) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetMoveQueue {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{36};
 
 	libv::vec3f target_position;
 
-	LIBV_REFLECTION_ACCESS(target_position);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetMoveQueue() = default;
+	explicit inline CTO_FleetMoveQueue(libv::vec3f target_position) : target_position(target_position) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetAttackFleet {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{37};
 
-	FleetID targetFleetID;
+	FleetID targetFleetID = invalidFleetID;
 
-	LIBV_REFLECTION_ACCESS(targetFleetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetAttackFleet() = default;
+	explicit inline CTO_FleetAttackFleet(FleetID targetFleetID) : targetFleetID(targetFleetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetAttackFleetQueue {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{38};
 
-	FleetID targetFleetID;
+	FleetID targetFleetID = invalidFleetID;
 
-	LIBV_REFLECTION_ACCESS(targetFleetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetAttackFleetQueue() = default;
+	explicit inline CTO_FleetAttackFleetQueue(FleetID targetFleetID) : targetFleetID(targetFleetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetAttackPlanet {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{39};
 
-	PlanetID targetPlanetID;
+	PlanetID targetPlanetID = invalidPlanetID;
 
-	LIBV_REFLECTION_ACCESS(targetPlanetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetAttackPlanet() = default;
+	explicit inline CTO_FleetAttackPlanet(PlanetID targetPlanetID) : targetPlanetID(targetPlanetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_FleetAttackPlanetQueue {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{40};
 
-	PlanetID targetPlanetID;
+	PlanetID targetPlanetID = invalidPlanetID;
 
-	LIBV_REFLECTION_ACCESS(targetPlanetID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_FleetAttackPlanetQueue() = default;
+	explicit inline CTO_FleetAttackPlanetQueue(PlanetID targetPlanetID) : targetPlanetID(targetPlanetID) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_ClearFleets {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{41};
 
-	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_Shuffle {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{42};
 
-	uint64_t seed;
-
-	LIBV_REFLECTION_ACCESS(seed);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_PlanetSpawn {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{43};
 
-//	FactionID factionID;
-//	FleetID fleetID;
 	libv::vec3f position;
 
-	LIBV_REFLECTION_ACCESS(position);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_PlanetSpawn() = default;
+	explicit inline CTO_PlanetSpawn(libv::vec3f position) : position(position) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_ClearPlanets {
-	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{44};
 
-	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
-// -------------------------------------------------------------------------------------------------
-
 struct CTO_TrackView {
-	using track_command = void;
 	static constexpr libv::serial::CodecMessageID id{50};
 
-	UserID userID;
+	UserID userID = invalidUserID;
 	libv::vec3f eye;
 	libv::vec3f target;
 	libv::vec3f mouse_direction;
 
-	LIBV_REFLECTION_ACCESS(userID);
-	LIBV_REFLECTION_ACCESS(eye);
-	LIBV_REFLECTION_ACCESS(target);
-	LIBV_REFLECTION_ACCESS(mouse_direction);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_TrackView() = default;
+	explicit inline CTO_TrackView(UserID userID, libv::vec3f eye, libv::vec3f target, libv::vec3f mouse_direction) : userID(userID), eye(eye), target(target), mouse_direction(mouse_direction) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
 
 struct CTO_CameraWarpTo {
-	using track_command = void;
 	static constexpr libv::serial::CodecMessageID id{51};
 
-	UserID userID;
+	UserID userID = invalidUserID;
 	libv::vec3f target_position;
 
-	LIBV_REFLECTION_ACCESS(userID);
-	LIBV_REFLECTION_ACCESS(target_position);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	CTO_CameraWarpTo() = default;
+	explicit inline CTO_CameraWarpTo(UserID userID, libv::vec3f target_position) : userID(userID), target_position(target_position) {}
+	void save(libv::archive::BinaryOutput& ar) const;
+	void load(libv::archive::BinaryInput& ar);
 };
-
-//struct CTO_CameraMovement : CommandTrack {
-//	using track_command = void;
-//	static constexpr libv::serial::CodecMessageID id{52};
-//
-//	UserID userID;
-//	libv::vec3f eye;
-//	libv::vec3f target;
-//	libv::vec3f mouse_direction;
-//};
-//
-//struct CTO_MouseMovement : CommandTrack {
-//	using track_command = void;
-//	static constexpr libv::serial::CodecMessageID id{43};
-//
-//	UserID userID;
-//	libv::vec3f mouse_position;
-//	libv::vec3f mouse_direction;
-//};
 
 // -------------------------------------------------------------------------------------------------
 

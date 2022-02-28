@@ -13,6 +13,11 @@ class Faction;
 class Planet;
 class Fleet;
 
+// sim/engine
+//class MemoryStore;
+class Simulation;
+class SimulationContext;
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace space

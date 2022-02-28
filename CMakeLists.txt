@@ -103,6 +103,7 @@ wish_warning(
 	Clang -Wno-comment
 	GNU -Wno-comment
 	# GNU -Wnull-dereference # Causes too many false positives as of GCC 11.2
+	# GNU -Werror
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -312,7 +313,7 @@ wish_create_external(
 wish_create_external(
 	NAME cereal
 	GIT_REPOSITORY https://github.com/VaderY/cereal.git
-	GIT_TAG 7c1ac3f21d04da6609bd127f45dabbc2bf6c28a8
+	GIT_TAG b03f237713a7e4aab18c7d9150fb3c9a5e92ea3a
 #	GIT_REPOSITORY /e/dev/cpp/forks/cereal
 #	GIT_TAG dev
 	CMAKE_ARGS
@@ -806,7 +807,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_serial INTERFACE
 	LINK   ext_cereal
-	LINK   ext_boost # Remove
+#	LINK   ext_boost # Remove
 	LINK   libv_utility # For byte streams that might be removed in the future
 )
 
@@ -987,6 +988,7 @@ wish_create_executable(
 	SOURCE app/space/sim/*.cpp
 	SOURCE app/space/view/*.cpp
 	SOURCE app/space/space_main.cpp
+	GENERATE codegen app/space/message/*.in.lua
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
 	LINK   libv_vm4
@@ -1001,6 +1003,7 @@ wish_create_executable(
 	SOURCE app/space/sim/*.cpp
 	SOURCE app/space/view/*.cpp
 	SOURCE app/space/surface/*.cpp
+	GENERATE codegen app/space/message/*.in.lua
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
 	LINK   libv_vm4

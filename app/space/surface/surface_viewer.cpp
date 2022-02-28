@@ -5,6 +5,7 @@
 //libv
 #include <libv/ui/settings.hpp>
 //#include <libv/ui/component/label.hpp>
+#include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/feature_register.hpp>
 
 //space

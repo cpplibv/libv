@@ -12,12 +12,12 @@ namespace space {
 
 struct CameraControl {
 	static void register_controls(libv::ctrl::FeatureRegister controls);
-	static void bind_default_controls(libv::ctrl::Controls& controls);
+	static void bind_default_controls(libv::ctrl::BindingRegister controls);
 };
 
 struct CameraControl2D {
 	static void register_controls(libv::ctrl::FeatureRegister controls);
-	static void bind_default_controls(libv::ctrl::Controls& controls);
+	static void bind_default_controls(libv::ctrl::BindingRegister controls);
 };
 
 // -------------------------------------------------------------------------------------------------

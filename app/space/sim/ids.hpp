@@ -32,14 +32,17 @@ constexpr inline PlanetID firstPlanetID = PlanetID{0};
 
 // -------------------------------------------------------------------------------------------------
 
+enum class UserID : int32_t {};
+constexpr inline UserID invalidUserID = UserID{-1};
+constexpr inline UserID firstUserID = UserID{0};
+[[nodiscard]] constexpr inline auto operator+(UserID e) noexcept { return libv::to_underlying(e); }
+[[nodiscard]] constexpr inline auto operator++(UserID& e, int) noexcept { auto r = e; e = UserID{+e + 1}; return r; }
+
 enum class TickIndex : int64_t {};
 [[nodiscard]] constexpr inline auto operator+(TickIndex e) noexcept { return libv::to_underlying(e); }
 
 enum class Timestamp : int64_t {};
 [[nodiscard]] constexpr inline auto operator+(Timestamp e) noexcept { return libv::to_underlying(e); }
-
-enum class UserID : int32_t {};
-[[nodiscard]] constexpr inline auto operator+(UserID e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
 

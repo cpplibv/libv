@@ -71,9 +71,9 @@ TEST_CASE("Codec3 encode/decode one object", "[libv.serial.codec]") {
 		codec.encode(oar, CTO_Introduction{"Vader", 202110131011});
 	}
 
-	CHECK(libv::hex_dump(buffer) == "10 00 00 00 00 00 00 00  05 56 61 64 65 72 00 00  00 2F 0E B3 DB 43");
-	//								 ^^ ID = 0x10                ^^^^^^^^^^^^^^ Vader
-	//								    ^^^^^^^^^^^^^^^^^^^^^^^^ Length = 5     ^^^^^^^^^^^^^^^^^^^^^^^^ Version
+	CHECK(libv::hex_dump(buffer) == "10 00 00 00 05 56 61 64  65 72 00 00 00 2F 0E B3  DB 43");
+	//								 ^^ ID = 0x10   ^^^^^^^^^^^^^^^ Vader
+	//								    ^^^^^^^^^^^ Length = 5      ^^^^^^^^^^^^^^^^^^^^^^^^ Version
 
 	libv::archive::Binary::input iar(buffer);
 
@@ -278,12 +278,12 @@ TEST_CASE("Codec3 encode/decode multiple object", "[libv.serial.codec]") {
 	}
 
 	CHECK(libv::hex_dump(buffer) ==
-			"10 00 00 00 00 00 00 00  05 56 61 64 65 72 00 00  00 2F 0E B3 DB 43 "
-//			 ^^ ID = 0x10                ^^^^^^^^^^^^^^ Vader
-//				^^^^^^^^^^^^^^^^^^^^^^^^ Length = 5     ^^^^^^^^^^^^^^^^^^^^^^^^ Version
-			"11 00  00 00 00 00 00 00 05 56\n61 64 65 72 00 00 00 00  00 00 00 06 48 65 6C 6C  6F 21");
-//			 ^^ ID = 0x11                ^^^^^^^^^^^^^^^ Vader                    ^^^^^^^^^^^^^^^^^^ Hello!
-//				^^^^^^^^^^^^^^^^^^^^^^^^ Length = 5      ^^^^^^^^^^^^^^^^^^^^^^^^ Length = 6
+			"10 00 00 00 05 56 61 64  65 72 00 00 00 2F 0E B3  DB 43 "
+//			 ^^ ID = 0x10   ^^^^^^^^^^^^^^^^^^^^^^^^ Version
+//				^^^^^^^^^^^ Length = 5               ^^^^^^^^^^^^^^^ Vader
+			"11 00 00 00 05 56  61 64 65 72 00 00 00 06\n48 65 6C 6C 6F 21");
+//			 ^^ ID = 0x11   ^^^^^^^^^^^^^^^ Vader        ^^^^^^^^^^^^^^^^^ Hello!
+//				^^^^^^^^^^^ Length = 5      ^^^^^^^^^^^ Length = 6
 
 	libv::archive::Binary::input iar(buffer);
 

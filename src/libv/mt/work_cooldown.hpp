@@ -17,7 +17,7 @@ namespace mt {
 /// - The first request while idle is scheduled immediately, enters cooldown.
 /// - The first request during the cooldown is rescheduled after the cooldown ends and extends the cooldown.
 /// - Repeated requests during the cooldown are discarded.
-/// - Once the cooldown period ends it returns to idle.
+/// - Once the cooldown period ends it executes the request and returns to idle.
 class work_cooldown {
 private:
 	std::atomic_bool in_flight = false;
@@ -61,10 +61,10 @@ public:
 /// Deduplicates work execution requests before an execution for a warmup and after it for a cooldown period.
 /// - The first request while idle is rescheduled after the warmup ends, enters warmup.
 /// - Requests during the warmup are discarded.
-/// - Once the warmup period ends it enters cooldown.
+/// - Once the warmup period ends it executes the request and enters cooldown.
 /// - The first request during the cooldown is rescheduled after the cooldown ends and extends the cooldown.
 /// - Repeated requests during the cooldown are discarded.
-/// - Once the cooldown period ends it returns to idle.
+/// - Once the cooldown period ends it executes the request and returns to idle.
 class work_warmup_cooldown {
 private:
 	std::atomic_bool in_flight = false;
@@ -111,7 +111,7 @@ public:
 /// Deduplicates work execution requests before an execution for a warmup period.
 /// - The first request while idle is rescheduled after the warmup ends, enters warmup.
 /// - Requests during the warmup are discarded.
-/// - Once the warmup period ends it returns to idle.
+/// - Once the warmup period ends it executes the request and returns to idle.
 class work_warmup {
 private:
 	std::atomic_bool in_flight = false;

@@ -14,14 +14,18 @@
 #include <cassert>
 // pro
 #include <space/game/game_session.hpp>
+#include <space/sim/faction.hpp>
+#include <space/sim/universe.hpp>
 #include <space/view/canvas_control.hpp>
 #include <space/view/render/renderer.hpp>
-#include <space/sim/universe.hpp>
 
 
 //#include <libv/log/log.hpp>
 //#include <libv/color/space.hpp>
+#include <libv/ctrl/controls.hpp>
 
+#include <space/message/internal_events.hpp>
+#include <libv/utility/nexus.hpp>
 
 
 namespace space {
@@ -113,12 +117,13 @@ RendererCommandArrow::ArrowStyle convert_to_arrow_style(FleetCommandType type) {
 
 // -------------------------------------------------------------------------------------------------
 
-SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool main_canvas) :
+SpaceCanvas::SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, GameSession& game_session, bool main_canvas) :
 		main_canvas(main_canvas),
 		game_session(game_session),
-		universe(game_session.universe),
+		//universe(*game_session.playout.simulation->universe),
 		playout(game_session.playout),
 //		camera(camera),
+		controls(controls),
 		screen_picker(camera.picker({100, 100})),
 		renderTarget({100, 100}, 4),
 		postProcessing(renderer.resource_context.shader_loader, {100, 100}),
@@ -131,6 +136,36 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 //	screen_picker = camera.picker(?, ?); // <<< ?
 	postProcessing.vignetteIntensity(0.15f);
+
+	game_session.nexus.connect<mc::ChangeControlledFaction>(this, [this] {
+		// !!!
+		controlVar.reset();
+	});
+}
+
+SpaceCanvas::~SpaceCanvas() {
+	// !!!
+	game_session.nexus.disconnect_all(this);
+}
+
+void SpaceCanvas::enableControls(libv::ctrl::Controls& controls) {
+	if (!controlVar)
+		// !!!
+		controlVar.emplace(
+				*this,
+				playout,
+				playout.simulation->universe->galaxy,
+//				player,
+				game_session.player
+		);
+
+	controls.context_enter<CanvasControl>(&*controlVar);
+	controls.context_enter<BaseCameraOrbit>(&camera);
+}
+
+void SpaceCanvas::disableControls(libv::ctrl::Controls& controls) {
+	controls.context_leave_if_matches<BaseCameraOrbit>(&camera);
+	controls.context_leave_if_matches<CanvasControl>(&*controlVar);
 }
 
 void SpaceCanvas::attach() {
@@ -140,31 +175,42 @@ void SpaceCanvas::attach() {
 
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 	const auto dtf = static_cast<float>(delta_time.count());
-	angle = std::fmod(angle + 5.0f * dtf, 360.0f);
-	time += dtf;
+//	angle = std::fmod(angle + 5.0f * dtf, 360.0f);
+//	time += dtf;
 	global_time += dtf;
 
-	if (global_test_mode != 0) {
-		test_sin_time += dtf;
-		auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
-		if (global_test_mode == 1) {
-			camera.pitch(-t * libv::pi_f * 0.5f);
-		} else if (global_test_mode == 2) {
-			t = t > 0.5f ? 1.f - t : t;
-			camera.pitch(-t * libv::pi_f * 0.5f);
-		} else if (global_test_mode == 3) {
-			const float part = 4;
-			auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
-			t = t > 0.5f ? 1.f - t : t;
-			camera.pitch(-t * libv::pi_f * 0.5f / part);
-		}
-	}
+//	if (global_test_mode != 0) {
+//		test_sin_time += dtf;
+//		auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
+//		if (global_test_mode == 1) {
+//			camera.pitch(-t * libv::pi_f * 0.5f);
+//		} else if (global_test_mode == 2) {
+//			t = t > 0.5f ? 1.f - t : t;
+//			camera.pitch(-t * libv::pi_f * 0.5f);
+//		} else if (global_test_mode == 3) {
+//			const float part = 4;
+//			auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
+//			t = t > 0.5f ? 1.f - t : t;
+//			camera.pitch(-t * libv::pi_f * 0.5f / part);
+//		}
+//	}
 
 	if (main_canvas) {
 		// <<< P1: Game_session update shouldnt come from the canvas, or should it?
 		game_session.update(delta_time);
 
-		CanvasControl::update(*this, delta_time);
+//		CanvasControl::update(*this, delta_time);
+		if (!controlVar)
+			// !!!
+			controlVar.emplace(
+					*this,
+					playout,
+					playout.simulation->universe->galaxy,
+	//				player,
+					game_session.player
+			);
+
+		CanvasControl::update(*controlVar, delta_time);
 	}
 }
 
@@ -289,106 +335,22 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	// --- Render Opaque ---
-
 	// TODO P1: Find a better way of managing text (and debug shape) lifetimes
 	renderer.text.clear_texts();
 
-	for (const auto& fleet_ptr : universe.galaxy.fleets) {
-		const auto& fleet = *fleet_ptr;
-		const auto m_guard = glr.model.push_guard();
-		const auto idf = static_cast<float>(+fleet.id);
-
-		glr.model.translate(fleet.position);
-		glr.model *= fleet.orientation.to_mat4();
-//		glr.model.scale(0.05f);
-		glr.model.scale(0.2f);
-
-		const auto numShipRendered = static_cast<int>(std::log(static_cast<float>(fleet.number_of_ships)) / std::log(2.f) * 2.f);
-//		const auto numShipRendered = fleet.number_of_ships;
-		for (int i = 0; i < numShipRendered; ++i) {
-			const auto fi = static_cast<float>(i);
-
-			const auto m2_guard = glr.model.push_guard();
-			const auto noiseX = libv::noise_perlin({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
-			const auto noiseY = libv::noise_perlin({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
-			const auto noiseZ = libv::noise_perlin({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
-			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.2f - 0.1f;
-			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
-
-			glr.model.translate(ship_pos);
-			// glr.model.scale(Fleet::pickingType.radius_universe);
-			glr.model.scale(0.05f);
-			glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(0, 0, 1)); // <<< Workaround the incorrect model orientation
-
-			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
-		}
-
-		const auto a = libv::smoothstep((eye - fleet.position).length(), 160.f, 80.f);
-		if (a > 0.02f) { // Skip barely and not visible texts
-			std::string fleetLabel;
-			if (!fleet.commands.empty()) {
-				fleetLabel = fmt::format("Fleet {}\nFaction {}\nOri:{}\nI:{}\n{}\n{}", +fleet.id, +fleet.faction->id, fleet.orientation, +fleet.commands.front().type, fleet.number_of_ships, fleet.distance_travelled);
-			} else {
-				fleetLabel = fmt::format("Fleet {}\nFaction {}\nOri:{}\n{}\n{}", +fleet.id, +fleet.faction->id, fleet.orientation, fleet.number_of_ships, fleet.distance_travelled);
-			}
-			renderer.text.add_text(
-					fleet.position,
-					libv::vec2f{0, -15.f},
-					std::move(fleetLabel),
-//					libv::vec4f{1.f, 1.f, 1.f, a}
-					fleet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
-			);
-		}
-	}
-
-	for (const auto& planet_ptr : universe.galaxy.planets) {
-		const auto& planet = *planet_ptr;
-		const auto m_guard = glr.model.push_guard();
-		glr.model.translate(planet.position);
-
-		renderer.planet.render(glr, renderer.resource_context.uniform_stream, planet);
-
-		const auto a = libv::smoothstep((eye - planet.position).length(), 100.f, 20.f);
-		if (a > 0.02f) // Skip barely and not visible texts
-			renderer.text.add_text(
-					planet.position,
-					libv::vec2f{0, -15.f},
-					fmt::format("Planet {}\nFaction {}", +planet.id, +planet.faction->id),
-//					libv::vec4f{1.f, 1.f, 1.f, a}
-					planet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
-			);
-	}
+	render_opaque(glr, eye, playout.simulation->universe->galaxy);
 
 	// --- Render EditorBackground/Sky ---
-
-	if (main_canvas) {
-		const auto s2_guard = glr.state.push_guard();
-		// No need to write depth data for the main background
-		glr.state.disableDepthMask();
-		renderer.editorBackground.render(glr, canvas_size);
-	}
+	render_background(glr, playout.simulation->universe->galaxy);
 
 	// --- Render Transparent ---
-
 //	renderer.arrow.add_debug_spiral();
 //	renderer.arrow.add_debug_view01();
 //	renderer.arrow.add_debug_view02();
 //	renderer.arrow.add_debug_view03();
 //	renderer.arrow.add_debug_view04();
 //	renderer.arrow.add_debug_view05();
-
-	for (const auto& fleet : universe.galaxy.fleets) {
-		renderer.arrow.restart_chain(fleet->animation_offset());
-
-		auto prev = fleet->position;
-		for (const auto& command : fleet->commands) {
-			const auto targetPosition = command.target();
-			renderer.arrow.add_arrow(prev, targetPosition, convert_to_arrow_style(command.type));
-			prev = targetPosition;
-		}
-	}
-
-	renderer.arrow.render(glr, canvas_size, renderer.resource_context.uniform_stream);
+	render_transparent(glr, playout.simulation->universe->galaxy);
 
 	// --- Render Debug shapes ---
 	{
@@ -461,6 +423,101 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 	renderer.text.add_debug_coordinates_if_nothing_else();
 	renderer.text.render(glr, renderer.resource_context.uniform_stream, screen_picker);
+}
+
+void SpaceCanvas::render_opaque(libv::glr::Queue& glr, libv::vec3f eye, Galaxy& galaxy) {
+	for (const auto& fleet_ptr : galaxy.fleets) {
+		const auto& fleet = *fleet_ptr;
+		const auto m_guard = glr.model.push_guard();
+		const auto idf = static_cast<float>(+fleet.id);
+
+		glr.model.translate(fleet.position);
+		glr.model *= fleet.orientation.to_mat4();
+//		glr.model.scale(0.05f);
+		glr.model.scale(0.2f);
+
+		const auto numShipRendered = static_cast<int>(std::log(static_cast<float>(fleet.number_of_ships)) / std::log(2.f) * 2.f);
+//		const auto numShipRendered = fleet.number_of_ships;
+		for (int i = 0; i < numShipRendered; ++i) {
+			const auto fi = static_cast<float>(i);
+
+			const auto m2_guard = glr.model.push_guard();
+			const auto noiseX = libv::noise_perlin({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
+			const auto noiseY = libv::noise_perlin({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 5});
+			const auto noiseZ = libv::noise_perlin({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 10});
+			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.2f - 0.1f;
+			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
+
+			glr.model.translate(ship_pos);
+			// glr.model.scale(Fleet::pickingType.radius_universe);
+			glr.model.scale(0.05f);
+			glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(0, 0, 1)); // <<< Workaround the incorrect model orientation
+
+			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
+		}
+
+		const auto a = libv::smoothstep((eye - fleet.position).length(), 160.f, 80.f);
+		if (a > 0.02f) { // Skip barely and not visible texts
+			std::string fleetLabel;
+			if (!fleet.commands.empty()) {
+				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{}\nI:{}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, +fleet.commands.front().type, fleet.number_of_ships, fleet.distance_travelled);
+			} else {
+				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, fleet.number_of_ships, fleet.distance_travelled);
+			}
+			renderer.text.add_text(
+					fleet.position,
+					libv::vec2f{0, -15.f},
+					std::move(fleetLabel),
+//					libv::vec4f{1.f, 1.f, 1.f, a}
+					fleet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
+			);
+		}
+	}
+
+	for (const auto& planet_ptr : galaxy.planets) {
+		const auto& planet = *planet_ptr;
+		const auto m_guard = glr.model.push_guard();
+		glr.model.translate(planet.position);
+
+		renderer.planet.render(glr, renderer.resource_context.uniform_stream, planet);
+
+		const auto a = libv::smoothstep((eye - planet.position).length(), 100.f, 20.f);
+		if (a > 0.02f) // Skip barely and not visible texts
+			renderer.text.add_text(
+					planet.position,
+					libv::vec2f{0, -15.f},
+					fmt::format("Planet {}\n{}", +planet.id, planet.faction->name),
+//					libv::vec4f{1.f, 1.f, 1.f, a}
+					planet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
+			);
+	}
+}
+
+void SpaceCanvas::render_background(libv::glr::Queue& glr, Galaxy& galaxy) {
+	if (!main_canvas)
+		return;
+
+	(void) galaxy;
+
+	const auto s_guard = glr.state.push_guard();
+	// No need to write depth data for the main background
+	glr.state.disableDepthMask();
+	renderer.editorBackground.render(glr, canvas_size);
+}
+
+void SpaceCanvas::render_transparent(libv::glr::Queue& glr, Galaxy& galaxy) {
+	for (const auto& fleet : galaxy.fleets) {
+		renderer.arrow.restart_chain(fleet->animation_offset());
+
+		auto prev = fleet->position;
+		for (const auto& command : fleet->commands) {
+			const auto targetPosition = command.target();
+			renderer.arrow.add_arrow(prev, targetPosition, convert_to_arrow_style(command.type));
+			prev = targetPosition;
+		}
+	}
+
+	renderer.arrow.render(glr, canvas_size, renderer.resource_context.uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------

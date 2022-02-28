@@ -4,12 +4,12 @@
 
 // ext
 #include <cereal/cereal.hpp>
+#include <cereal/concept.hpp>
 // libv
 #include <libv/utility/entity/entity_ptr_fwd.hpp>
-// std
-#include <concepts>
-#include <type_traits>
 // pro
+#include <space/sim/engine/serial_id.hpp>
+#include <space/sim/engine/snapshot_type.hpp>
 #include <space/sim/fwd.hpp>
 #include <space/sim/ids.hpp>
 
@@ -20,51 +20,71 @@ namespace space {
 
 class SnapshotPtrResolverArchive : public cereal::OutputArchive<SnapshotPtrResolverArchive, cereal::IgnoreNVP> {
 private:
+//	Universe& universe;
 	const Universe& universe;
-	bool isLocal_;
+	SnapshotType snapshotType;
 
 public:
-	explicit inline SnapshotPtrResolverArchive(const Universe& universe, bool isLocal) :
-			cereal::OutputArchive<SnapshotPtrResolverArchive, cereal::IgnoreNVP>(this),
+//	explicit inline SnapshotPtrResolverArchive(bool isLocal, const Universe& universe) :
+//	explicit inline SnapshotPtrResolverArchive(SimulationContext& simulationContext, SnapshotType snapshotType) :
+	explicit inline SnapshotPtrResolverArchive(const Universe& universe, SnapshotType snapshotType) :
+//			simulationContext(simulationContext),
 			universe(universe),
-			isLocal_(isLocal) {}
+			snapshotType(snapshotType) {}
 
 public:
 	[[nodiscard]] constexpr inline bool isLocal() const noexcept {
-		return isLocal_;
+		return snapshotType == SnapshotType::local;
 	}
 	[[nodiscard]] constexpr inline bool isShared() const noexcept {
-		return !isLocal_;
+		return snapshotType == SnapshotType::shared;
 	}
 
 public:
 	libv::entity_ptr<Faction> resolve(FactionID id) const;
 	libv::entity_ptr<Planet> resolve(PlanetID id) const;
 	libv::entity_ptr<Fleet> resolve(FleetID id) const;
+
+public:
+	using OutputArchive::process_as;
+
+	template <typename As, typename T>
+	inline void process_as(As& as, const cereal::NameValuePair<T>& var) {
+		as(var.value);
+	}
+
+	template <typename As, typename T>
+	inline void process_as(As&, const cereal::SizeTag<T>&) {
+		// Visitation is no-op, type serializers will call into the archive
+	}
+
+	template <typename As, typename T>
+	inline void process_as(As&, const cereal::BinaryData<T>&) {
+		// Visitation is no-op, type serializers will call into the archive
+	}
+
+	template <typename As, cereal::arithmetic T>
+	inline void process_as(As&, const T&) {
+		// Visitation is no-op, type serializers will call into the archive
+	}
+
+	template <typename As, typename T>
+	inline void process_as(As&, const SerialID<T>& var) {
+		using id_type = SerialID<T>::id_type;
+		using underlying_type = SerialID<T>::underlying_type;
+
+		// The id was already saved in place of the pointer: grab it, resolve it, place it back
+		const auto id = id_type{libv::ptr_to_int<underlying_type>(var.ptr.abandon())};
+
+		// NOTE: SerialID is allowed to edit the ptr during "save" as the resolver uses save inside a load, so the object is not const
+		var.ptr = resolve(id);
+	}
+
+	template <typename As, typename T>
+	inline void process_as(As& as, const libv::primary_entity_ptr<T>& var) {
+		as(*var);
+	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive& ar, cereal::NameValuePair<T>& var) {
-	ar(var.value);
-}
-
-template <typename T>
-	requires (std::is_arithmetic_v<T>)
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, T&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
-
-template <typename T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::SizeTag<T>&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
-
-template <class T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::BinaryData<T>&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
 
 // -------------------------------------------------------------------------------------------------
 

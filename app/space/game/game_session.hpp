@@ -13,9 +13,11 @@
 #include <memory>
 #include <string>
 // pro
+#include <space/game/player.hpp>
 #include <space/sim/playout/playout.hpp>
-#include <space/sim/gen/generation_settings.hpp>
-#include <space/sim/universe.hpp>
+//#include <space/sim/gen/generation_settings.hpp>
+//#include <space/sim/universe.hpp>
+//#include <space/sim/simulation.hpp>
 
 
 namespace space {
@@ -23,38 +25,20 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 class GameSession {
-private:
+public:
 	libv::Nexus& nexus;
 
-public:
-	Universe universe;
 	Playout playout;
+	Player player;
+//	PlayerController controller;
+//	FactionController controller;
+//	PlayerController playerController;
 
 public:
-	explicit inline GameSession(libv::Nexus& nexus) :
-			nexus(nexus),
-			universe(GalaxyGenerationSettings{}),
-			playout() {
-		register_nexus();
-	}
-
-	explicit inline GameSession(libv::Nexus& nexus, NetworkClient& network_client) :
-			nexus(nexus),
-			universe(GalaxyGenerationSettings{}),
-			playout(network_client) {
-		register_nexus();
-	}
-
-	explicit inline GameSession(libv::Nexus& nexus, NetworkServer& network_server) :
-			nexus(nexus),
-			universe(GalaxyGenerationSettings{}),
-			playout(network_server) {
-		register_nexus();
-	}
-
-	virtual ~GameSession() {
-		unregister_nexus();
-	}
+	explicit GameSession(libv::Nexus& nexus);
+	GameSession(libv::Nexus& nexus, NetworkClient& network_client);
+	GameSession(libv::Nexus& nexus, NetworkServer& network_server);
+	virtual ~GameSession();
 
 private:
 	void register_nexus();

@@ -59,17 +59,27 @@ protected:
 				auto& handler = *static_cast<Handler*>(const_cast<void*>(handler_ptr));
 
 				T object;
-				iar >> LIBV_NVP_NAMED("message", object);
+				iar(LIBV_NVP_NAMED("message", object));
 
 				handler(std::move(object));
 			}};
 	}
 
+//	template <typename Archive, typename Handler, MessageID id>
+//	static constexpr TypeAccessEntry create_entry_bypass() {
+//		return {id, +[](void* iar_ptr, const void* handler_ptr) {
+//			auto& iar = *static_cast<Archive*>(iar_ptr);
+//			auto& handler = *static_cast<Handler*>(const_cast<void*>(handler_ptr));
+//
+//			handler(iar);
+//		}};
+//	}
+
 public:
 	template <typename Archive, typename F>
 	auto decode(Archive& iar, F&& f) {
 		MessageID id;
-		iar >> LIBV_NVP_NAMED("type", id);
+		iar(LIBV_NVP_NAMED("type", id));
 
 		for (const auto& c : CRTP::template gen_table<Archive, std::decay_t<F>>::types)
 			if (c.id == id) {
@@ -82,9 +92,14 @@ public:
 
 	template <typename Archive, typename T>
 	auto encode(Archive& oar, T&& t) {
-		oar << LIBV_NVP_NAMED("type", std::remove_cvref_t<T>::id);
-		oar << LIBV_NVP_NAMED("message", t);
+		oar(LIBV_NVP_NAMED("type", std::remove_cvref_t<T>::id));
+		oar(LIBV_NVP_NAMED("message", t));
 	}
+
+//	template <typename Archive>
+//	auto encode_bypass(Archive& oar, MessageID id) {
+//		oar(LIBV_NVP_NAMED("type", id));
+//	}
 };
 
 // -------------------------------------------------------------------------------------------------

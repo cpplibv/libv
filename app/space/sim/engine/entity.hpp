@@ -24,9 +24,13 @@ private:
 	uint32_t ref_count = 0;
 //	std::atomic_uint32_t ref_count = 0;
 	bool dead_ = false;
+	// TODO P3: dead_ could be stored as ref_count's LSB and increase/decrease ref_count by 2 instead of 1
 
 public:
 	ID id = InvalidID;
+	// TODO P3: entity_ptr system could have an implicit ID based on memory block start index and the offset
+	//			Added bonuses: 0 id could/will be invalid, auto id reuse
+	//			! Not viable, serialization through network would fail, id ID's are not kept in sync
 
 protected:
 	constexpr inline Entity() noexcept = default;

@@ -10,6 +10,7 @@
 #include <libv/ui/component/canvas.hpp>
 // pro
 #include <space/view/camera.hpp>
+#include <space/view/canvas_control.hpp>
 #include <space/view/render/renderer.hpp>
 
 
@@ -18,10 +19,10 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 enum class StyleFlag : uint8_t {
-	WORLD = 1 << 0,
-	FILL = 1 << 1,
-	WIREFRAME = 1 << 2,
-	TWO_SIDED = 1 << 3,
+	WORLD = 1 << 0u,
+	FILL = 1 << 1u,
+	WIREFRAME = 1 << 2u,
+	TWO_SIDED = 1 << 3u,
 
 	DEFAULT = FILL | WORLD
 };
@@ -43,26 +44,21 @@ public:
 public:
 	bool main_canvas;
 	GameSession& game_session;
-	Universe& universe;
+	//Universe& universe;
 	Playout& playout;
+
+	libv::ctrl::Controls& controls; // !!! Should not store it (?) only to bypass controls invalidation issue
 
 	CameraPlayer camera;
 	CameraPlayer::screen_picker screen_picker;
 
 private:
-	float angle = 0.0f;
-	float time = 0.0f;
-	float test_sin_time = 0.0f;
+	std::optional<CanvasControl> controlVar;
 
-public:
-	enum class SelectionMode {
-		none,
-		d25,
-		d3,
-	};
-	SelectionMode selectionMode = SelectionMode::none;
-	libv::vec3f selectionStartGridPoint;
-	libv::vec3f selectionStartDir;
+////private:
+//	float angle = 0.0f;
+	float time = 0.0f;
+//	float test_sin_time = 0.0f;
 
 private:
 	libv::rev::RenderTarget renderTarget;
@@ -70,7 +66,8 @@ private:
 	Renderer& renderer;
 
 public:
-	SpaceCanvas(Renderer& renderer, GameSession& game_session, bool main_canvas);
+	SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, GameSession& game_session, bool main_canvas);
+	~SpaceCanvas();
 
 	void add_debug_point(libv::vec3f a, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
@@ -84,10 +81,17 @@ public:
 			libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
 	void clear_debug_shapes();
 
+public:
+	void enableControls(libv::ctrl::Controls& controls);
+	void disableControls(libv::ctrl::Controls& controls);
+
 private:
 	virtual void attach() override;
 	virtual void update(libv::ui::time_duration delta_time) override;
 	virtual void render(libv::glr::Queue& glr) override;
+	void render_opaque(libv::glr::Queue& glr, libv::vec3f eye, Galaxy& galaxy);
+	void render_background(libv::glr::Queue& glr, Galaxy& galaxy);
+	void render_transparent(libv::glr::Queue& glr, Galaxy& galaxy);
 };
 
 // -------------------------------------------------------------------------------------------------

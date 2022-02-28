@@ -21,7 +21,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view codegen_version = "v3.1.0";
+static constexpr std::string_view codegen_version = "v3.1.1";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ public:
 			out("\n");
 
 		for (const auto& member : clazz.static_members)
-			out("{}\t{} {}{{{}}};\n", ident, member.type, member.identifier, member.init_value);
+			out("{}\tstatic constexpr {} {}{{{}}};\n", ident, member.type, member.identifier, member.init_value);
 		if (!clazz.static_members.empty())
 			out("\n");
 
@@ -261,7 +261,6 @@ public:
 
 		return std::move(os).str();
 	}
-
 };
 
 struct SourceGeneratorLua {

@@ -123,7 +123,7 @@ public:
 class message {
 private:
 	std::vector<std::byte> payload;
-	std::span<const std::byte> view;
+	std::span<const std::byte> view; // Requirement: view cannot be invalidated by a move. Client code depends on it
 	libv::observer_ptr<message_view_proxy> view_proxy = nullptr;
 
 public:

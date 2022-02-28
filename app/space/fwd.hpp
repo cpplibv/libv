@@ -22,7 +22,7 @@ class User;
 
 class MemoryStore;
 
-class GalaxyGenerationSettings;
+class UniverseGenerationSettings;
 
 class Playout;
 class PlayoutDelayBuffer;

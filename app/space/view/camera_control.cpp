@@ -3,7 +3,7 @@
 // hpp
 #include <space/view/camera_control.hpp>
 // libv
-#include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
+#include <libv/ctrl/binding_register.hpp> // Temporary for the default binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/math/linearized.hpp>
@@ -117,7 +117,7 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void CameraControl::bind_default_controls(libv::ctrl::Controls& controls) {
+void CameraControl::bind_default_controls(libv::ctrl::BindingRegister controls) {
 	controls.bind("camera.orbit_distance", "T", -1);
 	controls.bind("camera.orbit_distance", "G");
 	controls.bind("camera.orbit_distance", "Scroll", -1);
@@ -204,7 +204,7 @@ void CameraControl2D::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void CameraControl2D::bind_default_controls(libv::ctrl::Controls& controls) {
+void CameraControl2D::bind_default_controls(libv::ctrl::BindingRegister controls) {
 	controls.bind("camera2D.orbit_distance", "Scroll", -1);
 	controls.bind("camera2D.orbit_distance", "t");
 	controls.bind("camera2D.orbit_distance", "g", -1);

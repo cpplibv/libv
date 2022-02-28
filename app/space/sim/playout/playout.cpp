@@ -2,31 +2,65 @@
 
 // hpp
 #include <space/sim/playout/playout.hpp>
-// libv
-#include <libv/serial/archive/binary.hpp>
+//// libv
+//#include <libv/serial/archive/binary.hpp>
+// pro
+#include <space/sim/simulation.hpp>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-//void Playout::save(libv::archive::Binary::output& ar) const {
-//	const_cast<Playout*>(this)->serialize(ar);
-//}
-//
-//void Playout::load(libv::archive::Binary::input& ar) {
-//	serialize(ar);
-//}
+Playout::Playout() :
+	simulation(std::make_unique<Simulation>()) {
+}
+
+Playout::Playout(NetworkClient& network_client) :
+	network_client(&network_client),
+	simulation(std::make_unique<Simulation>()) {
+}
+
+Playout::Playout(NetworkServer& network_server) :
+	network_server(&network_server),
+	simulation(std::make_unique<Simulation>()) {
+}
+
+Playout::~Playout() {
+	// For the sake of forward declared unique_ptr
+}
 
 // -------------------------------------------------------------------------------------------------
 
-void Playout::update(Universe& universe) {
+//void Playout::process_snapshot(std::shared_ptr<libv::archive::BinaryInput>&& iar) {
+////		SnapshotArchive<libv::archive::BinaryInput> snapshot_ar{*iar, context, SnapshotType::shared};
+////		simulation.loadSnapshot(*iar);
+//	0;
+//}
+
+void Playout::saveSimulationSnapshot(libv::archive::BinaryOutput& ar, SnapshotType mode) const {
+	auto lock = std::unique_lock(mutex);
+
+	simulation->saveSnapshot(ar, mode);
+}
+
+void Playout::loadSimulationSnapshot(libv::archive::BinaryInput& ar, SnapshotType mode) {
+	auto lock = std::unique_lock(mutex);
+
+	simulation->loadSnapshot(ar, mode);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Playout::update(time_duration delta_time) {
 	auto lock = std::unique_lock(mutex);
 
 	for (auto& entry : stateChangeEntries)
-		entry.apply_func(universe, entry.command.get());
+		entry.apply_func(*simulation, entry.command.get());
 
 	stateChangeEntries.clear();
+
+	simulation->update(delta_time); // !!! Sim time not delta time, or playout licensed tick count
 }
 
 // -------------------------------------------------------------------------------------------------

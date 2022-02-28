@@ -155,7 +155,7 @@ ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 }
 
 ContextUI::~ContextUI() {
-	// For forward declared unique_ptr
+	// For the sake of forward declared unique_ptr
 }
 
 // -------------------------------------------------------------------------------------------------

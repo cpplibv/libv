@@ -92,8 +92,8 @@ private:
 		FleetCommandType type;
 		libv::vec3f targetPosition;
 		// <<< Variant?
-		libv::entity_ptr<Planet> targetPlanet{nullptr};
-		libv::entity_ptr<Fleet> targetFleet{nullptr};
+		libv::entity_ptr<Planet> targetPlanet = nullptr;
+		libv::entity_ptr<Fleet> targetFleet = nullptr;
 
 		Command(); /// For de-serialization only
 		Command(FleetCommandType type, libv::vec3f targetPosition);
@@ -114,6 +114,7 @@ private:
 	// - Shield space           waypoint
 	// - Shield planet          friendly planet
 	// - Shield fleet           friendly fleet
+	// - Intercept hostile      - (no target)
 	//
 	// - Merge fleet            own fleet
 	// - Movement               own planet
@@ -125,15 +126,18 @@ private:
 	// - Attack planet          hostile planet
 	// - Blockade planet        hostile planet
 	//
-	// - Split fleet            -
-	// - Follow fleet           -
+	// - Investigate and attack fleet           hostile fleet (When a fleet vision is lost head to last known position change to attack fleet if fleet reacquired)
+	// - Investigate and follow fleet           ?
+	//
+	// - Split fleet            ?
+	// - Follow fleet           ?
 	// - Track/observe fleet    foreign fleet
 	//
 	// - Colonize               inhabited planet
 
 public:
-	libv::vec3f position;
 	std::string name;
+	libv::vec3f position;
 	libv::quatf orientation;
 
 	std::vector<Command> commands;
@@ -145,7 +149,7 @@ public:
 	//soi_type sphere_of_influence;
 
 //	std::vector<Order> order_queue;
-	int32_t number_of_ships;
+	int32_t number_of_ships = 1;
 //	int32_t number_of_big_ships = 3;
 //	int32_t number_of_medium_ships = 3;
 //	int32_t number_of_small_ships = 3;
@@ -155,12 +159,12 @@ public:
 //	std::vector<Tank> tanks;
 
 public:
+	template <typename Archive> void serialize(Archive& ar);
+
+public:
 	Fleet(); /// For de-serialization only
 	Fleet(FleetID id, libv::vec3f position, libv::entity_ptr<Faction> faction);
 	~Fleet();
-
-public:
-	template <typename Archive> void serialize(Archive& ar);
 
 public:
 	[[nodiscard]] constexpr inline float animation_offset() const noexcept {

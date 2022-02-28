@@ -20,12 +20,17 @@ std::string debug_binary_as_json(std::span<const std::byte> message) {
 //		libv::archive::Binary::input iar(message);
 //		libv::archive::JSONAny::output oar(result);
 
-		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
-		SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(false, result);
+//		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
+//		SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(false, result);
 
-		network_codec.decode(iar, [&oar](const auto& object) {
-			network_codec.encode(oar, object);
-		});
+		// !!!
+
+//		libv::archive::BinaryInput iar(message);
+//		libv::archive::JSONAnyOutput oar(result);
+//
+//		network_codec.decode(iar, [&oar](const auto& object) {
+//			network_codec.encode(oar, object);
+//		});
 
 	} catch (const Codec::UnexpectedIDException& e) {
 		if (!message.empty())

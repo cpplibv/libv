@@ -12,7 +12,7 @@ namespace space {
 
 struct SceneMainControl {
 	static void register_controls(libv::ctrl::FeatureRegister controls);
-	static void bind_default_controls(libv::ctrl::Controls& controls);
+	static void bind_default_controls(libv::ctrl::BindingRegister controls);
 };
 
 // -------------------------------------------------------------------------------------------------

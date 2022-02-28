@@ -54,5 +54,10 @@ struct RequestClearPlanets {
 
 // -------------------------------------------------------------------------------------------------
 
+struct ClearControlledFaction {};
+struct ChangeControlledFaction {};
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace mc
 } // namespace space

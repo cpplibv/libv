@@ -30,8 +30,8 @@ input_bytes::input_bytes(const std::span<const std::byte> s) noexcept :
 	input_bytes(reinterpret_cast<const std::byte*>(s.data()), s.size()) {
 }
 
-input_bytes::input_bytes(std::istream& s) noexcept {
-	object = &s;
+input_bytes::input_bytes(std::istream& s) noexcept :
+	object(&s) {
 
 	const auto cur_g = s.tellg();
 	s.seekg(0, std::ios::end);

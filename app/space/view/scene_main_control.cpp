@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 // libv
 #include <libv/ctrl/binding.hpp>
+#include <libv/ctrl/binding_register.hpp> // Temporary for the default binds
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/ui/component/label.hpp>
@@ -27,6 +28,9 @@
 #include <space/sim/engine/snapshot_archive.hpp>
 #include <space/sim/universe.hpp>
 
+#include <libv/utility/nexus.hpp>
+#include <space/message/internal_events.hpp>
+
 
 
 namespace space {
@@ -38,23 +42,29 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		std::vector<std::byte> save_data;
 
 		{
-			SnapshotArchive<libv::archive::BasicBinaryOutput> oar{true, save_data};
-			oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
+//			SnapshotArchive<libv::archive::BasicBinaryOutput> oar{true, save_data};
+//			oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
+			libv::archive::BasicBinaryOutput oar{save_data};
+			ctx.game_session->playout.saveSimulationSnapshot(oar, SnapshotType::local);
 		}
-		{
-			std::string debug_data;
-			{
-				SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(true, debug_data);
-				oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
-			}
-			log_space.info("Saved data: {}", debug_data);
-		}
+//		{
+//			std::string debug_data;
+//			{
+////				SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(true, debug_data);
+////				oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
+////				libv::archive::BasicJSONAnyOutput oar(debug_data);
+////				ctx.game_session->simulation.saveSnapshot(oar, SnapshotType::local);
+////				0;
+//				// !!1
+//			}
+//			log_space.info("Saved data: {}", debug_data);
+//		}
 
 		libv::write_file_or_throw("universe.sav", save_data);
 		// <<< handle write error
 
 		// TODO P4: Place / folder of save file, async write file, more logging, event on saving
-		log_space.info("Saved: {}", "universe.sav");
+		log_space.info("Saved: {} ({} byte)", "universe.sav", save_data.size());
 	});
 
 	controls.feature_action<SceneMain>("space.load", [](libv::ctrl::arg_action, SceneMain& ctx) {
@@ -62,12 +72,18 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		// <<< handle read error
 
 		{
-			SnapshotArchive<libv::archive::BasicBinaryInput> iar{true, save_data};
+			libv::archive::BinaryInput iar{save_data};
+//			SnapshotArchive<libv::archive::BinaryInput> proxy_ar{ar, ctx.game_session->simulation.context, SnapshotType::local};
+//			SnapshotArchive<libv::archive::BinaryInput> proxy_ar{ar, SnapshotType::local};
 
-			iar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
+//			proxy_ar(LIBV_NVP_FORCED("universe", ctx.game_session->universe));
+
+			ctx.nexus.broadcast<mc::ClearControlledFaction>(); // !!!
+			ctx.game_session->playout.loadSimulationSnapshot(iar, SnapshotType::local);
+			ctx.nexus.broadcast<mc::ChangeControlledFaction>(); // !!!
 		}
 
-		log_space.info("Loaded: {}", "universe.sav");
+		log_space.info("Loaded: {} ({} byte)", "universe.sav", save_data.size());
 	});
 
 	controls.feature_binary<SceneMain>("space.show_controls", [](libv::ctrl::arg_binary arg, SceneMain& ctx) {
@@ -101,7 +117,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void SceneMainControl::bind_default_controls(libv::ctrl::Controls& controls) {
+void SceneMainControl::bind_default_controls(libv::ctrl::BindingRegister controls) {
 	controls.bind("space.show_controls", "F1");
 	controls.bind("space.save", "F5");
 	controls.bind("space.load", "F6");

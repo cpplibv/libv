@@ -16,9 +16,26 @@
 #include <space/network/codec.hpp>
 #include <space/network/lobby.hpp>
 #include <space/sim/playout/playout.hpp>
+#include <space/sim/simulation.hpp>
 
 
 namespace space {
+
+// -------------------------------------------------------------------------------------------------
+
+inline std::shared_ptr<libv::archive::BinaryInput> defer_message_processing(libv::net::mtcp::message&& m, libv::archive::BinaryInput&& iar) {
+	struct Storage {
+		libv::net::mtcp::message m;
+		libv::archive::BinaryInput iar;
+
+		inline Storage(libv::net::mtcp::message&& m, libv::archive::BinaryInput&& iar) :
+			m(std::move(m)),
+			iar(std::move(iar)) {}
+	};
+
+	auto result = std::make_shared<Storage>(std::move(m), std::move(iar));
+	return std::shared_ptr<libv::archive::BinaryInput>(std::move(result), &result->iar);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -28,7 +45,8 @@ private:
 
 	GameThread& game_thread;
 	Playout& playout;
-	Universe& universe;
+//	Simulation& simulation;
+//	Universe& universe;
 	Lobby lobby{game_thread};
 
 private:
@@ -37,10 +55,12 @@ public:
 	bool disconnectExpected = false;
 
 public:
-	inline ConnectionHandler(std::string_view server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Universe& universe) :
+//	inline ConnectionHandler(std::string_view server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Simulation& simulation, Universe& universe) :
+	inline ConnectionHandler(std::string_view server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout) :
 			game_thread(game_thread),
 			playout(playout),
-			universe(universe),
+//			simulation(simulation),
+//			universe(universe),
 			name(std::move(name)) {
 		connection.connect_async(libv::net::Address(server_address, server_port));
 	}
@@ -64,20 +84,55 @@ private:
 		log_space.error("[{}] on_connect {}", name, libv::net::to_string(ec));
 	}
 
-	virtual void on_receive(message&& m) override {
-		log_space.trace("[{}] on_receive:\n{}", name, debug_binary_as_json(m.as_bin()));
+	virtual void on_receive(message&& raw_message) override {
+//	virtual void on_receive(message&& m) override {
+		log_space.trace("[{}] on_receive:\n{}", name, debug_binary_as_json(raw_message.as_bin()));
+
 
 		try {
-			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
-			network_codec.decode(iar, [this]<typename T>(T&& message) mutable {
+//			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
+//			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, raw_message.as_bin()};
+			libv::archive::BinaryInput iar{raw_message.as_bin()};
+
+//			struct MessageArchivePack {
+//				message msg;
+//				SnapshotArchive<libv::archive::BasicBinaryInput> iar{SnapshotType::shared, msg.as_bin()};
+//
+//				inline explicit MessageArchivePack(message&& msg) : msg(std::move(msg)) {}
+//			};
+//
+//			MessageArchivePack marp{std::move(m)};
+
+			network_codec.decode(iar, [this, &raw_message, &iar]<typename T>(T&& message) mutable {
 				if constexpr(std::is_same_v<T, SnapshotLobby>)
 					lobby.process(std::move(message));
 
-				else if constexpr(std::is_same_v<T, SnapshotUniverse>) {
-					game_thread.execute([&, snapshot = std::make_shared<SnapshotUniverse>(std::move(message))] mutable {
-						// NOTE: shared_ptr is required as std::function requires copy ctor, maybe a switch to unique_function would solve this
-						static_cast<SnapshotUniverse&>(universe) = std::move(*snapshot);
-					});
+//				else if constexpr(std::is_same_v<T, SnapshotUniverse>) {
+//					game_thread.execute([&, snapshot = std::make_shared<SnapshotUniverse>(std::move(message))] mutable {
+//						// NOTE: shared_ptr is required as std::function requires copy ctor, maybe a switch to unique_function would solve this
+//						static_cast<SnapshotUniverse&>(universe) = std::move(*snapshot);
+//					});
+//				}
+				else if constexpr(std::is_same_v<T, SimulationSnapshotTag>) {
+//					playout.process_snapshot(defer_message_processing(std::move(raw_message), std::move(iar)));
+//					playout.loadSimulationSnapshot(defer_message_processing(std::move(raw_message), std::move(iar)));
+					playout.loadSimulationSnapshot(iar, SnapshotType::shared);
+
+//					const auto raw_message_bytes = raw_message.as_bin();
+//					const auto raw_message_consumed = iar.tell_it();
+//					const auto raw_message_left = raw_message_bytes.subspan(raw_message_consumed);
+//					playout.process_snapshot(std::move(raw_message), raw_message_left);
+
+//					playout.process_snapshot(std::move(message), std::move(iar), std::move(raw_message));
+//					game_thread.execute([raw_message = std::move(raw_message), it = iar.tell_it()] mutable {
+////						iar.
+//						// NOTE: shared_ptr is required as std::function requires copy ctor, maybe a switch to unique_function would solve this
+////						static_cast<SnapshotUniverse&>(universe) = std::move(*snapshot);
+////						simulation.loadSnapshot(iar);
+//						const auto raw_message_bytes = raw_message.as_bin();
+//						const auto raw_message_left = raw_message_bytes.last(raw_message_bytes.size() - it);
+//						simulation.loadSnapshot(raw_message_left);
+//					});
 				}
 				else if constexpr(requires { typename T::lobby_command; })
 					lobby.process(std::move(message));
@@ -137,14 +192,18 @@ struct ImplNetworkClient {
 	libv::net::IOContext io_context{2};
 	Connection connection;
 
-	ImplNetworkClient(std::string server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Universe& universe) :
-			connection(io_context, std::move(server_address), server_port, std::move(name), game_thread, playout, universe) {}
+//	ImplNetworkClient(std::string server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Simulation& simulation, Universe& universe) :
+//			connection(io_context, std::move(server_address), server_port, std::move(name), game_thread, playout, simulation, universe) {}
+	ImplNetworkClient(std::string server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout) :
+			connection(io_context, std::move(server_address), server_port, std::move(name), game_thread, playout) {}
 };
 
 // =================================================================================================
 
-NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& user) :
-		self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, user.name, game_thread, playout, universe)) {
+//NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, Simulation& simulation, Universe& universe, User& user) :
+//		self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, user.name, game_thread, playout, simulation, universe)) {
+NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, User& user) :
+		self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, user.name, game_thread, playout)) {
 }
 
 NetworkClient::~NetworkClient() {

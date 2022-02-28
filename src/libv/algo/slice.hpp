@@ -33,7 +33,7 @@ namespace libv {
 	return std::string_view{str.data() + index_lo, length};
 }
 
-/// Returns a string_view to the sub-string of the
+/// Returns a string_view to the sub-string of the -
 /// - prefixing `abs(\c cut)` characters if \c cut is positive or
 /// - suffixing `abs(\c cut)` characters if \c cut is negative
 /// If `abs(\c cut)` is greater then the length of the string, the whole string will be returned
@@ -48,7 +48,7 @@ namespace libv {
 		return slice_view(str, 0, cut);
 }
 
-/// Returns a string_view to the sub-string of the
+/// Returns a string_view to the sub-string of the -
 /// - prefixing `abs(\c cut)` characters cut off if \c cut is positive or
 /// - suffixing `abs(\c cut)` characters cut off if \c cut is negative
 /// If `abs(\c cut)` is greater then the length of the string, an empty string will be returned

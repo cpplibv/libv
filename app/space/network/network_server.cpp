@@ -12,16 +12,16 @@
 #include <space/network/codec.hpp>
 #include <space/sim/playout/playout.hpp>
 #include <space/sim/universe.hpp>
+#include <space/sim/simulation.hpp>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-NetworkLobby::NetworkLobby(GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user) :
+NetworkLobby::NetworkLobby(GameThread& game_thread, Playout& playout, User& hosting_user) :
 	game_thread(game_thread),
-	playout(playout),
-	universe(universe) {
+	playout(playout) {
 
 	// Self join the hosted lobby
 	const auto program_version = 0; // TODO P1: Fetch global version
@@ -49,7 +49,17 @@ void NetworkLobby::join(libv::net::mtcp::Connection<NetworkPeer> peer, std::stri
 
 	lobby.process(std::move(join_event));
 	peer.connection().send_async(network_encode(static_cast<SnapshotLobby&>(lobby)));
-	peer.connection().send_async(network_encode(static_cast<SnapshotUniverse&>(universe)));
+
+//	peer.connection().send_async(network_encode(static_cast<SnapshotUniverse&>(universe)));
+	{
+		std::vector<std::byte> result;
+		{
+			libv::archive::BinaryOutput oar{result};
+			network_codec.encode(oar, SimulationSnapshotTag{});
+			playout.saveSimulationSnapshot(oar, SnapshotType::shared);
+		}
+		peer.connection().send_async(std::move(result));
+	}
 //	peer.connection().send_async(network_encode(SnapshotUniverse(universe)));
 //	peer.connection().send_async(network_encode(universe));
 
@@ -214,8 +224,10 @@ void AcceptorHandler::on_accept(error_code ec) {
 
 // =================================================================================================
 
-NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user) :
-	self(std::make_unique<ImplNetworkServer>(std::make_shared<NetworkLobby>(game_thread, playout, universe, hosting_user))) {
+//NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user) :
+//	self(std::make_unique<ImplNetworkServer>(std::make_shared<NetworkLobby>(game_thread, playout, universe, hosting_user))) {
+NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, User& hosting_user) :
+	self(std::make_unique<ImplNetworkServer>(std::make_shared<NetworkLobby>(game_thread, playout, hosting_user))) {
 
 	if (auto ec = self->acceptor.acceptor().listen(server_port, 4))
 		throw std::system_error(ec);

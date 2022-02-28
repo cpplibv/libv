@@ -51,7 +51,8 @@ class NetworkServer {
 	std::unique_ptr<ImplNetworkServer> self;
 
 public:
-	NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& user);
+//	NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& user);
+	NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, User& user);
 	~NetworkServer();
 
 public:

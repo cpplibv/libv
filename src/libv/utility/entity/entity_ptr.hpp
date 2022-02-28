@@ -184,7 +184,7 @@ public:
 		ctx->destroy(tmp);
 	}
 
-private:
+protected:
 	explicit constexpr inline entity_ptr(T* ptr) noexcept : ptr(ptr) {
 		assert(ptr != nullptr && "Internal error: Entity_ptr cannot be null on direct construction");
 		++entity_access::ref_count(*ptr);
@@ -193,11 +193,16 @@ private:
 public:
 	constexpr inline entity_ptr() noexcept = default;
 
-	explicit(false) constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
+	explicit(false) constexpr inline entity_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 
 	constexpr inline entity_ptr(const entity_ptr& other) noexcept : ptr(other.ptr) {
 		if (ptr != nullptr)
 			++entity_access::ref_count(*ptr);
+	}
+
+	constexpr inline entity_ptr& operator=(std::nullptr_t) & noexcept {
+		reset();
+		return *this;
 	}
 
 	constexpr inline entity_ptr& operator=(const entity_ptr& other) & noexcept {
@@ -224,6 +229,27 @@ public:
 
 		reset();
 		ptr = other.ptr;
+		other.ptr = nullptr;
+		return *this;
+	}
+
+	explicit(false) constexpr inline entity_ptr(const primary_entity_ptr<T>& other) noexcept :
+		entity_ptr(static_cast<const entity_ptr&>(other)) { }
+
+	constexpr inline entity_ptr& operator=(const primary_entity_ptr<T>& other) & noexcept {
+		return *this = static_cast<const entity_ptr&>(other);
+	}
+
+	explicit(false) constexpr inline entity_ptr(primary_entity_ptr<T>&& other) noexcept :
+		ptr(other.get()) {
+		other.kill();
+		other.ptr = nullptr;
+	}
+
+	constexpr inline entity_ptr& operator=(primary_entity_ptr<T>&& other) & noexcept {
+		reset();
+		ptr = other.ptr;
+		other.kill();
 		other.ptr = nullptr;
 		return *this;
 	}
@@ -284,6 +310,62 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
+struct primary_entity_ptr : public entity_ptr<T> {
+	friend entity_store<T>;
+
+private:
+	explicit constexpr inline primary_entity_ptr(T* ptr) noexcept : entity_ptr<T>(ptr) {}
+
+public:
+	constexpr inline primary_entity_ptr() noexcept = default;
+
+	constexpr inline primary_entity_ptr(const primary_entity_ptr&) noexcept = delete;
+	constexpr inline primary_entity_ptr& operator=(const primary_entity_ptr&) & noexcept = delete;
+	constexpr inline primary_entity_ptr(primary_entity_ptr&&) noexcept = default;
+	constexpr inline primary_entity_ptr& operator=(primary_entity_ptr&& other) & noexcept {
+		kill();
+		static_cast<entity_ptr<T>&>(*this) = static_cast<entity_ptr<T>&&>(other);
+		return *this;
+	}
+
+	explicit(false) constexpr inline primary_entity_ptr(std::nullptr_t) noexcept : entity_ptr<T>(nullptr) { }
+
+	void reset() {
+		kill();
+		entity_ptr<T>::reset();
+	}
+
+	void kill() {
+		if constexpr (requires { this->get()->kill(); } )
+			if (this->get() != nullptr)
+				this->get()->kill();
+	}
+
+	~primary_entity_ptr() {
+		kill();
+	}
+
+public:
+	[[nodiscard]] friend constexpr inline std::strong_ordering operator<=>(const primary_entity_ptr& lhs, const primary_entity_ptr& rhs) noexcept = default;
+	[[nodiscard]] friend constexpr inline bool operator==(const primary_entity_ptr& lhs, const primary_entity_ptr& rhs) noexcept = default;
+
+	[[nodiscard]] friend constexpr inline bool operator==(const primary_entity_ptr& p, std::nullptr_t) noexcept {
+		return p.ptr == nullptr;
+	}
+	[[nodiscard]] friend constexpr inline bool operator==(std::nullptr_t, const primary_entity_ptr& p) noexcept {
+		return nullptr == p.ptr;
+	}
+	[[nodiscard]] friend constexpr inline bool operator!=(const primary_entity_ptr& p, std::nullptr_t) noexcept {
+		return p.ptr != nullptr;
+	}
+	[[nodiscard]] friend constexpr inline bool operator!=(std::nullptr_t, const primary_entity_ptr& p) noexcept {
+		return nullptr != p.ptr;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
 struct entity_store : private BaseContextBlockArena {
 	friend entity_ptr<T>;
 
@@ -323,7 +405,14 @@ public:
 
 public:
 	template <typename... Args>
-	[[nodiscard]] inline entity_ptr<T> create(Args&&... args) {
+	[[nodiscard]] inline primary_entity_ptr<T> create(Args&&... args) {
+		auto ptr = as_aligned<T>(BaseContextBlockArena::alloc());
+		::new (ptr) T(std::forward<Args>(args)...);
+		return primary_entity_ptr{ptr};
+	}
+
+	template <typename... Args>
+	[[nodiscard]] inline entity_ptr<T> create_secondary(Args&&... args) {
 		auto ptr = as_aligned<T>(BaseContextBlockArena::alloc());
 		::new (ptr) T(std::forward<Args>(args)...);
 		return entity_ptr{ptr};

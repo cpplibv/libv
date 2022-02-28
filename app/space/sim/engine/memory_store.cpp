@@ -25,13 +25,10 @@ MemoryStore::MemoryStore() :
 MemoryStore::MemoryStore(MemoryStore&& other) noexcept = default;
 
 MemoryStore& MemoryStore::operator=(MemoryStore&& other) & noexcept {
-	log_space.error_if(faction.size() != 0, "Object leak detected in faction entity_store. Leaked {} entity", faction.size());
+	checkLeak();
+
 	faction = std::move(other.faction);
-
-	log_space.error_if(planet.size() != 0, "Object leak detected in planet entity_store. Leaked {} entity", planet.size());
 	planet = std::move(other.planet);
-
-	log_space.error_if(fleet.size() != 0, "Object leak detected in fleet entity_store. Leaked {} entity", fleet.size());
 	fleet = std::move(other.fleet);
 
 	return *this;
@@ -39,12 +36,15 @@ MemoryStore& MemoryStore::operator=(MemoryStore&& other) & noexcept {
 
 MemoryStore::~MemoryStore() {
 	log_space.trace("Faction terminating capacity: {}", faction.capacity());
-	log_space.error_if(faction.size() != 0, "Object leak detected in faction entity_store. Leaked {} entity", faction.size());
-
 	log_space.trace("Planet terminating capacity: {}", planet.capacity());
-	log_space.error_if(planet.size() != 0, "Object leak detected in planet entity_store. Leaked {} entity", planet.size());
-
 	log_space.trace("Fleet terminating capacity: {}", fleet.capacity());
+
+	checkLeak();
+}
+
+void MemoryStore::checkLeak() const {
+	log_space.error_if(faction.size() != 0, "Object leak detected in faction entity_store. Leaked {} entity", faction.size());
+	log_space.error_if(planet.size() != 0, "Object leak detected in planet entity_store. Leaked {} entity", planet.size());
 	log_space.error_if(fleet.size() != 0, "Object leak detected in fleet entity_store. Leaked {} entity", fleet.size());
 }
 

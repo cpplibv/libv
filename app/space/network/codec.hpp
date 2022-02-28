@@ -11,9 +11,11 @@
 // pro
 #include <space/message/cto.hpp>
 #include <space/network/lobby.hpp> // TODO P2: Find a better place for SnapshotLobby
-#include <space/sim/engine/snapshot_archive.hpp>
-#include <space/sim/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
-#include <space/sim/universe_serial.hpp> // TODO P2: Find a better place for SnapshotUniverse
+//#include <space/sim/engine/snapshot_archive.hpp>
+//#include <space/sim/engine/snapshot_type.hpp>
+#include <space/sim/engine/simulation_snapshot_tag.hpp>
+//#include <space/sim/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
+//#include <space/sim/universe_serial.hpp> // TODO P2: Find a better place for SnapshotUniverse
 //#include <space/network/nto.hpp>
 
 
@@ -36,7 +38,8 @@ struct Codec : libv::serial::Codec3<Codec> {
 
 				create_entry<Ar, F, SnapshotLobby>(),
 
-				create_entry<Ar, F, SnapshotUniverse>(),
+//				create_entry<Ar, F, SnapshotUniverse>(),
+				create_entry<Ar, F, SimulationSnapshotTag>(), // SnapshotUniverse
 
 				create_entry<Ar, F, CTO_ChatMessage>(),
 				create_entry<Ar, F, CTO_ClientJoined>(),
@@ -78,7 +81,8 @@ template <typename T>
 std::vector<std::byte> network_encode(const T& message) {
 	std::vector<std::byte> result;
 	{
-		SnapshotArchive<libv::archive::BasicBinaryOutput> oar{false, result};
+//		SnapshotArchive<libv::archive::BasicBinaryOutput> oar{SnapshotType::shared, result};
+		libv::archive::BinaryOutput oar{result};
 		network_codec.encode(oar, message);
 	}
 	return result;
@@ -87,10 +91,33 @@ std::vector<std::byte> network_encode(const T& message) {
 template <typename F>
 void network_decode(std::span<const std::byte> message, F& handler) {
 	{
-		SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, message};
+//		SnapshotArchive<libv::archive::BasicBinaryInput> iar{SnapshotType::shared, message};
+		libv::archive::BinaryInput iar{message};
 		network_codec.decode(iar, handler);
 	}
 }
+
+//struct Codec {
+//	void encode(T&& var) {
+////			requires (encodeable)
+//
+//		SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
+//
+//		int64_t type;
+//		iar & LIBV_NVP(type);
+//	}
+//	void decode(T&& var) {
+////			requires (encodeable)
+//
+//		SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
+//
+//		int64_t type;
+//		iar & LIBV_NVP(type);
+//	}
+//	void foo(auto& ar) {
+//		codec.reg()
+//	}
+//};
 
 // -------------------------------------------------------------------------------------------------
 

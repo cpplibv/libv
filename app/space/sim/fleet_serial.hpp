@@ -9,6 +9,7 @@
 #include <libv/math/vec_serial.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_string.hpp>
+#include <libv/serial/types/std_vector.hpp>
 // pro
 #include <space/sim/engine/serial_id.hpp>
 #include <space/sim/faction.hpp> // Only for SerialID id
@@ -29,8 +30,8 @@ template <typename Archive> void Fleet::Command::serialize(Archive& ar) {
 
 template <typename Archive> void Fleet::serialize(Archive& ar) {
 	ar & LIBV_NVP(id);
-	ar & LIBV_NVP(position);
 	ar & LIBV_NVP(name);
+	ar & LIBV_NVP(position);
 	ar & LIBV_NVP(orientation);
 	ar & LIBV_NVP(commands);
 

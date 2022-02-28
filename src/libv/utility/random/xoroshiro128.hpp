@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/utility/random/xoroshiro128_fwd.hpp>
 // std
 #include <bit>
 #include <cassert>

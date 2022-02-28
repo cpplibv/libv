@@ -10,6 +10,7 @@
 #include <libv/serial/types/std_chrono.hpp>
 #include <libv/serial/types/std_deque.hpp>
 #include <libv/serial/types/std_memory.hpp>
+#include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
@@ -31,6 +32,7 @@ struct SnapshotLobby {
 
 protected:
 	struct Client {
+//		User user;
 		UserID userID;
 		std::string name;
 		std::chrono::system_clock::time_point joined_at;

@@ -14,6 +14,7 @@
 #include <string>
 // pro
 #include <space/network/lobby.hpp>
+#include <space/sim/fwd.hpp>
 #include <space/sim/ids.hpp>
 
 
@@ -34,11 +35,13 @@ private:
 public:
 	GameThread& game_thread;
 	Playout& playout;
-	Universe& universe;
+//	Universe& universe;
+//	Simulation& simulation;
 	Lobby lobby{game_thread};
 
 public:
-	explicit NetworkLobby(GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user);
+//	explicit NetworkLobby(GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user);
+	explicit NetworkLobby(GameThread& game_thread, Playout& playout, User& hosting_user);
 
 private:
 	void _broadcast(std::vector<std::byte>&& msg);

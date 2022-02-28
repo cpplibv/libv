@@ -16,6 +16,7 @@ std::string generate_random_name(std::size_t length);
 // -------------------------------------------------------------------------------------------------
 
 struct User {
+//	UserID userID;
 	std::string name = generate_random_name(5);
 };
 

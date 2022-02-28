@@ -9,18 +9,20 @@
 #include <libv/utility/random/uniform_distribution.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>
 // pro
+//#include <space/sim/engine/memory_store.hpp>
+#include <space/sim/engine/simulation_context.hpp>
 #include <space/sim/faction.hpp>
 #include <space/sim/galaxy.hpp>
 #include <space/sim/planet.hpp>
-#include <space/sim/engine/memory_store.hpp>
+#include <space/sim/universe.hpp>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::entity_ptr<Planet> generatePlanet(MemoryStore& memory, PlanetID id, libv::vec3f position, libv::xoroshiro128& rng_planet) {
-	auto planet = memory.planet.create(id, position);
+libv::primary_entity_ptr<Planet> generatePlanet(const std::shared_ptr<SimulationContext>& ctx, PlanetID id, libv::vec3f position, libv::xoroshiro128& rng_planet) {
+	auto planet = ctx->memory.planet.create(id, position);
 
 	planet->radius = libv::normal998_clamp(rng_planet, 0.3f, 0.2f);
 
@@ -42,8 +44,9 @@ libv::entity_ptr<Planet> generatePlanet(MemoryStore& memory, PlanetID id, libv::
 	return planet;
 }
 
-Galaxy generateGalaxy(MemoryStore& memory, GalaxyGenerationSettings settings) {
-	Galaxy galaxy(memory);
+Universe generateGalaxy(const std::shared_ptr<SimulationContext>& ctx, UniverseGenerationSettings settings) {
+//	Galaxy galaxy(memory);
+	Universe universe(ctx);
 	auto galaxy_rng = libv::xoroshiro128(settings.seed);
 
 	for (int i = 0; i < settings.numPlanet; ++i) {
@@ -56,12 +59,12 @@ Galaxy generateGalaxy(MemoryStore& memory, GalaxyGenerationSettings settings) {
 		const auto position = libv::vec3f{x0, y0, z0};
 
 		auto rng_planet = galaxy_rng.fork();
-		galaxy.planets.push_back(generatePlanet(memory, galaxy.nextPlanetID++, position, rng_planet));
+		universe.galaxy.planets.emplace_back(generatePlanet(ctx, universe.nextPlanetID++, position, rng_planet));
 		// <<< Assign Neutral faction in a better way
-		galaxy.planets.back()->faction = galaxy.factionNeutral();
+		universe.galaxy.planets.back()->faction = universe.factionNeutral();
 	}
 
-	return galaxy;
+	return universe;
 }
 
 // -------------------------------------------------------------------------------------------------

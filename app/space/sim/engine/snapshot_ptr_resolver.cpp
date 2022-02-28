@@ -5,6 +5,7 @@
 // libv
 #include <libv/algo/linear_find.hpp>
 // pro
+#include <space/log.hpp>
 #include <space/sim/faction.hpp>
 #include <space/sim/fleet.hpp>
 #include <space/sim/planet.hpp>
@@ -15,19 +16,24 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: log_space.error_if most likely should be an exception
+
 libv::entity_ptr<Faction> SnapshotPtrResolverArchive::resolve(FactionID id) const {
-	auto opt = libv::linear_find_optional(universe.galaxy.factions, id, &Faction::id);
-	return opt ? *opt : libv::entity_ptr<Faction>(nullptr);
+	auto opt = libv::linear_find_optional(universe.factions, id, &Faction::id);
+	log_space.error_if(!opt, "Failed to resolve FactionID: {}", +id);
+	return opt ? libv::entity_ptr<Faction>(*opt) : libv::entity_ptr<Faction>(nullptr);
 }
 
 libv::entity_ptr<Planet> SnapshotPtrResolverArchive::resolve(PlanetID id) const {
 	auto opt = libv::linear_find_optional(universe.galaxy.planets, id, &Planet::id);
-	return opt ? *opt : libv::entity_ptr<Planet>(nullptr);
+	log_space.error_if(!opt, "Failed to resolve PlanetID: {}", +id);
+	return opt ? libv::entity_ptr<Planet>(*opt) : libv::entity_ptr<Planet>(nullptr);
 }
 
 libv::entity_ptr<Fleet> SnapshotPtrResolverArchive::resolve(FleetID id) const {
 	auto opt = libv::linear_find_optional(universe.galaxy.fleets, id, &Fleet::id);
-	return opt ? *opt : libv::entity_ptr<Fleet>(nullptr);
+	log_space.error_if(!opt, "Failed to resolve FleetID: {}", +id);
+	return opt ? libv::entity_ptr<Fleet>(*opt) : libv::entity_ptr<Fleet>(nullptr);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-struct GalaxyGenerationSettings {
+struct UniverseGenerationSettings {
 	uint64_t seed = 0x5EED;
 //	int numPlanet = 1000;
 	int numPlanet = 250;

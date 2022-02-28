@@ -6,8 +6,8 @@
 #include <libv/serial/archive/binary_fwd.hpp>
 // ext
 #include <cereal/cereal.hpp>
+#include <cereal/concept.hpp>
 // libv
-#include <libv/meta/derived_from_specialization.hpp>
 #include <libv/meta/lnv.hpp>
 #include <libv/utility/bytes/input_bytes.hpp>
 #include <libv/utility/bytes/output_bytes.hpp>
@@ -38,6 +38,7 @@ class BasicBinaryInput :
 		public cereal::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP> {
 public:
 	using ArchiveType = libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>;
+	using Base = cereal::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>;
 
 private:
 	libv::input_bytes input_stream;
@@ -46,12 +47,21 @@ private:
 public:
 	/// Construct, loading from the provided stream
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
-	explicit BasicBinaryInput(libv::input_bytes input) :
-			cereal::InputArchive<ArchiveType, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>(static_cast<ArchiveType*>(this)),
+	explicit inline BasicBinaryInput(libv::input_bytes input) :
 			input_stream(input) {
 	}
 
-	~BasicBinaryInput() noexcept = default;
+	BasicBinaryInput(const BasicBinaryInput&) = delete;
+	BasicBinaryInput& operator=(const BasicBinaryInput&) & = delete;
+	inline BasicBinaryInput(BasicBinaryInput&&) noexcept = default;
+	inline BasicBinaryInput& operator=(BasicBinaryInput&&) & noexcept = default;
+
+	inline ~BasicBinaryInput() noexcept = default;
+
+public:
+	[[nodiscard]] inline std::size_t tell_it() const noexcept {
+		return input_it;
+	}
 
 	template <std::size_t DataSize>
 	inline void loadBinary(void* const data, std::size_t size) {
@@ -65,6 +75,38 @@ public:
 			for (std::size_t i = 0; i < size; i += DataSize)
 				detail::swap_bytes<DataSize>(reinterpret_cast<std::byte*>(data) + i);
 	}
+
+	// --- process_as remapping ------------------------------------------------------------------------
+public:
+	using Base::process_as;
+
+	template <class As, typename T>
+	inline void process_as(As& as, cereal::NameValuePair<T>& t) {
+		as(t.value);
+	}
+
+	template <class As, typename T>
+	inline void process_as(As& as, cereal::SizeTag<T>& t) {
+		as(t.size);
+	}
+
+	template <class As, cereal::arithmetic T>
+	inline void process_as(As&, T& t) {
+		static_assert(!std::is_floating_point_v<T> || std::numeric_limits<T>::is_iec559,
+				"Portable binary only supports IEEE 754 standardized floating point");
+
+		loadBinary<sizeof(T)>(std::addressof(t), sizeof(t));
+	}
+
+	template <class As, class T>
+	inline void process_as(As&, cereal::BinaryData<T>& t) {
+		using TT = std::remove_pointer_t<T>;
+
+		static_assert(!std::is_floating_point_v<TT> || std::numeric_limits<TT>::is_iec559,
+				"Portable binary only supports IEEE 754 standardized floating point");
+
+		loadBinary<sizeof(TT)>(t.data, static_cast<std::streamsize>(t.size));
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -74,6 +116,7 @@ class BasicBinaryOutput :
 		public cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP> {
 public:
 	using ArchiveType = libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>;
+	using Base = cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>;
 
 private:
 	libv::output_bytes output_stream;
@@ -82,12 +125,21 @@ private:
 public:
 	/// Construct, outputting to the provided stream
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
-	explicit BasicBinaryOutput(libv::output_bytes output) :
-			cereal::OutputArchive<ArchiveType, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>(static_cast<ArchiveType*>(this)),
+	explicit inline BasicBinaryOutput(libv::output_bytes output) :
 			output_stream(output) {
 	}
 
-	~BasicBinaryOutput() noexcept = default;
+	BasicBinaryOutput(const BasicBinaryOutput&) = delete;
+	BasicBinaryOutput& operator=(const BasicBinaryOutput&) & = delete;
+	inline BasicBinaryOutput(BasicBinaryOutput&&) noexcept = default;
+	inline BasicBinaryOutput& operator=(BasicBinaryOutput&&) & noexcept = default;
+
+	inline ~BasicBinaryOutput() noexcept = default;
+
+public:
+	[[nodiscard]] inline std::size_t tell_it() const noexcept {
+		return output_it;
+	}
 
 	template <std::size_t DataSize>
 	inline void saveBinary(const void* const data, std::size_t size) {
@@ -113,82 +165,39 @@ public:
 //		if (writtenSize != size)
 //			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
 	}
+
+	// --- process_as remapping ------------------------------------------------------------------------
+public:
+	using Base::process_as;
+
+	template <class As, typename T>
+	inline void process_as(As& as, const cereal::NameValuePair<T>& t) {
+		as(t.value);
+	}
+
+	template <class As, typename T>
+	inline void process_as(As& as, const cereal::SizeTag<T>& t) {
+		as(t.size);
+	}
+
+	template <class As, cereal::arithmetic T>
+	inline void process_as(As&, const T& t) {
+		static_assert(!std::is_floating_point_v<T> || std::numeric_limits<T>::is_iec559,
+				"Portable binary only supports IEEE 754 standardized floating point");
+
+		saveBinary<sizeof(T)>(std::addressof(t), sizeof(t));
+	}
+
+	template <class As, class T>
+	inline void process_as(As&, const cereal::BinaryData<T>& t) {
+		using TT = std::remove_pointer_t<T>;
+
+		static_assert(!std::is_floating_point_v<TT> || std::numeric_limits<TT>::is_iec559,
+				"Portable binary only supports IEEE 754 standardized floating point");
+
+		saveBinary<sizeof(TT)>(t.data, static_cast<std::streamsize>(t.size));
+	}
 };
-
-// -------------------------------------------------------------------------------------------------
-// Common BinaryArchive serialization functions (Found by ADL)
-
-/// Loading for POD types from portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryInput>
-inline typename std::enable_if<std::is_arithmetic<T>::value, void>::type
-CEREAL_LOAD_FUNCTION_NAME(Archive& ar, T& t) {
-	static_assert(!std::is_floating_point<T>::value ||
-					(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
-			"Portable binary only supports IEEE 754 standardized floating point");
-	ar.template loadBinary<sizeof(T)>(std::addressof(t), sizeof(t));
-}
-
-/// Saving for POD types to portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryOutput>
-inline typename std::enable_if<std::is_arithmetic<T>::value, void>::type
-CEREAL_SAVE_FUNCTION_NAME(Archive& ar, T const& t) {
-	static_assert(!std::is_floating_point<T>::value ||
-					(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
-			"Portable binary only supports IEEE 754 standardized floating point");
-	ar.template saveBinary<sizeof(T)>(std::addressof(t), sizeof(t));
-}
-
-/// Serializing NVP types to portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryInput>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::NameValuePair<T>& t) {
-	ar(t.value);
-}
-
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryOutput>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::NameValuePair<T>& t) {
-	ar(t.value);
-}
-
-/// Serializing SizeTags to portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryInput>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::SizeTag<T>& t) {
-	ar(t.size);
-}
-
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryOutput>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::SizeTag<T>& t) {
-	ar(t.size);
-}
-
-/// Loading binary data from portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryInput>
-inline void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cereal::BinaryData<T>& bd) {
-	using TT = typename std::remove_pointer<T>::type;
-	static_assert(!std::is_floating_point<TT>::value ||
-					(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
-			"Portable binary only supports IEEE 754 standardized floating point");
-
-	ar.template loadBinary<sizeof(TT)>(bd.data, static_cast<std::size_t>(bd.size));
-}
-
-/// Saving binary data to portable binary
-template <typename Archive, typename T>
-	requires libv::meta::derived_from_specialization<Archive, BasicBinaryOutput>
-inline void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, cereal::BinaryData<T> const& bd) {
-	using TT = typename std::remove_pointer<T>::type;
-	static_assert(!std::is_floating_point<TT>::value ||
-					(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
-			"Portable binary only supports IEEE 754 standardized floating point");
-
-	ar.template saveBinary<sizeof(TT)>(bd.data, static_cast<std::size_t>(bd.size));
-}
 
 // -------------------------------------------------------------------------------------------------
 
