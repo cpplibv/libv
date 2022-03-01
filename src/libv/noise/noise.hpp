@@ -8,17 +8,18 @@
 
 
 namespace libv {
+using Seed = uint32_t;
 
 //float, double, libv::vec4f, libv::vec4d
 template <typename T>
-[[nodiscard]] T noise_value(int seed, T x, T y) noexcept {
+[[nodiscard]] T noise_value(Seed seed, T x, T y) noexcept {
 	int x0 = static_cast<int>(std::floor(x));
 	int y0 = static_cast<int>(std::floor(y));
 //	int x0 = fastFloor(x);
 //	int y0 = fastFloor(y);
 
-	T xs = hermiteInterp(static_cast<T>(x - x0));
-	T ys = hermiteInterp(static_cast<T>(y - y0));
+	T xs = hermiteInterp(x - static_cast<T>(x0));
+	T ys = hermiteInterp(y - static_cast<T>(y0));
 
 	x0 *= PrimeX;
 	y0 *= PrimeY;
@@ -31,16 +32,16 @@ template <typename T>
 	return lerp(xf0, xf1, ys);
 }
 
-[[nodiscard]] float noise_value(int seed, float x, float y, float z) noexcept;
+[[nodiscard]] float noise_value(Seed seed, float x, float y, float z) noexcept;
 
 //float, double, libv::vec4f, libv::vec4d
 template <typename T>
-[[nodiscard]] float noise_perlin(int seed, T x, T y) noexcept {
+[[nodiscard]] float noise_perlin(Seed seed, T x, T y) noexcept {
 	int x0 = static_cast<int>(std::floor(x));
 	int y0 = static_cast<int>(std::floor(y));
 
-	auto xd0 = static_cast<T>(x - x0);
-	auto yd0 = static_cast<T>(y - y0);
+	auto xd0 = x - static_cast<T>(x0);
+	auto yd0 = y - static_cast<T>(y0);
 	T xd1 = xd0 - 1;
 	T yd1 = yd0 - 1;
 
@@ -59,7 +60,7 @@ template <typename T>
 }
 
 template <typename T>
-[[nodiscard]] float noise_simplex(int seed, T x, T y) noexcept {
+[[nodiscard]] float noise_simplex(Seed seed, T x, T y) noexcept {
 	// 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
 
 	const float SQRT3 = 1.7320508075688772935274463415059f;
@@ -73,18 +74,18 @@ template <typename T>
 	*/
 
 	//x = x-y;
-	x = x+y*0.5f;//!!!
+	x = x + y * 0.5f;//!!!
 //	y = y + x*0.5f;
 	//y = y+x;
 
-	int i = FastFloor(x);
-	int j = FastFloor(y);
-	float xi = (float)(x - i);
-	float yi = (float)(y - j);
+	int i = static_cast<int>(std::floor(x));
+	int j = static_cast<int>(std::floor(y));
+	float xi =  x - static_cast<float>(i);
+	float yi = y - static_cast<float>(j);
 
 	float t = (xi + yi) * G2;
-	float x0 = (float)(xi - t);
-	float y0 = (float)(yi - t);
+	float x0 = xi - static_cast<float>(t);
+	float y0 = yi - static_cast<float>(t);
 
 	i *= PrimeX;
 	j *= PrimeY;
@@ -97,26 +98,25 @@ template <typename T>
 		n0 = (a * a) * (a * a) * gradCoord(seed, i, j, x0, y0);
 	}
 
-	float c = (float)(2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + ((float)(-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
+	float c = static_cast<float> (2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + (static_cast<float> (-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
 	if (c <= 0) n2 = 0;
 	else {
-		float x2 = x0 + (2 * (float)G2 - 1);
-		float y2 = y0 + (2 * (float)G2 - 1);
+		float x2 = x0 + (2 * static_cast<float> (G2) - 1);
+		float y2 = y0 + (2 * static_cast<float> (G2) - 1);
 		n2 = (c * c) * (c * c) * gradCoord(seed, i + PrimeX, j + PrimeY, x2, y2);
 	}
 
 	if (y0 > x0) {
-		float x1 = x0 + (float)G2;
-		float y1 = y0 + ((float)G2 - 1);
+		float x1 = x0 + static_cast<float> (G2);
+		float y1 = y0 + (static_cast<float> (G2) - 1);
 		float b = 0.5f - x1 * x1 - y1 * y1;
 		if (b <= 0) n1 = 0;
 		else {
 			n1 = (b * b) * (b * b) * gradCoord(seed, i, j + PrimeY, x1, y1);
 		}
-	}
-	else {
-		float x1 = x0 + ((float)G2 - 1);
-		float y1 = y0 + (float)G2;
+	} else {
+		float x1 = x0 + (static_cast<float> (G2) - 1);
+		float y1 = y0 + static_cast<float> (G2);
 		float b = 0.5f - x1 * x1 - y1 * y1;
 		if (b <= 0) n1 = 0;
 		else {
@@ -128,7 +128,7 @@ template <typename T>
 }
 
 //template <typename T>
-//[[nodiscard]] float noise_simplex2(int seed, T x, T y) noexcept {
+//[[nodiscard]] float noise_simplex2(Seed seed, T x, T y) noexcept {
 //	const float SQRT3 = 1.7320508075688772935274463415059f;
 //	const float F2 = 0.5f * (SQRT3 - 1.0f);
 //	const float G2 = (3.0f - SQRT3) / 6.0f;
@@ -173,10 +173,10 @@ template <typename T>
 //}
 
 template <typename T>
-float noise_simplex2S(int seed, T x, T y) {
+[[nodiscard]] float noise_simplex2S(Seed seed, T x, T y) {
 	// 2D OpenSimplex2S case is a modified 2D simplex noise.
 
-	const T SQRT3 = (T) 1.7320508075688772935274463415059;
+	const T SQRT3 = static_cast<T> (1.7320508075688772935274463415059f);
 	const T G2 = (T{3} - SQRT3) / T{6};
 
 	/*
@@ -188,8 +188,8 @@ float noise_simplex2S(int seed, T x, T y) {
 
 	int i = static_cast<int>(std::floor(x));
 	int j = static_cast<int>(std::floor(y));
-	float xi = static_cast<float> (x - i);
-	float yi = static_cast<float> (y - j);
+	float xi = x - static_cast<float>(i);
+	float yi = y - static_cast<float>(j);
 
 	i *= PrimeX;
 	j *= PrimeY;
@@ -300,7 +300,7 @@ namespace details {
 
 //float, double, libv::vec4f, libv::vec4d
 template <typename T, typename DistFn>
-[[nodiscard]] T aux_noise_cellular(int seed, T x, T y,
+[[nodiscard]] T aux_noise_cellular(Seed seed, T x, T y,
 		DistFn&& distFn,
 		CellularDistanceFunction distFnType,
 		CellularReturnType returnType,
@@ -365,7 +365,7 @@ template <typename T, typename DistFn>
 
 
 template <typename T>
-T noise_cellular(int seed, T x, T y,
+[[nodiscard]] T noise_cellular(Seed seed, T x, T y,
 		CellularDistanceFunction distanceFn = CellularDistanceFunction::euclidean,
 		CellularReturnType returnType = CellularReturnType::cellValue,
 		float jitter = 1.0f) {
@@ -389,18 +389,26 @@ T noise_cellular(int seed, T x, T y,
 }
 
 
+enum class FractalType {
+	none,
+	fbm,
+	ridged,
+	pingpong
+};
+
+//fmb(Fractional Brownian motion)
 template <typename T, typename NoiseFn>
-float noise_fractal(int seed, T x, T y, NoiseFn noiseFn, int octaves,
+[[nodiscard]] float noise_fractal(Seed seed, T x, T y, NoiseFn noiseFn, int octaves,
 		float amplitude = 1.0, float frequency = 1.0f, float lacunarity = 2.0f, float persistence = 0.5f) {
-//	int seed = mSeed;
+//	Seed seed = mSeed;
 	float sum = 0;
 
 	for (int i = 0; i < octaves; i++) {
 		float noise = noiseFn(seed++, x * frequency, y * frequency);
 		sum += noise * amplitude;
 
-		auto mWeightedStrength = 0.f;
-		amplitude *= lerp(1.0f, std::min(noise + 1, 2.f) * 0.5f, mWeightedStrength);
+		auto weightedStrength = 0.f;
+		amplitude *= lerp(1.0f, std::min(noise + 1, 2.f) * 0.5f, weightedStrength);
 
 //		x *= lacunarity;
 //		y *= lacunarity;
@@ -411,5 +419,203 @@ float noise_fractal(int seed, T x, T y, NoiseFn noiseFn, int octaves,
 
 	return sum;
 }
+
+// -------------------------------------------------------------------------------------------------
+// warp
+
+constexpr inline void singleWarpSimplexGradient(Seed seed, float x, float y, float& xr, float& yr, float warpAmp, float frequency, bool outGradOnly) {
+	const float SQRT3 = 1.7320508075688772935274463415059f;
+	const float G2 = (3 - SQRT3) / 6;
+
+	x *= frequency;
+	y *= frequency;
+
+	/*
+	 * --- Skew moved to TransformNoiseCoordinate method ---
+	 * const float F2 = 0.5f * (SQRT3 - 1);
+	 * float s = (x + y) * F2;
+	 * x += s; y += s;
+	*/
+
+	int i = static_cast<int>(std::floor(x));
+	int j = static_cast<int>(std::floor(y));
+
+	float xi = x - static_cast<float>(i);
+	float yi = y - static_cast<float>(j);
+
+	float t = (xi + yi) * G2;
+	float x0 = xi - static_cast<float>(t);
+	float y0 = yi - static_cast<float>(t);
+
+	i *= PrimeX;
+	j *= PrimeY;
+
+	float vx, vy;
+	vx = vy = 0;
+
+	float a = 0.5f - x0 * x0 - y0 * y0;
+	if (a > 0) {
+		float aaaa = (a * a) * (a * a);
+		float xo, yo;
+		if (outGradOnly)
+			GradCoordOut(seed, i, j, xo, yo);
+		else
+			GradCoordDual(seed, i, j, x0, y0, xo, yo);
+		vx += aaaa * xo;
+		vy += aaaa * yo;
+	}
+
+	float c = static_cast<float> (2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + (static_cast<float> (-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
+	if (c > 0) {
+		float x2 = x0 + (2 * static_cast<float> (G2) - 1);
+		float y2 = y0 + (2 * static_cast<float> (G2) - 1);
+		float cccc = (c * c) * (c * c);
+		float xo, yo;
+		if (outGradOnly)
+			GradCoordOut(seed, i + PrimeX, j + PrimeY, xo, yo);
+		else
+			GradCoordDual(seed, i + PrimeX, j + PrimeY, x2, y2, xo, yo);
+		vx += cccc * xo;
+		vy += cccc * yo;
+	}
+
+	if (y0 > x0) {
+		float x1 = x0 + static_cast<float> (G2);
+		float y1 = y0 + (static_cast<float> (G2) - 1);
+		float b = 0.5f - x1 * x1 - y1 * y1;
+		if (b > 0) {
+			float bbbb = (b * b) * (b * b);
+			float xo, yo;
+			if (outGradOnly)
+				GradCoordOut(seed, i, j + PrimeY, xo, yo);
+			else
+				GradCoordDual(seed, i, j + PrimeY, x1, y1, xo, yo);
+			vx += bbbb * xo;
+			vy += bbbb * yo;
+		}
+	} else {
+		float x1 = x0 + (static_cast<float> (G2) - 1);
+		float y1 = y0 + static_cast<float> (G2);
+		float b = 0.5f - x1 * x1 - y1 * y1;
+		if (b > 0) {
+			float bbbb = (b * b) * (b * b);
+			float xo, yo;
+			if (outGradOnly)
+				GradCoordOut(seed, i + PrimeX, j, xo, yo);
+			else
+				GradCoordDual(seed, i + PrimeX, j, x1, y1, xo, yo);
+			vx += bbbb * xo;
+			vy += bbbb * yo;
+		}
+	}
+
+	xr += vx * warpAmp;
+	yr += vy * warpAmp;
+}
+
+enum class WarpType {
+	simplex2,
+	simplex2_reduced,
+	basic_grid
+};
+
+// Domain Warp
+constexpr inline void doSingleWarp(Seed seed, float x, float y, float& xr, float& yr, WarpType type, float amp, float freq) {
+	switch (type) {
+	case WarpType::simplex2:
+		singleWarpSimplexGradient(seed, x, y, xr, yr, amp * 38.283687591552734375f, freq, false);
+		break;
+	case WarpType::simplex2_reduced:
+		//TODO
+//		singleWarpSimplexGradient(seed, amp * 16.0f, freq, x, y, xr, yr, true);
+		break;
+	case WarpType::basic_grid:
+		//TODO
+//		SingleDomainWarpBasicGrid(seed, amp, freq, x, y, xr, yr);
+		break;
+	}
+}
+
+// Domain Warp Coordinate Transforms
+constexpr inline void transformWarpCoordinate(float& x, float& y, WarpType type) {
+	if (type == WarpType::simplex2 || type == WarpType::simplex2_reduced) {
+		const float SQRT3 = 1.7320508075688772935274463415059f;
+		const float F2 = 0.5f * (SQRT3 - 1);
+		float t = (x + y) * F2;
+		x += t;
+		y += t;
+	}
+}
+
+// Domain Warp Fractal Independent
+constexpr inline void warpFractalIndependent(Seed seed, float& x, float& y,
+		float amplitude = 1.0, float frequency = 0.01f,
+		int octaves = 5, float lacunarity = 2.0f, float persistence = 0.5f, WarpType type = WarpType::simplex2) {
+	float xs = x;
+	float ys = y;
+	transformWarpCoordinate(xs, ys, type);
+
+//	Seed seed = mSeed;
+//	auto domainWarpAmp = 1.0f;
+//	auto fractalBounding = 1.f / 1.75f;
+//	float amp = domainWarpAmp * fractalBounding;
+//	float freq = mFrequency;
+
+	for (int i = 0; i < octaves; i++) {
+		doSingleWarp(seed, xs, ys, x, y, type, amplitude, frequency);
+
+		seed++;
+		amplitude *= persistence;
+		frequency *= lacunarity;
+	}
+}
+
+
+enum class WarpFractalType {
+	none,
+	progressive,
+	independent
+};
+
+
+/// <summary>
+/// 2D warps the input position using current domain warp settings
+/// </summary>
+/// <example>
+/// Example usage with GetNoise
+/// <code>DomainWarp(x, y)
+/// noise = GetNoise(x, y)</code>
+/// </example>
+constexpr inline void warp(Seed seed, float& x, float& y, WarpFractalType type,
+		float amplitude = 1.0, float frequency = 0.01f,
+		int octaves = 5, float lacunarity = 2.0f, float persistence = 0.5f) {
+	switch (type) {
+	case WarpFractalType::none:
+		//TODO
+//		DomainWarpSingle(x, y);
+		break;
+	case WarpFractalType::progressive:
+		//TODO
+//		DomainWarpFractalProgressive(x, y);
+		break;
+	case WarpFractalType::independent:
+		warpFractalIndependent(seed, x, y, amplitude, frequency, octaves, lacunarity, persistence);
+		break;
+	}
+}
+
+constexpr inline void warpWithIndependentFractal(Seed seed, float& x, float& y,
+		float amplitude = 1.0, float frequency = 0.01f,
+		int octaves = 5, float lacunarity = 2.0f, float persistence = 0.5f) {
+	warp(seed, x, y, WarpFractalType::independent,
+			amplitude, frequency, octaves, lacunarity, persistence);
+}
+
+
+//template <typename T>
+//float noise_warp(Seed seed, T x, T y) {
+//
+//	return 0;
+//}
 
 } // namespace libv

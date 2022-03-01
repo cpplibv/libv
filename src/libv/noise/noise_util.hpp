@@ -6,16 +6,16 @@
 
 
 namespace libv {
+using Seed = uint32_t;
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-static int FastFloor(T f) { return f >= 0 ? static_cast<int> (f) : static_cast<int> (f) - 1; }
+//template <typename T>
+//static int FastFloor(T f) { return f >= 0 ? static_cast<int> (f) : static_cast<int> (f) - 1; }
 
 
 template <typename T>
-struct Lookup
-{
+struct Lookup {
 	static const T Gradients2D[];
 	static const T Gradients3D[];
 	static const T RandVecs2D[];
@@ -23,20 +23,27 @@ struct Lookup
 };
 
 // Hashing
-static constexpr int PrimeX = 501125321;
-static constexpr int PrimeY = 1136930381;
-static constexpr int PrimeZ = 1720413743;
+static constexpr uint32_t PrimeX = 501125321;
+static constexpr uint32_t PrimeY = 1136930381;
+static constexpr uint32_t PrimeZ = 1720413743;
 
-[[nodiscard]] constexpr inline int hash(int seed, int xPrimed, int yPrimed) noexcept {
-	int hash = seed ^ xPrimed ^ yPrimed;
+[[nodiscard]] constexpr inline uint32_t hash(Seed seed, uint32_t xPrimed, uint32_t yPrimed) noexcept {
+	uint32_t hash = seed ^ xPrimed ^ yPrimed;
 
 	hash *= hash * 0x27d4eb2d;
 	return hash;
 }
 
+[[nodiscard]] constexpr inline uint32_t hash(Seed seed, uint32_t xPrimed, uint32_t yPrimed, uint32_t zPrimed) {
+	uint32_t hash = seed ^ xPrimed ^ yPrimed ^ zPrimed;
+
+	hash *= 0x27d4eb2d;
+	return hash;
+}
+
 // !!! check on this
-[[nodiscard]] constexpr inline float ValCoord(int seed, int xPrimed, int yPrimed) noexcept {
-	int hashVal = hash(seed, xPrimed, yPrimed);
+[[nodiscard]] constexpr inline float ValCoord(Seed seed, uint32_t xPrimed, uint32_t yPrimed) noexcept {
+	uint32_t hashVal = hash(seed, xPrimed, yPrimed);
 
 	hashVal *= hashVal;
 	hashVal ^= hashVal << 19;
@@ -47,7 +54,7 @@ static constexpr int PrimeZ = 1720413743;
 	return t * t * (3 - 2 * t);
 }
 
-[[nodiscard]] constexpr inline int fastFloor(float f) { return f >= 0 ? (int)f : (int)f - 1; }
+//[[nodiscard]] constexpr inline uint32_t fastFloor(float f) { return f >= 0 ? (uint32_t f : (uint32_t f - 1; }
 
 [[nodiscard]] constexpr inline float lerp(float a, float b, float t) {
 	return a + t * (b - a);
@@ -57,8 +64,8 @@ static constexpr int PrimeZ = 1720413743;
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
-[[nodiscard]] constexpr inline float gradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd) noexcept {
-	int hashVal = hash(seed, xPrimed, yPrimed);
+[[nodiscard]] constexpr inline float gradCoord(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float xd, float yd) noexcept {
+	uint32_t hashVal = hash(seed, xPrimed, yPrimed);
 	hashVal ^= hashVal >> 15;
 	hashVal &= 127 << 1;
 
@@ -66,6 +73,50 @@ static constexpr int PrimeZ = 1720413743;
 	float yg = Lookup<float>::Gradients2D[hashVal | 1];
 
 	return xd * xg + yd * yg;
+}
+
+constexpr inline void GradCoordOut(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float& xo, float& yo) {
+	uint32_t hashVal = hash(seed, xPrimed, yPrimed) & (255 << 1);
+
+	xo = Lookup<float>::RandVecs2D[hashVal];
+	yo = Lookup<float>::RandVecs2D[hashVal | 1];
+}
+
+constexpr inline void GradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float xd, float yd, float& xo, float& yo)
+{
+	uint32_t hashVal = hash(seed, xPrimed, yPrimed);
+	uint32_t index1 = hashVal & (127 << 1);
+	uint32_t index2 = (hashVal >> 7) & (255 << 1);
+
+	float xg = Lookup<float>::Gradients2D[index1];
+	float yg = Lookup<float>::Gradients2D[index1 | 1];
+	float value = xd * xg + yd * yg;
+
+	float xgo = Lookup<float>::RandVecs2D[index2];
+	float ygo = Lookup<float>::RandVecs2D[index2 | 1];
+
+	xo = value * xgo;
+	yo = value * ygo;
+}
+
+constexpr inline void GradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, uint32_t zPrimed, float xd, float yd, float zd, float& xo, float& yo, float& zo)
+{
+	uint32_t hashVal = hash(seed, xPrimed, yPrimed, zPrimed);
+	uint32_t index1 = hashVal & (63 << 2);
+	uint32_t index2 = (hashVal >> 6) & (255 << 2);
+
+	float xg = Lookup<float>::Gradients3D[index1];
+	float yg = Lookup<float>::Gradients3D[index1 | 1];
+	float zg = Lookup<float>::Gradients3D[index1 | 2];
+	float value = xd * xg + yd * yg + zd * zg;
+
+	float xgo = Lookup<float>::RandVecs3D[index2];
+	float ygo = Lookup<float>::RandVecs3D[index2 | 1];
+	float zgo = Lookup<float>::RandVecs3D[index2 | 2];
+
+	xo = value * xgo;
+	yo = value * ygo;
+	zo = value * zgo;
 }
 
 template <typename T>

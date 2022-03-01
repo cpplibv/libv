@@ -61,7 +61,8 @@ noise generator math/noise
 	perlin
 	perlin_simplex
 	value
-	warp
+	warp: regular - simplex for first
+			domainwarp open simplex independent
 		regular, polar, vortex, inverse
 	palette
 	animation
@@ -106,7 +107,6 @@ FastNoiseLite(int seed = 1337)
 	mWeightedStrength = 0.0f;
 	mPingPongStength = 2.0f;
 
-	mFractalBounding = 1 / 1.75f;
 
 	mCellularDistanceFunction = CellularDistanceFunction_EuclideanSq;
 	mCellularReturnType = CellularReturnType_Distance;
@@ -114,5 +114,87 @@ FastNoiseLite(int seed = 1337)
 
 	mDomainWarpType = DomainWarpType_OpenSimplex2;
 	mWarpTransformType3D = TransformType3D_DefaultOpenSimplex2;
+	mFractalBounding = 1 / 1.75f;
 	mDomainWarpAmp = 1.0f;
 }
+
+
+
+#pragma glslify: _warpRegular = require('./gl-noise/warpRegular.glsl', NOISE_FUN=fbmNoiseDual3D_warp, WarpParams=WarpParams)
+
+struct FbmNoiseParams {
+	int   octaves;           // number of octaves for fractal noise
+	float octavesFract;      // fractional part of octaves value
+	float frequency;         // noise frequency
+	float gain;              // amplitude factor per octave
+	float angle;             // rotation per octave
+	float lacunarity;        // frequency factor per octave
+	float turbulence;        // Z coordinate factor per octave
+};
+
+struct WarpParams {
+	FbmNoiseParams basic;
+	float anim;              // Z-position in 3D noise, for animation
+	float amplitude;         // directional amplitude
+	float rotation;          // rotational amplitude
+};
+
+vec2 warpRegular( vec2 pos, WarpParams warp ) {
+
+	vec2 noise = NOISE_FUN( vec3( pos, warp.anim ), warp.basic );
+
+	return pos + noise * warp.amplitude;
+}
+
+const noiseFunctions3D = {
+	Perlin3D        : { shortKey: "p3", title: "Perlin" },
+	SimplexPerlin3D : { shortKey: "s3", title: "Simplex" },
+	Value3D         : { shortKey: "v3", title: "Value" },
+	Cellular3D      : { shortKey: "c3", title: "Cellular" },
+};
+
+vec2 fbmNoiseDual3D( vec3 pos, FbmNoiseParams noise ) {
+
+	vec2 result = vec2( 0 );
+
+	float freq = noise.frequency;
+	float z    = pos.z;
+	float amp  = 1.0;
+
+	// Z-increment to "randomize" each octave for avoiding artefacts that originate from coords 0,0
+	// due to the pseudo-random nature of the noise.
+	// This value has been chosen by trial and error.
+	const float zInc = 7.0;
+
+	// Randomize noise for Y direction.
+	const float yInc = 4.8;
+
+	// Create fractal noise by adding multiple octaves of noise.
+	for( int i = 0; i < noise.octaves; ++i ) {
+
+		vec3 p = vec3( pos.xy * freq, z );
+		float nx = NOISE_FUN( vec3( pos.xy * freq, z ) );
+		float ny = NOISE_FUN( vec3( pos.xy * freq, z + yInc ) );
+
+		result += vec2( nx, ny ) * amp;
+
+		freq   *= noise.lacunarity;
+		amp    *= noise.gain;
+		z      += zInc;
+		z      *= noise.turbulence;
+	}
+
+	// Fractional part of octave value is used for smooth transition.
+	vec3 p = vec3( pos.xy * freq, z );
+	float nx = NOISE_FUN( vec3( pos.xy * freq, z ) );
+	float ny = NOISE_FUN( vec3( pos.xy * freq, z + yInc ) );
+
+	result += vec2( nx, ny ) * amp * noise.octavesFract;
+
+	return result;
+}
+
+#pragma glslify: export(fbmNoiseDual3D)
+
+
+vec2 identity( vec2 value, WarpParams warp ) { return value; }

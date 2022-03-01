@@ -209,7 +209,7 @@ public:
 	void build_mesh(libv::glr::Mesh& mesh, surface::Surface& surface);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Surface& surface);
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, surface::Surface& surface);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererSurfaceTexture {

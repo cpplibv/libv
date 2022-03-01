@@ -13,8 +13,10 @@
 // std
 #include <array>
 
-
 #include <space/surface/config.hpp>
+
+#include <space/surface/node.hpp>
+
 
 
 
@@ -57,7 +59,7 @@ private:
 public:
 //	gimme_surface();
 	NoiseGen();
-	Surface generateNoise(Config config);
+	Surface generateNoise(const Config& config);
 
 };
 

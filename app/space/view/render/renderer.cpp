@@ -877,7 +877,7 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, surface::Surface& surfac
 
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, surface::Surface& surface) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 //void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
 	//build_mesh(mesh, surface);
 

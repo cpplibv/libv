@@ -55,6 +55,7 @@ private:
 //	std::mutex mutex;
 	std::atomic<bool> changed = true;
 	SurfaceLuaBinding binding;
+	Config config;
 	libv::fsw::Watcher fileWatcher;
 
 public:
@@ -124,31 +125,29 @@ private:
 		glr.clearDepth();
 
 		// =================================================================================================
-
 		if (changed) {
 			libv::Timer timerNoiseGen;
 			NoiseGen noiseGen;
 			auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
-			auto config = binding.getConfigFromLuaScript(script);
+			config = binding.getConfigFromLuaScript(script);
 			surface::Surface surface = noiseGen.generateNoise(config);
 			fmt::print("TimerNoiseGen: {:8.4f} ms", timerNoiseGen.timed_ms().count());
 			std::cout << std::endl;
-			//texture
-			heightMap = libv::glr::Texture2D::RGBA32F();
-			heightMap.storage(1, libv::vec2i{config.size, config.size});
-			heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, surface.getColors().data());
 
-//			renderer.surface.build_mesh(renderer.surface.mesh, surface);
-
-
+			if (Mode{config.mode} == Mode::_3d) {
+				renderer.surface.build_mesh(renderer.surface.mesh, surface);
+			} else {
+				//texture
+				heightMap = libv::glr::Texture2D::RGBA32F();
+				heightMap.storage(1, libv::vec2i{config.size, config.size});
+				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, surface.getColors().data());
+			}
 			changed = false;
 
 		}
-
-		renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
-
-//		renderer.surface.render(glr, renderer.resource_context.uniform_stream, surface);
-
+		Mode{config.mode} == Mode::_3d ?
+				renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
+				renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
 	}
 };
 
