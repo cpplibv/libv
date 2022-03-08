@@ -116,7 +116,6 @@ void Frame::cmdCoreCreate() {
 
 	switch (self->displayMode) {
 	case DisplayMode::windowed: {
-		glfwWindowHint(GLFW_DECORATED, true);
 		self->window = glfwCreateWindow(self->size.x, self->size.y, self->title.c_str(), nullptr, self->shareWindow);
 
 		if (!self->window)
