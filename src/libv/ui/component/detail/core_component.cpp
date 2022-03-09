@@ -338,11 +338,13 @@ void CoreComponent::style(std::string_view style_name) {
 	style(context().style(style_name));
 }
 
-void CoreComponent::style_state(StyleState state, bool value) noexcept {
-	if ((value && style_state_ == (style_state_ & state)) || (!value && (style_state_ & state) == StyleState::none))
+void CoreComponent::style_state(StyleState state_mask, bool value) noexcept {
+	if (value && (state_mask == (style_state_ & state_mask)))
+		return;
+	if (!value && (StyleState::none == (style_state_ & state_mask)))
 		return;
 
-	style_state_ = value ? style_state_ | state : style_state_ & ~state;
+	style_state_ = value ? style_state_ | state_mask : style_state_ & ~state_mask;
 	flagAuto(Flag::pendingStyle);
 }
 

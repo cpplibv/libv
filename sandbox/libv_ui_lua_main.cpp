@@ -40,19 +40,20 @@ int main(int, char**) {
 
 		log_sandbox.info(" --- Execute script ---");
 
-		libv::ui::script_style(ui, lua, libv::read_file_or_throw("app/space/style.lua"));
+//		libv::ui::script_style(ui, lua, libv::read_file_or_throw("app/space/style.lua"));
+		libv::ui::script_style(ui, lua, libv::read_file_or_throw("app/star/style.lua"));
 
 		auto f = [](std::string_view name, libv::ui::Style& style) {
 			log_sandbox.info("Style: {}", name);
 
-			style.foreach([](std::string_view key, const libv::ui::PropertyDynamic& property) {
-				libv::ui::visitProperty(property, [&key](auto& v) {
+			style.foreach([](std::string_view key, const libv::ui::PropertyDynamic& property, libv::ui::StyleState mask, libv::ui::StyleState state) {
+				libv::ui::visitProperty(property, [&](auto& v) {
 					if constexpr (requires { std::cout << v; })
-						log_sandbox.info("    {} = {} [{}]", key, v, typeid(v).name());
+						log_sandbox.info("    {} = {} mask: {} state: {} [{}]", key, v, +mask, +state, typeid(v).name());
 					else if constexpr (std::is_enum_v<decltype(v)>)
-						log_sandbox.info("    {} = {} [{}]", key, libv::to_underlying(v), typeid(v).name());
+						log_sandbox.info("    {} = {} mask: {} state: {} [{}]", key, libv::to_underlying(v), +mask, +state, typeid(v).name());
 					else
-						log_sandbox.info("    {} = ?? [{}]", key, typeid(v).name());
+						log_sandbox.info("    {} = ?? mask: {} state: {} [{}]", key, +mask, +state, typeid(v).name());
 				});
 			});
 		};

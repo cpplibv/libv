@@ -275,7 +275,7 @@ public:
 	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
 	void style(libv::intrusive_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
-	void style_state(StyleState state, bool value) noexcept;
+	void style_state(StyleState state_mask, bool value) noexcept;
 	[[nodiscard]] constexpr inline StyleState style_state() const noexcept {
 		return style_state_;
 	}

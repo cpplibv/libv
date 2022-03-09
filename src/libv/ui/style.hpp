@@ -115,7 +115,7 @@ public:
 		// TODO P4: foreach should also iterate over inherited properties, or at least has an API for it
 		for (const auto& [key, entires] : properties)
 			for (const auto& entry : entires)
-				func(key, entry.value);
+				func(key, entry.value, entry.state_mask, entry.state_value);
 	}
 };
 

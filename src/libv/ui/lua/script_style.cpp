@@ -9,6 +9,7 @@
 #include <libv/parse/color.hpp>
 #include <libv/range/view_lines_string_view.hpp>
 #include <libv/utility/hash_string.hpp>
+#include <libv/utility/timer.hpp>
 #include <libv/utility/trim.hpp>
 #include <libv/lua/convert_color.hpp>
 // std
@@ -785,6 +786,7 @@ public:
 };
 
 void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
+	libv::Timer timer;
 	LoadLuaContext context(ui, lua);
 
 	try {
@@ -799,7 +801,7 @@ void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
 		if (result.get_type() != sol::type::none)
 			log_ui.warn("Script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
 
-		log_ui.info("Script loading successful");
+		log_ui.info("Script loading successful in {:7.3f}ms", timer.timef_ms().count());
 
 	} catch (const std::exception& e) {
 		log_ui.error("Script execution failed: {}", e.what());
