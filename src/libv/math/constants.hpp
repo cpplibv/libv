@@ -10,14 +10,11 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T> static constexpr T rad_v       = static_cast<T>(57.295779513082320876800);
-template <typename T> static constexpr T inv_sqrt2_v = static_cast<T>( 0.707106781186547524401);
-template <typename T> static constexpr T tau_v       = static_cast<T>( 6.283185307179586476926); /// tau = 2 PI
-template <typename T> static constexpr T golden_v    = std::numbers::phi_v<T>;
-
+template <typename T> static constexpr T rad_v        = static_cast<T>(57.295779513082320876800);
 template <typename T> static constexpr T e_v          = std::numbers::e_v<T>;
 template <typename T> static constexpr T egamma_v     = std::numbers::egamma_v<T>;
 template <typename T> static constexpr T inv_pi_v     = std::numbers::inv_pi_v<T>;
+template <typename T> static constexpr T inv_sqrt2_v  = static_cast<T>( 0.707106781186547524401);
 template <typename T> static constexpr T inv_sqrt3_v  = std::numbers::inv_sqrt3_v<T>;
 template <typename T> static constexpr T inv_sqrtpi_v = std::numbers::inv_sqrtpi_v<T>;
 template <typename T> static constexpr T ln10_v       = std::numbers::ln10_v<T>;
@@ -28,6 +25,8 @@ template <typename T> static constexpr T phi_v        = std::numbers::phi_v<T>;
 template <typename T> static constexpr T pi_v         = std::numbers::pi_v<T>;
 template <typename T> static constexpr T sqrt2_v      = std::numbers::sqrt2_v<T>;
 template <typename T> static constexpr T sqrt3_v      = std::numbers::sqrt3_v<T>;
+template <typename T> static constexpr T tau_v        = static_cast<T>( 6.283185307179586476926); /// tau = 2 PI
+template <typename T> static constexpr T golden_v     = std::numbers::phi_v<T>;
 
 static constexpr float rad_f        = rad_v<float>;
 static constexpr float e_f          = e_v<float>;
