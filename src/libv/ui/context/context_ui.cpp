@@ -50,19 +50,25 @@ public:
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
 //	std::unordered_map<TypeInfoRef, std::weak_ptr<Shader>, TypeInfoRefHasher, TypeInfoRefEqualTo> cache_typed_shader;
 
-	std::weak_ptr<ShaderFont> shader_font;
-	std::weak_ptr<ShaderImage> shader_image;
-	std::weak_ptr<ShaderQuad> shader_quad;
+//	std::weak_ptr<ShaderFont> shader_font;
+//	std::weak_ptr<ShaderImage> shader_image;
+//	std::weak_ptr<ShaderQuad> shader_quad;
+	std::shared_ptr<ShaderFont> shader_font;
+	std::shared_ptr<ShaderImage> shader_image;
+	std::shared_ptr<ShaderQuad> shader_quad;
 
 public:
 	template <typename T>
-	std::shared_ptr<T> getShader(std::weak_ptr<T>& wp, const std::string_view name) {
-		auto sp = wp.lock();
+//	std::shared_ptr<T> getShader(std::weak_ptr<T>& wp, const std::string_view name) {
+//		auto sp = wp.lock();
+	std::shared_ptr<T> getShader(std::shared_ptr<T>& wp, const std::string_view name) {
+		auto sp = wp;
 		if (sp) {
 //			log_ui.trace("Shader cache hit for: {}", name);
 		} else {
 			log_ui.trace("Shader cache miss for: {}", name);
-			wp = sp = std::make_shared<T>();
+			sp = std::make_shared<T>();
+			wp = sp;
 		}
 		return sp;
 	}
