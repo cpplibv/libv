@@ -981,6 +981,18 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET star
+	SOURCE app/star/*.cpp
+	GENERATE codegen app/star/message/*.in.lua
+	LINK   libv_log libv_sys
+	LINK   libv_frame libv_ctrl libv_ui
+	LINK   libv_rev libv_glr libv_color
+	LINK   libv_lua
+	LINK   libv_net libv_serial
+	LINK   libv_vm4
+)
+
+wish_create_executable(
 	TARGET space
 	SOURCE app/space/game/*.cpp
 	SOURCE app/space/message/*.cpp
