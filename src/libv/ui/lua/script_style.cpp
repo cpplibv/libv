@@ -10,6 +10,7 @@
 #include <libv/range/view_lines_string_view.hpp>
 #include <libv/utility/hash_string.hpp>
 #include <libv/utility/trim.hpp>
+#include <libv/lua/convert_color.hpp>
 // std
 #include <memory>
 #include <optional>
@@ -203,66 +204,58 @@ namespace ui {
 //	return libv::lua::transform(libv::lua::string_parse(std::move(parse_func)), std::forward<F>(func));
 //}
 
-std::optional<Color> convert_color(UI&, const sol::object& object) {
-
-	if (object.get_type() == sol::type::string) {
-		return {libv::parse::parse_color_optional(object.as<std::string_view>())};
-
-	} else if (object.get_type() == sol::type::userdata) {
-		if (object.is<libv::vec3f>())
-			return libv::vec4f(object.as<libv::vec3f>(), 1.0f);
-
-		else if (object.is<libv::vec4f>())
-			return object.as<libv::vec4f>();
-
-		else
+template <typename Enum>
+struct convert_enum_value {
+	std::optional<PropertyDynamic> operator()(UI&, const sol::object& object) {
+		if (object.get_type() != sol::type::number)
 			return std::nullopt;
 
-	} else if (object.get_type() == sol::type::table) {
-		auto table = object.as<sol::table>();
-		{
-			auto n1 = table.get<sol::object>(1);
-			auto n2 = table.get<sol::object>(2);
-			auto n3 = table.get<sol::object>(3);
-			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number) {
-				auto n4 = table.get<sol::object>(4);
-				if (n4.get_type() == sol::type::number)
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), n4.as<float>());
-				else
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), 1.0f);
-			}
-		}
-		{
-			auto n1 = table.get<sol::object>("r");
-			auto n2 = table.get<sol::object>("g");
-			auto n3 = table.get<sol::object>("b");
-			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number) {
-				auto n4 = table.get<sol::object>("a");
-				if (n4.get_type() == sol::type::number)
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), n4.as<float>());
-				else
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), 1.0f);
-			}
-		}
-		{
-			auto n1 = table.get<sol::object>("x");
-			auto n2 = table.get<sol::object>("y");
-			auto n3 = table.get<sol::object>("z");
-			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number) {
-				auto n4 = table.get<sol::object>("w");
-				if (n4.get_type() == sol::type::number)
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), n4.as<float>());
-				else
-					return libv::vec4f(n1.as<float>(), n2.as<float>(), n3.as<float>(), 1.0f);
-			}
-		}
-
-		return std::nullopt;
-
-	} else {
-		return std::nullopt;
+		return PropertyDynamic{static_cast<Enum>(object.as<int64_t>())};
 	}
+};
+
+template <typename T>
+struct convert_userdata {
+	std::optional<PropertyDynamic> operator()(UI&, const sol::object& object) {
+		if (!object.is<T>())
+			return std::nullopt;
+
+		return PropertyDynamic{object.as<T>()};
+	}
+};
+
+const auto convert_string_parse = [](auto&& parse_fn) {
+	return [parse_function = std::forward<decltype(parse_fn)>(parse_fn)](UI&, const sol::object& object) -> std::optional<PropertyDynamic> {
+		if (object.get_type() != sol::type::string)
+			return std::nullopt;
+
+		auto result_opt = parse_function(object.as<std::string_view>());
+		if (!result_opt)
+			return std::nullopt;
+
+		return PropertyDynamic{std::move(*result_opt)};
+	};
+};
+
+template <typename F>
+auto direct_fn(F&& fn) {
+	if constexpr (requires { fn(std::declval<UI&>(), std::declval<const sol::object&>()); })
+		return std::forward<F>(fn);
+	else
+		return [fn = std::forward<decltype(fn)>(fn)](UI&, const sol::object& object) {
+			return fn(object);
+		};
 }
+
+const auto conv_fn = [](auto&& fn) {
+	return [fn = direct_fn(std::forward<decltype(fn)>(fn))](UI& ui, const sol::object& object) -> std::optional<PropertyDynamic> {
+		auto result_opt = fn(ui, object);
+		if (!result_opt)
+			return std::nullopt;
+
+		return PropertyDynamic{std::move(*result_opt)};
+	};
+};
 
 std::optional<Padding> convert_extent(UI&, const sol::object& object) {
 	if (object.get_type() == sol::type::number) {
@@ -441,7 +434,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::none();
 
 		} else if (type_str == "color") {
-			const auto color = convert_member(ui, table, "color", convert_color);
+			const auto color = convert_member(ui, table, "color", direct_fn(libv::lua::convert_color));
 			if (!color)
 				return std::nullopt;
 
@@ -452,7 +445,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::color(*color);
 
 		} else if (type_str == "texture") {
-			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			const auto color = convert_member(ui, table, "color", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color)
 				return std::nullopt;
 
@@ -467,7 +460,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::texture(*color, *texture);
 
 		} else if (type_str == "border") {
-			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			const auto color = convert_member(ui, table, "color", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color)
 				return std::nullopt;
 
@@ -482,7 +475,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::border(*color, *texture);
 
 		} else if (type_str == "pattern") {
-			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			const auto color = convert_member(ui, table, "color", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color)
 				return std::nullopt;
 
@@ -497,7 +490,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::pattern(*color, *texture);
 
 		} else if (type_str == "padding_pattern") {
-			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			const auto color = convert_member(ui, table, "color", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color)
 				return std::nullopt;
 
@@ -516,11 +509,11 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::padding_pattern(*color, *inner_padding, *texture);
 
 		} else if (type_str == "border_padding_pattern") {
-			const auto color_border = convert_member(ui, table, "color_border", convert_color, Color{1, 1, 1, 1});
+			const auto color_border = convert_member(ui, table, "color_border", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color_border)
 				return std::nullopt;
 
-			const auto color_pattern = convert_member(ui, table, "color_pattern", convert_color, Color{1, 1, 1, 1});
+			const auto color_pattern = convert_member(ui, table, "color_pattern", direct_fn(libv::lua::convert_color), Color{1, 1, 1, 1});
 			if (!color_pattern)
 				return std::nullopt;
 
@@ -558,49 +551,6 @@ std::optional<PropertyDynamic> convert_font(UI& ui, const sol::object& object) {
 	return PropertyDynamic{ui.context().font(object.as<std::string_view>())};
 }
 
-template <typename Enum>
-struct convert_enum_value {
-	std::optional<PropertyDynamic> operator()(UI&, const sol::object& object) {
-		if (object.get_type() != sol::type::number)
-			return std::nullopt;
-
-		return PropertyDynamic{static_cast<Enum>(object.as<int64_t>())};
-	}
-};
-
-template <typename T>
-struct convert_userdata {
-	std::optional<PropertyDynamic> operator()(UI&, const sol::object& object) {
-		if (!object.is<T>())
-			return std::nullopt;
-
-		return PropertyDynamic{object.as<T>()};
-	}
-};
-
-const auto convert_string_parse = [](auto&& parse_fn) {
-	return [parse_function = std::forward<decltype(parse_fn)>(parse_fn)](UI&, const sol::object& object) -> std::optional<PropertyDynamic> {
-		if (object.get_type() != sol::type::string)
-			return std::nullopt;
-
-		auto result_opt = parse_function(object.as<std::string_view>());
-		if (!result_opt)
-			return std::nullopt;
-
-		return PropertyDynamic{std::move(*result_opt)};
-	};
-};
-
-const auto conv_fn = [](auto&& fn) {
-	return [fn = std::forward<decltype(fn)>(fn)](UI& ui, const sol::object& object) -> std::optional<PropertyDynamic> {
-		auto result_opt = fn(ui, object);
-		if (!result_opt)
-			return std::nullopt;
-
-		return PropertyDynamic{std::move(*result_opt)};
-	};
-};
-
 using load_fn = std::function<std::optional<PropertyDynamic>(UI&, const sol::object&)>;
 
 // =================================================================================================
@@ -624,18 +574,18 @@ public:
 		//		property_loaders.emplace(pnm::area_position, _______);
 		//		property_loaders.emplace(pnm::area_size, _______);
 		property_loaders.emplace(pnm::background, convert_background);
-		property_loaders.emplace(pnm::bar_color, conv_fn(convert_color));
+		property_loaders.emplace(pnm::bar_color, conv_fn(libv::lua::convert_color));
 		property_loaders.emplace(pnm::bar_image, conv_fn(convert_texture));
 //		property_loaders.emplace(pnm::bar_shader, _______);
 		//		property_loaders.emplace(pnm::caret, _______);
-		property_loaders.emplace(pnm::caret_color, conv_fn(convert_color));
+		property_loaders.emplace(pnm::caret_color, conv_fn(libv::lua::convert_color));
 		//		property_loaders.emplace(pnm::caret_shader, _______);
-		property_loaders.emplace(pnm::color, conv_fn(convert_color));
+		property_loaders.emplace(pnm::color, conv_fn(libv::lua::convert_color));
 //		property_loaders.emplace(pnm::column_count, _______);
 //		property_loaders.emplace(pnm::focus_select_policy, _______);
 		property_loaders.emplace(pnm::font, convert_font);
 //		property_loaders.emplace(pnm::font_outline, convert_font_outline);
-		property_loaders.emplace(pnm::font_color, conv_fn(convert_color));
+		property_loaders.emplace(pnm::font_color, conv_fn(libv::lua::convert_color));
 //		property_loaders.emplace(pnm::font_shader, _______);
 		property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
 		property_loaders.emplace(pnm::margin, conv_fn(convert_extent));
