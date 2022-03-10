@@ -15,6 +15,7 @@ private:
 	Config config;
 
 	void setConfig(const sol::table& luaConfig);
+	void setColorGradient(libv::gradientf<libv::vec4f>& colorGrad, const sol::table& table);
 //	void setFractalConfig(const sol::table& luaConfig);
 
 public:

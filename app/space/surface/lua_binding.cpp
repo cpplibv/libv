@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <libv/lua/sol_type_to_string.hpp>
+#include <libv/lua/convert_color.hpp>
 
 
 namespace surface {
@@ -17,6 +18,53 @@ void setFractalConfig(T& node, const sol::table& luaConfig) {
 	node.lacunarity = luaConfig["lacunarity"];
 	node.persistence = luaConfig["persistence"];
 //	config.noiseType = luaConfig["noiseType"];
+}
+
+SurfaceLuaBinding::SurfaceLuaBinding() {
+	lua.open_libraries(sol::lib::base);
+	lua.open_libraries(sol::lib::table);
+	lua.open_libraries(sol::lib::string);
+	lua.open_libraries(sol::lib::math);
+//	lua.open_libraries(sol::lib::math);
+//	std::cout << "scriptStr: " << scriptStr << std::endl;
+//	int x = 0;
+//	lua.set_function("beep", [&x]{ ++x; });
+//		lua.set_function("size", [this](int size) { config.size = size; });
+
+//		std::cout << "luaConfig: " << luaConfig << std::endl;
+}
+
+void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
+	config.mode = luaConfig["mode"];
+	config.size = luaConfig["size"];
+//	config.octaves = luaConfig["octaves"];
+	config.amplitude = luaConfig["amplitude"];
+//	config.colorGrad = luaConfig["colorGrad"];
+//	config.frequency = luaConfig["frequency"];
+//	config.lacunarity = luaConfig["lacunarity"];
+//	config.persistence = luaConfig["persistence"];
+//	config.seed = luaConfig["seed"];
+//	config.noiseType = luaConfig["noiseType"];
+}
+
+void SurfaceLuaBinding::setColorGradient(libv::gradientf<libv::vec4f>& colorGrad, const sol::table& table) {
+	for (const auto& [_, keyValue] : table) {
+		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size()!=2)
+			throw std::runtime_error("Invalid colorGrad key-value pair");
+
+//		colorGrad.add(12.4f, libv::lua::convert_color(std::string{"magenta"}));
+//if(miniTable. != sol::type::table)
+
+		const auto key = keyValue.as<sol::table>()[1];
+		const auto value = keyValue.as<sol::table>()[2];
+		if (key.get_type() != sol::type::number)
+			throw std::runtime_error("Key of color gradient has to be a number "+std::string(libv::lua::lua_type_to_string(key.get_type())));
+		const auto color = libv::lua::convert_color(value);
+		if(!color.has_value())
+			throw std::runtime_error("Color given in config couldn't be converted");
+		colorGrad.add(key.get<float>(), color.value());
+		std::cout << key.get<std::string_view>() << " = " << value.get<std::string_view>() << std::endl;
+	}
 }
 
 std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, int depth) {
@@ -89,56 +137,17 @@ std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, in
 		throw std::runtime_error("Unknown node type: " + table.as<std::string>());
 }
 
-SurfaceLuaBinding::SurfaceLuaBinding() {
-	lua.open_libraries(sol::lib::base);
-	lua.open_libraries(sol::lib::table);
-	lua.open_libraries(sol::lib::string);
-	lua.open_libraries(sol::lib::math);
-//	lua.open_libraries(sol::lib::math);
-//	std::cout << "scriptStr: " << scriptStr << std::endl;
-//	int x = 0;
-//	lua.set_function("beep", [&x]{ ++x; });
-//		lua.set_function("size", [this](int size) { config.size = size; });
-
-//		std::cout << "luaConfig: " << luaConfig << std::endl;
-}
-
-void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
-	config.mode = luaConfig["mode"];
-	config.size = luaConfig["size"];
-//	config.octaves = luaConfig["octaves"];
-	config.amplitude = luaConfig["amplitude"];
-//	config.frequency = luaConfig["frequency"];
-//	config.lacunarity = luaConfig["lacunarity"];
-//	config.persistence = luaConfig["persistence"];
-//	config.seed = luaConfig["seed"];
-//	config.noiseType = luaConfig["noiseType"];
-}
-
 Config SurfaceLuaBinding::getConfigFromLuaScript(std::string_view script) {
-//		auto scriptStr = libv::read_file_str_or_throw(filepath);
 	auto env = sol::environment(lua, sol::create, lua.globals());
 	lua.script(script, env);
-	sol::table luaConfig = env["result"];
-	if (luaConfig.get_type() != sol::type::table) {
-		//TODO: log error
-//		return config;
-		throw std::runtime_error(std::string("Expected lua table with name \"Config\" but received: ") + std::string(libv::lua::lua_type_to_string(luaConfig.get_type())));
-	}
-	auto nodes = getNodeTree(luaConfig);
-//	std::cout << "luaConfig[\"mode\"] " << luaConfig["mode"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"size\"] " << luaConfig["size"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"octaves\"] " << luaConfig["octaves"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"amplitude\"] " << luaConfig["amplitude"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"frequency\"] " << luaConfig["frequency"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"lacunarity\"] " << luaConfig["lacunarity"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"persistence\"] " << luaConfig["persistence"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"seed\"] " << luaConfig["seed"].get<std::string_view>() << std::endl;
-//	std::cout << "luaConfig[\"noiseType\"] " << luaConfig["noiseType"].get<std::string_view>() << std::endl;
-//		sol::type::table
+	sol::table luaNodes = env["nodes"];
+	sol::table luaConfig = env["config"];
+	if (luaNodes.get_type() != sol::type::table)
+		throw std::runtime_error(std::string("Expected lua table with name \"Config\" but received: ") + std::string(libv::lua::lua_type_to_string(luaNodes.get_type())));
+	auto nodes = getNodeTree(luaNodes);
 	config.rootNode = std::move(nodes);
+	setColorGradient(config.colorGrad, luaConfig["colorGrad"]);
 	setConfig(luaConfig);
-//	config.size = 1024;
 	return std::move(config);
 }
 

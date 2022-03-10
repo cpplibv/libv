@@ -84,6 +84,8 @@ Config = {
 --	args.node_type = "add"
 --	return args
 --end
+
+
 local constant = function(args)
 	args = args or {}
 	args.nodeType = NodeType.constant
@@ -135,27 +137,41 @@ end
 --			cellular(cell.distance0)
 --		)
 
-result =
+--local addKeyValue = function(key, value)
+--
+--	return args
+--end
+
+config = {
+	colorGrad = {
+		{-1.0 , "hsv(240, 80%, 20%)"},
+		{-0.01 , "hsv(240, 80%, 60%)"},
+		{0.0 , "hsv(240, 70%, 99%)"},
+		{0.0 , "hsv(60, 60%, 100%)"},
+		{0.01 , "hsv(60, 80%, 90%)"},
+		{0.05 , "hsv(120, 70%, 75%)"},
+		{0.1 , "hsv(120, 100%, 50%)"},
+		{0.5 , "hsv(120, 100%, 60%)"},
+		{0.6 , "hsv(120, 60%, 60%)"},
+		{1.0 , "hsv(220, 5%, 95%)"},
+		--{key = -2.0 ,value =  "blue"},
+		--{key = 0.0 , value = "yellow"},
+		--{key = 1.0 , value = "green"},
+		--{key = 2.0 , value = "grey"},
+		--[-2.0] = "blue",
+		--[0.0] = "yellow",
+		--[1.0] = "green",
+		--[2.0] = "grey",
+	},
+	mode = Mode._3d,
+	size = 1024,
+	amplitude = 0.5,
+}
+
+nodes =
 	pow{
-		mode = Mode._3d,
-		--mode = Mode.texture,
-		size = 1024,
-		amplitude = 0.5,
 
 		exponent = 2.0,
-		--exponent = 0.5,
-		--exponent = 1.0,
-
-		--warp{
-		--	--value = 0.5,
-		--	seed = 423,
-		--	octaves = 5,
-		--	amplitude = 100,
-		--	frequency = 0.01,
-		--	lacunarity = 2.0,
-		--	persistence = 0.5,
-		--	simplex{
-		--		seed = 500
 		--	}
 		--}
 		add{
@@ -172,10 +188,10 @@ result =
 				--	seed = 126
 				--}
 				simplexFractal {
-					seed = 423,
+					seed = 426,
 					octaves = 6,
 					amplitude = 0.5,
-					frequency = 0.2,
+					frequency = 0.0015,
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
@@ -189,7 +205,7 @@ result =
 			--	persistence = 0.5,
 			--},
 			constant{
-				value = 0.25
+				value = 0.5
 			},
 			--perlin{}
 

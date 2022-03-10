@@ -4,7 +4,8 @@
 
 #include <libv/noise/noise.hpp>
 #include <space/surface/node.hpp>
-
+#include <libv/math/gradient.hpp>
+#include <libv/math/vec.hpp>
 
 namespace surface {
 
@@ -37,10 +38,11 @@ enum class NoiseType{
 //};
 
 struct Config {
-	std::unique_ptr<Node> rootNode;
 	Mode mode;
 	int size;
 	float amplitude;
+	libv::gradientf<libv::vec4f> colorGrad;
+	std::unique_ptr<Node> rootNode;
 
 	//fractal
 //	int octaves;

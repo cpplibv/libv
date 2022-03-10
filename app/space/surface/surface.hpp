@@ -14,8 +14,9 @@
 #include <array>
 
 #include <space/surface/config.hpp>
-
 #include <space/surface/node.hpp>
+
+#include <libv/math/gradient.hpp>
 
 
 

@@ -12,6 +12,11 @@ template -> hpp, ne inline es kicsi simd vec4f x, vec4f y, int seed
 multithreading:  ui must remain responsive (one dedicated thread)
 	vector - > dynArray
 
+03.09: Add gradient to heightmap
+vegetation (popsickle)
+biome heatmaps
+More than one chunk
+
 
 chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
 ne lyukas: skirt
