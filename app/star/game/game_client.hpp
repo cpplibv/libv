@@ -1,19 +1,21 @@
-// Created by Vader on 2022.03.08..
+// Project: libv, File: app/star/game/game_client.hpp
 
 #pragma once
 
 // fwd
-//#include <star/fwd.hpp>
+#include <star/game/fwd.hpp>
 // libv
-//#include <libv/ctrl/controls.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
+//#include <libv/ctrl/controls.hpp>
 // std
-//#include <memory>
+#include <filesystem>
+#include <memory>
 //#include <optional>
 //#include <string>
 // pro
 #include <star/game/game_client_frame.hpp>
+//#include <star/game/client_settings.hpp>
 //#include <star/game/game_thread.hpp>
 //#include <star/game/user.hpp>
 //#include <star/view/render/renderer.hpp>
@@ -24,11 +26,30 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
+//class GameClient {
+//private:
+//	std::unique_ptr<class ImplGameClient> self;
+//
+//public:
+//	GameClient();
+//	~GameClient();
+//};
+//
+//GameClient::GameClient() :
+//	self(std::make_unique<ImplGameClient>()) {
+//}
+//
+//GameClient::~GameClient() {
+//	// For the sake of forward declared unique_ptr
+//}
+
 class GameClient {
 private:
+	std::shared_ptr<ClientConfig> settings_;
+
 	GameClientFrame frame;
 
-	libv::Nexus nexus;
+	libv::Nexus nexus_;
 //	libv::ctrl::Controls controls;
 
 	libv::ui::UI ui;
@@ -40,7 +61,7 @@ private:
 //	User user;
 
 public:
-	GameClient();
+	explicit GameClient(const std::filesystem::path& settingsFilepath);
 	~GameClient();
 
 //public:
@@ -58,6 +79,15 @@ private:
 
 public:
 	void run();
+
+public:
+	[[nodiscard]] constexpr inline libv::Nexus& nexus() noexcept {
+		return nexus_;
+	}
+
+	[[nodiscard]] constexpr inline const std::shared_ptr<ClientConfig>& settings() const noexcept {
+		return settings_;
+	}
 };
 
 // ---

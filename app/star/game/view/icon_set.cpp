@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/icon_set.cpp
+// Project: libv, File: app/star/game/view/icon_set.cpp
 
 // hpp
 #include <star/game/view/icon_set.hpp>

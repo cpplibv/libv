@@ -7,6 +7,13 @@
 
 local golden = 1.618033988749894848204586834365638118
 
+local fonts = {
+	packed = "arialn.ttf",
+	label = "calibril.ttf",
+	title = "consola.ttf",
+	mono = "consola.ttf",
+}
+
 local colors = {
 	--text_light =         "hsva(  0°,  0%,  80%, 100%)",
 	--text_dark =          "hsva(  0°,  0%,  20%, 100%)",
@@ -14,10 +21,10 @@ local colors = {
 	--hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
 }
 
--- =================================================================================================
+-- === Main Menu ===================================================================================
 
 ui.style("main-menu") {
-	font = "consola.ttf"
+	font = fonts.label,
 }
 
 ui.style("main-menu.golden-line") {
@@ -90,25 +97,126 @@ ui.style("main-menu.version-lbl") {
 	font_color = {1, 1, 1, 1},
 }
 
+-- === Settings ====================================================================================
+
+	--align_horizontal = "left",
+	--align_horizontal = "justify_all",
+	--anchor = "center_center",
+
+ui.style("settings.main") {
+	anchor = "center",
+	--size = "1r, 1r",
+	orientation = "down",
+	--background = "red",
+	padding = 25,
+}
+
+ui.style("settings.title") {
+	size = "1r, D",
+	font_size = 20,
+	padding = {18, 6},
+	font = fonts.title,
+	font_color = {1, 1, 1, 1},
+	--background = "green",
+}
+
+ui.style("settings.ctrl") {
+	size = "D, D",
+	font_size = 20,
+	padding = {18, 6},
+	font = fonts.title,
+	font_color = {1, 1, 1, 1},
+	margin = {0, 0, 0, 20},
+	--background = "green",
+
+	--background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.05}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+
+	state("focus") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("active") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover, active") {
+		background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("disable") {
+		font_color = {0.5, 0.5, 0.5, 1},
+		background = {type = "border_padding_pattern", color_border = {0.4, 0.4, 0.4, 0.6}, color_pattern = {0.4, 0.4, 0.4, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+}
+
+ui.style("settings.grid") {
+	size = "1r, D",
+	orientation2 = "right down",
+	column_count = 2,
+	padding = {20, 10},
+	spacing2 = {20, 4},
+	background = "hsva(240, 15%, 15%, 80%)",
+	--background = "yellow",
+}
+
+ui.style("settings.entry.lbl") {
+	size = "D, D",
+	anchor = "left",
+	font = fonts.label,
+	font_color = {1, 1, 1, 1},
+}
+
+ui.style("settings.entry.value") {
+	size = "1r, D",
+	padding = {4, 2},
+	anchor = "left",
+	align_horizontal = "center",
+	align_vertical = "center",
+	font_color = {1, 1, 1, 1},
+	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+}
+
+ui.style("settings.entry.value.number") {
+}
+
+ui.style("settings.entry.value.toggle") {
+}
+
+ui.style("settings.entry.value.text") {
+}
+
+ui.style("settings.entry.value.option.row") {
+	orientation = "right",
+	background = "none",
+	padding = 0,
+	spacing = 5,
+}
+
+ui.style("settings.entry.value.option.button") {
+	--size = "D, D",
+	--background = "yellow",
+}
+
 -- =================================================================================================
 
---ui.style("space") {
+--ui.style("star") {
 --	font = "consola.ttf",
 --	font_color = "rgba(0.0, 0.0, 0.0, 1.0)",
 --	font_size = 12,
 --}
 --
---ui.style("space.canvas.main") {
+--ui.style("star.canvas.main") {
 --
 --}
 --
---ui.style("space.canvas.mini") {
+--ui.style("star.canvas.mini") {
 --	anchor = "center_right",
 --	size = "1r, 15%",
 --	margin = 10,
 --}
 --
---ui.style("space.hud-bar.cmd.panel") {
+--ui.style("star.hud-bar.cmd.panel") {
 --	anchor = "bottom_right",
 --	orientation = "down",
 --	size = "D, D",
@@ -116,7 +224,7 @@ ui.style("main-menu.version-lbl") {
 --	margin = 5,
 --}
 --
---ui.style("space.hud-bar.cmd.btn") {
+--ui.style("star.hud-bar.cmd.btn") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	background = colors.hud_light_bg_color,
@@ -139,7 +247,7 @@ ui.style("main-menu.version-lbl") {
 --	},
 --}
 --
-----ui.style("space.hud-bar.mp.main") {
+----ui.style("star.hud-bar.mp.main") {
 ----	anchor = "top_center",
 ----	align_horizontal = "center",
 ----	align_vertical = "center",
@@ -147,7 +255,7 @@ ui.style("main-menu.version-lbl") {
 ----	size = "D, D",
 ----}
 --
---ui.style("space.hud-bar.mp.panel") {
+--ui.style("star.hud-bar.mp.panel") {
 --	anchor = "top_center",
 --	orientation = "right",
 --	size = "D, D",
@@ -155,14 +263,14 @@ ui.style("main-menu.version-lbl") {
 --	margin = 5,
 --}
 --
---ui.style("space.hud-bar.mp.btn") {
+--ui.style("star.hud-bar.mp.btn") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	background = colors.hud_light_bg_color,
 --	size = "10pxD, 4pxD",
 --}
 --
---ui.style("space.hud-bar.mp.input") {
+--ui.style("star.hud-bar.mp.input") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	background = colors.hud_light_bg_color,
@@ -170,15 +278,15 @@ ui.style("main-menu.version-lbl") {
 --	size = "10pxD, 4pxD",
 --}
 --
---ui.style("space.hud-bar.mp.lbl") {
+--ui.style("star.hud-bar.mp.lbl") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	background = colors.hud_light_bg_color,
 --	size = "10pxD, 4pxD",
 --}
 --
---ui.style("space.title-space") {
---	--ui.style("space.hud-bar.mp.btn") {
+--ui.style("star.title-star") {
+--	--ui.style("star.hud-bar.mp.btn") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
@@ -239,7 +347,7 @@ ui.style("main-menu.version-lbl") {
 --	size = "10pxD, 4pxD",
 --}
 --
---ui.style("space.hud-bar.mp-cam.panel") {
+--ui.style("star.hud-bar.mp-cam.panel") {
 --	anchor = "center_right",
 --	orientation = "down",
 --	size = "25%, 100%",
@@ -251,7 +359,7 @@ ui.style("main-menu.version-lbl") {
 --
 --
 --
---ui.style("space.hud-bar.lobby.panel") {
+--ui.style("star.hud-bar.lobby.panel") {
 --	align_horizontal = "left",
 --	align_vertical = "center",
 --	anchor = "center_left",
@@ -263,7 +371,7 @@ ui.style("main-menu.version-lbl") {
 --	spacing = 2,
 --}
 --
---ui.style("space.hud-bar.lobby.name") {
+--ui.style("star.hud-bar.lobby.name") {
 --	align_horizontal = "left",
 --	align_vertical = "center",
 --	background = colors.hud_light_bg_color,
@@ -272,14 +380,14 @@ ui.style("main-menu.version-lbl") {
 --	size = "D1r, D",
 --}
 --
---ui.style("space.hud-bar.lobby.title") {
+--ui.style("star.hud-bar.lobby.title") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	font_color = colors.text_black,
 --	size = "10pxD, 4pxD",
 --}
 --
---ui.style("space.overlay.controls-help.lbl") {
+--ui.style("star.overlay.controls-help.lbl") {
 --	align_horizontal = "left",
 --	align_vertical = "center",
 --	anchor = "center",

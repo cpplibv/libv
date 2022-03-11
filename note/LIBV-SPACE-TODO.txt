@@ -70,6 +70,7 @@ libv.ui: Fix incorrect ref_count management in components
 libv.net: Fix incorrect ref_count management in HandlerGuards
 app.space: Fix simple disconnect as a non-connected client will do long timeout
 app.space: Remove dead component during galaxy update
+libv.math: gradient
 
 
 
@@ -81,7 +82,7 @@ app.space: Remove dead component during galaxy update
 
 
 
-libv.math: gradient
+star: pimpl game client
 
 
 cereal: visiting_archive
@@ -93,9 +94,6 @@ https://www.youtube.com/watch?v=pfIC-kle4b0
 cerealv: instead of the free function use member functions on the archives
 		this eliminates the excessive sfinae too, getting better lookups
 		| this kindof doable with hooking into self().processImpl(), but most likely needs an intermediate layer for it
-
-
-
 
 
 
@@ -173,8 +171,12 @@ place.it:
 
 
 
-Noise needs:
+Surface needs:
+	frame/ui
+		resolve silent exception
 	ui
+		! color picker
+		! gradient picker
 		style/property nesting
 		static composition
 		components

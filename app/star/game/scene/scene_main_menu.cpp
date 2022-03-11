@@ -1,4 +1,4 @@
-// Created by Vader on 2022.03.08..
+// Project: libv, File: app/star/game/scene/scene_main_menu.cpp
 
 // hpp
 #include <star/game/scene/scene_main_menu.hpp>
@@ -11,19 +11,19 @@
 #include <libv/utility/nexus.hpp>
 // pro
 #include <star/game/control/requests.hpp>
-//#include <star/game/scene/scene_settings.hpp>
+#include <star/game/game_client.hpp>
+#include <star/game/scene/scene_root.hpp>
+#include <star/game/scene/scene_settings.hpp>
+#include <star/version.hpp>
 
 
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-//class SceneMainMenu {
-//
-//};
-
-libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
-	libv::ui::PanelAnchor layers{"layers"};
+libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
+	//libv::ui::PanelAnchor layers{"layers"};
+	libv::ui::PanelAnchor layers;
 
 	{
 		libv::ui::PanelLine golden_line{"golden-line"};
@@ -70,7 +70,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 					libv::ui::Button btn;
 					btn.style("main-menu.menu.entry");
 					btn.text("Mods");
-					btn.enable(false);
+//					btn.enable(false);
 					btn.event().submit.connect([] {
 		//				nexus.broadcast(ChangeScene(createSceneSettings()));
 					});
@@ -79,8 +79,8 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 					libv::ui::Button btn;
 					btn.style("main-menu.menu.entry");
 					btn.text("Settings");
-					btn.event().submit.connect([&nexus] {
-//						nexus.broadcast(ChangeScene(createSceneSettings(nexus, )));
+					btn.event().submit.connect([&gameClient](libv::ui::Button& source) {
+						source.event().global.fire<SwitchPrimaryScene>(createSceneSettings(gameClient));
 					});
 					menu_box.add(std::move(btn));
 				} {
@@ -88,7 +88,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 					btn.style("main-menu.menu.entry");
 					btn.text("Credits");
 					btn.enable(false);
-					btn.event().submit.connect([&nexus] {
+					btn.event().submit.connect([] {
 //						nexus.broadcast(RequestClientExit());
 					});
 					menu_box.add(std::move(btn));
@@ -96,8 +96,8 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 					libv::ui::Button btn;
 					btn.style("main-menu.menu.entry");
 					btn.text("Exit");
-					btn.event().submit.connect([&nexus] {
-						nexus.broadcast(RequestClientExit());
+					btn.event().submit.connect([&gameClient] {
+						gameClient.nexus().broadcast(RequestClientExit());
 					});
 					menu_box.add(std::move(btn));
 				}
@@ -113,8 +113,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 	} {
 		libv::ui::Label lbl("version_lbl");
 		lbl.style("main-menu.version-lbl");
-		// TODO P1: Version string
-		lbl.text("Version: 0.0.0");
+		lbl.text(star::version);
 		layers.add(std::move(lbl));
 	}
 

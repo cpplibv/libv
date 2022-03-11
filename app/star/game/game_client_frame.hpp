@@ -1,4 +1,4 @@
-// Created by Vader on 2022.03.08..
+// Project: libv, File: app/star/game/game_client_frame.hpp
 
 #pragma once
 

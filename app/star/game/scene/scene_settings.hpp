@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_main_menu.hpp
+// Project: libv, File: app/star/game/scene/scene_settings.hpp
 
 #pragma once
 
@@ -12,7 +12,8 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] libv::ui::Component createSceneMainMenu(GameClient& gameClient);
+//[[nodiscard]] libv::ui::Component createSceneSettings(libv::Nexus& nexus, const std::shared_ptr<ClientConfig>& config);
+[[nodiscard]] libv::ui::Component createSceneSettings(GameClient& gameClient);
 
 // -------------------------------------------------------------------------------------------------
 

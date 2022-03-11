@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/space_main.cpp
+// Project: libv, File: app/star/star_main.cpp
 
 // std
 #include <filesystem>
@@ -6,6 +6,7 @@
 // pro
 #include <star/game/game_client.hpp>
 #include <star/log.hpp>
+#include <star/version.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 
 	try {
-		star::log_star.info("Hello Space!");
+		star::log_star.info("Hello Space! {}", star::version);
 
 		// Change working directory
 		if (std::filesystem::exists("app/star/"))
@@ -41,7 +42,7 @@ int main(int argc, const char** argv) {
 			std::filesystem::current_path("../app/star/"); // During development binary artifacts created under /bin
 
 		// Run the game
-		star::GameClient game;
+		star::GameClient game("config.json");
 		game.run();
 
 	} catch (const std::exception& e) {
