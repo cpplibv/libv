@@ -451,7 +451,6 @@ void SpaceCanvas::render_opaque(libv::glr::Queue& glr, libv::vec3f eye, Galaxy& 
 			glr.model.translate(ship_pos);
 			// glr.model.scale(Fleet::pickingType.radius_universe);
 			glr.model.scale(0.05f);
-			glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(0, 0, 1)); // <<< Workaround the incorrect model orientation
 
 			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
 		}
