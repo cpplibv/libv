@@ -24,6 +24,7 @@
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/parse/parse_anchor.hpp>
 #include <libv/ui/parse/parse_orientation.hpp>
+#include <libv/ui/parse/parse_orientation2.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/anchor.hpp>
@@ -257,6 +258,52 @@ const auto conv_fn = [](auto&& fn) {
 		return PropertyDynamic{std::move(*result_opt)};
 	};
 };
+
+std::optional<libv::vec2f> convert_extent2(UI&, const sol::object& object) {
+	if (object.get_type() == sol::type::number) {
+		// left_down_right_top
+		return libv::vec2f::one(object.as<float>());
+
+	} else if (object.get_type() == sol::type::userdata) {
+		if (object.is<libv::vec2f>())
+			// left_right, down_top
+			return object.as<libv::vec2f>();
+
+		else
+			return std::nullopt;
+
+	} else if (object.get_type() == sol::type::table) {
+		auto table = object.as<sol::table>();
+
+		auto size = table.size();
+		if (size == 2) {
+			auto n1 = table.get<sol::object>(1);
+			auto n2 = table.get<sol::object>(2);
+			if (n1.get_type() != sol::type::number || n2.get_type() != sol::type::number)
+				return std::nullopt;
+
+			const auto v1 = n1.as<float>();
+			const auto v2 = n2.as<float>();
+
+			return libv::vec2f(v1, v2);
+
+		} else if (size == 1) {
+			auto n1 = table.get<sol::object>(1);
+			if (n1.get_type() != sol::type::number)
+				return std::nullopt;
+
+			const auto v1 = n1.as<float>();
+
+			return libv::vec2f::one(v1);
+
+		} else {
+			return std::nullopt;
+		}
+
+	} else {
+		return std::nullopt;
+	}
+}
 
 std::optional<Padding> convert_extent(UI&, const sol::object& object) {
 	if (object.get_type() == sol::type::number) {
@@ -582,7 +629,7 @@ public:
 		property_loaders.emplace(pnm::caret_color, conv_fn(libv::lua::convert_color));
 		//		property_loaders.emplace(pnm::caret_shader, _______);
 		property_loaders.emplace(pnm::color, conv_fn(libv::lua::convert_color));
-//		property_loaders.emplace(pnm::column_count, _______);
+		property_loaders.emplace(pnm::column_count, convert_enum_value<ColumnCount>());
 //		property_loaders.emplace(pnm::focus_select_policy, _______);
 		property_loaders.emplace(pnm::font, convert_font);
 //		property_loaders.emplace(pnm::font_outline, convert_font_outline);
@@ -591,14 +638,14 @@ public:
 		property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
 		property_loaders.emplace(pnm::margin, conv_fn(convert_extent));
 		property_loaders.emplace(pnm::orientation, convert_string_parse(&libv::ui::parse_orientation_optional));
-//		property_loaders.emplace(pnm::orientation2, _______);
+		property_loaders.emplace(pnm::orientation2, convert_string_parse(&libv::ui::parse_orientation2_optional));
 		property_loaders.emplace(pnm::padding, conv_fn(convert_extent));
 //		property_loaders.emplace(pnm::quad_shader, _______);
 //		property_loaders.emplace(pnm::scroll_area_mode, _______);
 		property_loaders.emplace(pnm::size, convert_string_parse(&libv::ui::parse_size_optional));
 //		property_loaders.emplace(pnm::snap_to_edge, _______);
 		property_loaders.emplace(pnm::spacing, convert_enum_value<Spacing>());
-//		property_loaders.emplace(pnm::spacing2, _______);
+		property_loaders.emplace(pnm::spacing2, conv_fn(convert_extent2));
 //		property_loaders.emplace(pnm::squish, _______);
 		property_loaders.emplace(pnm::z_index_offset, convert_enum_value<ZIndexOffset>());
 		//		property_loaders.emplace(pnm::text, _______);
