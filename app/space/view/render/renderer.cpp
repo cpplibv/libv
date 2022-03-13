@@ -570,6 +570,20 @@ void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 	}
 }
 
+void RendererDebug::renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+	glr.program(shader.program());
+
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh_triangle);
+	}
+}
+
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
@@ -645,7 +659,7 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
 // <<< P2: Model loader
-		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4"))),
+		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 //		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
 		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
@@ -845,41 +859,45 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs"){}
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
-void RendererSurface::build_mesh(libv::glr::Mesh& mesh, surface::Surface& surface) {
+void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<surface::Chunk>& chunks) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
-	const auto rowSize = surface.points.size();
+	for (int i = 0; i < chunks.size_x(); ++i) {
+		for (int j = 0; j < chunks.size_y(); ++j) {
+			surface::Chunk chunk = chunks(i,j);
+			const auto rowSize = chunk.points.size();
 
-	for (unsigned int i = 0; i < rowSize; i++) {
-		const auto colSize = surface.points[i].size();
-		for (unsigned int j = 0; j < colSize; ++j) {
-			position(surface.points[i][j].point);
-			color0(surface.points[i][j].color);
+			for (unsigned int i = 0; i < rowSize; i++) {
+				const auto colSize = chunk.points[i].size();
+				for (unsigned int j = 0; j < colSize; ++j) {
+					position(chunk.points[i][j].point + chunk.position);
+					color0(chunk.points[i][j].color);
+				}
+			}
+
+			for (int i = 0; i < rowSize - 1; ++i) {
+				index(vi);
+				const auto colSize = chunk.points[i].size();
+				for (int j = 0; j < colSize; ++j) {
+					index(vi);
+					index(vi + colSize);
+					vi += 1;
+				}
+				index(vi + colSize - 1);
+				//index(vi - 1);
+			}
 		}
 	}
-
-	for (int i = 0; i < rowSize - 1; ++i) {
-		index(vi);
-		const auto colSize = surface.points[i].size();
-		for (int j = 0; j < colSize; ++j) {
-			index(vi);
-			index(vi + colSize);
-			vi += 1;
-		}
-		index(vi + colSize - 1);
-		//index(vi - 1);
-	}
-
 }
 
 void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 //void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
-	//build_mesh(mesh, surface);
+	//build_mesh(mesh, chunk);
 
 	glr.program(shader.program());
 	{

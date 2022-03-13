@@ -34,11 +34,52 @@ SurfaceLuaBinding::SurfaceLuaBinding() {
 //		std::cout << "luaConfig: " << luaConfig << std::endl;
 }
 
+libv::vec4f convertColor(const sol::object& solColor) {
+	const auto color = libv::lua::convert_color(solColor);
+	if (!color.has_value())
+		throw std::runtime_error("Color given in config couldn't be converted");
+	return color.value();
+}
+
+SurfaceObject convertSurfaceObject(const sol::table& solSurfaceObject) {
+	SurfaceObject result;
+	result.size = solSurfaceObject["size"];
+	result.count = solSurfaceObject["count"];
+	result.color = convertColor(solSurfaceObject["color"]);
+	return result;
+}
+
+std::vector<SurfaceObject> convertSurfaceObjects(const sol::table& solSurfaceObjects) {
+	std::vector<SurfaceObject> result;
+	result.reserve(solSurfaceObjects.size());
+	for (const auto &[key, value] : solSurfaceObjects) {
+		if (value.get_type() != sol::type::table)
+			throw std::runtime_error("Lua type has to be table");
+		result.emplace_back(convertSurfaceObject(value.as<sol::table>()));
+	}
+	return result;
+}
+
 void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
+	config.colorGrad = convertColorGradient(luaConfig["colorGrad"]);
+//	config.colorGrad.add(0, {1, 1, 1, 1});
 	config.mode = luaConfig["mode"];
+	config.visualization = luaConfig["visualization"];
 	config.size = luaConfig["size"];
-//	config.octaves = luaConfig["octaves"];
 	config.amplitude = luaConfig["amplitude"];
+	config.plantDistribution = luaConfig["plantDistribution"];
+	config.circleNumber = luaConfig["circleNumber"];
+	config.circleSize = luaConfig["circleSize"];
+	config.objects = convertSurfaceObjects(luaConfig["objects"]);
+//	config.treeSize = luaConfig["treeSize"];
+//	config.treeNumber = luaConfig["treeNumber"];
+//	config.treeColor = convertColor(luaConfig["treeColor"]);
+//	config.bushSize = luaConfig["bushSize"];
+//	config.bushNumber = luaConfig["bushNumber"];
+//	config.bushColor = convertColor(luaConfig["bushColor"]);
+//	config.rockSize = luaConfig["rockSize"];
+//	config.rockNumber = luaConfig["rockNumber"];
+//	config.rockColor = convertColor(luaConfig["rockColor"]);
 //	config.colorGrad = luaConfig["colorGrad"];
 //	config.frequency = luaConfig["frequency"];
 //	config.lacunarity = luaConfig["lacunarity"];
@@ -47,9 +88,10 @@ void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
 //	config.noiseType = luaConfig["noiseType"];
 }
 
-void SurfaceLuaBinding::setColorGradient(libv::gradientf<libv::vec4f>& colorGrad, const sol::table& table) {
-	for (const auto& [_, keyValue] : table) {
-		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size()!=2)
+libv::gradientf<libv::vec4f> SurfaceLuaBinding::convertColorGradient(const sol::table& table) {
+	libv::gradientf<libv::vec4f> colorGrad;
+	for (const auto&[_, keyValue] : table) {
+		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size() != 2)
 			throw std::runtime_error("Invalid colorGrad key-value pair");
 
 //		colorGrad.add(12.4f, libv::lua::convert_color(std::string{"magenta"}));
@@ -58,13 +100,14 @@ void SurfaceLuaBinding::setColorGradient(libv::gradientf<libv::vec4f>& colorGrad
 		const auto key = keyValue.as<sol::table>()[1];
 		const auto value = keyValue.as<sol::table>()[2];
 		if (key.get_type() != sol::type::number)
-			throw std::runtime_error("Key of color gradient has to be a number "+std::string(libv::lua::lua_type_to_string(key.get_type())));
-		const auto color = libv::lua::convert_color(value);
-		if(!color.has_value())
-			throw std::runtime_error("Color given in config couldn't be converted");
-		colorGrad.add(key.get<float>(), color.value());
-		std::cout << key.get<std::string_view>() << " = " << value.get<std::string_view>() << std::endl;
+			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::lua_type_to_string(key.get_type())));
+		const auto color = convertColor(value);
+
+//		std::cout << key.get<std::string_view>() << " = " << value.get<std::string_view>() << std::endl;
+
+		colorGrad.add(key.get<float>(), color);
 	}
+	return colorGrad;
 }
 
 std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, int depth) {
@@ -88,27 +131,19 @@ std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, in
 		auto node = std::make_unique<NodeConstant>();
 		node->value = table["value"];
 		return node;
-	}
-
-	else if (nodeType == "perlin") {
+	} else if (nodeType == "perlin") {
 		auto node = std::make_unique<NodePerlin>();
 		node->seed = table["seed"];
 		return node;
-	}
-
-	else if (nodeType == "simplex") {
+	} else if (nodeType == "simplex") {
 		auto node = std::make_unique<NodeSimplex>();
 		node->seed = table["seed"];
 		return node;
-	}
-
-	else if (nodeType == "simplexFractal") {
+	} else if (nodeType == "simplexFractal") {
 		auto node = std::make_unique<NodeSimplexFractal>();
 		setFractalConfig(*node, table);
 		return node;
-	}
-
-	else if (nodeType == "warp") {
+	} else if (nodeType == "warp") {
 		if (children.size() != 1)
 			throw std::runtime_error("Warp can only be applied to size of one nodes");
 
@@ -146,7 +181,6 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(std::string_view script) {
 		throw std::runtime_error(std::string("Expected lua table with name \"Config\" but received: ") + std::string(libv::lua::lua_type_to_string(luaNodes.get_type())));
 	auto nodes = getNodeTree(luaNodes);
 	config.rootNode = std::move(nodes);
-	setColorGradient(config.colorGrad, luaConfig["colorGrad"]);
 	setConfig(luaConfig);
 	return std::move(config);
 }

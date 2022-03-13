@@ -3,6 +3,11 @@ Mode = {
 	_3d = 1
 }
 
+Visualization = {
+	model = 0,
+	spheres = 1
+}
+
 NodeType = {
 	constant = "constant",
 	perlin = "perlin",
@@ -20,6 +25,16 @@ NoiseType = {
 	simplex2S = 3,
 	cellular = 4,
 }
+
+PlantDistribution = {
+	random = 0,
+	clustered = 1,
+}
+
+--PlantDistribution = {
+--	random = "random",
+--	clustered = "clustered",
+--}
 
 Config = {
 	mode = Mode._3d,
@@ -146,8 +161,8 @@ config = {
 	colorGrad = {
 		{-1.0 , "hsv(240, 80%, 20%)"},
 		{-0.01 , "hsv(240, 80%, 60%)"},
-		{0.0 , "hsv(240, 70%, 99%)"},
-		{0.0 , "hsv(60, 60%, 100%)"},
+		--{0.0 , "hsv(240, 70%, 99%)"},
+		{0.0 , "hsv(220, 80%, 60%)"},
 		{0.01 , "hsv(60, 80%, 90%)"},
 		{0.05 , "hsv(120, 70%, 75%)"},
 		{0.1 , "hsv(120, 100%, 50%)"},
@@ -164,8 +179,42 @@ config = {
 		--[2.0] = "grey",
 	},
 	mode = Mode._3d,
-	size = 1024,
+	visualization = Visualization.spheres,
+	size = 64,
 	amplitude = 0.5,
+	--treeSize = 0.003,
+	plantDistribution = PlantDistribution.random,
+	circleNumber = 50,
+	circleSize = 0.01,
+	objects = {
+		--asd = 12,
+		{
+			type = "tree",
+			size = 0.01,
+			count = 200,
+			color = "hsv(120, 70%, 75%)",
+		},
+		{
+			type = "bush",
+			size = 0.006,
+			count = 400,
+			color= "hsv(160, 70%, 75%)",
+		},
+		{
+			type = "rock",
+			size = 0.004,
+			count = 600,
+			color = "grey",
+		},
+		--{
+		--	--type = "boulder",
+		--	type = "rock",
+		--	size = 0.005,
+		--	count = 300,
+		--	color = "hsv(160, 10%, 60%)",
+		--},
+	},
+
 }
 
 nodes =
@@ -188,9 +237,9 @@ nodes =
 				--	seed = 126
 				--}
 				simplexFractal {
-					seed = 426,
+					seed = 810,
 					octaves = 6,
-					amplitude = 0.5,
+					amplitude = 1,
 					frequency = 0.0015,
 					lacunarity = 2.0,
 					persistence = 0.5,
@@ -211,6 +260,42 @@ nodes =
 
 		}
 	}
+
+heatMaps = {
+	temperature = {
+		heightSensitivity = 0.2,
+		simplexFractal {
+			seed = 810,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.0015,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+	},
+	humidity = {
+		heightSensitivity = 0.2,
+		simplexFractal {
+			seed = 810,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.0015,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+	},
+	fertility = {
+		heightSensitivity = 0.2,
+		simplexFractal {
+			seed = 810,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.0015,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+	}
+}
 
 --option 3
 --NodeTree = {

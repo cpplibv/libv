@@ -176,6 +176,10 @@ struct RendererDebug {
 	};
 
 public:
+	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+
 	std::vector<Point> points;
 	std::vector<Line> lines;
 	std::vector<Triangle> triangles;
@@ -185,9 +189,6 @@ public:
 	std::vector<Sphere> spheres;
 
 private:
-	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	ShaderTestMode shader;
 
@@ -198,6 +199,7 @@ public:
 	void build_lines_mesh(libv::glr::Mesh& mesh);
 	void build_triangles_mesh(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	void renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererSurface {
@@ -206,9 +208,9 @@ struct RendererSurface {
 
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
-	void build_mesh(libv::glr::Mesh& mesh, surface::Surface& surface);
+	void build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<surface::Chunk>& chunk);
 
-//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Surface& surface);
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
@@ -254,7 +256,7 @@ struct RendererFleet {
 public:
 	explicit RendererFleet(RendererResourceContext& rctx);
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status = Fleet::Selection::notSelected);
 };
 
 struct RendererPlanet {

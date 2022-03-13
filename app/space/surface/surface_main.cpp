@@ -32,7 +32,6 @@
 #include <space/view/camera_control.hpp>
 #include <space/view/frame.hpp>
 #include <space/view/render/renderer.hpp>
-#include <space/view/render/renderer.hpp>
 #include <libv/meta/resolve.hpp>
 #include <libv/fsw/watcher.hpp>
 
@@ -50,7 +49,8 @@ private:
 //	libv::rev::PostProcessing postProcessing;
 	space::Renderer renderer;
 	libv::glr::Texture2D::RGBA32F heightMap;
-	Surface surface;
+	libv::vector_2D<Chunk> chunks{3, 3};
+//	std::vector<Chunk> chunks;
 //	int count;
 //	std::mutex mutex;
 	std::atomic<bool> changed = true;
@@ -65,7 +65,6 @@ public:
 	//renderTarget({100, 100}, 4),
 	//postProcessing(renderer.resource_context.shader_loader, {100, 100})
 	{
-//		count = 256;
 		camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 //		auto config = binding.getConfigFromLuaScript("surface/noise_config.lua");
 //
@@ -126,28 +125,83 @@ private:
 
 		// =================================================================================================
 		if (changed) {
-			libv::Timer timerNoiseGen;
-			NoiseGen noiseGen;
+			libv::Timer timerChunkGen;
+			ChunkGen chunkGen;
 			auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
 			config = binding.getConfigFromLuaScript(script);
-			surface::Surface surface = noiseGen.generateNoise(config);
-			fmt::print("TimerNoiseGen: {:8.4f} ms", timerNoiseGen.timed_ms().count());
-			std::cout << std::endl;
+			for (int i = 0; i < 3; ++i) {
+				for (int j = 0; j < 3; ++j) {
+					Chunk chunk = chunkGen.generateChunk(config);
+					chunkGen.placeVegetation(chunk, config);
+					chunk.position = {static_cast<float> (i), static_cast<float> (j), 0};
+					chunks(i, j) = chunk;
+//					chunks.emplace_back(chunk);
+					fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
+					std::cout << std::endl;
 
-			if (Mode{config.mode} == Mode::_3d) {
-				renderer.surface.build_mesh(renderer.surface.mesh, surface);
-			} else {
-				//texture
-				heightMap = libv::glr::Texture2D::RGBA32F();
-				heightMap.storage(1, libv::vec2i{config.size, config.size});
-				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, surface.getColors().data());
+
+//				for (int i = 0; i < chunk.featureList.size(); ++i) {
+//					const auto point = chunk.featureList[i];
+//					renderer.debug.spheres[i] = space::RendererDebug::Sphere
+//							{point.point, config.treeSize, config.treeColor, 10, 10};
+//				}
+					renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
+				}
 			}
-			changed = false;
+			if (config.mode == Mode::_3d) {
+				renderer.surface.build_mesh(renderer.surface.mesh, chunks);
+			}
+//			else {
+//				//texture
+//				heightMap = libv::glr::Texture2D::RGBA32F();
+//				heightMap.storage(1, libv::vec2i{config.size, config.size});
+//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, chunk.getColors().data());
+//			}
 
+//			if (config.visualization == Visualization::spheres) { //add features
+//				renderer.debug.spheres.clear();
+////				renderer.debug.spheres.reserve(chunk.featureList.size());
+//				for (const auto& surfaceObjectStorage : chunk.featureList) {
+////					renderer.debug.spheres.reserve(renderer.debug.spheres.size() + surfaceObjectStorage.points.size());
+//					for (const auto& point : surfaceObjectStorage.points) {
+//						renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+//								{point.position, point.size, point.color, 10, 10});
+//					}
+//				}
+//
+//			}
+			changed = false;
 		}
-		Mode{config.mode} == Mode::_3d ?
+
+		config.mode == Mode::_3d ?
 				renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
 				renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
+		// render plant model
+//		if (config.visualization == Visualization::model)
+//			for (const auto& feature : chunk.featureList) {
+//				for (const auto& point : feature.points) {
+//					const auto m2_guard = glr.model.push_guard();
+//					glr.model.translate(point.position);
+//					glr.model.scale(point.size);
+//					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+//
+//					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+//				}
+//			}
+//			for (int i = 0; i < chunk.featureList.size(); ++i) {
+//				const auto m2_guard = glr.model.push_guard();
+//
+//				//			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
+//
+//				glr.model.translate(chunk.featureList[i].point);
+//				// glr.model.scale(Fleet::pickingType.radius_universe);
+//				glr.model.scale(config.treeSize);
+//				glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+//
+//				renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+//			}
+//		else
+//			renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
 	}
 };
 

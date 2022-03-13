@@ -3,6 +3,8 @@
 #include <cmath>
 #include <libv/noise/noise_util.hpp>
 
+#include <stdexcept>
+
 
 #pragma once
 
@@ -386,6 +388,7 @@ template <typename T>
 			return std::abs(x) + std::abs(y) + x * x + y * y;
 		}, distanceFn, returnType, jitter);
 	}
+	throw std::runtime_error("Distance function unknown: {}" ); //TODO error msg;
 }
 
 

@@ -1,0 +1,170 @@
+Index: app/space/surface/noise_config.lua
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Mode = {\n\ttexture = 0,\n\t_3d = 1\n}\n\nNodeType = {\n\tconstant = \"constant\",\n\tperlin = \"perlin\",\n\tsimplex = \"simplex\",\n\tsimplexFractal = \"simplexFractal\",\n\twarp = \"warp\",\n\tadd = \"add\",\n\tpow = \"pow\",\n}\n\nNoiseType = {\n\tvalue = 0,\n\tperlin = 1,\n\tsimplex = 2,\n\tsimplex2S = 3,\n\tcellular = 4,\n}\n\nConfig = {\n\tmode = Mode._3d,\n\tsize = 1024,\n\tamplitude = 0.5,\n\n\t--{\n\t--\t--fractal\n\t--\toctaves = 4,\n\t--\tamplitude = 0.5,\n\t--\tfrequency = 0.2,\n\t--\tlacunarity = 2.0,\n\t--\tpersistence = 0.5,\n\t--\t--noise\n\t--\tseed = 0x5EED,\n\t--\tnoiseType = NoiseType.perlin,\n\t--\t----cellular\n\t--\t--distanceFn =,\n\t--\t--returnType =,\n\t--\t--jitter = 1.0f\n\t--},\n\t--{\n\t--\t--fractal\n\t--\toctaves = 8,\n\t--\tamplitude = 0.5,\n\t--\tfrequency = 0.2,\n\t--\tlacunarity = 2.0,\n\t--\tpersistence = 0.5,\n\t--\t--noise\n\t--\tseed = 0x5EED,\n\t--\tnoiseType = NoiseType.simplex,\n\t--\t----cellular\n\t--\t--distanceFn =,\n\t--\t--returnType =,\n\t--\t--jitter = 1.0f\n\t--}\n}\n\n--option 1\n--height = perlin(seed) > warp(0.5) + cellular(cell.distance0);\n\n--option 2\n--function perlin()\n--\treturn {\n--\t\tnodeType = \"perlin\"\n--\t\t--seed = seed\n--\t}\n--end\n\n\n--function warp(node)\n--\treturn {\n--\t\tnodeType = \"warp\",\n--\t\t--warp_value = 0.5,\n--\t\tinput = node\n--\t}\n--end\n\n--function add(...)\n--\tlocal args = {...}\n--\t--local x = table.unpack(arg)\n--\targs.node_type = \"add\"\n--\treturn args\n--end\n\n\nlocal constant = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.constant\n\treturn args\nend\n\nlocal perlin = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.perlin\n\treturn args\nend\n\nlocal simplex = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.simplex\n\treturn args\nend\n\nlocal simplexFractal = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.simplexFractal\n\treturn args\nend\n\nlocal warp = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.warp\n\treturn args\nend\n\nlocal add = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.add\n\treturn args\nend\n\nlocal pow = function(args)\n\targs = args or {}\n\targs.nodeType = NodeType.pow\n\treturn args\nend\n\n--base = perlin(seed, 3, 4, 5, 6, 2, 4);\n--result =\n--\t\tadd(\n--\t\t\twarp(\n--\t\t\t\tperlin(seed, 3, 4, 5, 6, 2, 4)\n--\t\t\t),\n--\t\t\tcellular(cell.distance0)\n--\t\t)\n\n--local addKeyValue = function(key, value)\n--\n--\treturn args\n--end\n\nconfig = {\n\tcolorGrad = {\n\t\t{-1.0 , \"hsv(240, 80%, 20%)\"},\n\t\t{-0.01 , \"hsv(240, 80%, 60%)\"},\n\t\t--{0.0 , \"hsv(240, 70%, 99%)\"},\n\t\t{0.0 , \"hsv(220, 80%, 60%)\"},\n\t\t{0.01 , \"hsv(60, 80%, 90%)\"},\n\t\t{0.05 , \"hsv(120, 70%, 75%)\"},\n\t\t{0.1 , \"hsv(120, 100%, 50%)\"},\n\t\t{0.5 , \"hsv(120, 100%, 60%)\"},\n\t\t{0.6 , \"hsv(120, 60%, 60%)\"},\n\t\t{1.0 , \"hsv(220, 5%, 95%)\"},\n\t\t--{key = -2.0 ,value =  \"blue\"},\n\t\t--{key = 0.0 , value = \"yellow\"},\n\t\t--{key = 1.0 , value = \"green\"},\n\t\t--{key = 2.0 , value = \"grey\"},\n\t\t--[-2.0] = \"blue\",\n\t\t--[0.0] = \"yellow\",\n\t\t--[1.0] = \"green\",\n\t\t--[2.0] = \"grey\",\n\t},\n\tmode = Mode._3d,\n\tsize = 128,\n\t--treeSize = 0.003,\n\ttreeSize = 0.00005,\n\ttreeNumber = 100,\n\tamplitude = 0.5,\n}\n\nnodes =\n\tpow{\n\n\t\texponent = 2.0,\n\t\t--\t}\n\t\t--}\n\t\tadd{\n\t\t\t--perlin{},\n\t\t\twarp{\n\t\t\t\t--value = 0.5,\n\t\t\t\tseed = 423,\n\t\t\t\toctaves = 5,\n\t\t\t\tamplitude = 1,\n\t\t\t\tfrequency = 0.25,\n\t\t\t\tlacunarity = 2.0,\n\t\t\t\tpersistence = 0.5,\n\t\t\t\t--simplex{\n\t\t\t\t--\tseed = 126\n\t\t\t\t--}\n\t\t\t\tsimplexFractal {\n\t\t\t\t\tseed = 810,\n\t\t\t\t\toctaves = 6,\n\t\t\t\t\tamplitude = 1,\n\t\t\t\t\tfrequency = 0.0015,\n\t\t\t\t\tlacunarity = 2.0,\n\t\t\t\t\tpersistence = 0.5,\n\t\t\t\t},\n\t\t\t},\n\t\t\t--simplexFractal {\n\t\t\t--\tseed = 423,\n\t\t\t--\toctaves = 6,\n\t\t\t--\tamplitude = 0.2,\n\t\t\t--\tfrequency = 0.2,\n\t\t\t--\tlacunarity = 2.0,\n\t\t\t--\tpersistence = 0.5,\n\t\t\t--},\n\t\t\tconstant{\n\t\t\t\tvalue = 0.5\n\t\t\t},\n\t\t\t--perlin{}\n\n\t\t}\n\t}\n\n--option 3\n--NodeTree = {\n--\tnode_type = \"add\",\n--\t{\n--\t\tnode_type = \"warp\",\n--\t\twarp_value = 0.5,\n--\t\tinput = {\n--\t\t\tnode_type = \"perlin\"\n--\t\t\t--seed,\n--\t\t\t--args,\n--\t\t}\n--\t},\n--\t{\n--\t\tnode_type = \"perlin\"\n--\t\t--return_value = cell.distance0,\n--\t}\n--}\n\n\nNodeTree = {\n\tnode_type = \"add\",\n\t[1] = {...},\n\t[2] = {...}\n}\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/space/surface/noise_config.lua b/app/space/surface/noise_config.lua
+--- a/app/space/surface/noise_config.lua	(revision e4afefaa39fcbe1c2f4bf0f01230e85b1d657a14)
++++ b/app/space/surface/noise_config.lua	(date 1647496939307)
+@@ -164,10 +164,10 @@
+ 		--[2.0] = "grey",
+ 	},
+ 	mode = Mode._3d,
+-	size = 128,
++	size = 256,
+ 	--treeSize = 0.003,
+-	treeSize = 0.00005,
+-	treeNumber = 100,
++	treeSize = 0.003,
++	treeNumber = 4500,
+ 	amplitude = 0.5,
+ }
+ 
+@@ -193,7 +193,7 @@
+ 				simplexFractal {
+ 					seed = 810,
+ 					octaves = 6,
+-					amplitude = 1,
++					amplitude = 0.5,
+ 					frequency = 0.0015,
+ 					lacunarity = 2.0,
+ 					persistence = 0.5,
+Index: app/space/surface/surface.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Created by dbobula on 1/16/2022.\n\n#include <space/surface/surface.hpp>\n//timer\n#include <libv/noise/noise.hpp>\n#include <iostream>\n#include <memory>\n//#include <libv/math/smoothstep.hpp>\n\n\nnamespace surface {\n\n//\tChunkGen::ChunkGen(space::Renderer& renderer):renderer(renderer) {\nChunkGen::ChunkGen() {}\n\nvoid ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {\n\t//TODO\n\tconst auto size = config.size;\n\trange = libv::xoroshiro128(+123);\n\tauto dist = libv::make_uniform_distribution_inclusive(1, config.treeNumber);\n\tauto dist2 = libv::make_uniform_distribution_exclusive(0, size-1);\n//\tauto veggie = libv::make_uniform_distribution_inclusive(0, 3);\n//\tauto ratio = libv::make_uniform_distribution_inclusive(0, 1000);\n\tauto ratio = libv::make_uniform_distribution_inclusive(0.f, 1.f);\n\tconst auto treeCount = dist(range);\n\tfor (int i = 0; i < config.treeNumber; ++i) {\n\t\tconst auto x = dist2(range);\n\t\tconst auto y = dist2(range);\n\t\tconst auto r1 = ratio(range);\n\t\tconst auto r2 = ratio(range);\n\t\tconst auto r3 = ratio(range);\n\t\tconst auto point1 = chunk.points[x][y];\n\t\tconst auto point2 = chunk.points[x][y + 1];\n\t\tconst auto point3 = chunk.points[x + 1][y];\n\t\tconst auto sum = r1 + r2 + r3;\n\t\tconst auto r1_f = static_cast<float> (r1) / static_cast<float> (sum);\n\t\tconst auto r2_f = static_cast<float> (r2) / static_cast<float> (sum);\n\t\tconst auto r3_f = static_cast<float> (r3) / static_cast<float> (sum);\n//\t\tlibv::smoothstep();\n\t\tconst auto point=point1.point*r1_f+point2.point*r2_f+point3.point*r3_f;\n\t\tchunk.vegetation.emplace_back(VegetationPoint{point});\n//\t\t\t\tVegetationPoint{libv::vec3f(static_cast<float>(x) / size, static_cast<float>(y) / size, point.z)});\n\t}\n\n//\tfor (int i = 0; i < size; ++i) {\n//\t\tconst auto x = dist(range);\n//\t\tfor (int j = 0; j < size; ++j) {\n//\t\t\tconst auto y = dist(range);\n//\t\t\tchunk.vegetation.emplace_back(\n//\t\t\t\t\tVegetationPoint{libv::vec3f{static_cast<float>(x)/size,static_cast<float>(y)/size,0}});\n//\t\t}\n//\t}\n//\tbool hasTree = dist(range) == 1;\n//\t\t\tif (hasTree)\n//\t\t\t\tchunk.vegetation.emplace_back(VegetationPoint{point});\n}\n\n\nChunk ChunkGen::generateChunk(const Config& config) {\n\tChunk chunk;\n\tauto size = config.size;\n\tchunk.size = config.size;\n\tstd::cout << \"chunk.size: \" << chunk.size << std::endl;\n\tchunk.points.resize(size);\n\n\n\tlibv::mt::parallel_for(threads, 0, size, [&](auto i) {\n//\t\t\t\tlibv::xoroshiro128 rng(seed + i);\n//\t\t\t\tauto dist = libv::make_uniform_distribution_inclusive(-1.f, 1.f);\n\t\tstd::vector<SurfacePoint> temp;\n\t\ttemp.resize(size);\n\n\t\tfor (int j = 0; j < size; ++j) {\n\t\t\tauto i_f = static_cast<float>(i);\n\t\t\tauto j_f = static_cast<float>(j);\n\t\t\tauto size_f = static_cast<float>(size);\n\n\t\t\tconst auto noise_value = config.rootNode->evaluate(i_f, j_f);\n\t\t\tconst auto point = libv::vec3f{i_f / size_f, j_f / size_f, noise_value * 0.1f};\n\t\t\tconst auto color = config.colorGrad.sample(noise_value);\n\n//\t\t\tconst auto color = libv::vec4f{libv::vec3f::one(noise_value / (config.amplitude * 2) * 0.5f + 0.5f), 1.f};\n\n//\t\t\tplus.inputs =\n//\t\t\tauto noise_value = libv::noise_fractal(config.seed, i_f / 50.f, j_f / 50.f, [](auto... a){ return libv::noise_cellular<float>(a...,\n//\t\t\t\t\tlibv::CellularDistanceFunction::euclidean,\n//\t\t\t\t\tlibv::CellularReturnType::cellValue\n//\t\t\t\t);}, config.octaves, config.amplitude, config.frequency, config.lacunarity, config.persistence);\n//\n//\t\t\tnoise_value += libv::noise_fractal(config.seed, i_f / 50.f, j_f / 50.f, libv::noise_simplex<float>, config.octaves, config.amplitude, config.frequency, config.lacunarity, config.persistence);\n\n//\t\t\t\t\tconst auto color = libv::vec4f{libv::color::hue_to_rgb(1.f / 3.f * (noise_value * 0.5f + 0.5f)), 1.f};\n\n//\t\t\t\t\t\t\tlibv::vec4f{1, 1, 1, 1}\n//\t\t\t\t\trenderer.debug.points.emplace_back(\n//\t\t\t\t\t\t\tlibv::vec3f{i_f, j_f, noise_value*0.1f},\n//\t\t\t\t\t\t\tcolor\n//\t\t\t\t\t);\n\t\t\ttemp[j] = SurfacePoint{point, color};\n//\t\t\t\t\tchunk.points[i][j] = SurfacePoint{libv::vec3f{i_f, j_f, noise_value * 0.1f}, color};\n\t\t}\n\t\tchunk.points[i] = std::move(temp);\n\t});\n\treturn chunk;\n\n}\n\n} // namespace surface\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/space/surface/surface.cpp b/app/space/surface/surface.cpp
+--- a/app/space/surface/surface.cpp	(revision e4afefaa39fcbe1c2f4bf0f01230e85b1d657a14)
++++ b/app/space/surface/surface.cpp	(date 1647496939307)
+@@ -5,7 +5,7 @@
+ #include <libv/noise/noise.hpp>
+ #include <iostream>
+ #include <memory>
+-//#include <libv/math/smoothstep.hpp>
++#include <libv/math/smoothstep.hpp>
+ 
+ 
+ namespace surface {
+@@ -20,10 +20,9 @@
+ 	auto dist = libv::make_uniform_distribution_inclusive(1, config.treeNumber);
+ 	auto dist2 = libv::make_uniform_distribution_exclusive(0, size-1);
+ //	auto veggie = libv::make_uniform_distribution_inclusive(0, 3);
+-//	auto ratio = libv::make_uniform_distribution_inclusive(0, 1000);
+-	auto ratio = libv::make_uniform_distribution_inclusive(0.f, 1.f);
++	auto ratio = libv::make_uniform_distribution_inclusive(0, 1000);
+ 	const auto treeCount = dist(range);
+-	for (int i = 0; i < config.treeNumber; ++i) {
++	for (int i = 0; i < treeCount; ++i) {
+ 		const auto x = dist2(range);
+ 		const auto y = dist2(range);
+ 		const auto r1 = ratio(range);
+@@ -63,6 +62,18 @@
+ 	std::cout << "chunk.size: " << chunk.size << std::endl;
+ 	chunk.points.resize(size);
+ 
++//	libv::gradientf<libv::vec4f> colorGrad;
++//	colorGrad.add(-2.f, {0, 0, 1, 1});
++//	colorGrad.add(-0.2f, {0, 0.4f, 1, 0.7f});
++//	colorGrad.add(0.1f, {0.8f, 0.8f, 0.15f, 1});
++////	colorGrad.add(0.f, {1, 1, 1, 1});
++//	colorGrad.add(0.2f, {0.1f, 0.5f, 0.1f, 1});
++//	colorGrad.add(0.5f, {0.1f, 0.3f, 0.1f, 1});
++//	colorGrad.add(1.f, {0, 0, 0, 0.3f});
++
++//	xoroshiro128 = libv::xoroshiro128(+123);
++//	auto dist = libv::make_uniform_distribution_inclusive(0, 1);
++
+ 
+ 	libv::mt::parallel_for(threads, 0, size, [&](auto i) {
+ //				libv::xoroshiro128 rng(seed + i);
+@@ -79,6 +90,9 @@
+ 			const auto point = libv::vec3f{i_f / size_f, j_f / size_f, noise_value * 0.1f};
+ 			const auto color = config.colorGrad.sample(noise_value);
+ 
++//			bool hasTree = dist(xoroshiro128) == 1;
++//			if (hasTree)
++//				chunk.vegetation.emplace_back(VegetationPoint{point});
+ //			const auto color = libv::vec4f{libv::vec3f::one(noise_value / (config.amplitude * 2) * 0.5f + 0.5f), 1.f};
+ 
+ //			plus.inputs =
+Index: app/space/surface/surface_main.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Project: libv, File: app/space/space_main.cpp\n\n// std\n#include <filesystem>\n#include <iostream>\n// pro\n//#include <space/game/game_instance.hpp>\n#include <space/log.hpp>\n\n\n#include <iostream>\n#include <space/surface/surface.hpp>\n#include <space/surface/lua_binding.hpp>\n#include <space/view/camera.hpp>\n\n#include <libv/color/space.hpp>\n#include <libv/ctrl/controls.hpp>\n#include <libv/ctrl/feature_register.hpp>\n#include <libv/glr/queue.hpp>\n#include <libv/glr/texture.hpp>\n#include <libv/noise/noise.hpp>\n#include <libv/rev/post_processing.hpp>\n#include <libv/rev/render_target.hpp>\n#include <libv/ui/component/canvas.hpp>\n#include <libv/ui/component/label.hpp>\n#include <libv/ui/settings.hpp>\n#include <libv/ui/ui.hpp>\n#include <libv/utility/timer.hpp>\n#include <libv/utility/random/xoroshiro128.hpp>\n#include <libv/utility/random/uniform_distribution.hpp>\n#include <space/view/camera.hpp>\n#include <space/view/camera_control.hpp>\n#include <space/view/frame.hpp>\n#include <space/view/render/renderer.hpp>\n#include <libv/meta/resolve.hpp>\n#include <libv/fsw/watcher.hpp>\n\n\nnamespace surface {\n\n\nclass SurfaceCanvas : public libv::ui::CanvasBase {\npublic:\n\tspace::CameraPlayer camera;\n//\tCameraPlayer::screen_picker screen_picker;\n\nprivate:\n//\tlibv::rev::RenderTarget renderTarget;\n//\tlibv::rev::PostProcessing postProcessing;\n\tspace::Renderer renderer;\n\tlibv::glr::Texture2D::RGBA32F heightMap;\n\tChunk chunk;\n//\tint count;\n//\tstd::mutex mutex;\n\tstd::atomic<bool> changed = true;\n\tSurfaceLuaBinding binding;\n\tConfig config;\n\tlibv::fsw::Watcher fileWatcher;\n\npublic:\n\texplicit SurfaceCanvas(libv::ui::UI& ui) :\n\t\t\trenderer(ui)\n\t//screen_picker(camera.picker({100, 100})),\n\t//renderTarget({100, 100}, 4),\n\t//postProcessing(renderer.resource_context.shader_loader, {100, 100})\n\t{\n\t\tcamera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});\n//\t\tauto config = binding.getConfigFromLuaScript(\"surface/noise_config.lua\");\n//\n//\t\theightMap.storage(1, libv::vec2i{config.size, config.size});\n\n\t\tfileWatcher.subscribe_file(\"surface/noise_config.lua\", [this](const libv::fsw::Event& event) {\n//\t\t\tauto lock = std::unique_lock(mutex);\n\t\t\tchanged = true;\n\t\t});\n//\t\trenderer.surface.build_mesh(renderer.surface.mesh, surface);\n\t\t//postProcessing.vignetteIntensity(0.15f);\n\t}\n\nprivate:\n\tvirtual void attach() override {\n\t\tfocus();\n\t}\n\n//\tvirtual void update(libv::ui::time_duration delta_time) override {}\n\tvirtual void render(libv::glr::Queue& glr) override {\n\t\trenderer.prepare_for_render(glr);\n\n//\t\tscreen_picker = camera.picker(canvas_size);\n//\t\trenderTarget.size(canvas_size.cast<int32_t>());\n//\t\tpostProcessing.size(canvas_size.cast<int32_t>());\n\n\t\tconst auto s_guard = glr.state.push_guard();\n\n\t\tglr.state.enableDepthTest();\n\t\tglr.state.depthFunctionLess();\n\t\tglr.state.enableDepthMask();\n\n\t\tglr.state.enableBlend();\n\t\tglr.state.blendSrc_SourceAlpha();\n\t\tglr.state.blendDst_One_Minus_SourceAlpha();\n\n\t\t//glr.state.enableCullFace();\n\t\tglr.state.disableCullFace();\n\t\tglr.state.cullBackFace();\n\t\tglr.state.frontFaceCCW();\n\n\t\tglr.state.clipPlanes(0);\n\t\tglr.state.polygonModeFill();\n\t\t//glr.state.polygonModeLine();\n\n\t\tglr.projection = camera.projection(canvas_size);\n\t\tglr.view = camera.view();\n\t\tglr.model = libv::mat4f::identity();\n\n\t\t//const auto eye = glr.eye();\n\n\t\t// Set framebuffer to the post-processing target\n\t\t//glr.framebuffer_draw(renderTarget.framebuffer());\n\n\t\tglr.setClearColor(0, 0, 0, 1);\n\t\tglr.clearColor();\n\t\tglr.clearDepth();\n\n\t\t// =================================================================================================\n\t\tif (changed) {\n\t\t\tlibv::Timer timerChunkGen;\n\t\t\tChunkGen chunkGen;\n\t\t\tauto script = libv::read_file_str_or_throw(\"surface/noise_config.lua\");\n\t\t\tconfig = binding.getConfigFromLuaScript(script);\n\t\t\tchunk = chunkGen.generateChunk(config);\n\t\t\tchunkGen.placeVegetation(chunk, config);\n\t\t\tfmt::print(\"TimerChunkGen: {:8.4f} ms\", timerChunkGen.timed_ms().count());\n\t\t\tstd::cout << std::endl;\n\n\t\t\tif (Mode{config.mode} == Mode::_3d) {\n\t\t\t\trenderer.surface.build_mesh(renderer.surface.mesh, chunk);\n\t\t\t} else {\n\t\t\t\t//texture\n\t\t\t\theightMap = libv::glr::Texture2D::RGBA32F();\n\t\t\t\theightMap.storage(1, libv::vec2i{config.size, config.size});\n\t\t\t\theightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, chunk.getColors().data());\n\t\t\t}\n//\t\t\t{ //add trees\n//\t\t\t\trenderer.debug.spheres.clear();\n//\t\t\t\trenderer.debug.spheres.resize(chunk.vegetation.size());\n//\t\t\t\tfor (int i = 0; i < chunk.vegetation.size(); ++i) {\n//\t\t\t\t\tconst auto point = chunk.vegetation[i];\n//\t\t\t\t\trenderer.debug.spheres[i] = space::RendererDebug::Sphere\n//\t\t\t\t\t\t\t{point.point, config.treeSize, libv::vec4f{1, 0, 0, 1}, 10, 10};\n//\t\t\t\t}\n//\t\t\t\trenderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);\n//\t\t\t}\n\t\t\tchanged = false;\n\n//\t\t}\n\t\t}\n\t\tMode{config.mode} == Mode::_3d ?\n\t\t\t\trenderer.surface.render(glr, renderer.resource_context.uniform_stream) :\n\t\t\t\trenderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);\n\t\tfor (int i = 0; i < chunk.vegetation.size(); ++i) {\n\t\t\tconst auto m2_guard = glr.model.push_guard();\n\n//\t\t\tlibv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;\n\n\t\t\tglr.model.translate(chunk.vegetation[i].point);\n\t\t\t// glr.model.scale(Fleet::pickingType.radius_universe);\n\t\t\tglr.model.scale(config.treeSize);\n\t\t\tglr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0)); // <<< Workaround the incorrect model orientation\n\n\t\t\trenderer.fleet.render(glr, renderer.resource_context.uniform_stream);\n\t\t}\n//\t\trenderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);\n\t}\n};\n\n\nclass SurfaceViewer {\npublic:\n//\tlibv::rev::RenderTarget renderTarget;\n//\tlibv::rev::PostProcessing postProcessing;\n\tspace::SpaceFrame frame;\n\n\tlibv::ctrl::Controls controls;\n\n\tlibv::ui::UI ui;\n\n//\tspace::Renderer renderer;\n//\tspace::CameraPlayer camera;\n//\tspace::CameraPlayer::screen_picker screen_picker;\n\npublic:\n\tSurfaceViewer() :\n\t\t\tui([] {\n\t\t\t\tlibv::ui::Settings settings;\n\t\t\t\t// TODO P1: Internalize used UI resources under space, currently: app/space/../../res/\n\t\t\t\tsettings.res_font.base_path = \"../../res/font/\";\n\t\t\t\tsettings.res_shader.base_path = \"../../res/shader/\";\n\t\t\t\tsettings.res_texture.base_path = \"../../res/texture/\";\n\n\t\t\t\tsettings.res_font.restict_under_base = false; // TODO P1: Should go away with proper res folder\n\t\t\t\tsettings.res_shader.restict_under_base = false; // TODO P1: Should go away with proper res folder\n\t\t\t\tsettings.res_texture.restict_under_base = false; // TODO P1: Should go away with proper res folder\n\n\t\t\t\tsettings.track_style_scripts = true;\n\t\t\t\treturn settings;\n\t\t\t}()) {\n\t\tframe.setSize(1024, 1024);\n\n\t\tspace::CameraControl::register_controls(controls);\n\t\tspace::CameraControl::bind_default_controls(controls);\n//\t\tCanvasControl::register_controls(controls);\n//\t\tCanvasControl::bind_default_controls(controls);\n\n\t\tcontrols.attach(frame);\n\t\tui.attach(frame);\n\n//\t\tlibv::ui::Label label(\"helloLabel\");\n//\t\tlabel.text(\"Surface app\");\n//\t\tlabel.font_color(libv::vec4f(1, 1, 1, 1));\n//\t\tlabel.align_horizontal(libv::ui::AlignHorizontal::center);\n//\t\tlabel.align_vertical(libv::ui::AlignVertical::center);\n//\t\tui.add(label);\n\n\t\tlibv::ui::CanvasAdaptorT<SurfaceCanvas> canvas(\"canvas\", ui);\n\t\tcanvas.z_index_offset(-100);\n\t\tcanvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {\n\t\t\tif (e.gain())\n\t\t\t\tcontrols.context_enter<space::BaseCameraOrbit>(&canvas.object().camera);\n\t\t\telse\n\t\t\t\tcontrols.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera);\n\t\t});\n\t\tui.add(canvas);\n\n\n\n\n//\t\tframe.onKey.output([canvas](const libv::input::EventKey& e) mutable {\n//\t\t\tif (e.keycode == libv::input::Keycode::H) {\n//\t\t\t\tcanvas.object().camera.move_up(-1.f);\n//\t\t\t}\n//\t\t});\n\t}\n\n\tvoid execute() {\n\t\tframe.show();\n\t\tframe.join();\n\t}\n};\n\n} // namespace surface\n\nint main(int argc, const char** argv) {\n\t(void) argc;\n\t(void) argv;\n\n\n\tlibv::logger_stream.setFormat(\"{severity} {thread_id} {module}: {message}, {file}:{line}\\n\");\n\tstd::cout << libv::logger_stream;\n\n\ttry {\n\t\tspace::log_space.info(\"Hello Surface!\");\n\n\t\t// Change working directory\n\t\tif (std::filesystem::exists(\"app/space/\"))\n\t\t\tstd::filesystem::current_path(\"app/space/\");\n\t\telse\n\t\t\tstd::filesystem::current_path(\"../app/space/\"); // During development binary artifacts created under /bin\n\n\t\t// Run the game\n\t\tsurface::SurfaceViewer surfaceViewer;\n\t\tsurfaceViewer.execute();\n\n\t} catch (const std::exception& e) {\n\t\tspace::log_space.fatal(\"Execution failed with an exception: {}\", e.what());\n\t\tstd::cerr << \"Execution failed with an exception: \" << e.what() << std::endl;\n\t\treturn EXIT_FAILURE;\n\t}\n\n\treturn EXIT_SUCCESS;\n}\n\n// -------------------------------------------------------------------------------------------------\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/space/surface/surface_main.cpp b/app/space/surface/surface_main.cpp
+--- a/app/space/surface/surface_main.cpp	(revision e4afefaa39fcbe1c2f4bf0f01230e85b1d657a14)
++++ b/app/space/surface/surface_main.cpp	(date 1647496939307)
+@@ -49,7 +49,7 @@
+ //	libv::rev::PostProcessing postProcessing;
+ 	space::Renderer renderer;
+ 	libv::glr::Texture2D::RGBA32F heightMap;
+-	Chunk chunk;
++//	Chunk chunk;
+ //	int count;
+ //	std::mutex mutex;
+ 	std::atomic<bool> changed = true;
+@@ -128,7 +128,7 @@
+ 			ChunkGen chunkGen;
+ 			auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
+ 			config = binding.getConfigFromLuaScript(script);
+-			chunk = chunkGen.generateChunk(config);
++			Chunk chunk = chunkGen.generateChunk(config);
+ 			chunkGen.placeVegetation(chunk, config);
+ 			fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
+ 			std::cout << std::endl;
+@@ -141,36 +141,23 @@
+ 				heightMap.storage(1, libv::vec2i{config.size, config.size});
+ 				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, chunk.getColors().data());
+ 			}
+-//			{ //add trees
+-//				renderer.debug.spheres.clear();
+-//				renderer.debug.spheres.resize(chunk.vegetation.size());
+-//				for (int i = 0; i < chunk.vegetation.size(); ++i) {
+-//					const auto point = chunk.vegetation[i];
+-//					renderer.debug.spheres[i] = space::RendererDebug::Sphere
+-//							{point.point, config.treeSize, libv::vec4f{1, 0, 0, 1}, 10, 10};
+-//				}
+-//				renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
+-//			}
++			{ //add trees
++				renderer.debug.spheres.clear();
++				renderer.debug.spheres.resize(chunk.vegetation.size());
++				for (int i = 0; i < chunk.vegetation.size(); ++i) {
++					const auto point = chunk.vegetation[i];
++					renderer.debug.spheres[i] = space::RendererDebug::Sphere
++							{point.point, config.treeSize, libv::vec4f{1, 0, 0, 1}, 10, 10};
++				}
++				renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
++			}
+ 			changed = false;
+ 
+-//		}
+ 		}
+ 		Mode{config.mode} == Mode::_3d ?
+ 				renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
+ 				renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
+-		for (int i = 0; i < chunk.vegetation.size(); ++i) {
+-			const auto m2_guard = glr.model.push_guard();
+-
+-//			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
+-
+-			glr.model.translate(chunk.vegetation[i].point);
+-			// glr.model.scale(Fleet::pickingType.radius_universe);
+-			glr.model.scale(config.treeSize);
+-			glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0)); // <<< Workaround the incorrect model orientation
+-
+-			renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+-		}
+-//		renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
++		renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
+ 	}
+ };
+ 

@@ -1,35 +1,114 @@
 DONE: next step: mesh triangle strips, shader a depth miatt (flat)
-submesh update
-hotkey for switching between wire and fill
-only build mesh when change
-hook shader error overlay
 DONE: bug image size (heightMap.storage meret allitas is kell)
-seed csere, time-mal menni z koordinatan
-
-template -> hpp, ne inline es kicsi simd vec4f x, vec4f y, int seed
-
-60ms -> 16ms ( multithreading, better containers) <- after composition
-multithreading:  ui must remain responsive (one dedicated thread)
-	vector - > dynArray
-
+only build mesh when change
+Rename Surface to Chunk
 03.09: Add gradient to heightmap
+
+
+ =================================================================================================
+69 - 78 nap
+60 nap -
+doksi: 15 nap
+csuszasok: 15 nap
+implementacio + kutatas: 30nap
+EPICS:
+	NOISE-LIB: 40%
+		3d-s algok <- animation miatt is
+		soft simd support
+		clean up
+		hianyzo algo (warp kieg), kisebb warp
+		api beautyfing, unifying
+		celullar tobb visszateresi ertek szimultan
+		bonus: glsl support
+		bonus: glsl support with identical cpp implementation(noise lib glsl) ?
+	NODE ARCH.: 20%
+		mix node (linear), smooth step/hermit interpolation node
+		fake node
+		logical node, min/max node
+		different return types, modify evaluate
+		node with multiple return value
+	SURFACE CONFIG:
+		more lua config support
+		multiple root node
+		vegetation, biomes, planet primary properties from config
+	BIOMES:
+		color palette
+		cellular blend, smooth step, hermit interpolation on edges
+	VEGETATION:
+		requirement traits (legyen levego, viz alatti)
+		rocks, grass, bushes, trees with fertility requirement
+		IDEA: LOD popin-re: vegetation detail level threshold randomization
+		IDEA Plant placement: Vader two path method (doc)
+	CHUNK:
+		progressive generation
+		chunk lod
+		patch or skirt
+		vegetation placement/management
+	SURFACE:
+		chunks, camera, frustrum culling,
+		progressive generation managment
+		chunk lod managment
+		collusion queries: camera, terrain picking
+	RENDERING:
+		skybox
+		shaders: env. lighting
+		(shadow),
+		billboarding || instance rendering
+		vegetation textures
+
+
+hotkey for switching between wire and fill
+hook shader error overlay
+3D noise algok:
+	DONE: seed csere
+	time-mal menni z koordinatan
+
+template for supporting simd
+	WIP: simd vec4f x, vec4f y, int seed
+	almost done: template noise methods
+	template util methods
+
+generation limit 16ms {seed, center_x, center_y, pregenerated_data} -> chunk
+	multithreading, better containers
+		multithreading:  ui must remain responsive (one dedicated thread)
+		vector - > dynArray, vector<vector> -> vector_2D
+			surface.hpp Change container for surface points
+	glsl code gen from lua nodes
+	simd
+model rendering tricks:
+ 	billboards,
+ 	lod
+ 	out of scope: micro texture: csak akkor jelenik meg ha nagyon kozel van a kamera
+
 vegetation (popsickle)
+	1. spheres
+	2.a model betoltes
+	2.b sprite/billboard
+		modellbol billboard nezetek generalasa (8*8 2D texture of 3D model from different angles)
+
 biome heatmaps
+
 More than one chunk
+	1. box (3x3)
+	2. spiral ( 4096*4096 vertex -> 16*16 256-os chunk, super high resolution chunk max 4db)
+	submesh update (chunk spiral scanning update)
+	chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
+		lod illesztes, ne lyukas: patching/vertex merging, skirt
 
+out of scope: pop hatas elkerules: geomorphing (x, y, z1, z2)
 
-chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
-ne lyukas: skirt
-pop hatas elkerules: geomorphing (x, y, z1, z2)
-texturazas
 
 terep generalason hangsuly, nem a rendelesen
-erozio algoritmusok (vizcseppes!) 10k-100k csepp
-	megy a lokalis min fele, le csokk magassag, amugy no
-deformalni a terepet (noise + gorbe) z ^ 3 pl vagy maszk (viz tavolsaga adott ponttol), fennsik
+out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis min fele, le csokk magassag, amugy no
+	nem lehet fuggetlen chunkokat generalni
+	nem lehet vegtelen surafcet generalni
+	nem lehet 1 pixelt samplelelni
+	egeszet memoriaban kell tarolni
+	iterativ
+	alternativa: lehet kozeliteni sima negyztremelessel ha jol van osszeblendelve egy surface tulajdonsaggal
 
- perlin buckakat csinal, white noise felismerhetetlen
- nem lehet megmondani -> hasznaljuk a gyorsat
+lakes
+	bool floodFillTest(x, y, surface) -> true, lehet to ott, else abort
 
  to, folyo, nagy hegy <- felskiccelt - maszk -> generalas
  vizszint megadasa (0- vizszint + 5)
@@ -95,6 +174,8 @@ SurfaceViewer
 		visualize surface
 		camera
 		controls
+
+ =================================================================================================
 
 
 FastNoiseLite(int seed = 1337)
