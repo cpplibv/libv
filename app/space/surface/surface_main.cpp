@@ -108,7 +108,7 @@ private:
 
 		glr.state.clipPlanes(0);
 		glr.state.polygonModeFill();
-		//glr.state.polygonModeLine();
+//		glr.state.polygonModeLine();
 
 		glr.projection = camera.projection(canvas_size);
 		glr.view = camera.view();
@@ -129,47 +129,48 @@ private:
 			ChunkGen chunkGen;
 			auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
 			config = binding.getConfigFromLuaScript(script);
+			renderer.debug.spheres.clear();
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
-					Chunk chunk = chunkGen.generateChunk(config);
+
+					const auto chunkPos = libv::vec2f{static_cast<float> (i), static_cast<float> (j)};
+					Chunk chunk = chunkGen.generateChunk(config, chunkPos);
 					chunkGen.placeVegetation(chunk, config);
-					chunk.position = {static_cast<float> (i), static_cast<float> (j), 0};
-					chunks(i, j) = chunk;
-//					chunks.emplace_back(chunk);
 					fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
 					std::cout << std::endl;
 
+					renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+							{{chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10});
 
-//				for (int i = 0; i < chunk.featureList.size(); ++i) {
-//					const auto point = chunk.featureList[i];
-//					renderer.debug.spheres[i] = space::RendererDebug::Sphere
-//							{point.point, config.treeSize, config.treeColor, 10, 10};
-//				}
-					renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
+					if (config.visualization == Visualization::spheres) { //add features
+						for (const auto& surfaceObjectStorage : chunk.featureList) {
+							for (const auto& point : surfaceObjectStorage.points) {
+								renderer.debug.spheres.emplace_back(point.position, point.size, point.color, 10, 10);
+							}
+						}
+//						renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
+					}
+					chunks(i, j) = std::move(chunk);
 				}
 			}
+			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+					{{0.5f, 0, 0}, 0.04f, {1, 0, 0, 1}, 10, 10});
+			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+					{{0, 0.5f, 0}, 0.04f, {0, 1, 0, 1}, 10, 10});
+			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+					{{0, 0, 0.5f}, 0.04f, {0, 0, 1, 1}, 10, 10});
+			renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
 			if (config.mode == Mode::_3d) {
 				renderer.surface.build_mesh(renderer.surface.mesh, chunks);
 			}
 //			else {
 //				//texture
 //				heightMap = libv::glr::Texture2D::RGBA32F();
-//				heightMap.storage(1, libv::vec2i{config.size, config.size});
-//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.size, config.size}, chunk.getColors().data());
+//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
+//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
 //			}
 
-//			if (config.visualization == Visualization::spheres) { //add features
-//				renderer.debug.spheres.clear();
-////				renderer.debug.spheres.reserve(chunk.featureList.size());
-//				for (const auto& surfaceObjectStorage : chunk.featureList) {
-////					renderer.debug.spheres.reserve(renderer.debug.spheres.size() + surfaceObjectStorage.points.size());
-//					for (const auto& point : surfaceObjectStorage.points) {
-//						renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-//								{point.position, point.size, point.color, 10, 10});
-//					}
-//				}
-//
-//			}
+
 			changed = false;
 		}
 
@@ -177,31 +178,24 @@ private:
 				renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
 				renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
 		// render plant model
-//		if (config.visualization == Visualization::model)
-//			for (const auto& feature : chunk.featureList) {
-//				for (const auto& point : feature.points) {
-//					const auto m2_guard = glr.model.push_guard();
-//					glr.model.translate(point.position);
-//					glr.model.scale(point.size);
-//					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
-//
-//					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-//				}
-//			}
-//			for (int i = 0; i < chunk.featureList.size(); ++i) {
-//				const auto m2_guard = glr.model.push_guard();
-//
-//				//			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
-//
-//				glr.model.translate(chunk.featureList[i].point);
-//				// glr.model.scale(Fleet::pickingType.radius_universe);
-//				glr.model.scale(config.treeSize);
-//				glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
-//
-//				renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-//			}
-//		else
-//			renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
+		if (config.visualization == Visualization::model)
+			for (int i = 0; i < 3; ++i) {
+				for (int j = 0; j < 3; ++j) {
+					const auto& chunk = chunks(i, j);
+					for (const auto& feature : chunk.featureList) {
+						for (const auto& point : feature.points) {
+							const auto m2_guard = glr.model.push_guard();
+							glr.model.translate(point.position);
+							glr.model.scale(point.size);
+							glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+
+							renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+						}
+					}
+				}
+			}
+		else
+			renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
 	}
 };
 

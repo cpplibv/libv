@@ -53,7 +53,7 @@ struct SurfaceObjectStorage {
 class Chunk {
 public:
 	int size;
-	libv::vec3f position;
+	libv::vec2f position;
 	std::vector<std::vector<SurfacePoint>> points;
 	std::vector<SurfaceObjectStorage> featureList;
 
@@ -90,7 +90,7 @@ public:
 //	explicit ChunkGen(space::Renderer& renderer);
 	ChunkGen();
 
-	Chunk generateChunk(const Config& config);
+	Chunk generateChunk(const Config& yi, const libv::vec2f chunkPosition);
 	void placeVegetation(Chunk& chunk, const Config& config);
 //		void placeVegetation(const Config& config);
 

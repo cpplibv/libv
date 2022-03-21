@@ -69,7 +69,7 @@ struct HeatMap {
 struct Config {
 	Mode mode;
 	Visualization visualization;
-	int size;
+	int resolution; /// Number of quads/pixels per side
 	float amplitude;
 	PlantDistribution plantDistribution;
 	int circleNumber;

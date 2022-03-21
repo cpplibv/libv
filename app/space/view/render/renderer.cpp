@@ -867,19 +867,21 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<su
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
-	for (int i = 0; i < chunks.size_x(); ++i) {
-		for (int j = 0; j < chunks.size_y(); ++j) {
-			surface::Chunk chunk = chunks(i,j);
+	for (int y = 0; y < chunks.size_y(); ++y) {
+		for (int x = 0; x < chunks.size_x(); ++x) {
+			const auto& chunk = chunks(x, y);
 			const auto rowSize = chunk.points.size();
 
 			for (unsigned int i = 0; i < rowSize; i++) {
 				const auto colSize = chunk.points[i].size();
 				for (unsigned int j = 0; j < colSize; ++j) {
-					position(chunk.points[i][j].point + chunk.position);
+					position(chunk.points[i][j].point);
 					color0(chunk.points[i][j].color);
 				}
 			}
 
+//			index(vi); //to create the chunk jump
+			size_t lastVi;
 			for (int i = 0; i < rowSize - 1; ++i) {
 				index(vi);
 				const auto colSize = chunk.points[i].size();
@@ -889,8 +891,12 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<su
 					vi += 1;
 				}
 				index(vi + colSize - 1);
+				lastVi = vi + colSize - 1;
 				//index(vi - 1);
 			}
+			vi += rowSize;
+//			index(lastVi); //to create the chunk jump
+//			index(lastVi); //to create the chunk jump
 		}
 	}
 }

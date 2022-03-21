@@ -65,7 +65,7 @@ void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
 //	config.colorGrad.add(0, {1, 1, 1, 1});
 	config.mode = luaConfig["mode"];
 	config.visualization = luaConfig["visualization"];
-	config.size = luaConfig["size"];
+	config.resolution = luaConfig["resolution"];
 	config.amplitude = luaConfig["amplitude"];
 	config.plantDistribution = luaConfig["plantDistribution"];
 	config.circleNumber = luaConfig["circleNumber"];

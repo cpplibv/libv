@@ -179,8 +179,8 @@ config = {
 		--[2.0] = "grey",
 	},
 	mode = Mode._3d,
-	visualization = Visualization.spheres,
-	size = 64,
+	visualization = Visualization.model,
+	resolution = 256,
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,
@@ -190,20 +190,20 @@ config = {
 		--asd = 12,
 		{
 			type = "tree",
-			size = 0.01,
+			size = 0.0002,
 			count = 200,
 			color = "hsv(120, 70%, 75%)",
 		},
 		{
 			type = "bush",
-			size = 0.006,
-			count = 400,
+			size = 0.00012,
+			count = 40,
 			color= "hsv(160, 70%, 75%)",
 		},
 		{
 			type = "rock",
-			size = 0.004,
-			count = 600,
+			size = 0.00008,
+			count = 60,
 			color = "grey",
 		},
 		--{
@@ -219,7 +219,6 @@ config = {
 
 nodes =
 	pow{
-
 		exponent = 2.0,
 		--	}
 		--}
@@ -229,7 +228,7 @@ nodes =
 				--value = 0.5,
 				seed = 423,
 				octaves = 5,
-				amplitude = 1,
+				amplitude = 0.05,
 				frequency = 0.25,
 				lacunarity = 2.0,
 				persistence = 0.5,
@@ -240,7 +239,7 @@ nodes =
 					seed = 810,
 					octaves = 6,
 					amplitude = 1,
-					frequency = 0.0015,
+					frequency = 0.5,
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
@@ -294,6 +293,9 @@ heatMaps = {
 			lacunarity = 2.0,
 			persistence = 0.5,
 		}
+	},
+	hardness = {
+		...
 	}
 }
 
@@ -316,10 +318,5 @@ heatMaps = {
 --}
 
 
-NodeTree = {
-	node_type = "add",
-	[1] = {...},
-	[2] = {...}
-}
 
 
