@@ -870,13 +870,13 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<su
 	for (int y = 0; y < chunks.size_y(); ++y) {
 		for (int x = 0; x < chunks.size_x(); ++x) {
 			const auto& chunk = chunks(x, y);
-			const auto rowSize = chunk.points.size();
+			const auto rowSize = chunk.points.size_y();
 
 			for (unsigned int i = 0; i < rowSize; i++) {
-				const auto colSize = chunk.points[i].size();
+				const auto colSize = chunk.points.size_x();
 				for (unsigned int j = 0; j < colSize; ++j) {
-					position(chunk.points[i][j].point);
-					color0(chunk.points[i][j].color);
+					position(chunk.points(i, j).point);
+					color0(chunk.points(i, j).color);
 				}
 			}
 
@@ -884,7 +884,7 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<su
 			size_t lastVi;
 			for (int i = 0; i < rowSize - 1; ++i) {
 				index(vi);
-				const auto colSize = chunk.points[i].size();
+				const auto colSize = chunk.points.size_x();
 				for (int j = 0; j < colSize; ++j) {
 					index(vi);
 					index(vi + colSize);

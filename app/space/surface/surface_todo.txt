@@ -3,6 +3,8 @@ DONE: bug image size (heightMap.storage meret allitas is kell)
 only build mesh when change
 Rename Surface to Chunk
 03.09: Add gradient to heightmap
+simplify pointInTriangle bc its |_ triangle
+hotkey for switching between wire and fill
 
 
  =================================================================================================
@@ -57,7 +59,6 @@ EPICS:
 		vegetation textures
 
 
-hotkey for switching between wire and fill
 hook shader error overlay
 3D noise algok:
 	DONE: seed csere
@@ -87,9 +88,11 @@ vegetation (popsickle)
 		modellbol billboard nezetek generalasa (8*8 2D texture of 3D model from different angles)
 
 biome heatmaps
+	WIP: config
+	data structure
 
 More than one chunk
-	1. box (3x3)
+	DONE: 1. box (3x3)
 	2. spiral ( 4096*4096 vertex -> 16*16 256-os chunk, super high resolution chunk max 4db)
 	submesh update (chunk spiral scanning update)
 	chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)

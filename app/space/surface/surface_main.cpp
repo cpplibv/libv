@@ -38,6 +38,7 @@
 
 namespace surface {
 
+bool isPolygonFill = true;
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
@@ -51,7 +52,6 @@ private:
 	libv::glr::Texture2D::RGBA32F heightMap;
 	libv::vector_2D<Chunk> chunks{3, 3};
 //	std::vector<Chunk> chunks;
-//	int count;
 //	std::mutex mutex;
 	std::atomic<bool> changed = true;
 	SurfaceLuaBinding binding;
@@ -107,8 +107,10 @@ private:
 		glr.state.frontFaceCCW();
 
 		glr.state.clipPlanes(0);
-		glr.state.polygonModeFill();
-//		glr.state.polygonModeLine();
+		if (isPolygonFill)
+			glr.state.polygonModeFill();
+		else
+			glr.state.polygonModeLine();
 
 		glr.projection = camera.projection(canvas_size);
 		glr.view = camera.view();
@@ -164,7 +166,7 @@ private:
 				renderer.surface.build_mesh(renderer.surface.mesh, chunks);
 			}
 //			else {
-//				//texture
+//				//TODO revive texture
 //				heightMap = libv::glr::Texture2D::RGBA32F();
 //				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
 //				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
@@ -186,7 +188,7 @@ private:
 						for (const auto& point : feature.points) {
 							const auto m2_guard = glr.model.push_guard();
 							glr.model.translate(point.position);
-							glr.model.scale(point.size);
+							glr.model.scale(point.size * 0.01f);
 							glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
 
 							renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
@@ -198,7 +200,6 @@ private:
 			renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
 	}
 };
-
 
 class SurfaceViewer {
 public:
@@ -257,8 +258,11 @@ public:
 		});
 		ui.add(canvas);
 
-
-
+		//switch between triangle fill and wireframe
+		controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
+			isPolygonFill = !isPolygonFill;
+		});
+		controls.bind("surface.switch_polygon_mode", "F2 [press]");
 
 //		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {
 //			if (e.keycode == libv::input::Keycode::H) {

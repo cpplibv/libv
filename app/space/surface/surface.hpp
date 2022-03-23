@@ -54,17 +54,17 @@ class Chunk {
 public:
 	int size;
 	libv::vec2f position;
-	std::vector<std::vector<SurfacePoint>> points;
+//	std::vector<std::vector<SurfacePoint>> points;
+	libv::vector_2D<SurfacePoint> points{256, 256};
 	std::vector<SurfaceObjectStorage> featureList;
 
-//	libv::vector_2D<SurfacePoint> points{256, 256};
 //	libv::vec4f color;
 	[[nodiscard]]std::vector<libv::vec4f> getColors() const {
 		std::vector<libv::vec4f> colors;
 		colors.reserve(size * size);
-		for (const auto& row : points) {
-			for (const auto& point : row) {
-				colors.emplace_back(point.color);
+		for (int i = 0; i < points.size_y(); ++i) {
+			for (int j = 0; j < points.size_x(); ++j) {
+				colors.emplace_back(points(i, j).color);
 			}
 		}
 		return colors;
