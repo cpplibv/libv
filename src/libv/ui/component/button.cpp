@@ -52,9 +52,6 @@ void CoreButton::onMouseButton(const EventMouseButton& event) {
 
 void CoreButton::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter)
-//		if (button_is_pressed_down)
-//			style_state(StyleState::hover | StyleState::active, true);
-//		else
 		style_state(StyleState::hover, true);
 
 	if (event.leave)

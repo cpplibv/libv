@@ -26,11 +26,12 @@ template <typename T, typename... Args>
 
 template <typename BaseT, typename HandlerT, typename CoreT, template <typename> typename EventHostT>
 struct ComponentAPI : public BaseT {
-private:
+protected:
 	static inline std::size_t nextID = 0;
 
 protected:
 	using Base = BaseT;
+	using BaseAPI = ComponentAPI;
 
 public:
 	explicit inline ComponentAPI(core_ptr ptr) noexcept :

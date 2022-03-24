@@ -504,6 +504,11 @@ void CoreComponent::detachScan() {
 	} else if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
+		// Note: flag reset happens before doDetachChildren so any invalidation event (like pendingStyle)
+		//			that concerns a children that was already passed (so childFlags did not account for it)
+		//			is not discarded by it
+		flags.reset(Flag::mask_propagate);
+
 		doDetachChildren([this, &childFlags](Component& child) {
 			bool remove = get_core(child)->flags.match_any(Flag::pendingDetachSelf);
 
@@ -516,7 +521,6 @@ void CoreComponent::detachScan() {
 			return remove;
 		});
 
-		flags.reset(Flag::mask_propagate);
 		flags.set(calculatePropagateFlags(childFlags));
 	}
 }

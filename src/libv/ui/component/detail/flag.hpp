@@ -6,6 +6,7 @@
 #include <libv/utility/flag_enum.hpp>
 // std
 #include <cstdint>
+#include <string>
 
 
 namespace libv {
@@ -51,7 +52,7 @@ static constexpr Flag_t focusableChild         = libv::bit(24);
 static constexpr Flag_t focusableSelf          = libv::bit(25);
 static constexpr Flag_t watchChar              = libv::bit(26);
 static constexpr Flag_t watchKey               = libv::bit(27);
-static constexpr Flag_t watchFocus             = libv::bit(28); // Not really a self contained flag, mostly present for consistency
+static constexpr Flag_t watchFocus             = libv::bit(28); // Not really a self-contained flag, mostly present for consistency
 static constexpr Flag_t watchMouse             = libv::bit(29);
 static constexpr Flag_t floatRegion            = libv::bit(30); /// Mark if a component is a floating region, used for mouse context
 //static constexpr Flag_t focusLinked          = libv::bit(31);
@@ -125,6 +126,8 @@ constexpr inline Flag_t calculatePropagateFlags(Flag_t flags) noexcept {
 
 	return Flag_t{propagatableSelf.value() >> 1} | propagatableChild;
 }
+
+std::string to_string(Flag_t flags);
 
 // -------------------------------------------------------------------------------------------------
 

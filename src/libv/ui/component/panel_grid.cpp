@@ -183,8 +183,6 @@ libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
 
 	auto result = libv::vec3f{};
 
-	boost::container::small_vector<libv::vec3f, 32> child_dynamics(children.size(), libv::vec3f{});
-
 	for (auto& child : l_children) {
 		result[_Z_] = std::max(result[_Z_],
 				child->size()[_Z_].pixel +

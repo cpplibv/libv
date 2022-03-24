@@ -11,8 +11,6 @@
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
-//#include <libv/ui/context/context_style.hpp>
-//#include <libv/ui/style.hpp>
 
 
 namespace libv {
@@ -31,13 +29,14 @@ void CoreBasePanel::add(Component component) {
 
 void CoreBasePanel::add_front(Component component) {
 	children.emplace(children.begin(), std::move(component));
-	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
-	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
 
 	// Reassign IDs
 	int32_t id = 0;
 	for (auto& child : children)
 		AccessParent::childID(child.core()) = ChildID{id++};
+
+	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
+	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
 }
 
 void CoreBasePanel::remove(Component& component) {
