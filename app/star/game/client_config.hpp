@@ -15,6 +15,20 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
+//#include <libv/mt/work_cooldown.hpp>
+//#include <libv/mt/worker_thread.hpp>
+
+//	libv::mt::worker_thread scheduler_thread;
+
+// GameSettingsManager settings; // Or profile
+
+//class GameSettingsManager {
+//	libv::mt::work_warmup_cooldown settings_file_write_cd{std::chrono::seconds(1), std::chrono::seconds(5)};
+//	GameSettings settings;
+//};
+
+// -------------------------------------------------------------------------------------------------
+
 struct BaseConfigEntry {
 //	std::string name;
 //	std::string path;

@@ -33,7 +33,7 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 
 	try {
-		star::log_star.info("Hello Space! {}", star::version);
+		star::log_star.info("Hello Star! {}", star::version);
 
 		// Change working directory
 		if (std::filesystem::exists("app/star/"))

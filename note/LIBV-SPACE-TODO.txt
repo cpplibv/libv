@@ -81,9 +81,7 @@ libv.math: gradient
 
 
 
-
-star: pimpl game client
-
+star: Settings page back clear the focus while apply will rotate it to next
 
 cereal: visiting_archive
 
