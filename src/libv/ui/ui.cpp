@@ -536,6 +536,11 @@ void UI::execute_in_ui_loop(std::function<void()> func) {
 	self->loop_tasks.emplace_back(std::move(func));
 }
 
+void UI::foreach_recursive_component(libv::function_ref<void(const Component&)> func) {
+	func(self->root);
+	self->root.foreach_recursive_children(func);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 //void UI::load_style_script(std::string_view script) {

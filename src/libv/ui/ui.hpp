@@ -8,6 +8,7 @@
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/function_ref.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -55,6 +56,8 @@ public:
 public:
 	/// This is the only thread-safe operation on UI, every other member function can only be called from the main UI thread
 	void execute_in_ui_loop(std::function<void()> func);
+
+	void foreach_recursive_component(libv::function_ref<void(const Component&)> func);
 
 public:
 	/// Loads a lua style script file
