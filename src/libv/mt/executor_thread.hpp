@@ -20,6 +20,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Legacy worker thread implementation, use libv/mt/worker_thread.hpp instead
 class ExecutorThread {
 	std::queue<std::function<void()>> queue;
 	std::mutex queue_m;
@@ -30,12 +31,11 @@ class ExecutorThread {
 	std::string name;
 
 public:
-	template <typename F, typename = decltype(std::declval<F>()())>
-	void executeAsync(F&& func) {
+	void executeAsync(std::function<void()> func) {
 		std::unique_lock lock(queue_m);
 		assert(!terminate && "Queueing task after worker thread was stopped");
 
-		queue.emplace(std::forward<F>(func));
+		queue.emplace(std::move(func));
 		received_cv.notify_all();
 	}
 

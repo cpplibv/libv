@@ -36,6 +36,7 @@ public:
 	GLFWwindow* shareWindow = nullptr;
 
 	libv::ExecutorThread context;
+	std::atomic<bool> showWasCalled{false};
 
 	std::shared_ptr<Core> core = getCoreInstance();
 

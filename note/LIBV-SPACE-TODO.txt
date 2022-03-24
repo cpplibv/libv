@@ -81,21 +81,53 @@ libv.math: gradient
 
 
 
+
+
+Surface needs:
+	ui
+		! color picker
+		! gradient picker
+		style/property nesting
+		static composition
+		components
+			toggle
+			drop down
+			number input
+			number slider
+			color input
+				color picker
+			gradient input
+			tabs (card layout with controls)
+		default style sheet
+	options
+		store/load/save/track
+	args?
+	lua
+		track
+		include
+		hot reload
+	measurement (and monitoring)
+	threading
+		2D parallel scanning algorithms
+		work off-load to background thread
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.mt: worker thread group support for launching the same tasks for multiple thread
 star: Settings page back clear the focus while apply will rotate it to next
 
 cereal: visiting_archive
-
-
-https://www.youtube.com/watch?v=pfIC-kle4b0
-
-
-cerealv: instead of the free function use member functions on the archives
-		this eliminates the excessive sfinae too, getting better lookups
-		| this kindof doable with hooking into self().processImpl(), but most likely needs an intermediate layer for it
-
-
-
-
 
 
 
@@ -143,10 +175,6 @@ UNDO SYSTEM
 
 
 
-
-
-
-
 Simulation
 	app.space: Simulation (container / master controller object)
 				A new container object/class that has the universe in it
@@ -169,38 +197,6 @@ place.it:
 
 
 
-Surface needs:
-	frame/ui
-		resolve silent exception
-	ui
-		! color picker
-		! gradient picker
-		style/property nesting
-		static composition
-		components
-			toggle
-			drop down
-			number input
-			number slider
-			color input
-				color picker
-			gradient input
-			tabs (card layout with controls)
-		default style sheet
-	options
-		store/load/save/track
-	args?
-	lua
-		track
-		include
-		hot reload
-	measurement (and monitoring)
-	threading
-		2D parallel scanning algorithms
-		work off-load to background thread
-
-
-
 
 libv.utility: entity_store: cheap non alloc default ctor | this would allow usage after moved from
 
@@ -208,18 +204,6 @@ libv.utility: entity_store: cheap non alloc default ctor | this would allow usag
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
 
-
-
-
-
-
-
-Bug P2: app.space: Model loading failure causes silent error and soft-lock
-			Who catches that exception and why?
-		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
-			So it looks like any exception (what is interesting that it kills the thread)
-		| If the exception comes from model loading (model not file loading) it was a silent crash
-			| This is a different issue, corrupt model file loading
 
 
 

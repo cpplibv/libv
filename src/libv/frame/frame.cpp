@@ -33,6 +33,11 @@ Frame::Frame(libv::vec2i size) :
 
 Frame::~Frame() {
 	closeForce();
+	if (!self->showWasCalled)
+		// NOTE: If show() was never called the worker thread has to be stopped to allow join and termination via exceptions
+		//		A better solution would be to refactor the whole worker thread and task handling in Frame
+		//		This flag/check is safe as show() and dtor() should never be called concurrently
+		self->context.stop();
 	join();
 }
 
@@ -172,6 +177,7 @@ const Monitor& Frame::_getCurrentMonitor() const {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::show() {
+	self->showWasCalled = true;
 	self->context.executeAsync([this] {
 		{
 			std::lock_guard lock(self->frameState_m);
