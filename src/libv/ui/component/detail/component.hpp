@@ -34,8 +34,7 @@ private:
 	core_ptr ptr_ = nullptr;
 
 public:
-	Component() noexcept = delete;
-
+	constexpr inline Component() noexcept = default;
 	explicit Component(core_ptr ptr_) noexcept;
 
 public:
@@ -59,6 +58,14 @@ public:
 	}
 	[[nodiscard]] inline const void* ptr() const noexcept {
 		return ptr_;
+	}
+
+public:
+	[[nodiscard]] constexpr explicit inline operator bool() const noexcept {
+		return ptr_ != nullptr;
+	}
+	[[nodiscard]] constexpr inline bool operator!() const noexcept {
+		return ptr_ != nullptr;
 	}
 
 public:
