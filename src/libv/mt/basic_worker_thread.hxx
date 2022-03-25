@@ -43,7 +43,7 @@ private:
 	std::condition_variable work_cv;
 
 	bool terminate = false;
-	Threads context;
+	Threads context_;
 	const std::string name_;
 
 	uint64_t next_index = 0;
@@ -68,6 +68,9 @@ public:
 		std::unique_lock lock(queue_m);
 		return queue.size();
 	}
+	[[nodiscard]] inline const Threads& context() const noexcept {
+		return context_;
+	}
 
 public:
 	void run();
@@ -78,7 +81,7 @@ public:
 template <typename Threads>
 template <typename... Args>
 inline basic_worker_thread<Threads>::basic_worker_thread(std::string new_name, Args&&... args) :
-	context(std::forward<Args>(args)..., &basic_worker_thread::run, this),
+	context_(std::forward<Args>(args)..., &basic_worker_thread::run, this),
 	name_(std::move(new_name)) {}
 
 template <typename Threads>
@@ -117,7 +120,7 @@ inline void basic_worker_thread<Threads>::stop() {
 
 template <typename Threads>
 inline void basic_worker_thread<Threads>::join() {
-	context.join();
+	context_.join();
 }
 
 // -------------------------------------------------------------------------------------------------

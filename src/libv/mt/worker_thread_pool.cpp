@@ -54,6 +54,10 @@ size_t worker_thread_pool::task_queue_size() const noexcept {
 	return self->task_queue_size();
 }
 
+size_t worker_thread_pool::thread_count() const noexcept {
+	return self->context().size();
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace mt

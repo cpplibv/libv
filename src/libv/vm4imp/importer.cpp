@@ -298,56 +298,56 @@ public:
 			log_vm4.warn("Fixing winding order for Node {} {}", nodeID, model.nodes[nodeID].name);
 		}
 	}
-
-	// -------------------------------------------------------------------------------------------------
-
-	template <typename F>
-	void foreachVertex(NodeID nodeID, libv::mat4f parentMat, const F& func) {
-		const auto globalMat = parentMat * model.nodes[nodeID].transformation;
-
-		for (const auto& meshID : model.nodes[nodeID].meshIDs) {
-			for (std::size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
-				const auto vertexID = model.meshes[meshID].baseVertex + model.indices[model.meshes[meshID].baseIndex + i];
-				const auto vertexPositionW = libv::xyz(globalMat * libv::vec4f(model.vertices[vertexID].position, 1));
-
-				func(vertexPositionW);
-			}
-		}
-
-		for (const auto& childID : model.nodes[nodeID].childrenIDs)
-			foreachVertex(childID, globalMat, func);
-	}
-
-	void calculateAABB() {
-		if (model.vertices.empty())
-			return;
-
-		// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
-
-		const auto fmax = std::numeric_limits<float>::max();
-		const auto fmin = std::numeric_limits<float>::lowest();
-
-		model.AABB_max = libv::vec3f(fmin, fmin, fmin);
-		model.AABB_min = libv::vec3f(fmax, fmax, fmax);
-
-		foreachVertex(0, libv::mat4f::identity(), [this](libv::vec3f positionW) {
-			model.AABB_min = libv::min(model.AABB_min, positionW);
-			model.AABB_max = libv::max(model.AABB_max, positionW);
-		});
-	}
-
-	void calculateBoundingSphere() {
-		// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
-		// NOTE: This implementation is a very rough approximation based on AABB, improve it on-demand
-
-		model.BS_origin = (model.AABB_min + model.AABB_max) * 0.5f;
-
-		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
-			const auto dist = (model.BS_origin - positionW).length();
-			model.BS_radius = std::max(model.BS_radius, dist);
-		});
-	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename F>
+void foreachVertex(Model& model, NodeID nodeID, libv::mat4f parentMat, const F& func) {
+	const auto globalMat = parentMat * model.nodes[nodeID].transformation;
+
+	for (const auto& meshID : model.nodes[nodeID].meshIDs) {
+		for (std::size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
+			const auto vertexID = model.meshes[meshID].baseVertex + model.indices[model.meshes[meshID].baseIndex + i];
+			const auto vertexPositionW = libv::xyz(globalMat * libv::vec4f(model.vertices[vertexID].position, 1));
+
+			func(vertexPositionW);
+		}
+	}
+
+	for (const auto& childID : model.nodes[nodeID].childrenIDs)
+		foreachVertex(model, childID, globalMat, func);
+}
+
+void calculateAABB(Model& model) {
+	if (model.vertices.empty())
+		return;
+
+	// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
+
+	const auto fmax = std::numeric_limits<float>::max();
+	const auto fmin = std::numeric_limits<float>::lowest();
+
+	model.AABB_max = libv::vec3f(fmin, fmin, fmin);
+	model.AABB_min = libv::vec3f(fmax, fmax, fmax);
+
+	foreachVertex(model, 0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
+		model.AABB_min = libv::min(model.AABB_min, positionW);
+		model.AABB_max = libv::max(model.AABB_max, positionW);
+	});
+}
+
+void calculateBoundingSphere(Model& model) {
+	// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
+	// NOTE: This implementation is a very rough approximation based on AABB, improve it on-demand
+
+	model.BS_origin = (model.AABB_min + model.AABB_max) * 0.5f;
+
+	foreachVertex(model, 0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
+		const auto dist = (model.BS_origin - positionW).length();
+		model.BS_radius = std::max(model.BS_radius, dist);
+	});
+}
 
 } // namespace -------------------------------------------------------------------------------------
 
@@ -405,7 +405,7 @@ void scanNode(uint32_t depth, const Model& model, uint32_t nodeID) {
 
 std::optional<Model> import(const std::string& filePath) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath, 0
+	const aiScene* scene = importer.ReadFile(filePath, 0u
 		| aiProcess_CalcTangentSpace
 		| aiProcess_GenNormals
 		| aiProcess_GenUVCoords
@@ -454,8 +454,8 @@ std::optional<Model> import(const std::string& filePath) {
 	ctx.fixupFlippedWindingOrder();
 	// TODO P4: libv.vm4: Prompt / importer setting for aiProcess_OptimizeGraph
 
-	ctx.calculateAABB();
-	ctx.calculateBoundingSphere();
+	calculateAABB(ctx.model);
+	calculateBoundingSphere(ctx.model);
 
 //	fmt::print("=== Scan assimp =====================================================================\n");
 //	scanNode(0, scene->mRootNode);
@@ -463,6 +463,11 @@ std::optional<Model> import(const std::string& filePath) {
 //	scanNode(0, *model, 0);
 
 	return model;
+}
+
+void recalculateBounding(Model& model) {
+	calculateAABB(model);
+	calculateBoundingSphere(model);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -7,7 +7,6 @@
 // libv
 #include <libv/math/mat_serial.hpp>
 #include <libv/math/vec_serial.hpp>
-#include <libv/serial/reflection.hpp>
 #include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
 // pro

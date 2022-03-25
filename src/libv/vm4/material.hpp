@@ -6,11 +6,9 @@
 #include <boost/container/flat_map.hpp>
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
-#include <libv/serial/enable.hpp>
+#include <libv/serial/serial.hpp>
 // std
-#include <map>
-#include <memory>
+#include <string>
 #include <variant>
 #include <vector>
 // pro

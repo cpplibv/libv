@@ -22,6 +22,8 @@ class Model;
 
 std::optional<Model> import(const std::string& filePath);
 
+void recalculateBounding(Model& model);
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace vm4

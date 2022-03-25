@@ -5,15 +5,14 @@
 // libv
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
-#include <libv/serial/enable.hpp>
+#include <libv/serial/serial.hpp>
 // std
 #include <vector>
 // pro
 #include <libv/vm4/material.hpp>
 
 // TODO P2: Use dynarray instead of vector
-// TODO P2: Use pointers instead of IDs
+// TODO P2: Use pointers instead of IDs (serialization with pointer <-> id resolving)
 
 
 namespace libv {
@@ -25,13 +24,13 @@ using MeshID = uint32_t;
 using NodeID = uint32_t;
 
 struct Animation {
-	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive&) {
+	}
 };
 
 struct AnimationChannel {
-	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive&) {
+	}
 };
 
 struct Vertex {
@@ -43,14 +42,15 @@ struct Vertex {
 	libv::vec4i boneID;
 	libv::vec4f boneWeight;
 
-	LIBV_REFLECTION_ACCESS(position);
-	LIBV_REFLECTION_ACCESS(normal);
-	LIBV_REFLECTION_ACCESS(tangent);
-	LIBV_REFLECTION_ACCESS(bitangent);
-	LIBV_REFLECTION_ACCESS(texture0);
-	LIBV_REFLECTION_ACCESS(boneID);
-	LIBV_REFLECTION_ACCESS(boneWeight);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive& ar) {
+		ar(LIBV_NVP(position));
+		ar(LIBV_NVP(normal));
+		ar(LIBV_NVP(tangent));
+		ar(LIBV_NVP(bitangent));
+		ar(LIBV_NVP(texture0));
+		ar(LIBV_NVP(boneID));
+		ar(LIBV_NVP(boneWeight));
+	}
 };
 
 struct Mesh {
@@ -61,12 +61,13 @@ struct Mesh {
 	uint32_t materialID;
 	//bounding box ?
 
-	LIBV_REFLECTION_ACCESS(name);
-	LIBV_REFLECTION_ACCESS(baseIndex);
-	LIBV_REFLECTION_ACCESS(baseVertex);
-	LIBV_REFLECTION_ACCESS(numIndices);
-	LIBV_REFLECTION_ACCESS(materialID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive& ar) {
+		ar(LIBV_NVP(name));
+		ar(LIBV_NVP(baseIndex));
+		ar(LIBV_NVP(baseVertex));
+		ar(LIBV_NVP(numIndices));
+		ar(LIBV_NVP(materialID));
+	}
 };
 
 struct Node {
@@ -78,12 +79,13 @@ struct Node {
 	std::vector<MeshID> meshIDs;
 	std::vector<NodeID> childrenIDs;
 
-	LIBV_REFLECTION_ACCESS(name);
-	LIBV_REFLECTION_ACCESS(parentID);
-	LIBV_REFLECTION_ACCESS(transformation);
-	LIBV_REFLECTION_ACCESS(meshIDs);
-	LIBV_REFLECTION_ACCESS(childrenIDs);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive& ar) {
+		ar(LIBV_NVP(name));
+		ar(LIBV_NVP(parentID));
+		ar(LIBV_NVP(transformation));
+		ar(LIBV_NVP(meshIDs));
+		ar(LIBV_NVP(childrenIDs));
+	}
 };
 
 struct LOD {
@@ -91,10 +93,11 @@ struct LOD {
 	double rangeFar; //threshold for decreasing LOD
 	NodeID rootNodeID;
 
-	LIBV_REFLECTION_ACCESS(rangeNear);
-	LIBV_REFLECTION_ACCESS(rangeFar);
-	LIBV_REFLECTION_ACCESS(rootNodeID);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	template <typename Archive> void serialize(Archive& ar) {
+		ar(LIBV_NVP(rangeNear));
+		ar(LIBV_NVP(rangeFar));
+		ar(LIBV_NVP(rootNodeID));
+	}
 };
 
 struct Model {
@@ -131,34 +134,35 @@ struct Model {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
-	LIBV_REFLECTION_ACCESS(format);
-//	LIBV_REFLECTION_ACCESS(hash);
-	LIBV_REFLECTION_ACCESS(version);
-//	LIBV_REFLECTION_ACCESS(import_time);
-	LIBV_REFLECTION_ACCESS(name);
+	template <typename Archive> void serialize(Archive& ar) {
+		ar(LIBV_NVP(format));
+	//	ar(LIBV_NVP(hash));
+		ar(LIBV_NVP(version));
+	//	ar(LIBV_NVP(import_time));
+		ar(LIBV_NVP(name));
 
-	LIBV_REFLECTION_ACCESS(AABB_min);
-	LIBV_REFLECTION_ACCESS(AABB_max);
-	LIBV_REFLECTION_ACCESS(BS_origin);
-	LIBV_REFLECTION_ACCESS(BS_radius);
+		ar(LIBV_NVP(AABB_min));
+		ar(LIBV_NVP(AABB_max));
+		ar(LIBV_NVP(BS_origin));
+		ar(LIBV_NVP(BS_radius));
 
-	LIBV_REFLECTION_ACCESS(animations);
-	LIBV_REFLECTION_ACCESS(animationChannels);
-	LIBV_REFLECTION_ACCESS(materials);
-	LIBV_REFLECTION_ACCESS(meshes);
-	LIBV_REFLECTION_ACCESS(nodes);
-	LIBV_REFLECTION_ACCESS(lods);
+		ar(LIBV_NVP(animations));
+		ar(LIBV_NVP(animationChannels));
+		ar(LIBV_NVP(materials));
+		ar(LIBV_NVP(meshes));
+		ar(LIBV_NVP(nodes));
+		ar(LIBV_NVP(lods));
 
-//	LIBV_REFLECTION_ACCESS(vertex_positions);
-//	LIBV_REFLECTION_ACCESS(vertex_normals);
-//	LIBV_REFLECTION_ACCESS(vertex_tangents);
-//	LIBV_REFLECTION_ACCESS(vertex_bitangents);
-//	LIBV_REFLECTION_ACCESS(vertex_texCoord0s);
-//	LIBV_REFLECTION_ACCESS(vertex_boneIDs);
-//	LIBV_REFLECTION_ACCESS(vertex_boneWeights);
-	LIBV_REFLECTION_ACCESS(vertices);
-	LIBV_REFLECTION_ACCESS(indices);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	//	ar(LIBV_NVP(vertex_positions));
+	//	ar(LIBV_NVP(vertex_normals));
+	//	ar(LIBV_NVP(vertex_tangents));
+	//	ar(LIBV_NVP(vertex_bitangents));
+	//	ar(LIBV_NVP(vertex_texCoord0s));
+	//	ar(LIBV_NVP(vertex_boneIDs));
+	//	ar(LIBV_NVP(vertex_boneWeights));
+		ar(LIBV_NVP(vertices));
+		ar(LIBV_NVP(indices));
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

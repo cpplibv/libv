@@ -876,10 +876,85 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET fsw
-	SOURCE app/fsw.cpp
-	LINK   ext_fmt libv_utility libv_fsw libv_mt
-#	LINK   libv_arg
+	TARGET enum
+	SOURCE app/enum/*.cpp
+	LINK   ext_fmt ext_range libv_lua libv_utility
+)
+
+wish_create_executable(
+	TARGET mimp
+	SOURCE app/mimp/*.cpp
+	LINK   libv_vm4imp libv_lua
+	LINK   libv_utility libv_algo
+#	LINK   ext_fmt ext_range libv_lua libv_utility libv_algo
+)
+
+#wish_create_executable(
+#	TARGET space
+#	SOURCE app/space/*.cpp
+#	GENERATE codegen app/space/message/*.in.lua
+##	LINK   ext_fmt ext_clip ext_range
+#	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
+#	LINK   libv_vm4
+#	LINK   libv_sys
+#)
+
+wish_create_executable(
+	TARGET space
+	SOURCE app/space/game/*.cpp
+	SOURCE app/space/message/*.cpp
+	SOURCE app/space/network/*.cpp
+	SOURCE app/space/sim/*.cpp
+	SOURCE app/space/view/*.cpp
+	SOURCE app/space/space_main.cpp
+	GENERATE codegen app/space/message/*.in.lua
+#	LINK   ext_fmt ext_clip ext_range
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
+	LINK   libv_vm4
+	LINK   libv_sys
+)
+
+wish_create_executable(
+	TARGET surface
+	SOURCE app/space/game/*.cpp
+	SOURCE app/space/message/*.cpp
+	SOURCE app/space/network/*.cpp
+	SOURCE app/space/sim/*.cpp
+	SOURCE app/space/view/*.cpp
+	SOURCE app/space/surface/*.cpp
+	GENERATE codegen app/space/message/*.in.lua
+#	LINK   ext_fmt ext_clip ext_range
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
+	LINK   libv_vm4
+	LINK   libv_sys
+
+#	LINK   libv_noise
+	# Temporarily just hook in the noise lib directly into surface for faster dev build time
+	SOURCE src/libv/noise/*.cpp
+	LINK   libv_utility libv_math
+)
+
+wish_create_executable(
+	TARGET star
+	SOURCE app/star/*.cpp
+	GENERATE codegen app/star/message/*.in.lua
+	LINK   libv_log libv_sys
+	LINK   libv_frame libv_ctrl libv_ui
+	LINK   libv_rev libv_glr libv_color
+	LINK   libv_lua
+	LINK   libv_net libv_serial
+	LINK   libv_vm4
+)
+
+wish_create_executable(
+	TARGET theme
+	#OUTPUT_FOLDER theme
+	#OUTPUT_NAME theme
+	#OUTPUT_RESOURCE res
+	#RESOURCE app/theme/res
+	SOURCE app/theme/*.cpp
+	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_mt
+#	LINK   libv_ctrl
 )
 
 ## --- Update ---
@@ -964,67 +1039,10 @@ wish_create_executable(
 #)
 
 wish_create_executable(
-	TARGET theme
-	#OUTPUT_FOLDER theme
-	#OUTPUT_NAME theme
-	#OUTPUT_RESOURCE res
-	#RESOURCE app/theme/res
-	SOURCE app/theme/*.cpp
-	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_mt
-#	LINK   libv_ctrl
-)
-
-wish_create_executable(
-	TARGET enum
-	SOURCE app/enum/*.cpp
-	LINK   ext_fmt ext_range libv_lua libv_utility
-)
-
-wish_create_executable(
-	TARGET star
-	SOURCE app/star/*.cpp
-	GENERATE codegen app/star/message/*.in.lua
-	LINK   libv_log libv_sys
-	LINK   libv_frame libv_ctrl libv_ui
-	LINK   libv_rev libv_glr libv_color
-	LINK   libv_lua
-	LINK   libv_net libv_serial
-	LINK   libv_vm4
-)
-
-wish_create_executable(
-	TARGET space
-	SOURCE app/space/game/*.cpp
-	SOURCE app/space/message/*.cpp
-	SOURCE app/space/network/*.cpp
-	SOURCE app/space/sim/*.cpp
-	SOURCE app/space/view/*.cpp
-	SOURCE app/space/space_main.cpp
-	GENERATE codegen app/space/message/*.in.lua
-#	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-	LINK   libv_vm4
-	LINK   libv_sys
-)
-
-wish_create_executable(
-	TARGET surface
-	SOURCE app/space/game/*.cpp
-	SOURCE app/space/message/*.cpp
-	SOURCE app/space/network/*.cpp
-	SOURCE app/space/sim/*.cpp
-	SOURCE app/space/view/*.cpp
-	SOURCE app/space/surface/*.cpp
-	GENERATE codegen app/space/message/*.in.lua
-#	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-	LINK   libv_vm4
-	LINK   libv_sys
-
-#	LINK   libv_noise
-	# Temporarily just hook in the noise lib directly into surface for faster dev build time
-	SOURCE src/libv/noise/*.cpp
-	LINK   libv_utility libv_math
+	TARGET fsw
+	SOURCE app/fsw.cpp
+	LINK   ext_fmt libv_utility libv_fsw libv_mt
+#	LINK   libv_arg
 )
 
 wish_create_executable(
