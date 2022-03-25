@@ -10,3 +10,4 @@
 #include <libv/serial/types/boost_flat_map.hpp>
 #include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_variant.hpp>
+#include <libv/serial/types/std_vector.hpp>

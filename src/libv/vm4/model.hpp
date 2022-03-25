@@ -98,7 +98,7 @@ struct LOD {
 };
 
 struct Model {
-	int32_t format = 20191204; /// VM4 format version identifier
+	int32_t format = 20220324; /// VM4 format version identifier
 
 //	int64_t hash; /// Pre-calculated hash value of the Model, useful to detect changes
 //	binary<32> hash; /// Pre-calculated hash value of the Model, useful to detect changes

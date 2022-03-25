@@ -3,11 +3,12 @@
 // hpp
 #include <libv/vm4imp/importer.hpp>
 // ext
-#include <assimp/Importer.hpp>
-#include <assimp/ProgressHandler.hpp>
 #include <assimp/cimport.h>
+#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <assimp/ProgressHandler.hpp>
 #include <assimp/scene.h>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <fmt/format.h>
@@ -101,17 +102,25 @@ public:
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_REFRACTI, ai_float))
 				materials[i].properties.emplace("refraction", ai_float);
 
-			const auto loadTexture = [&](const auto& stack, const auto& name) {
-				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXTURE(stack, n), ai_str); ++n)
-					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_path", name, n), std::string(ai_str.C_Str()));
+			const auto loadTexture = [&](const auto& stack, TextureType type, const auto& name) {
+				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXTURE(stack, n), ai_str); ++n) {
+//					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_path", name, n), std::string(ai_str.C_Str()));
+					materials[i].textures.emplace_back(
+							type,
+							boost::algorithm::replace_all_copy(std::string(ai_str.C_Str()), "\\", "/"),
+							0
+					);
+				}
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXBLEND(stack, n), ai_float); ++n)
 					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_blend", name, n), ai_float);
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXOP(stack, n), ai_int); ++n)
 					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texop", name, n), ai_int);
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPING(stack, n), ai_int); ++n)
 					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mapping", name, n), ai_int);
-				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_UVWSRC(stack, n), ai_int); ++n)
-					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_uvwsrc", name, n), ai_int);
+				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_UVWSRC(stack, n), ai_int); ++n) {
+//					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_uvwsrc", name, n), ai_int);
+					materials[i].textures[n].uvwsrc = ai_int;
+				}
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_U(stack, n), ai_int); ++n)
 					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mappingmode_u", name, n), ai_int);
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_V(stack, n), ai_int); ++n)
@@ -122,19 +131,26 @@ public:
 					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texflags", name, n), ai_int);
 			};
 
-			loadTexture(aiTextureType_NONE, "none");
-			loadTexture(aiTextureType_DIFFUSE, "diffuse");
-			loadTexture(aiTextureType_SPECULAR, "specular");
-			loadTexture(aiTextureType_AMBIENT, "ambient");
-			loadTexture(aiTextureType_EMISSIVE, "emissive");
-			loadTexture(aiTextureType_HEIGHT, "height");
-			loadTexture(aiTextureType_NORMALS, "normals");
-			loadTexture(aiTextureType_SHININESS, "shininess");
-			loadTexture(aiTextureType_OPACITY, "opacity");
-			loadTexture(aiTextureType_DISPLACEMENT, "displacement");
-			loadTexture(aiTextureType_LIGHTMAP, "lightmap"); // Ambient occlusion
-			loadTexture(aiTextureType_REFLECTION, "reflection");
-			loadTexture(aiTextureType_UNKNOWN, "unknown");
+			loadTexture(aiTextureType_DIFFUSE, TextureType::diffuse, "diffuse");
+			loadTexture(aiTextureType_SPECULAR, TextureType::specular, "specular");
+			loadTexture(aiTextureType_AMBIENT, TextureType::ambient, "ambient");
+			loadTexture(aiTextureType_EMISSIVE, TextureType::emissive, "emissive");
+			loadTexture(aiTextureType_HEIGHT, TextureType::height, "height");
+			loadTexture(aiTextureType_NORMALS, TextureType::normals, "normals");
+			loadTexture(aiTextureType_SHININESS, TextureType::shininess, "shininess");
+			loadTexture(aiTextureType_OPACITY, TextureType::opacity, "opacity");
+			loadTexture(aiTextureType_DISPLACEMENT, TextureType::displacement, "displacement");
+			loadTexture(aiTextureType_LIGHTMAP, TextureType::lightmap, "lightmap"); // Ambient occlusion
+			loadTexture(aiTextureType_REFLECTION, TextureType::reflection, "reflection");
+
+			loadTexture(aiTextureType_BASE_COLOR, TextureType::base_color, "base_color");
+			loadTexture(aiTextureType_NORMAL_CAMERA, TextureType::normal_camera, "normal_camera");
+			loadTexture(aiTextureType_EMISSION_COLOR, TextureType::emission_color, "emission_color");
+			loadTexture(aiTextureType_METALNESS, TextureType::metalness, "metalness");
+			loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, TextureType::diffuse_roughness, "diffuse_roughness");
+			loadTexture(aiTextureType_AMBIENT_OCCLUSION, TextureType::ambient_occlusion, "ambient_occlusion");
+
+			loadTexture(aiTextureType_UNKNOWN, TextureType::unknown, "unknown");
 		}
 	}
 
