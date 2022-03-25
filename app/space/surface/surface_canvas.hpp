@@ -36,6 +36,7 @@ private:
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui);
 private:
+	void setupRenderStates(libv::glr::Queue& glr);
 	virtual void attach() override;
 	virtual void render(libv::glr::Queue& glr) override;
 };

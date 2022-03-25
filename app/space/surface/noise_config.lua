@@ -239,20 +239,28 @@ nodes =
 				simplexFractal {
 					seed = 810,
 					octaves = 6,
-					amplitude = 1,
+					amplitude = 0.6,
 					frequency = 0.5,
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
 			},
-			--simplexFractal {
-			--	seed = 423,
-			--	octaves = 6,
-			--	amplitude = 0.2,
-			--	frequency = 0.2,
-			--	lacunarity = 2.0,
-			--	persistence = 0.5,
-			--},
+			simplexFractal {
+				seed = 1,
+				octaves = 6,
+				amplitude = 0.2,
+				frequency = 0.2,
+				lacunarity = 2.0,
+				persistence = 0.5,
+			},
+			simplexFractal {
+				seed = 1000,
+				octaves = 6,
+				amplitude = 0.6,
+				frequency = 0.2,
+				lacunarity = 2.0,
+				persistence = 0.5,
+			},
 			constant{
 				value = 0.5
 			},

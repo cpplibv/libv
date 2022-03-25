@@ -155,6 +155,8 @@ struct NodePow : Node {
 //	}
 //};
 
+//TODO: multiply node
+
 //TODO P5: NodeSplit definitely out of scope for now
 //struct NodeSplit : Node {
 //    Node* input;

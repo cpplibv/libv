@@ -468,49 +468,44 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 void SpaceCanvas::add_debug_point(libv::vec3f a, libv::vec4f color, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.points.emplace_back(a, color);
+	renderer.debug.add_debug_point(a, color);
 }
 
 void SpaceCanvas::add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.lines.emplace_back(a, b, color);
+	renderer.debug.add_debug_line(a, b, color);
 }
 
 void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.triangles.emplace_back(a, b, c, color);
+	renderer.debug.add_debug_triangle(a, b, c, color);
 }
 
 void SpaceCanvas::add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.discs.emplace_back(center, radius, normal, color);
+	renderer.debug.add_debug_circle(center, radius, normal, color);
 }
 
 void SpaceCanvas::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.spheres.emplace_back(center, radius, color, ring_count, segment_count);
+	renderer.debug.add_debug_sphere(center, radius, color, ring_count, segment_count);
 }
 
 void SpaceCanvas::add_debug_frustum(
 		libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr, libv::vec3f ntl,
 		libv::vec3f fbl, libv::vec3f fbr, libv::vec3f ftr, libv::vec3f ftl,
-		libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode) {
+		libv::vec4f color_sides, libv::vec4f color_wire , StyleFlag mode) {
 	(void) mode;
-	renderer.debug.frustums.push_back(RendererDebug::Frustum{{nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl}, color_sides, color_wire});
+	renderer.debug.add_debug_frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl, color_sides, color_wire);
 }
 
 void SpaceCanvas::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.quads.emplace_back(a, b, c, d, color);
+	renderer.debug.add_debug_quad(a, b, c, d, color);
 }
 
 void SpaceCanvas::clear_debug_shapes() {
-	renderer.debug.points.clear();
-	renderer.debug.lines.clear();
-	renderer.debug.triangles.clear();
-	renderer.debug.quads.clear();
-	renderer.debug.frustums.clear();
-	renderer.debug.spheres.clear();
+	renderer.debug.clear_debug_shapes();
 }
 
 // -------------------------------------------------------------------------------------------------

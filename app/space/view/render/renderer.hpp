@@ -175,11 +175,7 @@ struct RendererDebug {
 		int segment_count;
 	};
 
-public:
-	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
+private:
 	std::vector<Point> points;
 	std::vector<Line> lines;
 	std::vector<Triangle> triangles;
@@ -188,18 +184,40 @@ public:
 	std::vector<Frustum> frustums;
 	std::vector<Sphere> spheres;
 
-private:
+	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	ShaderTestMode shader;
-
-public:
-	explicit RendererDebug(RendererResourceContext& rctx);
+	bool dirty = true;
 
 	void build_points_mesh(libv::glr::Mesh& mesh);
 	void build_lines_mesh(libv::glr::Mesh& mesh);
 	void build_triangles_mesh(libv::glr::Mesh& mesh);
+public:
+	explicit RendererDebug(RendererResourceContext& rctx);
+
+	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
+	void clear_spheres();
+
+	//surface/canvas.cpp need these
+	void add_debug_point(libv::vec3f a, libv::vec4f color);
+	void add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color);
+	void add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color);
+	void add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color);
+	void add_debug_frustum(
+			libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr, libv::vec3f ntl,
+			libv::vec3f fbl, libv::vec3f fbr, libv::vec3f ftr, libv::vec3f ftl,
+			libv::vec4f color_wire, libv::vec4f color_sides);
+	void add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color);
+	void clear_debug_shapes();
+
+
+
+	// -------------------------------------------------------------------------------------------------
+
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-	void renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+//	void renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererSurface {

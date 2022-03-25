@@ -18,7 +18,6 @@
 #include <space/surface/chunk.hpp>
 
 
-
 namespace surface {
 
 
@@ -42,15 +41,8 @@ void SurfaceCanvas::attach() {
 	focus();
 }
 
-//	virtual void update(libv::ui::time_duration delta_time) override {}
-void SurfaceCanvas::render(libv::glr::Queue& glr) {
+void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	renderer.prepare_for_render(glr);
-
-//		screen_picker = camera.picker(canvas_size);
-//		renderTarget.size(canvas_size.cast<int32_t>());
-//		postProcessing.size(canvas_size.cast<int32_t>());
-
-	const auto s_guard = glr.state.push_guard();
 
 	glr.state.enableDepthTest();
 	glr.state.depthFunctionLess();
@@ -83,43 +75,50 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	glr.setClearColor(0, 0, 0, 1);
 	glr.clearColor();
 	glr.clearDepth();
+}
 
-	// =================================================================================================
+
+//	virtual void update(libv::ui::time_duration delta_time) override {}
+void SurfaceCanvas::render(libv::glr::Queue& glr) {
+	setupRenderStates(glr);
+	//		screen_picker = camera.picker(canvas_size);
+//		renderTarget.size(canvas_size.cast<int32_t>());
+//		postProcessing.size(canvas_size.cast<int32_t>());
+	const auto s_guard = glr.state.push_guard();
+
 	if (changed) {
 		libv::Timer timerChunkGen;
 		ChunkGen chunkGen;
 		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
 		config = binding.getConfigFromLuaScript(script);
-		renderer.debug.spheres.clear();
+		renderer.debug.clear_spheres();
+		//getChunk, render (availability alapjan)
 		chunks.clear();
 		for (int i = 0; i < config.numChunks; ++i) {
-			const auto chunkPosi = libv::index_spiral(i);
-			const auto chunkPos = libv::vec2f(chunkPosi.x, chunkPosi.y);
+			const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
 			Chunk chunk = chunkGen.generateChunk(config, chunkPos);
 			chunkGen.placeVegetation(chunk, config);
+			// more log needed
 			fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
 			std::cout << std::endl;
 
-			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-					{{chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10});
+			renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
 
 			if (config.visualization == Visualization::spheres) { //add features
 				for (const auto& surfaceObjectStorage : chunk.featureList) {
 					for (const auto& point : surfaceObjectStorage.points) {
-						renderer.debug.spheres.emplace_back(point.position, point.size, point.color, 10, 10);
+						renderer.debug.add_debug_sphere(point.position, point.size, point.color, 10, 10);
 					}
 				}
-//						renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
 			}
 			chunks.emplace_back(std::move(chunk));
 		}
-		renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-				{{0.5f, 0, 0}, 0.25f, {1, 0, 0, 1}, 10, 10});
-		renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-				{{0, 0.5f, 0}, 0.25f, {0, 1, 0, 1}, 10, 10});
-		renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-				{{0, 0, 0.5f}, 0.25f, {0, 0, 1, 1}, 10, 10});
-		renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
+		renderer.debug.add_debug_sphere(
+				{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
+		renderer.debug.add_debug_sphere(
+				{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
+		renderer.debug.add_debug_sphere(
+				{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
 		if (config.mode == Mode::_3d) {
 			renderer.surface.build_mesh(renderer.surface.mesh, chunks);
 		}
@@ -129,7 +128,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
 //				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
 //			}
-
 
 		changed = false;
 	}
@@ -152,7 +150,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 			}
 		}
 	else
-		renderer.debug.renderTriangles(glr, renderer.resource_context.uniform_stream);
+		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------

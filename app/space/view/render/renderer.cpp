@@ -535,9 +535,12 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	// !!! P3: Rebuild is too expensive on each frame
 
-	build_points_mesh(mesh_point);
-	build_lines_mesh(mesh_line);
-	build_triangles_mesh(mesh_triangle);
+	if (dirty) {
+		build_points_mesh(mesh_point);
+		build_lines_mesh(mesh_line);
+		build_triangles_mesh(mesh_triangle);
+		dirty = false;
+	}
 
 	glr.program(shader.program());
 
@@ -570,19 +573,71 @@ void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 	}
 }
 
-void RendererDebug::renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	glr.program(shader.program());
-
-	{
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
-		glr.uniform(std::move(uniforms));
-		glr.render(mesh_triangle);
-	}
+void RendererDebug::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count) {
+	spheres.emplace_back(center, radius, color, ring_count, segment_count);
+	dirty = true;
 }
+
+void RendererDebug::clear_spheres() {
+	spheres.clear();
+	dirty = true;
+}
+
+void RendererDebug::add_debug_point(libv::vec3f a, libv::vec4f color) {
+	points.emplace_back(a, color);
+	dirty = true;
+}
+
+void RendererDebug::add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color) {
+	lines.emplace_back(a, b, color);
+	dirty = true;
+}
+
+void RendererDebug::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color) {
+	triangles.emplace_back(a, b, c, color);
+	dirty = true;
+}
+
+void RendererDebug::add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color) {
+	discs.emplace_back(center, radius, normal, color);
+	dirty = true;
+}
+
+void RendererDebug::add_debug_frustum(libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr,
+		libv::vec3f ntl, libv::vec3f fbl, libv::vec3f fbr,
+		libv::vec3f ftr, libv::vec3f ftl, libv::vec4f color_wire, libv::vec4f color_sides) {
+	frustums.push_back(RendererDebug::Frustum{{nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl}, color_sides, color_wire});
+	dirty = true;
+}
+
+void RendererDebug::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color) {
+	quads.emplace_back(a, b, c, d, color);
+	dirty = true;
+}
+
+void RendererDebug::clear_debug_shapes() {
+	points.clear();
+	lines.clear();
+	triangles.clear();
+	quads.clear();
+	frustums.clear();
+	spheres.clear();
+	dirty = true;
+}
+
+//void RendererDebug::renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+//	glr.program(shader.program());
+//
+//	{
+//		auto uniforms = uniform_stream.block_unique(layout_matrices);
+//		uniforms[layout_matrices.matMVP] = glr.mvp();
+//		uniforms[layout_matrices.matM] = glr.model;
+//		uniforms[layout_matrices.matP] = glr.projection;
+//		uniforms[layout_matrices.eye] = glr.eye();
+//		glr.uniform(std::move(uniforms));
+//		glr.render(mesh_triangle);
+//	}
+//}
 
 // -------------------------------------------------------------------------------------------------
 
