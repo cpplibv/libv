@@ -94,6 +94,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		renderer.debug.clear_spheres();
 		//getChunk, render (availability alapjan)
 		chunks.clear();
+		bool firstChunk = true;
 		for (int i = 0; i < config.numChunks; ++i) {
 			const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
 			Chunk chunk = chunkGen.generateChunk(config, chunkPos);
@@ -111,6 +112,30 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 					}
 				}
 			}
+			if (firstChunk) {
+				if (config.mode == Mode::_3d) {
+					renderer.surface.addFirstChunk(chunk);
+					firstChunk = false;
+				}
+//				else {
+//				//TODO revive texture
+//				heightMap = libv::glr::Texture2D::RGBA32F();
+//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
+//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
+//			}
+			} else {
+				if (config.mode == Mode::_3d) {
+					renderer.surface.addChunk(chunk);
+				}
+//				else {
+//				//TODO revive texture
+//				heightMap = libv::glr::Texture2D::RGBA32F();
+//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
+//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
+//			}
+			}
+
+			// after std::move, entity is empty
 			chunks.emplace_back(std::move(chunk));
 		}
 		renderer.debug.add_debug_sphere(
@@ -119,23 +144,15 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 				{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
 		renderer.debug.add_debug_sphere(
 				{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
-		if (config.mode == Mode::_3d) {
-			renderer.surface.build_mesh(renderer.surface.mesh, chunks);
-		}
-//			else {
-//				//TODO revive texture
-//				heightMap = libv::glr::Texture2D::RGBA32F();
-//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
-//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
-//			}
-
 		changed = false;
 	}
 
+	//render surface texture/_3d
 	config.mode == Mode::_3d ?
-			renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
+			renderer.surface.render(glr, renderer.resource_context.uniform_stream, chunks) :
 			renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
-	// render plant model
+
+	// render plant model/debug
 	if (config.visualization == Visualization::model)
 		for (const auto& chunk : chunks) {
 			for (const auto& feature : chunk.featureList) {

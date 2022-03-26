@@ -916,7 +916,39 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
-void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const std::vector<surface::Chunk>& chunks) {
+void RendererSurface::addChunk(surface::Chunk& chunk) {
+	auto position = mesh.attribute(attribute_position);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto index = mesh.index();
+	const auto rowSize = chunk.points.size_y();
+
+	for (unsigned int i = 0; i < rowSize; i++) {
+		const auto colSize = chunk.points.size_x();
+		for (unsigned int j = 0; j < colSize; ++j) {
+			position(chunk.points(i, j).point);
+			color0(chunk.points(i, j).color);
+		}
+	}
+
+	for (int i = 0; i < rowSize - 1; ++i) {
+		index(vi);
+		const auto colSize = chunk.points.size_x();
+		for (int j = 0; j < colSize; ++j) {
+			index(vi);
+			index(vi + colSize);
+			vi += 1;
+		}
+		index(vi + colSize - 1);
+	}
+}
+
+void RendererSurface::addFirstChunk(surface::Chunk& chunk) {
+	mesh.clear();
+	vi = 0;
+	addChunk(chunk);
+}
+
+void RendererSurface::build_mesh(const std::vector<surface::Chunk>& chunks) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -953,9 +985,9 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const std::vector<surfac
 	}
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<surface::Chunk>& chunks) {
 //void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
-	//build_mesh(mesh, chunk);
+//	build_mesh(chunks);
 
 	glr.program(shader.program());
 	{

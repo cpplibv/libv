@@ -124,6 +124,13 @@ std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, in
 		auto node = std::make_unique<NodeSimplex>();
 		node->seed = table["seed"];
 		return node;
+	} else if (nodeType == "cellular") {
+		auto node = std::make_unique<NodeCellular>();
+		node->seed = table["seed"];
+		node->distanceFn = table["distanceFn"];
+		node->returnType = table["returnType"];
+		node->jitter = table["jitter"];
+		return node;
 	} else if (nodeType == "simplexFractal") {
 		auto node = std::make_unique<NodeSimplexFractal>();
 		setFractalConfig(*node, table);

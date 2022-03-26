@@ -12,7 +12,7 @@ hotkey for switching between wire and fill
 60 nap -
 doksi: 15 nap
 csuszasok: 15 nap
-implementacio + kutatas: 30nap
+implementacio + kutatas: 30nap 03.13-04.13
 EPICS:
 	NOISE-LIB: 40%
 		3d-s algok <- animation miatt is

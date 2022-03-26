@@ -12,6 +12,7 @@ NodeType = {
 	constant = "constant",
 	perlin = "perlin",
 	simplex = "simplex",
+	cellular = "cellular",
 	simplexFractal = "simplexFractal",
 	warp = "warp",
 	add = "add",
@@ -36,42 +37,6 @@ PlantDistribution = {
 --	clustered = "clustered",
 --}
 
-Config = {
-	mode = Mode._3d,
-	size = 1024,
-	amplitude = 0.5,
-
-	--{
-	--	--fractal
-	--	octaves = 4,
-	--	amplitude = 0.5,
-	--	frequency = 0.2,
-	--	lacunarity = 2.0,
-	--	persistence = 0.5,
-	--	--noise
-	--	seed = 0x5EED,
-	--	noiseType = NoiseType.perlin,
-	--	----cellular
-	--	--distanceFn =,
-	--	--returnType =,
-	--	--jitter = 1.0f
-	--},
-	--{
-	--	--fractal
-	--	octaves = 8,
-	--	amplitude = 0.5,
-	--	frequency = 0.2,
-	--	lacunarity = 2.0,
-	--	persistence = 0.5,
-	--	--noise
-	--	seed = 0x5EED,
-	--	noiseType = NoiseType.simplex,
-	--	----cellular
-	--	--distanceFn =,
-	--	--returnType =,
-	--	--jitter = 1.0f
-	--}
-}
 
 --option 1
 --height = perlin(seed) > warp(0.5) + cellular(cell.distance0);
@@ -116,6 +81,29 @@ end
 local simplex = function(args)
 	args = args or {}
 	args.nodeType = NodeType.simplex
+	return args
+end
+
+DistFun = {
+	euclidean = 0,
+	euclideanSq = 1,
+	manhattan = 2,
+	hybrid = 3,
+}
+
+ReturnType = {
+	cellValue = 0,
+	distance = 1,
+	distance2 = 2,
+	distance2Add = 3,
+	distance2Sub = 4,
+	distance2Mul = 5,
+	distance2Div = 6,
+}
+
+local cellular = function(args)
+	args = args or {}
+	args.nodeType = NodeType.cellular
 	return args
 end
 
@@ -239,7 +227,7 @@ nodes =
 				simplexFractal {
 					seed = 810,
 					octaves = 6,
-					amplitude = 0.6,
+					amplitude = 0.7,
 					frequency = 0.5,
 					lacunarity = 2.0,
 					persistence = 0.5,
@@ -253,18 +241,22 @@ nodes =
 				lacunarity = 2.0,
 				persistence = 0.5,
 			},
-			simplexFractal {
-				seed = 1000,
-				octaves = 6,
-				amplitude = 0.6,
-				frequency = 0.2,
-				lacunarity = 2.0,
-				persistence = 0.5,
-			},
+			--simplexFractal {
+			--	seed = 1000,
+			--	octaves = 6,
+			--	amplitude = 0.6,
+			--	frequency = 0.2,
+			--	lacunarity = 2.0,
+			--	persistence = 0.5,
+			--},
 			constant{
 				value = 0.5
 			},
-			--perlin{}
+			--cellular {
+			--	distanceFn = DistFun.manhattan,
+			--	returnType = ReturnType.distance2Div,
+			--	jitter = 1,
+			--},
 
 		}
 	}

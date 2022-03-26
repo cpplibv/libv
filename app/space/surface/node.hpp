@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <vector>
+//#include <vector>
 #include <memory>
 #include <cmath>
 
@@ -22,9 +22,7 @@ struct Node {
 struct NodeConstant : Node {
 	float value = 0.f;
 
-	virtual float evaluate(float x, float y) override {
-		return value;
-	}
+	virtual float evaluate(float x, float y) override;
 };
 
 struct NodePerlin : Node {
@@ -103,7 +101,6 @@ struct NodeWarp : BaseFractalNode {
 
 struct NodePlus : Node {
 	using container = boost::container::small_vector<std::unique_ptr<Node>, 4>;
-//	std::vector<std::unique_ptr<Node>> inputs;
 	container inputs;
 
 //	Node* input0;
@@ -116,13 +113,7 @@ struct NodePlus : Node {
 //	}
 	explicit NodePlus(container inputs) : inputs(std::move(inputs)) {}
 
-	virtual float evaluate(float x, float y) override {
-		float result = 0.f;
-		for (const auto& input : inputs) {
-			result += input->evaluate(x, y);
-		}
-		return result;
-	}
+	virtual float evaluate(float x, float y) override;
 };
 
 struct NodePow : Node {
@@ -132,13 +123,7 @@ struct NodePow : Node {
 
 	explicit NodePow(std::unique_ptr<Node> input) : input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override {
-		auto base = input->evaluate(x, y);
-		if (base < 0)
-			return -std::pow(-base, exponent);
-		else
-			return std::pow(base, exponent);
-	}
+	virtual float evaluate(float x, float y) override;
 };
 
 //TODO P2: MixNode b

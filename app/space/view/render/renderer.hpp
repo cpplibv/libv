@@ -221,15 +221,21 @@ public:
 };
 
 struct RendererSurface {
+private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 	ShaderSurface shader;
+	libv::glr::VertexIndex vi = 0;
+//	bool dirty = true;
 
+	void build_mesh(const std::vector<surface::Chunk>& chunks);
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
-	void build_mesh(libv::glr::Mesh& mesh, const std::vector<surface::Chunk>& chunk);
+
+	void addChunk(surface::Chunk& chunk);
+	void addFirstChunk(surface::Chunk& chunk);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<surface::Chunk>& chunks);
 };
 
 struct RendererSurfaceTexture {
