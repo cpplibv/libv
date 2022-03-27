@@ -83,14 +83,19 @@ model rendering tricks:
  	out of scope: micro texture: csak akkor jelenik meg ha nagyon kozel van a kamera
 
 vegetation (popsickle)
-	1. spheres
-	2.a model betoltes
+	DONE: 1. spheres
+	DONE: 2.a model betoltes
 	2.b sprite/billboard
 		modellbol billboard nezetek generalasa (8*8 2D texture of 3D model from different angles)
 
 biome heatmaps
 	WIP: config
 	data structure
+	revive texture
+		a. 1 chunk texture, zoom, movement
+			projection mtx to the center chunk
+			new camera, new controls
+		b. new scene (2D, no veggie)
 
 More than one chunk
 	DONE: 1. box (3x3)
@@ -105,7 +110,6 @@ More than one chunk
 		lod illesztes, ne lyukas: patching/vertex merging, skirt
 
 out of scope: pop hatas elkerules: geomorphing (x, y, z1, z2)
-
 
 terep generalason hangsuly, nem a rendelesen
 out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis min fele, le csokk magassag, amugy no

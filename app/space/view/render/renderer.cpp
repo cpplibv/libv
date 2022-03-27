@@ -920,13 +920,12 @@ void RendererSurface::addChunk(surface::Chunk& chunk) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
-	const auto rowSize = chunk.points.size_y();
 
-	for (unsigned int i = 0; i < rowSize; i++) {
-		const auto colSize = chunk.points.size_x();
-		for (unsigned int j = 0; j < colSize; ++j) {
-			position(chunk.points(i, j).point);
-			color0(chunk.points(i, j).color);
+	const auto rowSize = chunk.points.size_y();
+	for (unsigned int y = 0; y < rowSize; y++) {
+		for (unsigned int x = 0; x < chunk.points.size_x(); ++x) {
+			position(chunk.points(x, y).point);
+			color0(chunk.points(x, y).color);
 		}
 	}
 
@@ -940,6 +939,7 @@ void RendererSurface::addChunk(surface::Chunk& chunk) {
 		}
 		index(vi + colSize - 1);
 	}
+	vi += rowSize;
 }
 
 void RendererSurface::addFirstChunk(surface::Chunk& chunk) {
@@ -948,44 +948,7 @@ void RendererSurface::addFirstChunk(surface::Chunk& chunk) {
 	addChunk(chunk);
 }
 
-void RendererSurface::build_mesh(const std::vector<surface::Chunk>& chunks) {
-	mesh.clear();
-	auto position = mesh.attribute(attribute_position);
-	auto color0 = mesh.attribute(attribute_color0);
-	auto index = mesh.index();
-	libv::glr::VertexIndex vi = 0;
-	for (const auto& chunk : chunks) {
-		const auto rowSize = chunk.points.size_y();
-
-		for (unsigned int i = 0; i < rowSize; i++) {
-			const auto colSize = chunk.points.size_x();
-			for (unsigned int j = 0; j < colSize; ++j) {
-				position(chunk.points(i, j).point);
-				color0(chunk.points(i, j).color);
-			}
-		}
-
-//			index(vi); //to create the chunk jump
-		size_t lastVi;
-		for (int i = 0; i < rowSize - 1; ++i) {
-			index(vi);
-			const auto colSize = chunk.points.size_x();
-			for (int j = 0; j < colSize; ++j) {
-				index(vi);
-				index(vi + colSize);
-				vi += 1;
-			}
-			index(vi + colSize - 1);
-			lastVi = vi + colSize - 1;
-			//index(vi - 1);
-		}
-		vi += rowSize;
-//			index(lastVi); //to create the chunk jump
-//			index(lastVi); //to create the chunk jump
-	}
-}
-
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<surface::Chunk>& chunks) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 //void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
 //	build_mesh(chunks);
 
@@ -1006,40 +969,57 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
-	build_mesh(mesh);
 }
 
+void RendererSurfaceTexture::addTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos) {
+	const auto texture_pos = ChunkTexture{texture, chunkPos};
+	chunks.emplace_back(texture_pos); //std::move?
+}
 
-void RendererSurfaceTexture::build_mesh(libv::glr::Mesh& mesh) {
+void RendererSurfaceTexture::addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos) {
+	chunks.clear();
+	mesh.clear();
+	const auto chunk = ChunkTexture{texture, chunkPos};
+	build_mesh();
+	addTexture(texture, chunkPos); //std::move?
+}
+
+void RendererSurfaceTexture::build_mesh() {
 	auto position = mesh.attribute(attribute_position);
 	auto texture0 = mesh.attribute(attribute_texture0);
 	auto index = mesh.index();
 
-	position(-1, -1, 0);
+	position(0, 0, 0); //left-down
 	texture0(0, 0);
 
-	position(1, -1, 0);
+	position(1, 0, 0); //right-down
 	texture0(1, 0);
 
-	position(1, 1, 0);
+	position(1, 1, 0); //right-up
 	texture0(1, 1);
 
-	position(-1, 1, 0);
+	position(0, 1, 0); //left-up
 	texture0(0, 1);
 
 	index.quad(0, 1, 2, 3);
 }
 
-void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
+void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+	auto guard_p = glr.projection.push_guard();
 
+//	glr.projection = libv::mat4f::ortho() //left right edge
 	glr.program(shader.program());
-	glr.texture(texture, textureChannel_diffuse);
 
-	texture.set(libv::gl::MagFilter::Nearest);
-	texture.set(libv::gl::MinFilter::Nearest);
-	texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+	for (const auto& chunk : chunks) {
+		auto texture = chunk.texture;
+		glr.texture(texture, textureChannel_diffuse);
+		texture.set(libv::gl::MagFilter::Nearest);
+		texture.set(libv::gl::MinFilter::Nearest);
+		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 
-	{
+		auto guard = glr.model.push_guard();
+		glr.model.translate(libv::vec3f{chunk.pos, 0});
+
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = glr.mvp();
 		uniforms[layout_matrices.matM] = glr.model;
@@ -1048,8 +1028,8 @@ void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuf
 		glr.uniform(std::move(uniforms));
 		glr.render(mesh);
 	}
-}
 
+}
 
 // -------------------------------------------------------------------------------------------------
 

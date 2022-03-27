@@ -56,23 +56,23 @@ public:
 	int size;
 	libv::vec2f position;
 //	std::vector<std::vector<SurfacePoint>> points;
-	libv::vector_2D<SurfacePoint> points{256, 256};
+	libv::vector_2D<SurfacePoint> points{256, 256}; //constructor
 	std::vector<SurfaceObjectStorage> featureList;
 
 //	libv::vec4f color;
 	[[nodiscard]]std::vector<libv::vec4f> getColors() const {
 		std::vector<libv::vec4f> colors;
-		colors.reserve(size * size);
-		for (int i = 0; i < points.size_y(); ++i) {
-			for (int j = 0; j < points.size_x(); ++j) {
-				colors.emplace_back(points(i, j).color);
+		colors.reserve(points.size_x() * points.size_y());
+		for (int y = 0; y < points.size_y(); ++y) {
+			for (int x = 0; x < points.size_x(); ++x) {
+				colors.emplace_back(points(x, y).color);
 			}
 		}
 		return colors;
 	}
-
 };
 
+// -------------------------------------------------------------------------------------------------
 
 class ChunkGen {
 private:

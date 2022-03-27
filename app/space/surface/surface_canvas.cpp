@@ -28,7 +28,6 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
 //postProcessing(renderer.resource_context.shader_loader, {100, 100})
 {
 	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
-//		heightMap.storage(1, libv::vec2i{config.size, config.size});
 
 	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event& event) {
 //			auto lock = std::unique_lock(mutex);
@@ -112,27 +111,25 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 					}
 				}
 			}
-			if (firstChunk) {
-				if (config.mode == Mode::_3d) {
+			if (config.mode == Mode::_3d) {
+				if (firstChunk) {
 					renderer.surface.addFirstChunk(chunk);
 					firstChunk = false;
-				}
-//				else {
-//				//TODO revive texture
-//				heightMap = libv::glr::Texture2D::RGBA32F();
-//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
-//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
-//			}
-			} else {
-				if (config.mode == Mode::_3d) {
+				} else {
 					renderer.surface.addChunk(chunk);
 				}
-//				else {
-//				//TODO revive texture
-//				heightMap = libv::glr::Texture2D::RGBA32F();
-//				heightMap.storage(1, libv::vec2i{config.resolution, config.resolution});
-//				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution, config.resolution}, chunk.getColors().data());
-//			}
+			} else {
+				//TODO revive texture
+				auto heightMap = libv::glr::Texture2D::RGBA32F();
+				heightMap.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
+				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors().data());
+//				heightMapTextures.emplace_back(heightMap);
+				if (firstChunk) {
+					renderer.surfaceTexture.addFirstTexture(heightMap, chunk.position);
+					firstChunk = false;
+				} else {
+					renderer.surfaceTexture.addTexture(heightMap, chunk.position);
+				}
 			}
 
 			// after std::move, entity is empty
@@ -149,8 +146,8 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	//render surface texture/_3d
 	config.mode == Mode::_3d ?
-			renderer.surface.render(glr, renderer.resource_context.uniform_stream, chunks) :
-			renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
+			renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
+			renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream);
 
 	// render plant model/debug
 	if (config.visualization == Visualization::model)

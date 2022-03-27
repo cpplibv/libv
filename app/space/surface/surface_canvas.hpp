@@ -26,8 +26,8 @@ private:
 //	libv::rev::RenderTarget renderTarget;
 //	libv::rev::PostProcessing postProcessing;
 	space::Renderer renderer;
-	libv::glr::Texture2D::RGBA32F heightMap;
-	std::vector <Chunk> chunks;
+//	std::vector<libv::glr::Texture2D::RGBA32F> heightMapTextures;
+	std::vector<Chunk> chunks;
 //	std::mutex mutex;
 	std::atomic<bool> changed = true;
 	SurfaceLuaBinding binding;
