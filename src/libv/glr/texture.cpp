@@ -8,7 +8,7 @@
 #include <libv/gl/gl.hpp>
 #include <libv/gl/image.hpp>
 #include <libv/gl/texture.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <optional>
 // pro

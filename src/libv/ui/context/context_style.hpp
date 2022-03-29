@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // pro
 #include <libv/ui/style_fwd.hpp>
 

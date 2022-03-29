@@ -6,7 +6,7 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/utility/function_ref.hpp>
-#include <libv/utility/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive_ptr.hpp>
 #include <libv/utility/type_key.hpp>
 // std
 #include <filesystem>

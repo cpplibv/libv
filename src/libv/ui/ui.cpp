@@ -10,8 +10,8 @@
 #include <libv/lua/lua.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/utility/histogram.hpp>
-#include <libv/utility/observer_ptr.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>

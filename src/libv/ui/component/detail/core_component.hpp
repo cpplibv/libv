@@ -7,9 +7,9 @@
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
-#include <libv/utility/intrusive_ptr.hpp>
-#include <libv/utility/observer_ptr.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/intrusive_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/type_key.hpp>
 // std
 #include <string>

@@ -19,7 +19,7 @@
 #include <libv/ui/property/z_index_offset.hpp>
 #include <libv/ui/style_state.hpp>
 //#include <libv/ui/style_fwd.hpp>
-//#include <libv/utility/intrusive_ptr.hpp>
+//#include <libv/utility/memory/intrusive_ptr.hpp>
 
 
 namespace libv {

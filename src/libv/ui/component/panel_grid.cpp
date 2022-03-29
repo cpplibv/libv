@@ -12,7 +12,7 @@
 #include <libv/algo/sum.hpp>
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/range/view_deinterleave.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>

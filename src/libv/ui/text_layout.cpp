@@ -9,7 +9,7 @@
 // libv
 #include <libv/algo/slice.hpp>
 #include <libv/range/view_uft8_codepoints.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/utf8.hpp>
 // std
 #include <cmath>

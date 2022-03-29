@@ -5,7 +5,7 @@
 // libv
 #include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 
 
 namespace libv {

@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/utility/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive_ptr.hpp>
 //#include <libv/utility/fixed_string.hpp>
 // std
 #include <any>

@@ -6,7 +6,7 @@
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/meta/identity.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <memory>
 #include <string>

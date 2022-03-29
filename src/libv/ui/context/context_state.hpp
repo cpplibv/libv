@@ -9,7 +9,7 @@
 // libv
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // pro
 #include <libv/ui/chrono.hpp>
 

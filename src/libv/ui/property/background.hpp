@@ -6,7 +6,7 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/math/vec_fwd.hpp>
-#include <libv/utility/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive_ptr.hpp>
 // pro
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/padding.hpp>

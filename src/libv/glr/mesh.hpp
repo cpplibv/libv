@@ -13,7 +13,7 @@
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/vertex_array_object.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <memory>
 #include <span>

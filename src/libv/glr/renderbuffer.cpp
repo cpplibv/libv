@@ -5,7 +5,7 @@
 // libv
 #include <libv/gl/gl.hpp>
 #include <libv/gl/renderbuffer.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // pro
 #include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>

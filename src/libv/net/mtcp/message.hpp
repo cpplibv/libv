@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/utility/byte_swap.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/utility/storage_size.hpp>
 #include <libv/utility/to_underlying.hpp>
 // std

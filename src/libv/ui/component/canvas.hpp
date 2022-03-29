@@ -6,7 +6,7 @@
 #include <libv/ui/component/fwd.hpp>
 // libv
 #include <libv/glr/fwd.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 // std
 #include <memory>
 // pro

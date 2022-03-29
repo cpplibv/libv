@@ -14,7 +14,7 @@
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/type_traits.hpp>
 #include <libv/utility/align.hpp>
-#include <libv/utility/observer_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
 // pro
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_block_binding.hpp>

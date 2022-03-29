@@ -9,9 +9,9 @@
 #include <boost/container/flat_set.hpp>
 // libv
 #include <libv/utility/concat.hpp>
-#include <libv/utility/intrusive_ref.hpp>
-#include <libv/utility/observer_ref.hpp>
-#include <libv/utility/optional_ref.hpp>
+#include <libv/utility/memory/intrusive_ref.hpp>
+#include <libv/utility/memory/observer_ref.hpp>
+#include <libv/utility/memory/optional_ref.hpp>
 // std
 #include <stdexcept>
 #include <string>

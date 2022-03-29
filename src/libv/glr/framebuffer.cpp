@@ -6,7 +6,7 @@
 #include <boost/container/small_vector.hpp>
 // libv
 #include <libv/gl/framebuffer.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/meta/similar.hpp>
 // std
 #include <variant>

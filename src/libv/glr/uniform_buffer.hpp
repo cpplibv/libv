@@ -6,7 +6,7 @@
 #include <boost/container/flat_set.hpp>
 // libv
 #include <libv/gl/gl_fwd.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <memory>
 #include <vector>

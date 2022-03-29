@@ -11,7 +11,7 @@
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/utility/nexus.hpp>
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/utility/parse_number.hpp>
 // pro
 #include <star/game/client_config.hpp>

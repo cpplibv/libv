@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <string_view>
 #include <type_traits>
