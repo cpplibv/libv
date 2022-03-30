@@ -795,6 +795,7 @@ wish_create_library(
 	LINK   libv_glr libv_gl libv_utility libv_fsw
 #	LINK   ext_boost
 	LINK   libv_algo libv_range libv_log ext_range ext_ctre # Source include engine stuff
+	LINK   libv_vm4
 )
 
 wish_create_library(
@@ -1209,6 +1210,12 @@ wish_create_executable(
 	TARGET sandbox_libv_rev
 	SOURCE sandbox/libv_rev_main.cpp
 	LINK   libv_log libv_rev ext_glfw #libv_utility libv_math
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_rev_res
+	SOURCE sandbox/libv_rev_res_main.cpp
+	LINK   libv_log libv_rev ext_glfw
 )
 
 wish_create_executable(

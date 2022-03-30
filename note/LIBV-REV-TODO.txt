@@ -52,12 +52,67 @@ libv.rev: Bloom
 
 
 
-place.it: Age of empires 4 menu show/hide effect is cool
+
+
+
+rev.resource
+	- loader deregistration from resources
+
+	- root god resource manager
+
+	- add_include_directory
+	- tracking
+	- foreach resource
+
+	- progress bar?
+
+	- threading
+		- void update(libv::gl::GL& gl);
+		- fs thread? Shared?
+
+	- events
+		- void attach_libv_ui_hub(Hub&& hub);
+		- on_create
+		- on_update
+		- on_destroy
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+libv.rev: Move files: internal_ to internal/internal_
+libv.rev: Move files: glsl_ to glsl/glsl_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+place.it:
+	visual.ui: Age of empires 4 menu show/hide effect is cool
 
 libv.rev: Post processing
 

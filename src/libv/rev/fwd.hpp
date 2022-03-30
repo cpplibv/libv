@@ -18,20 +18,36 @@ class BaseUniformContainer;
 
 } // namespace detail ------------------------------------------------------------------------------
 
+// Model
+//class InternalModelLoader;
+class ModelLoader;
+//class InternalModel;
+class Model;
+
+// Texture
+class InternalTextureLoader;
+class TextureLoader;
+class InternalTexture;
+class Texture;
+
+// Material
+class MaterialLoader;
+class ModelMaterial;
+//class Material;
+
+// Shader
+class ShaderLoader;
 class InternalShader;
 class InternalShaderLoader;
 class InternalShaderStage;
 //class InternalIncludedSource;
-
-class ShaderLoader;
-
 class BaseShader;
 template <typename T> class Shader;
 
 using ShaderID = uint64_t;
 
+// Other
 class PostProcessing;
-
 class RenderTarget;
 
 } // namespace rev ---------------------------------------------------------------------------------

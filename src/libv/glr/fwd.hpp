@@ -14,6 +14,8 @@ class Queue;
 class Remote;
 class UniformBuffer;
 
+class Texture;
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace glr

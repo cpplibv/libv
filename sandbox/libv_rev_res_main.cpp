@@ -30,6 +30,9 @@
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
 
+#include <libv/rev/resource/texture.hpp>
+#include <libv/rev/resource/texture_loader.hpp>
+
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
 //#include <libv/glr/attribute.hpp>
@@ -72,17 +75,17 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 
 // -------------------------------------------------------------------------------------------------
 
-struct UniformsOnlyMatrixBlock {
+struct UniformsSphere {
 //	libv::glr::Uniform_mat4f matMVP;
 //	libv::glr::Uniform_mat4f matM;
 //	libv::glr::Uniform_vec3f color;
+	libv::glr::Uniform_texture texture0;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		(void) access;
-
 //		access(matMVP, "matMVP");
 //		access(render_resolution, "render_resolution");
 //		access(time, "time", 0.f);
+		access(texture0, "texture0", textureChannel_diffuse);
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -104,9 +107,14 @@ struct Sandbox {
 	libv::glr::Mesh mesh_color_bar{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+	libv::rev::TextureLoader texture_loader{"../res/texture/"};
+	libv::rev::Texture texture0 = texture_loader.load("hexagon_metal_0001_diffuse.dds");
+	libv::rev::Texture texture0b = texture_loader.load("hexagon_metal_0001_diffuse.dds");
+	libv::rev::Texture texture1 = texture_loader.load("hexagon_metal_0001_normal.dds");
+	libv::rev::Texture texture2 = texture_loader.load("hexagon_metal_0001_emission.dds");
 	libv::rev::ShaderLoader shader_loader{"../res/shader/"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere.fs"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
+	libv::rev::Shader<UniformsSphere> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere_tex.fs"};
+	libv::rev::Shader<UniformsSphere> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
 
 	libv::rev::RenderTarget render_target{window_size, 4};
 
@@ -264,6 +272,7 @@ struct Sandbox {
 			uniforms[layout_matrices.matM] = glr.model;
 
 			glr.program(shader_sphere.program());
+			glr.texture(texture0.texture(), textureChannel_diffuse);
 			glr.uniform(std::move(uniforms));
 			glr.render(mesh_sphere);
 		}

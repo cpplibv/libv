@@ -82,6 +82,11 @@ libv.math: gradient
 
 
 
+https://www.youtube.com/watch?v=P6Y-Z1uPp4c
+
+
+
+
 
 Surface needs:
 	ui

@@ -6,6 +6,7 @@
 #include <libv/rev/internal_shader.hxx>
 // libv
 #include <libv/algo/slice.hpp>
+#include <libv/utility/ordering.hpp>
 // pro
 #include <libv/rev/internal_shader_loader.hxx>
 
@@ -77,52 +78,33 @@ void InternalShader::finish() {
 	}();
 }
 
-int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const {
-	if (this->uniformTID < uniformTID) return -1;
-	if (this->uniformTID > uniformTID) return 1;
+int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const noexcept {
+	if (auto v = this->uniformTID <=> uniformTID; v != 0) return libv::ordering_as_int(v);
 
-	if (stages.size() < 2) return -1;
-	if (stages.size() > 2) return 1;
+	if (auto v = stages.size() <=> 2; v != 0) return libv::ordering_as_int(v);
 
-	if (stages[0].type < t0) return -1;
-	if (stages[0].type > t0) return 1;
+	if (auto v = stages[0].type <=> t0; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[0].source_path <=> p0; v != 0) return libv::ordering_as_int(v);
 
-	if (stages[0].source_path < p0) return -1;
-	if (stages[0].source_path > p0) return 1;
-
-	if (stages[1].type < t1) return -1;
-	if (stages[1].type > t1) return 1;
-
-	if (stages[1].source_path < p1) return -1;
-	if (stages[1].source_path > p1) return 1;
+	if (auto v = stages[1].type <=> t1; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[1].source_path <=> p1; v != 0) return libv::ordering_as_int(v);
 
 	return 0;
 }
 
-int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const {
-	if (this->uniformTID < uniformTID) return -1;
-	if (this->uniformTID > uniformTID) return 1;
+int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const noexcept {
+	if (auto v = this->uniformTID <=> uniformTID; v != 0) return libv::ordering_as_int(v);
 
-	if (stages.size() < 2) return -1;
-	if (stages.size() > 2) return 1;
+	if (auto v = stages.size() <=> 3; v != 0) return libv::ordering_as_int(v);
 
-	if (stages[0].type < t0) return -1;
-	if (stages[0].type > t0) return 1;
+	if (auto v = stages[0].type <=> t0; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[0].source_path <=> p0; v != 0) return libv::ordering_as_int(v);
 
-	if (stages[0].source_path < p0) return -1;
-	if (stages[0].source_path > p0) return 1;
+	if (auto v = stages[1].type <=> t1; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[1].source_path <=> p1; v != 0) return libv::ordering_as_int(v);
 
-	if (stages[1].type < t1) return -1;
-	if (stages[1].type > t1) return 1;
-
-	if (stages[1].source_path < p1) return -1;
-	if (stages[1].source_path > p1) return 1;
-
-	if (stages[2].type < t2) return -1;
-	if (stages[2].type > t2) return 1;
-
-	if (stages[2].source_path < p2) return -1;
-	if (stages[2].source_path > p2) return 1;
+	if (auto v = stages[2].type <=> t2; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[2].source_path <=> p2; v != 0) return libv::ordering_as_int(v);
 
 	return 0;
 }

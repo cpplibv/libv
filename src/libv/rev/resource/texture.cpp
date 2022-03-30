@@ -1,0 +1,33 @@
+// Project: libv, File: app/space/view/render/model.hpp
+
+// hpp
+#include <libv/rev/resource/texture.hpp>
+#include <libv/rev/resource/texture_internal.hxx>
+
+
+namespace libv {
+namespace rev {
+
+// -------------------------------------------------------------------------------------------------
+
+Texture::Texture(libv::intrusive2_ptr<InternalTexture> self) :
+	self(std::move(self)) {
+}
+
+Texture::Texture(const Texture&) noexcept = default;
+Texture& Texture::operator=(const Texture&) & noexcept = default;
+Texture::Texture(Texture&&) noexcept = default;
+Texture& Texture::operator=(Texture&&) & noexcept = default;
+
+Texture::~Texture() {
+	// For the sake of forward declared ptr
+}
+
+const libv::glr::Texture& Texture::texture() const {
+	return self->texture;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace rev
+} // namespace libv

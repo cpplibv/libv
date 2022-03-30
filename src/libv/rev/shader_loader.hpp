@@ -23,11 +23,13 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
+class InternalShaderLoader;
+
 class ShaderLoader {
-	friend class BaseShader;
+	friend BaseShader;
 
 private:
-	std::shared_ptr<class InternalShaderLoader> self;
+	std::shared_ptr<InternalShaderLoader> self;
 
 public:
 	explicit ShaderLoader(std::filesystem::path base_include_directory);
