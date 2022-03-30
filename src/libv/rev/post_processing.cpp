@@ -35,7 +35,7 @@ PostProcessing::PostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebuff
 }
 
 PostProcessing::~PostProcessing() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void PostProcessing::size(libv::vec2i framebufferSize) noexcept {

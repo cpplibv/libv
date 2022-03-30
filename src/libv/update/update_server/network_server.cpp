@@ -188,7 +188,7 @@ UpdateNetworkServer::UpdateNetworkServer(libv::net::IOContext& io_context, std::
 
 UpdateNetworkServer::~UpdateNetworkServer() {
 	log_update.info("~UpdateNetworkServer");
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void UpdateNetworkServer::listen(libv::net::mtcp::Endpoint endpoint, int backlog) {

@@ -94,7 +94,7 @@ GameClient::GameClient(const std::filesystem::path& settingsFilepath) :
 
 GameClient::~GameClient() {
 	unregister_nexus();
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void GameClient::register_nexus() {

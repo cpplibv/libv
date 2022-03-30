@@ -215,7 +215,7 @@ Engine::Engine(std::filesystem::path script_file, std::function<void(libv::vecto
 }
 
 Engine::~Engine() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 // -------------------------------------------------------------------------------------------------

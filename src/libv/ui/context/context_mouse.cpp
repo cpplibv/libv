@@ -251,7 +251,7 @@ ContextMouse::ContextMouse() :
 	self(std::make_unique<ImplContextMouse>()) {
 }
 
-ContextMouse::~ContextMouse() = default; // For the sake of forward declared unique_ptr
+ContextMouse::~ContextMouse() = default; // For the sake of forward declared ptr
 
 void ContextMouse::subscribe(CoreComponent& component) {
 	self->container.add_node(component_region(component), &component);

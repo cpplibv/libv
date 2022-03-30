@@ -210,7 +210,7 @@ NetworkClient::~NetworkClient() {
 	self->connection->disconnectExpected = true;
 //	self->connection.connection().disconnect_async();
 //	self->io_context.join();
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 // -------------------------------------------------------------------------------------------------

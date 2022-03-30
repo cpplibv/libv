@@ -40,7 +40,7 @@ ContextEvent::ContextEvent() :
 	self(std::make_unique<ImplContextEvent>()) { }
 
 ContextEvent::~ContextEvent() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void ContextEvent::connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {

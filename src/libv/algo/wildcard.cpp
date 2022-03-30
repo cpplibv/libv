@@ -218,7 +218,7 @@ bool WildcardGlobMatcher::match(const std::string_view str) const {
 }
 
 WildcardGlobMatcher::~WildcardGlobMatcher() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 // -------------------------------------------------------------------------------------------------

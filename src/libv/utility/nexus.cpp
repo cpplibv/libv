@@ -40,7 +40,7 @@ Nexus::Nexus() :
 	self(std::make_shared<ImplNexus>()) { }
 
 Nexus::~Nexus() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void Nexus::aux_connect(track_ptr owner, key_type event_type, std::function<void(const void*)> func) {

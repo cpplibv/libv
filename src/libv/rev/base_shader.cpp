@@ -30,7 +30,7 @@ BaseShader::BaseShader(ShaderLoader& loader, libv::type_uid uniformTID, BaseShad
 }
 
 BaseShader::~BaseShader() {
-	// For the sake of forward declared shared_ptr
+	// For the sake of forward declared ptr
 }
 
 ShaderID BaseShader::id() const noexcept {

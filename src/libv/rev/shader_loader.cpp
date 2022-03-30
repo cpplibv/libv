@@ -32,7 +32,7 @@ ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
 }
 
 ShaderLoader::~ShaderLoader() {
-	// For the sake of forward declared shared_ptr
+	// For the sake of forward declared ptr
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -228,7 +228,7 @@ ContextRender::ContextRender() :
 	self(std::make_unique<ImplContextRender>()) { }
 
 ContextRender::~ContextRender() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 Renderer ContextRender::root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time, libv::vec2f mouse_position, libv::vec2f ui_size) {

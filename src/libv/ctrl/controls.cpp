@@ -660,7 +660,7 @@ Controls::Controls() : self(std::make_unique<ImplControls>()) {
 }
 
 Controls::~Controls() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 // -------------------------------------------------------------------------------------------------

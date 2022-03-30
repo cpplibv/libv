@@ -23,7 +23,7 @@ public:
 worker_thread::worker_thread(std::string new_name) :
 	self(std::make_unique<impl_worker_thread>(std::move(new_name))) {}
 
-worker_thread::~worker_thread() noexcept = default; // For the sake of forward declared unique_ptr
+worker_thread::~worker_thread() noexcept = default; // For the sake of forward declared ptr
 
 // -------------------------------------------------------------------------------------------------
 

@@ -188,7 +188,7 @@ UpdateClient::UpdateClient(Settings settings) :
 }
 
 UpdateClient::~UpdateClient() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 update_check_result UpdateClient::check_for_update() {

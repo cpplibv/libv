@@ -25,7 +25,7 @@ InternalShader::InternalShader(
 }
 
 InternalShader::~InternalShader() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 
 	if (const auto loader_sp = loader.lock())
 		loader_sp->unsubscribe(this);

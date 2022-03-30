@@ -132,7 +132,7 @@ GLSLSourceLoader::GLSLSourceLoader() :
 }
 
 GLSLSourceLoader::~GLSLSourceLoader() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared ptr
 }
 
 void GLSLSourceLoader::add_global_define(std::string define) {
