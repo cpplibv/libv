@@ -9,7 +9,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/utility/ordering.hpp>
 // pro
-#include <libv/rev/resource/resource.hpp>
+#include "basic_resource.hpp"
 #include <libv/rev/resource/texture_loader_internal.hxx>
 
 

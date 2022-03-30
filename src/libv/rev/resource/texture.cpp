@@ -23,7 +23,11 @@ Texture::~Texture() {
 	// For the sake of forward declared ptr
 }
 
-const libv::glr::Texture& Texture::texture() const {
+libv::glr::Texture& Texture::texture() noexcept {
+	return self->texture;
+}
+
+const libv::glr::Texture& Texture::texture() const noexcept {
 	return self->texture;
 }
 

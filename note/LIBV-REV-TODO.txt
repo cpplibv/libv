@@ -53,25 +53,28 @@ libv.rev: Bloom
 
 
 
+threading
+	void update(libv::gl::GL& gl);
 
 
-rev.resource
-	- loader deregistration from resources
 
-	- root god resource manager
+loader deregistration from resources
+root god resource manager
 
-	- add_include_directory
-	- tracking
-	- foreach resource
 
-	- progress bar?
+libv.rev.resource
+	tracking
+		fs thread? Shared?
+	threading
+		void update(libv::gl::GL& gl);
+		fs thread? Shared?
 
-	- threading
-		- void update(libv::gl::GL& gl);
-		- fs thread? Shared?
+	add_include_directory
+	foreach resource
+	progress bar?
 
-	- events
-		- void attach_libv_ui_hub(Hub&& hub);
+	events
+		void attach_libv_ui_hub(Hub&& hub);
 		- on_create
 		- on_update
 		- on_destroy
@@ -81,11 +84,10 @@ rev.resource
 
 
 
-
-
-
-
-
+libv.rev: Texture Loader: error handling, fallback logic
+		per resource decision if load failure is tolerable or not
+		(update tolerance is different from create tolerance)
+libv.rev: Texture Loader: add_virtual_resource "builtin:white"
 
 
 

@@ -27,7 +27,8 @@ public:
 	~Texture();
 
 public:
-	const libv::glr::Texture& texture() const;
+	libv::glr::Texture& texture() noexcept;
+	const libv::glr::Texture& texture() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

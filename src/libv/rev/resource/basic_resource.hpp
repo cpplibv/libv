@@ -85,6 +85,7 @@ protected:
 	using Loader = LoaderT;
 
 private:
+//	std::atomic<Loader*> loader;
 	Loader* loader;
 //	libv::intrusive2_ptr<Loader> loader;
 //	libv::intrusive_ptr<Loader> loader;

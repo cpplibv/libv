@@ -31,7 +31,8 @@
 #include <libv/rev/shader_loader.hpp>
 
 #include <libv/rev/resource/texture.hpp>
-#include <libv/rev/resource/texture_loader.hpp>
+//#include <libv/rev/resource/texture_loader.hpp>
+#include <libv/rev/resource/resource_manager.hpp>
 
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
@@ -107,11 +108,15 @@ struct Sandbox {
 	libv::glr::Mesh mesh_color_bar{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
-	libv::rev::TextureLoader texture_loader{"../res/texture/"};
-	libv::rev::Texture texture0 = texture_loader.load("hexagon_metal_0001_diffuse.dds");
-	libv::rev::Texture texture0b = texture_loader.load("hexagon_metal_0001_diffuse.dds");
-	libv::rev::Texture texture1 = texture_loader.load("hexagon_metal_0001_normal.dds");
-	libv::rev::Texture texture2 = texture_loader.load("hexagon_metal_0001_emission.dds");
+	libv::rev::ResourceManager loader{[] {
+		libv::rev::Settings settings;
+		settings.texture.base_path = "../res/texture/";
+		return settings;
+	}()};
+	libv::rev::Texture texture0 = loader.texture.load("hexagon_metal_0001_diffuse.dds");
+	libv::rev::Texture texture0b = loader.texture.load("hexagon_metal_0001_diffuse.dds");
+	libv::rev::Texture texture1 = loader.texture.load("hexagon_metal_0001_normal.dds");
+	libv::rev::Texture texture2 = loader.texture.load("hexagon_metal_0001_emission.dds");
 	libv::rev::ShaderLoader shader_loader{"../res/shader/"};
 	libv::rev::Shader<UniformsSphere> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere_tex.fs"};
 	libv::rev::Shader<UniformsSphere> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};

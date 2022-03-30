@@ -21,7 +21,7 @@ private:
 	libv::intrusive2_ptr<InternalTextureLoader> self;
 
 public:
-	explicit TextureLoader(std::string base_path);
+	explicit TextureLoader(const libv::intrusive2_ptr<InternalResourceManager>& irm);
 	TextureLoader(const TextureLoader&) noexcept;
 	TextureLoader& operator=(const TextureLoader&) & noexcept;
 	TextureLoader(TextureLoader&&) noexcept;

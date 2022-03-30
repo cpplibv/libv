@@ -12,8 +12,8 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-TextureLoader::TextureLoader(std::string base_path) :
-	self(libv::make_intrusive2_ptr<InternalTextureLoader>(std::move(base_path))) {
+TextureLoader::TextureLoader(const libv::intrusive2_ptr<InternalResourceManager>& irm) :
+	self(libv::make_intrusive2_ptr<InternalTextureLoader>(irm)) {
 }
 
 TextureLoader::TextureLoader(const TextureLoader&) noexcept = default;

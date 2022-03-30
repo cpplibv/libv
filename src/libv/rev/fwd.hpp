@@ -50,5 +50,7 @@ using ShaderID = uint64_t;
 class PostProcessing;
 class RenderTarget;
 
+class InternalResourceManager;
+
 } // namespace rev ---------------------------------------------------------------------------------
 } // namespace libv

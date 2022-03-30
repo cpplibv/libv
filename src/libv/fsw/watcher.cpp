@@ -23,6 +23,7 @@ std::ostream& operator<<(std::ostream& os, const Action& action) {
 	case Action::remove: return os << "remove";
 	case Action::modify: return os << "modify";
 	case Action::rename: return os << "rename";
+//	case Action::exists: return os << "exists";
 	}
 
 	return os << "unknown";
@@ -40,6 +41,9 @@ std::ostream& operator<<(std::ostream& os, const Event& event) {
 
 	if (event.action == Action::rename)
 		return os << "Moved " << libv::generic_path(event.path) << " from " << libv::generic_path(event.old_path);
+
+//	if (event.action == Action::exists)
+//		return os << "Exists " << libv::generic_path(event.path);
 
 	return os << "Unknown event";
 }

@@ -16,7 +16,7 @@ enum class Action {
 	remove = 2,
 	modify = 3,
 	rename = 4,
-//	prerun = 5,
+//	exists = 5,
 };
 
 std::ostream& operator<<(std::ostream& os, const Action& event);
