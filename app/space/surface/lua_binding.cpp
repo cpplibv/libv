@@ -62,7 +62,6 @@ std::vector<SurfaceObject> convertSurfaceObjects(const sol::table& solSurfaceObj
 
 void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
 	config.colorGrad = convertColorGradient(luaConfig["colorGrad"]);
-	config.mode = luaConfig["mode"];
 	config.visualization = luaConfig["visualization"];
 	config.resolution = luaConfig["resolution"];
 	config.numChunks = luaConfig["numChunks"];

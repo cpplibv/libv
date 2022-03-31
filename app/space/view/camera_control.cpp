@@ -6,6 +6,7 @@
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
+#include <libv/math/linearized.hpp>
 // std
 #include <cmath>
 // pro
@@ -52,7 +53,8 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 	// TODO P3: Refine c0 constants in camera control
 	static constexpr auto c0_orbit = 1.15f;
-	static constexpr auto c0_translate = 1.1f; (void) c0_translate; // Suppressing a false warning
+	static constexpr auto c0_translate = 1.1f;
+	(void) c0_translate; // Suppressing a false warning
 
 	controls.feature_analog<BaseCameraOrbit>("camera.orbit_roll", sg_rotate, [](const auto& arg, BaseCameraOrbit& ctx) {
 		const auto value = arg.value_f();
@@ -87,10 +89,7 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 
 	controls.feature_analog<BaseCameraOrbit>("camera.orbit_distance", sg_orbit, [](const auto& arg, BaseCameraOrbit& ctx) {
-		const auto linear_orbit = std::pow(ctx.orbit_distance(), 1.0f / c0_orbit);
-		const auto is_neg = linear_orbit + arg.value_f() < 0;
-		const auto value = is_neg ? 0.0f : std::pow(linear_orbit + arg.value_f(), c0_orbit);
-
+		const auto value = libv::linearized_change(ctx.orbit_distance(), c0_orbit, arg.value_f());
 		ctx.orbit_distance(std::clamp(value, ctx.near() * 2.0f, ctx.far() * 0.5f));
 	});
 
@@ -162,4 +161,64 @@ void CameraControl::bind_default_controls(libv::ctrl::Controls& controls) {
 
 // -------------------------------------------------------------------------------------------------
 
+void CameraControl2D::register_controls(libv::ctrl::FeatureRegister controls) {
+
+	libv::ctrl::scale_group sg_translate{
+			.impulse = 0.1,
+			.time = 1.0,
+			.mouse = 1.0 / 600.0,
+			.scroll = 0.1,
+			.gp_analog = 1.0,
+			.js_analog = 1.0
+	};
+
+	libv::ctrl::scale_group sg_zoom{
+			.impulse = 0.01,
+			.time = 0.08,
+			.mouse = 0.08 / 600.0,
+			.scroll = 0.002,
+			.gp_analog = 0.08,
+			.js_analog = 0.08
+	};
+
+	// TODO P3: Refine c0 constants in camera control
+	static constexpr auto c0_zoom = 2.0f;
+	static constexpr auto c0_translate = 1.1f;
+//	(void) c0_translate; // Suppressing a false warning
+
+	controls.feature_analog<CameraOrtho>("camera2D.orbit_distance", sg_zoom, [](const auto& arg, CameraOrtho& ctx) {
+		const auto value = libv::linearized_change(ctx.zoom(), c0_zoom, arg.value_f());
+//		ctx.zoom(std::clamp(value, 0.000001f, value));
+		ctx.zoom(std::max(0.000001f, value));
+	});
+
+	controls.feature_analog<CameraOrtho>("camera2D.move_forward", sg_translate, [](const auto& arg, CameraOrtho& ctx) {
+//		const auto value = arg.value_f() * std::pow(ctx.orbit_distance(), c0_translate);
+//		ctx.move_forward(value);
+		ctx.move_forward(arg.value_f());
+	});
+
+	controls.feature_analog<CameraOrtho>("camera2D.move_right", sg_translate, [](const auto& arg, CameraOrtho& ctx) {
+//		const auto value = arg.value_f() * std::pow(ctx.orbit_distance(), c0_translate);
+//		ctx.move_right(value);
+		ctx.move_right(arg.value_f());
+	});
+}
+
+void CameraControl2D::bind_default_controls(libv::ctrl::Controls& controls) {
+	controls.bind("camera2D.orbit_distance", "Scroll", -1);
+	controls.bind("camera2D.orbit_distance", "t");
+	controls.bind("camera2D.orbit_distance", "g", -1);
+
+	controls.bind("camera2D.move_forward", "Up");
+	controls.bind("camera2D.move_forward", "Down", -1);
+
+	controls.bind("camera2D.move_right", "Right");
+	controls.bind("camera2D.move_right", "Left", -1);
+
+
+//	controls.bind("camera.snap_position", "Shift + Ctrl + O");
+//	controls.bind("camera.snap_angle", "Shift + Ctrl + I");
+
+}
 } // namespace space

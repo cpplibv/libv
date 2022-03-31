@@ -58,6 +58,7 @@ namespace libv {
 	int32_t y = 0;
 	int32_t x = 0;
 	switch (sideId) {
+	default: // To calm down compiler warnings
 	case 0:
 		x = ring;
 		//y = [0 , ring]

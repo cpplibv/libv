@@ -10,11 +10,6 @@
 
 namespace surface {
 
-enum class Mode {
-	texture,
-	_3d
-};
-
 enum class Visualization {
 	model,
 	spheres
@@ -48,6 +43,7 @@ enum class NoiseType {
 //	float lacunarity;
 //	float persistence;
 //};
+
 enum class PlantDistribution {
 	random,
 	clustered
@@ -67,7 +63,6 @@ struct HeatMap {
 };
 
 struct Config {
-	Mode mode;
 	Visualization visualization;
 	size_t resolution; /// Number of quads/pixels per side
 	size_t numChunks; /// Number of quads/pixels per side

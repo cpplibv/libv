@@ -1005,17 +1005,11 @@ void RendererSurfaceTexture::build_mesh() {
 }
 
 void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto guard_p = glr.projection.push_guard();
-
-//	glr.projection = libv::mat4f::ortho() //left right edge
 	glr.program(shader.program());
 
 	for (const auto& chunk : chunks) {
 		auto texture = chunk.texture;
 		glr.texture(texture, textureChannel_diffuse);
-		texture.set(libv::gl::MagFilter::Nearest);
-		texture.set(libv::gl::MinFilter::Nearest);
-		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 
 		auto guard = glr.model.push_guard();
 		glr.model.translate(libv::vec3f{chunk.pos, 0});

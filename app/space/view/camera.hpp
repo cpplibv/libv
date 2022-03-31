@@ -236,4 +236,83 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+struct CameraOrtho{
+public:
+	using float_type = float;
+	using vec2 = libv::vec2_t<float_type>;
+	using vec3 = libv::vec3_t<float_type>;
+	using mat4 = libv::mat4_t<float_type>;
+	using screen_picker = libv::screen_picker<float_type>;
+
+private:
+	static constexpr vec3 axis_forward = {1, 0, 0};
+	static constexpr vec3 axis_right = {0, -1, 0};
+	static constexpr vec3 axis_up = {0, 0, 1};
+
+	/// OpenGL axes: Forward is Z-, Right is X+, Up is Y+
+	/// Camera axes: Forward is X+, Right is Y-, Up is Z+
+	static constexpr mat4 base_camera_orientation = mat4(
+			0,  0, -1,  0, // Map Z- to X+
+			-1,  0,  0,  0, // Map X+ to Y-
+			0,  1,  0,  0, // Map Y+ to Z+
+			0,  0,  0,  1  //
+	);
+
+private:
+	vec3 position_{0, 0, 0};
+	float zoom_ = 0.01f; /// world unit/pixel
+//	float_type orbit_distance_ = 1.f;
+
+//	float_type roll_ = 0;
+//	float_type pitch_ = 0;
+//	float_type yaw_ = 0;
+
+	float_type near_ = 50;
+	float_type far_ = -50;
+//	float_type fov_y_ = libv::deg_to_rad(75.0f);
+
+public:
+	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
+	[[nodiscard]] mat4 view() const noexcept;
+
+//public:
+//	void look_at(vec3 newPosition) noexcept;
+
+public:
+	[[nodiscard]] constexpr inline float_type zoom() const noexcept {
+		return zoom_;
+	}
+	constexpr inline void zoom(float_type value) noexcept {
+		zoom_ = value;
+	}
+	[[nodiscard]] constexpr inline vec3 position() const noexcept {
+		return position_;
+	}
+	constexpr inline void position(vec3 value) noexcept {
+		position_ = value;
+	}
+//	[[nodiscard]] constexpr inline float_type near() const noexcept {
+//		return near_;
+//	}
+//	[[nodiscard]] constexpr inline float_type far() const noexcept {
+//		return far_;
+//	}
+
+public:
+	/// Moves the camera on the XY plane based on cameras view direction to forward
+	constexpr inline void move_forward(float_type value) noexcept {
+		// Yaw is CW but math is CCW
+//		orbit_point_.x += value;
+		position_.y += value;
+	}
+	/// Moves the camera on the XY plane based on cameras view direction to right
+	constexpr inline void move_right(float_type value) noexcept {
+		// Yaw is CW but math is CCW
+		position_.x += value;
+//		orbit_point_.y += value;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace space

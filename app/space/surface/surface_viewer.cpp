@@ -12,7 +12,6 @@
 #include <space/view/camera_control.hpp>
 
 
-
 namespace surface {
 SurfaceViewer::SurfaceViewer() :
 		ui([] {
@@ -34,11 +33,10 @@ SurfaceViewer::SurfaceViewer() :
 
 	space::CameraControl::register_controls(controls);
 	space::CameraControl::bind_default_controls(controls);
+	space::CameraControl2D::register_controls(controls);
+	space::CameraControl2D::bind_default_controls(controls);
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
-
-	controls.attach(frame);
-	ui.attach(frame);
 
 //		libv::ui::Label label("helloLabel");
 //		label.text("Surface app");
@@ -50,18 +48,48 @@ SurfaceViewer::SurfaceViewer() :
 	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui);
 	canvas.z_index_offset(-100);
 	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
-		if (e.gain())
-			controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera);
-		else
-			controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera);
+		if (is3DCamera) {
+			if (e.gain()) {
+				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera3D);
+			} else
+				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
+		} else {
+			if (e.gain()) {
+				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_enter<space::CameraOrtho>(&canvas.object().camera2D);
+			} else
+				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
+		}
 	});
+
+	frame.onContextUpdate.output([&](const auto&) {
+		if (isCameraChanged)
+			if (is3DCamera) {
+				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera3D);
+			} else {
+				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_enter<space::CameraOrtho>(&canvas.object().camera2D);
+			}
+	});
+
+	controls.attach(frame);
+	ui.attach(frame);
 	ui.add(canvas);
 
 	//switch between triangle fill and wireframe
 	controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
 		isPolygonFill = !isPolygonFill;
 	});
+	//switch between camera 3D and 2D
+	controls.feature_action<void>("surface.switch_camera", [](const auto&) {
+		is3DCamera = !is3DCamera;
+		isCameraChanged = true;
+	});
+
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
+	controls.bind("surface.switch_camera", "F3 [press]");
 
 //		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {
 //			if (e.keycode == libv::input::Keycode::H) {

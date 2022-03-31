@@ -244,7 +244,7 @@ struct RendererSurfaceTexture {
 		libv::vec2f pos; //down-left corner
 	};
 private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderSurface shader;
 	std::vector<ChunkTexture> chunks;
 

@@ -5,6 +5,8 @@ Rename Surface to Chunk
 03.09: Add gradient to heightmap
 simplify pointInTriangle bc its |_ triangle
 hotkey for switching between wire and fill
+TODO revive texture
+
 
 
  =================================================================================================
@@ -109,26 +111,6 @@ More than one chunk
 	chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
 		lod illesztes, ne lyukas: patching/vertex merging, skirt
 
-out of scope: pop hatas elkerules: geomorphing (x, y, z1, z2)
-
-terep generalason hangsuly, nem a rendelesen
-out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis min fele, le csokk magassag, amugy no
-	nem lehet fuggetlen chunkokat generalni
-	nem lehet vegtelen surafcet generalni
-	nem lehet 1 pixelt samplelelni
-	egeszet memoriaban kell tarolni
-	iterativ
-	alternativa: lehet kozeliteni sima negyztremelessel ha jol van osszeblendelve egy surface tulajdonsaggal
-
-lakes
-	bool floodFillTest(x, y, surface) -> true, lehet to ott, else abort
-
- to, folyo, nagy hegy <- felskiccelt - maszk -> generalas
- vizszint megadasa (0- vizszint + 5)
- folyo shader <- designer rakta le a folyot
-
-
-
 1. world, camera, rendering
 noise generator math/noise
 	cellular
@@ -187,6 +169,28 @@ SurfaceViewer
 		visualize surface
 		camera
 		controls
+
+
+=== OUT OF SCOPE ===================================================================================
+picture in picture: simultaneous visualization of 2D and 3D views, both with possible intermediate result/value vis.
+
+pop hatas elkerules: geomorphing (x, y, z1, z2)
+
+terep generalason hangsuly, nem a rendelesen
+out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis min fele, le csokk magassag, amugy no
+	nem lehet fuggetlen chunkokat generalni
+	nem lehet vegtelen surafcet generalni
+	nem lehet 1 pixelt samplelelni
+	egeszet memoriaban kell tarolni
+	iterativ
+	alternativa: lehet kozeliteni sima negyztremelessel ha jol van osszeblendelve egy surface tulajdonsaggal
+
+lakes
+	bool floodFillTest(x, y, surface) -> true, lehet to ott, else abort
+
+ to, folyo, nagy hegy <- felskiccelt - maszk -> generalas
+ vizszint megadasa (0- vizszint + 5)
+ folyo shader <- designer rakta le a folyot
 
  =================================================================================================
 

@@ -157,4 +157,19 @@ void CameraDeveloper::warp_to(vec3 target) {
 
 // -------------------------------------------------------------------------------------------------
 
+CameraOrtho::mat4 CameraOrtho::projection(vec2 canvas_size) const noexcept {
+	//return mat4::ortho(canvas_size * -0.5f, canvas_size, near_, far_);
+	return mat4::ortho(canvas_size * -0.5f * zoom_, canvas_size * zoom_, near_, far_);
+}
+
+CameraOrtho::mat4 CameraOrtho::view() const noexcept {
+	return mat4::identity().translate(-position_);
+}
+
+//void CameraOrtho::look_at(CameraOrtho::vec3 newPosition) noexcept {
+//	position_ = newPosition;
+//}
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace space

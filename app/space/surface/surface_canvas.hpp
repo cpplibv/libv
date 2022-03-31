@@ -16,10 +16,13 @@
 
 namespace surface {
 inline bool isPolygonFill = true;
+inline bool is3DCamera = true;
+inline bool isCameraChanged = true;
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
-	space::CameraPlayer camera;
+	space::CameraPlayer camera3D;
+	space::CameraOrtho camera2D;
 //	CameraPlayer::screen_picker screen_picker;
 
 private:

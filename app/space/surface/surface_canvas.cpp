@@ -20,14 +20,13 @@
 
 namespace surface {
 
-
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
 		renderer(ui)
 //screen_picker(camera.picker({100, 100})),
 //renderTarget({100, 100}, 4),
 //postProcessing(renderer.resource_context.shader_loader, {100, 100})
 {
-	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
+	camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
 	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event& event) {
 //			auto lock = std::unique_lock(mutex);
@@ -51,8 +50,8 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.state.blendSrc_SourceAlpha();
 	glr.state.blendDst_One_Minus_SourceAlpha();
 
-	//glr.state.enableCullFace();
-	glr.state.disableCullFace();
+	glr.state.enableCullFace();
+//	glr.state.disableCullFace();
 	glr.state.cullBackFace();
 	glr.state.frontFaceCCW();
 
@@ -62,11 +61,22 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	else
 		glr.state.polygonModeLine();
 
-	glr.projection = camera.projection(canvas_size);
-	glr.view = camera.view();
-	glr.model = libv::mat4f::identity();
+	if (is3DCamera) {
+		//TODO: get current position from the other camera type
+//		if (isCameraChanged)
+//			camera3D.look_at(camera2D.position(), libv::vec3f{xy(camera2D.position()),0});
+		glr.projection = camera3D.projection(canvas_size);
+		glr.view = camera3D.view();
+	} else {
+//		camera2D.look_at(camera3D.orbit_point(), libv::vec3f{xy(camera3D.orbit_point()), 0});
+//		if (isCameraChanged)
+//			camera2D.position(camera3D.eye());
+		glr.projection = camera2D.projection(canvas_size);
+		glr.view = camera2D.view();
 
-	//const auto eye = glr.eye();
+	}
+
+	glr.model = libv::mat4f::identity();
 
 	// Set framebuffer to the post-processing target
 	//glr.framebuffer_draw(renderTarget.framebuffer());
@@ -85,7 +95,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
 
-	if (changed) {
+	if (changed || isCameraChanged) {
 		libv::Timer timerChunkGen;
 		ChunkGen chunkGen;
 		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
@@ -111,7 +121,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 					}
 				}
 			}
-			if (config.mode == Mode::_3d) {
+			if (is3DCamera) {
 				if (firstChunk) {
 					renderer.surface.addFirstChunk(chunk);
 					firstChunk = false;
@@ -119,11 +129,12 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 					renderer.surface.addChunk(chunk);
 				}
 			} else {
-				//TODO revive texture
 				auto heightMap = libv::glr::Texture2D::RGBA32F();
 				heightMap.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
+				heightMap.set(libv::gl::MagFilter::Nearest);
+				heightMap.set(libv::gl::MinFilter::Nearest);
+				heightMap.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors().data());
-//				heightMapTextures.emplace_back(heightMap);
 				if (firstChunk) {
 					renderer.surfaceTexture.addFirstTexture(heightMap, chunk.position);
 					firstChunk = false;
@@ -131,7 +142,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 					renderer.surfaceTexture.addTexture(heightMap, chunk.position);
 				}
 			}
-
 			// after std::move, entity is empty
 			chunks.emplace_back(std::move(chunk));
 		}
@@ -142,12 +152,15 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		renderer.debug.add_debug_sphere(
 				{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
 		changed = false;
+		isCameraChanged = false;
 	}
 
 	//render surface texture/_3d
-	config.mode == Mode::_3d ?
-			renderer.surface.render(glr, renderer.resource_context.uniform_stream) :
-			renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream);
+	if (is3DCamera) {
+		renderer.surface.render(glr, renderer.resource_context.uniform_stream);
+	} else {
+		renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream);
+	}
 
 	// render plant model/debug
 	if (config.visualization == Visualization::model)
