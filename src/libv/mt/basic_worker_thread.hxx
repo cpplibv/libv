@@ -40,7 +40,7 @@ class basic_worker_thread {
 private:
 	std::priority_queue<queued_task, std::vector<queued_task>, queue_comp> queue;
 	mutable std::mutex queue_m;
-	std::condition_variable work_cv;
+	mutable std::condition_variable work_cv;
 
 	bool terminate = false;
 	Threads context_;
@@ -59,6 +59,7 @@ public:
 	inline void execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at);
 	inline void stop();
 	inline void join();
+	[[nodiscard]] inline bool wait_for_empty() const;
 
 public:
 	[[nodiscard]] inline const std::string& name() const noexcept {
@@ -121,6 +122,25 @@ inline void basic_worker_thread<Threads>::stop() {
 template <typename Threads>
 inline void basic_worker_thread<Threads>::join() {
 	context_.join();
+}
+
+template <typename Threads>
+inline bool basic_worker_thread<Threads>::wait_for_empty() const {
+	std::unique_lock lock(queue_m);
+
+	bool had_job = false;
+	while (true) {
+		if (queue.empty())
+			return had_job;
+
+		if (queue.top().time > std::chrono::steady_clock::now())
+			return had_job;
+
+		had_job = true;
+		work_cv.wait(lock, [this] {
+			return queue.empty() || queue.top().time > std::chrono::steady_clock::now();
+		});
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

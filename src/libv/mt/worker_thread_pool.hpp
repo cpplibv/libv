@@ -28,6 +28,7 @@ public:
 	void execute_async(libv::unique_function<void()> task, std::chrono::steady_clock::time_point at);
 	void stop();
 	void join();
+	[[nodiscard]] bool wait_for_empty() const;
 
 public:
 	[[nodiscard]] const std::string& name() const noexcept;

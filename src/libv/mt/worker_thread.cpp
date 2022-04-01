@@ -47,6 +47,10 @@ void worker_thread::join() {
 	self->join();
 }
 
+bool worker_thread::wait_for_empty() const {
+	return self->wait_for_empty();
+}
+
 const std::string& worker_thread::name() const noexcept {
 	return self->name();
 }
