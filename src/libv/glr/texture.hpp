@@ -37,6 +37,7 @@ private:
 
 public:
 	Texture() noexcept;
+	explicit Texture(libv::gl::Image&& image) noexcept;
 
 private:
 	explicit Texture(std::shared_ptr<RemoteTexture> remote) noexcept;

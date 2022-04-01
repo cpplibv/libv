@@ -207,6 +207,10 @@ Texture::Texture() noexcept :
 	remote(std::make_shared<RemoteTexture>()) {
 }
 
+Texture::Texture(libv::gl::Image&& image) noexcept : Texture() {
+	load(std::move(image));
+}
+
 Texture::Texture(std::shared_ptr<RemoteTexture> remote) noexcept :
 	remote(std::move(remote)) {
 }
