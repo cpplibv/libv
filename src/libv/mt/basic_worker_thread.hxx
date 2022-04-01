@@ -89,6 +89,7 @@ template <typename Threads>
 inline basic_worker_thread<Threads>::~basic_worker_thread() {
 	// TODO P2: What should happen with tasks that are 'canceled', for now we just dont execute them, best would be an argument to the task like netts that tells it, that it is cancelled, with maybe a default way that it would just not get called
 	stop();
+	join();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -109,7 +110,10 @@ inline void basic_worker_thread<Threads>::execute_async(libv::unique_function<vo
 	assert(!terminate && "Queueing task after worker thread has been stopped");
 
 	queue.emplace(at, next_index++, std::move(func));
-	work_cv.notify_one();
+	work_cv.notify_all();
+	// NOTE: notify_all will wake up every thread for the next task
+	//      because wait_for_empty thread could steal the notify_one
+	//      (there could be workaround like: wait_for_empty could notify_all if it stole the 'notify_one' on accident)
 }
 
 template <typename Threads>
@@ -128,19 +132,13 @@ template <typename Threads>
 inline bool basic_worker_thread<Threads>::wait_for_empty() const {
 	std::unique_lock lock(queue_m);
 
-	bool had_job = false;
-	while (true) {
-		if (queue.empty())
-			return had_job;
-
-		if (queue.top().time > std::chrono::steady_clock::now())
-			return had_job;
-
-		had_job = true;
-		work_cv.wait(lock, [this] {
-			return queue.empty() || queue.top().time > std::chrono::steady_clock::now();
-		});
-	}
+	bool had_work = false;
+	work_cv.wait(lock, [&] {
+		const auto finished_waiting = queue.empty() || queue.top().time > std::chrono::steady_clock::now();
+		had_work |= !finished_waiting;
+		return finished_waiting;
+	});
+	return had_work;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -163,9 +161,9 @@ inline void basic_worker_thread<Threads>::run() {
 				break;
 
 			} else {
-				// NOTE: This code will woke up every thread for the next task
-				//      could be improved, but it would be extra complexity, good enough for now
 				const auto cvs = work_cv.wait_until(lock, queue.top().time);
+				// NOTE: This code will wake up every thread for the next task
+				//      could be improved, but it would be extra complexity, good enough for now
 				if (cvs == std::cv_status::timeout) {
 					if (queue.empty() || queue.top().time > std::chrono::steady_clock::now())
 						// Someone else already took care of the job, go back to sleep
