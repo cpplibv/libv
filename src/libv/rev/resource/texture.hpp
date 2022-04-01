@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/model.hpp
+// Project: libv.rev, File: src/libv/rev/resource/texture.hpp
 
 #pragma once
 
@@ -14,11 +14,13 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Handler type
 class Texture {
 private:
 	libv::intrusive2_ptr<InternalTexture> self;
 
 public:
+	// Texture() = default; We could have a default ctor, we will see if we need one
 	explicit Texture(libv::intrusive2_ptr<InternalTexture> self);
 	Texture(const Texture&) noexcept;
 	Texture& operator=(const Texture&) & noexcept;
@@ -27,8 +29,8 @@ public:
 	~Texture();
 
 public:
-	libv::glr::Texture& texture() noexcept;
-	const libv::glr::Texture& texture() const noexcept;
+	[[nodiscard]] libv::glr::Texture& texture() noexcept;
+	[[nodiscard]] const libv::glr::Texture& texture() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

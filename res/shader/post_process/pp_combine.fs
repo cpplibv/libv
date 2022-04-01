@@ -2,6 +2,7 @@
 
 #include <lib/color_spaces.glsl>
 #include <lib/sample.glsl>
+#include <lib/gamma.glsl>
 #include <lib/tone_mapping.glsl>
 
 in vec2 fragmentTexture0;
@@ -60,6 +61,7 @@ void main() {
 	{
 		// TODO
 		// color *= uniforms.exposure;
+//		 color *= 2.5;
 	}
 
 	// --- Tone Mapping ---

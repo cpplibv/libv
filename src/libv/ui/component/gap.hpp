@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/label.hpp
+// Project: libv.ui, File: src/libv/ui/component/gap.hpp
 
 #pragma once
 

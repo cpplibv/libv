@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/random/xoroshiro128.hpp
+// Project: libv.utility, File: src/libv/utility/random/xoroshiro128_fwd.hpp
 
 #pragma once
 

@@ -160,7 +160,7 @@ public:
 				TextureTarget::_1DArray, TextureTarget::_2DArray, TextureTarget::CubeMap, TextureTarget::CubeMapArray>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
-		glGenerateMipmap(object.target);
+		glGenerateMipmap(to_value(object.target));
 		checkGL();
 	}
 

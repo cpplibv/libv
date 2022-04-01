@@ -53,49 +53,82 @@ libv.rev: Bloom
 
 
 
-threading
-	void update(libv::gl::GL& gl);
-
-
-
-loader deregistration from resources
-root god resource manager
-
-
-libv.rev.resource
-	tracking
-		fs thread? Shared?
-	threading
-		void update(libv::gl::GL& gl);
-		fs thread? Shared?
-
-	add_include_directory
-	foreach resource
-	progress bar?
-
-	events
-		void attach_libv_ui_hub(Hub&& hub);
-		- on_create
-		- on_update
-		- on_destroy
-
-
-
-
-
-
-libv.rev: Texture Loader: error handling, fallback logic
-		per resource decision if load failure is tolerable or not
-		(update tolerance is different from create tolerance)
-libv.rev: Texture Loader: add_virtual_resource "builtin:white"
-
-
-
-
 
 
 libv.rev: Move files: internal_ to internal/internal_
 libv.rev: Move files: glsl_ to glsl/glsl_
+libv.rev: Move files: *shader* to resource/*shader*
+libv.fsw: Rename WatchToken -> Token
+
+
+
+libv.utility: xoroshiro128 shall handle {0,0} as low quality input
+
+
+
+
+
+
+
+libv.rev.res: Events
+	libv.rev.res: Texture fs tracking
+	libv.rev.res: Model fs tracking
+	libv.rev.res: Material fs tracking (should be a kind of noop)
+	libv.rev.res: Model loading events: load, update/reload, unload (or as: create, update, destroy)
+	libv.rev.res: Texture loading events: load, update/reload, unload (or as: create, update, destroy)
+	libv.rev.res: Material loading events, but it should be a noop
+	libv.rev.res: void attach_libv_ui_hub(Hub&& hub);
+
+libv.rev.res: Extended loader API
+	libv.rev.res: Model better error messages for include directories passes
+	libv.rev.res: Texture better error messages for include directories passes
+	libv.rev.res: Model include directories API
+	libv.rev.res: Texture include directories API
+	libv.rev.res: Model foreach
+	libv.rev.res: Texture foreach
+	libv.rev.res: Model add_virtual_resource
+	libv.rev.res: Texture add_virtual_resource
+	libv.rev.res: Material add_virtual_resource
+
+libv.rev: Improve the job system
+	Classify job loading request types:
+		- create: (immediate) / blocking / delayed / (lod)
+		- update: blocking / delayed / (lod)
+		- required / optional
+		- common setting override: require all / optional all
+	Currently everything is 'optional' and 'blocking'
+
+libv.rev: Texture Loader: policy for error handling and fallback logic
+		per resource decision if load failure is tolerable or not
+		(update tolerance is different from create tolerance)
+libv.rev: Texture Loader: add_virtual_resource "builtin:white"
+libv.rev: Texture Loader: mipmap
+libv.rev: Texture Loader: filtering
+libv.rev: Texture Loader: anisotropic filtering
+
+libv.rev: Try to remove shaders (glr program include) from material headers
+
+
+
+
+
+
+
+struct TrackedFile {
+	libv::fsw::Watcher* watcher;
+	libv::fsw::WatchToken token;
+	std::string path;
+
+	void update(std::string&& data);
+	void update(std::error_code ec);
+
+	~TrackedFile() {
+		watcher->unsubscribe(token);
+	}
+};
+
+libv.vm4: On load verify every indexing (nodeID materialID etc in range [maybe even vertex index range check too]) and the integrity (no node circles) of the loaded data
+
 
 
 
@@ -139,9 +172,6 @@ libv.glr: Add support for anisotropic filtering
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 
-app.vm4viewer: adopt libv.rev's Shader and ShaderLoader
-		| Well it looks like vm4viewer was killed in the meantime
-
 libv.gl: Add support for glDrawBuffers https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawBuffers.xhtml
 		| Might not be necessary | Maybe needed for a shadow pass
 libv.glr: Add support for glDrawBuffers
@@ -175,18 +205,18 @@ libv.rev: Paper
 		Shader - How
 		Material - Parameters (uniforms) to How (shader) and render state properties
 
-libv.rev: Material
-		Material = Textures, Uniform values, Shader, Various material property
+	libv.rev: Material
+			Material = Textures, Uniform values, Shader, Various material property
 
-		Material Instance = Material reference + instance based overrides
+			Material Instance = Material reference + instance based overrides
 
-		Material property = Determines every render property of the material
-			Render order / Pass information: Opaque or transparent (or other)
-			Sideness
-			Culling
-			BlendMode
-			DepthTest/Mask
-			AKA: The whole OpenGL capability and other state (libv.glr.state)
+			Material property = Determines every render property of the material
+				Render order / Pass information: Opaque or transparent (or other)
+				Sideness
+				Culling
+				BlendMode
+				DepthTest/Mask
+				AKA: The whole OpenGL capability and other state (libv.glr.state)
 
 libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 

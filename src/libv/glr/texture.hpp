@@ -78,7 +78,13 @@ public:
 	void image(int32_t level, libv::gl::CubeSide side, const void* data)  noexcept;
 	void image(int32_t level, libv::gl::CubeSide side, int32_t layer, const void* data) noexcept;
 
-//	void* at(int32_t level, libv::vec3i position) noexcept;
+public:
+//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::gl::GL& gl, int32_t level, libv::gl::CubeSide side, void* data)  const noexcept;
+//	void get_image(libv::gl::GL& gl, int32_t level, libv::gl::CubeSide side, int32_t layer, void* data) const noexcept;
+//	void* at(libv::gl::GL& gl, int32_t level, libv::vec3i position) const noexcept;
 
 public:
 	void set(libv::gl::MagFilter filter) noexcept;
@@ -86,6 +92,8 @@ public:
 	void set(libv::gl::Wrap warpS) noexcept;
 	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT) noexcept;
 	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap warpR) noexcept;
+
+	void generate_mipmaps() noexcept;
 
 private:
 	void sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
@@ -130,6 +138,9 @@ struct Texture2D_t : Texture {
 	inline void image(int32_t level, libv::vec2i offset, libv::vec2i size, const typename Params::storage_type* data) noexcept {
 		static_cast<Texture&>(*this).image(level, offset, size, data);
 	}
+//	inline void get_image(libv::gl::GL& gl, int32_t level, typename Params::storage_type* data) const noexcept {
+//		static_cast<const Texture&>(*this).get_image(gl, level, data);
+//	}
 };
 
 template <typename Params>

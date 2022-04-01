@@ -714,7 +714,8 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
 // <<< P2: Model loader
-		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
+		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),
+//		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 //		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
 		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {

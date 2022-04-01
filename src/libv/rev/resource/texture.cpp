@@ -1,7 +1,8 @@
-// Project: libv, File: app/space/view/render/model.hpp
+// Project: libv.rev, File: src/libv/rev/resource/texture.cpp
 
 // hpp
 #include <libv/rev/resource/texture.hpp>
+// pro
 #include <libv/rev/resource/texture_internal.hxx>
 
 

@@ -21,13 +21,17 @@ namespace rev {
 // TODO P4: If RenderTarget is not MS, use different type, or use a flag, but do not create MS stuff in it
 
 class ImplRenderTarget {
+//	using MSTexture = libv::glr::Texture2DMultisample::RGBA32F;
+	using MSTexture = libv::glr::Texture2DMultisample::R11F_G11F_B10F;
+	using SSTexture = libv::glr::Texture2D::R11F_G11F_B10F;
+
 public:
 	libv::glr::Framebuffer ms_framebuffer;
-	libv::glr::Texture2DMultisample::R11F_G11F_B10F ms_color0;
+	MSTexture ms_color0;
 	libv::glr::Renderbuffer::D32 ms_depth;
 
 	libv::glr::Framebuffer ss_framebuffer;
-	libv::glr::Texture2D::R11F_G11F_B10F ss_color0;
+	SSTexture ss_color0;
 
 	libv::vec2i framebufferSize;
 	int sampleCount_;

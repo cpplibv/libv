@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/detail/flag.hpp
+// Project: libv.ui, File: src/libv/ui/component/detail/flag.cpp
 
 // hpp
 #include <libv/ui/component/detail/flag.hpp>

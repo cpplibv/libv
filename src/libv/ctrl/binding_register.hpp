@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/feature_register.hpp
+// Project: libv.ctrl, File: src/libv/ctrl/binding_register.hpp
 
 #pragma once
 

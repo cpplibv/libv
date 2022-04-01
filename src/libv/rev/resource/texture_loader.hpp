@@ -1,13 +1,11 @@
-// Project: libv, File: app/space/view/render/model.hpp
+// Project: libv.rev, File: src/libv/rev/resource/texture_loader.hpp
 
 #pragma once
 
 // fwd
 #include <libv/rev/fwd.hpp>
-// libv
-#include <libv/utility/memory/intrusive2_ptr.hpp>
 // std
-#include <string>
+#include <memory>
 #include <string_view>
 
 
@@ -16,20 +14,22 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Handler type
 class TextureLoader {
 private:
-	libv::intrusive2_ptr<InternalTextureLoader> self;
+	std::shared_ptr<InternalTextureLoader> self;
 
 public:
-	explicit TextureLoader(const libv::intrusive2_ptr<InternalResourceManager>& irm);
-	TextureLoader(const TextureLoader&) noexcept;
-	TextureLoader& operator=(const TextureLoader&) & noexcept;
-	TextureLoader(TextureLoader&&) noexcept;
-	TextureLoader& operator=(TextureLoader&&) & noexcept;
-	~TextureLoader();
+	explicit TextureLoader(const std::shared_ptr<InternalResourceManager>& irm);
+	inline TextureLoader(const TextureLoader&) noexcept = default;
+	inline TextureLoader& operator=(const TextureLoader&) & noexcept = default;
+	inline TextureLoader(TextureLoader&&) noexcept = default;
+	inline TextureLoader& operator=(TextureLoader&&) & noexcept = default;
+	inline ~TextureLoader() = default;
 
 public:
-	Texture load(std::string_view path);
+	[[nodiscard]] Texture load(std::string_view name);
+	[[nodiscard]] Texture fallback() const;
 };
 
 // -------------------------------------------------------------------------------------------------

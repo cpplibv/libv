@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/smoothstep.hpp
+// Project: libv.math, File: src/libv/math/step.hpp
 
 #pragma once
 

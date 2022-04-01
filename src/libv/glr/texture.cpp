@@ -10,6 +10,7 @@
 #include <libv/gl/texture.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
 // std
+#include <bit>
 #include <optional>
 // pro
 #include <libv/glr/assert.hpp>
@@ -33,6 +34,7 @@ struct RemoteTexture {
 	bool dirty_wrap1 = false;
 	bool dirty_wrap2 = false;
 	bool dirty_wrap3 = false;
+	bool dirty_mipmaps = false;
 
 	//int32_t ref_count = 0;
 
@@ -191,6 +193,18 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		gl(head.texture).bind();
 		gl(head.texture).setWrap(warpS, warpT, warpR);
 		dirty_wrap3 = false;
+	}
+
+	if (dirty_mipmaps) {
+		gl(head.texture).bind();
+		const auto size = gl(head.texture).getSize2D();
+		const auto level_count = std::max(
+				0,
+				std::countr_zero(std:: bit_floor(static_cast<uint32_t>(std::min(size.x, size.y)))) - 1
+		);
+		gl(head.texture).setMaxLevel(level_count);
+		gl(head.texture).generateMipmap();
+		dirty_mipmaps = false;
 	}
 
 	head.dirty = false;
@@ -386,6 +400,11 @@ void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap war
 	remote->warpS = warpS;
 	remote->warpT = warpT;
 	remote->warpR = warpR;
+}
+
+void Texture::generate_mipmaps() noexcept {
+	remote->head.dirty = true;
+	remote->dirty_mipmaps = true;
 }
 
 void Texture::sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept {

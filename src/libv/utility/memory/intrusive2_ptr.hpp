@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/intrusive2_ptr.hpp
+// Project: libv.utility, File: src/libv/utility/memory/intrusive2_ptr.hpp
 
 #pragma once
 
@@ -160,6 +160,8 @@ public:
 
 public:
 	constexpr inline T* operator->() const noexcept {
+		if (ptr_ == nullptr)
+			return nullptr;
 		assert(ptr_ != nullptr);
 		return ptr_;
 	}

@@ -1,26 +1,21 @@
-// Project: libv, File: app/space/view/render/model.hpp
+// Project: libv.rev, File: src/libv/rev/resource/basic_resource.hpp
 
 #pragma once
 
 // std
 #include <algorithm>
-#include <mutex>
 #include <vector>
 // libv
 #include <libv/algo/erase_stable.hpp>
 #include <libv/utility/memory/intrusive2_ptr.hpp>
-//// pro
-//#include <libv/rev/log.hpp>
 
 
 namespace libv {
 namespace rev {
 
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-//libv.res: Resource - New library for resource and asset loading, caching and tracking
+// libv.res: Resource - New library for resource and asset loading, caching and tracking
 //		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
 //		assets, audio, textures, mods/scripts and models
 //
@@ -39,66 +34,26 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename CRTP, typename T>
-class BasicResourceLoader : public libv::ref_count_base<CRTP> {
-	std::mutex mutex;
-	std::vector<T*> cache; // Ordered
-
+template <typename T>
+class BasicResourceLoaderCache {
 public:
+	std::vector<libv::intrusive2_ptr<T>> storage; // Ordered by compare
+
 	template <typename... Args>
-	libv::intrusive2_ptr<T> lookup(Args&&... args) {
-		auto lock = std::unique_lock(mutex);
+	libv::intrusive2_ptr<T>& lookup(Args&&... args) {
+		// O( N*log(N) )
+		const auto comp = [&](const libv::intrusive2_ptr<T>& resource) { return resource->compare(args...); };
+		const auto it = std::ranges::lower_bound(storage, 0, {}, comp);
 
-		const auto comp = [&](const T* resource) { return resource->compare(args...); };
-		const auto it = std::ranges::lower_bound(cache, 0, {}, comp);
+		if (it != storage.end() && 0 == (*it)->compare(args...))
+			return *it;
 
-		if (it != cache.end() && 0 == (*it)->compare(args...))
-			return libv::intrusive2_ptr<T>(*it); // (it)->intrusive_from_this();
-
-		auto result = static_cast<CRTP&>(*this).create_resource(std::forward<Args>(args)...);
-		cache.emplace(it, result.get());
-		return result;
+		return *storage.emplace(it, nullptr);
 	}
 
-	void unload(T* resource) {
-		auto lock = std::unique_lock(mutex);
-
-		libv::erase_stable(cache, resource);
-	}
-
-	// void update(libv::gl::GL& gl);
-	// void attach_libv_ui_hub(Hub&& hub);
-	// add_include_directory
-	// tracking
-	// foreach
-	// on_create
-	// on_update
-	// on_destroy
-};
-
-template <typename CRTP, typename LoaderT>
-class BasicResource : public libv::ref_count_base<CRTP> {
-	friend libv::ref_count_access;
-
-protected:
-	using Base = BasicResource;
-	using Loader = LoaderT;
-
-private:
-//	std::atomic<Loader*> loader;
-	Loader* loader;
-//	libv::intrusive2_ptr<Loader> loader;
-//	libv::intrusive_ptr<Loader> loader;
-//	std::weak_ptr<Loader> loader;
-
-public:
-	explicit BasicResource(Loader* loader) : loader(loader) {}
-
-private:
-	constexpr inline void ref_count_zero() noexcept {
-		// !!! Loader lifetime synchronization without a weak_ptr is not solved yet
-		if (loader)
-			loader->unload(static_cast<CRTP*>(this));
+	void remove(T* resource) {
+		// O( N^2 )
+		libv::erase_stable(storage, resource, [](const libv::intrusive2_ptr<T>& ptr){ return ptr.get(); });
 	}
 };
 

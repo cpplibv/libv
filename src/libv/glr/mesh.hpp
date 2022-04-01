@@ -367,8 +367,10 @@ public:
 	Mesh(libv::gl::Primitive primitive, libv::gl::BufferUsage usage) :
 		remote(std::make_shared<RemoteMesh>(primitive, usage)) {
 	}
-	Mesh(const Mesh& orig) = default;
-	Mesh(Mesh&& orig) = default;
+	inline Mesh(const Mesh&) noexcept = default;
+	inline Mesh& operator=(const Mesh&) & noexcept = default;
+	inline Mesh(Mesh&&) noexcept = default;
+	inline Mesh& operator=(Mesh&&) & noexcept = default;
 
 public:
 	template <typename T>

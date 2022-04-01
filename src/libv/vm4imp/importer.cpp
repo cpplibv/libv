@@ -63,6 +63,7 @@ public:
 
 		for (uint32_t i = 0; i < scene->mNumMaterials; ++i) {
 			aiString ai_str;
+			bool ai_bool;
 			float ai_float;
 			int ai_int = 0;
 			aiVector2D ai_vec2;
@@ -86,8 +87,10 @@ public:
 
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_ENABLE_WIREFRAME, ai_int))
 				materials[i].properties.emplace("wireframe", ai_int != 0);
-			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TWOSIDED, ai_int))
-				materials[i].properties.emplace("twosided", ai_int != 0);
+			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TWOSIDED, ai_bool))
+				materials[i].properties.emplace("twosided", ai_bool);
+//			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TWOSIDED, ai_int))
+//				materials[i].properties.emplace("twosided", ai_int != 0);
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_SHADING_MODEL, ai_int))
 				materials[i].shader = to_libv_technique(ai_int);
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_BLEND_FUNC, ai_int))

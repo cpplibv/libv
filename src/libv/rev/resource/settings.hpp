@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/model.hpp
+// Project: libv.rev, File: src/libv/rev/resource/settings.hpp
 
 #pragma once
 
@@ -13,6 +13,7 @@ namespace rev {
 
 struct ResourceManagerSettings {
 	std::string base_path; /// Relative resource path base
+
 	// bool track_files = true; /// Track every resource and reload resource upon file change
 	// bool relative_path_only = true; /// Forbid requests with absolute path
 	// bool restict_under_base = true; /// Forbid requests that would leave the base path
@@ -27,8 +28,8 @@ struct TextureLoaderSettings : ResourceManagerSettings {
 
 struct Settings {
 	TextureLoaderSettings texture = {"res/texture/"};
-//	ResourceManagerSettings shader = {"res/shader/"};
-//	ResourceManagerSettings model = {"res/model/"};
+	ResourceManagerSettings shader = {"res/shader/"};
+	ResourceManagerSettings model = {"res/model/"};
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -70,6 +70,12 @@ struct LuaContext {
 			return sol::object(sol::nil);
 		});
 
+		api_table.set_function("add_bool", [this](const std::string_view material_name, std::string property_name, bool value) mutable {
+			for (auto& material : model.materials)
+				if (material.name == material_name)
+					material.properties[std::move(property_name)] = value;
+		});
+
 //		api_table.set_function("properties", [this](const std::string_view name) mutable {
 //			for (auto& material : model.materials)
 //				if (material.name == name)

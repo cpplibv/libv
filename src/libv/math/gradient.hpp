@@ -1,4 +1,4 @@
-// Project: libv.color, File: src/libv/color/spread.hpp
+// Project: libv.math, File: src/libv/math/gradient.hpp
 
 #pragma once
 

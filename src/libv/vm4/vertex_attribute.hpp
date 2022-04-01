@@ -1,4 +1,4 @@
-// Project: libv.vm4, File: src/libv/vm4/material.hpp
+// Project: libv.vm4, File: src/libv/vm4/vertex_attribute.hpp
 
 #pragma once
 

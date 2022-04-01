@@ -56,14 +56,14 @@ void ImplRenderTarget::createSSFramebuffer() {
 void ImplRenderTarget::destroyMSFramebuffer() {
 	ms_framebuffer = libv::glr::Framebuffer{};
 
-	ms_color0 = libv::glr::Texture2DMultisample::R11F_G11F_B10F{};
+	ms_color0 = MSTexture{};
 	ms_depth = libv::glr::Renderbuffer::D32{};
 }
 
 void ImplRenderTarget::destroySSFramebuffer() {
 	ss_framebuffer = libv::glr::Framebuffer{};
 
-	ss_color0 = libv::glr::Texture2D::R11F_G11F_B10F{};
+	ss_color0 = SSTexture{};
 }
 
 void RenderTarget::sampleCount(int sampleCount_) noexcept {

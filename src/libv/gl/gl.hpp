@@ -616,7 +616,7 @@ private:
 	}
 
 private:
-	constexpr inline std::size_t convertToTargetIndex(TextureTarget target) const noexcept;
+	static constexpr inline std::size_t convertToTargetIndex(TextureTarget target) noexcept;
 
 public:
 	inline GLint getMaxColorAttachments() const {
@@ -777,6 +777,16 @@ public:
 		glReadPixels(pos.x, pos.y, size.x, size.y, libv::to_value(format), libv::to_value(type), data);
 	}
 
+	inline void readTextureImage(const Texture& texture, int32_t level, ReadFormat format, DataType type, void* data) {
+		auto prev = bound_texture(texture.target);
+		bind(texture);
+		glGetTexImage(libv::to_value(texture.target), level, libv::to_value(format), libv::to_value(type), data);
+		bind(prev);
+
+//		// OpenGL 4.5
+//		glGetTextureImage(libv::to_value(texture.id), level, libv::to_value(format), libv::to_value(type), buffer_size, data);
+	}
+
 public:
 	//	void depthMask(bool writeEnabled);
 	//	void stencilMask(bool writeEnabled);
@@ -863,7 +873,7 @@ public:
 
 // =================================================================================================
 
-constexpr inline std::size_t GL::convertToTargetIndex(TextureTarget target) const noexcept {
+constexpr inline std::size_t GL::convertToTargetIndex(TextureTarget target) noexcept {
 	switch (target) {
 	case TextureTarget::_2D: return 0;
 	case TextureTarget::CubeMap: return 1;

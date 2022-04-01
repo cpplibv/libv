@@ -2,23 +2,21 @@
 
 #pragma once
 
+// fwd
+#include <libv/rev/fwd.hpp>
+// ext
+#include <boost/container/flat_set.hpp>
+// libv
+#include <libv/glr/texture.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 // std
+#include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
-// libv
-#include <libv/utility/memory/intrusive2_ptr.hpp>
 // pro
-#include <libv/rev/log.hpp>
 #include <libv/rev/resource/basic_resource.hpp>
-#include <libv/rev/resource/resource_manager_internal.hxx>
 #include <libv/rev/resource/texture_internal.hxx>
-
-
-
-#include <libv/gl/image.hpp>
-#include <libv/gl/load_image.hpp>
-#include <libv/glr/texture.hpp>
-#include <libv/utility/read_file.hpp>
 
 
 namespace libv {
@@ -26,49 +24,58 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-struct InternalTextureLoader : BasicResourceLoader<InternalTextureLoader, InternalTexture> {
-	libv::intrusive2_ptr<InternalResourceManager> irm;
-	std::string base_path;
+using InternalTexture_ptr = libv::intrusive2_ptr<InternalTexture>;
 
-	explicit inline InternalTextureLoader(const libv::intrusive2_ptr<InternalResourceManager>& irm) :
-		irm(irm),
-		base_path(irm->settings.texture.base_path) {
+// -------------------------------------------------------------------------------------------------
 
-//		add_virtual_resource("builtin:up", libv::vec2i{1, 1}, libv::vec4uc{127, 127, 255, 255});
-//		add_virtual_resource("builtin:down", libv::vec2i{1, 1}, libv::vec4uc{127, 127, 0, 255});
-//		add_virtual_resource("builtin:black", libv::vec2i{1, 1}, libv::vec4uc{0, 0, 0, 255});
-//		add_virtual_resource("builtin:white", libv::vec2i{1, 1}, libv::vec4uc{255, 255, 255, 255});
-//		add_virtual_resource("builtin:gray", libv::vec2i{1, 1}, libv::vec4uc{127, 127, 127, 255});
-//		add_virtual_resource("builtin:transparent", libv::vec2i{1, 1}, libv::vec4uc{0, 0, 0, 0});
+struct InternalTexturePtrNameComp {
+	using is_transparent = void;
 
-//		add_virtual_resource("lut:ace", ...);
-//		add_virtual_resource("lut:natural", ...);
-//		add_virtual_resource("lut:tonemap", ...);
+	[[nodiscard]] inline bool operator()(const InternalTexture_ptr& ptr, const std::string_view name) const noexcept {
+		return ptr->name_ < name;
 	}
-
-	libv::intrusive2_ptr<InternalTexture> create_resource(std::string_view path) {
-		log_rev.trace("Create new texture: {}", path);
-
-		const auto resource_path = base_path + std::string(path);
-//		fs_thread();
-		const auto dataTexture0 = libv::read_file_or_throw(resource_path);
-//		gl_loop();
-		auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
-//		any_thread();
-		libv::glr::Texture texture0;
-		texture0.load(std::move(imageTexture0));
-
-//		irm->fsw.subscribe_file(resource_path, [] {
-//
-//		});
-
-		return libv::make_intrusive2_ptr<InternalTexture>(this, path, texture0);
+	[[nodiscard]] inline bool operator()(const std::string_view name, const InternalTexture_ptr& ptr) const noexcept {
+		return name < ptr->name_;
 	}
+	[[nodiscard]] inline bool operator()(const InternalTexture_ptr& lhs, const InternalTexture_ptr& rhs) const noexcept {
+		return lhs->name_ < rhs->name_;
+	}
+};
 
-//	libv::intrusive2_ptr<InternalTexture> destroy_resource(libv::intrusive2_ptr<InternalTexture>) {
-//	libv::intrusive2_ptr<InternalTexture> destroy_resource(InternalTexture& resource) {
-//		log_rev.trace("Destroy texture: {}", resource.path_);
-//	}
+// -------------------------------------------------------------------------------------------------
+
+class InternalTextureLoader : public std::enable_shared_from_this<InternalTextureLoader> {
+public:
+	std::mutex mutex;
+	BasicResourceLoaderCache<InternalTexture> cache;
+
+	std::shared_ptr<InternalResourceManager> irm;
+	std::mutex includeDirectories_m;
+	std::vector<std::string> includeDirectories;
+
+	libv::glr::Texture glrDefault;
+	InternalTexture_ptr fallback_;
+	boost::container::flat_set<InternalTexture_ptr, InternalTexturePtrNameComp> builtins;
+
+public:
+	explicit InternalTextureLoader(const std::shared_ptr<InternalResourceManager>& irm);
+	~InternalTextureLoader();
+
+private:
+	void initDefaultGLR();
+	libv::glr::Texture createColorTextureGLR(libv::vec4uc color);
+	void initBuiltin(std::string name, libv::vec4uc color);
+
+public:
+	InternalTexture_ptr load(std::string_view name);
+	InternalTexture_ptr fallback() const;
+	void unload(InternalTexture* resource);
+
+private:
+	InternalTexture_ptr create_resource(std::string_view name);
+	void process_fs(InternalTexture_ptr&& res);
+	void process_cpu(InternalTexture_ptr&& res, std::string&& data);
+	void process_res(InternalTexture_ptr&& resource, libv::gl::Image&& image);
 };
 
 // -------------------------------------------------------------------------------------------------
