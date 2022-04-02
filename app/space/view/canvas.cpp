@@ -9,7 +9,7 @@
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/noise/perlin.hpp>
-#include <libv/math/smoothstep.hpp>
+#include <libv/math/step.hpp>
 // std
 #include <cassert>
 // pro

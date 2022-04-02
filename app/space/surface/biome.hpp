@@ -3,7 +3,7 @@
 #pragma once
 
 //libv
-#include <libv/math/smoothstep.hpp>
+#include <libv/math/step.hpp>
 #include <utility>
 #include <libv/utility/random/xoroshiro128.hpp> // fwdable
 #include <libv/utility/random/uniform_distribution.hpp>
