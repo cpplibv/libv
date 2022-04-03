@@ -231,8 +231,9 @@ private:
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
 
-	void addChunk(surface::Chunk& chunk);
-	void addFirstChunk(surface::Chunk& chunk);
+	void addChunk(const surface::Chunk& chunk);
+	void clear();
+//	void addFirstChunk(const surface::Chunk& chunk);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
@@ -250,8 +251,9 @@ private:
 
 	void build_mesh();
 public:
-	void addTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
-	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
+	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos);
+	void clear();
+//	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
 	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
 
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);

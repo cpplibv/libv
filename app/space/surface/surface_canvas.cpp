@@ -86,6 +86,92 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
+libv::glr::Texture2D::RGBA32F SurfaceCanvas::buildTexture(const Chunk& chunk) {
+	auto texture = libv::glr::Texture2D::RGBA32F();
+	texture.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+	if (currentHeatMap == HeatMapType::height) {
+		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.height).data());
+	} else if (currentHeatMap == HeatMapType::temperature) {
+		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.temperature).data());
+	} else if (currentHeatMap == HeatMapType::humidity) {
+		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.humidity).data());
+	} else if (currentHeatMap == HeatMapType::fertility) {
+		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
+	}
+	return texture;
+
+//	renderer.surfaceTexture.addTexture(heightMap, chunk.position);
+}
+
+void SurfaceCanvas::buildRenderObject(const Chunk& chunk) {
+	if (is3DCamera) {
+		renderer.surface.addChunk(chunk);
+	} else {
+		const auto heatMap = buildTexture(chunk);
+		renderer.surfaceTexture.addTexture(heatMap, chunk.position);
+	}
+}
+
+void SurfaceCanvas::clearRenderObjects() {
+	renderer.surface.clear();
+	renderer.surfaceTexture.clear();
+//	renderer.debug.clear_spheres();
+}
+
+void SurfaceCanvas::buildRenderObjects() {
+	clearRenderObjects();
+
+	for (const auto& chunk : chunks) {
+		buildRenderObject(chunk);
+	}
+}
+
+void SurfaceCanvas::addGizmo() {
+	renderer.debug.add_debug_sphere(
+			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
+	renderer.debug.add_debug_sphere(
+			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
+	renderer.debug.add_debug_sphere(
+			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
+}
+
+void SurfaceCanvas::buildChunks() {
+	libv::Timer timerChunkGen;
+	ChunkGen chunkGen;
+	auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
+	config = binding.getConfigFromLuaScript(script);
+	clearRenderObjects();
+	renderer.debug.clear_spheres();
+
+	//getChunk, render (availability alapjan)
+	chunks.clear();
+	for (int i = 0; i < config.numChunks; ++i) {
+		const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
+		Chunk chunk = chunkGen.generateChunk(config, chunkPos);
+		chunkGen.placeVegetation(chunk, config);
+		// more log needed
+		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
+		std::cout << std::endl;
+
+		renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
+
+		buildRenderObject(chunk);
+		//add features
+		if (config.visualization == Visualization::spheres) {
+			for (const auto& surfaceObjectStorage : chunk.featureList) {
+				for (const auto& point : surfaceObjectStorage.points) {
+					renderer.debug.add_debug_sphere(point.position, point.size, point.color, 10, 10);
+				}
+			}
+		}
+		chunks.emplace_back(std::move(chunk));
+	}
+	addGizmo();
+}
+
 
 //	virtual void update(libv::ui::time_duration delta_time) override {}
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
@@ -94,76 +180,21 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		renderTarget.size(canvas_size.cast<int32_t>());
 //		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
-
-	if (changed || isCameraChanged || isTextureChanged) {
-		libv::Timer timerChunkGen;
-		ChunkGen chunkGen;
-		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
-		config = binding.getConfigFromLuaScript(script);
-		renderer.debug.clear_spheres();
-		//getChunk, render (availability alapjan)
-		chunks.clear();
-		bool firstChunk = true;
-		for (int i = 0; i < config.numChunks; ++i) {
-			const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
-			Chunk chunk = chunkGen.generateChunk(config, chunkPos);
-			chunkGen.placeVegetation(chunk, config);
-			// more log needed
-			fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
-			std::cout << std::endl;
-
-			renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
-
-			if (config.visualization == Visualization::spheres) { //add features
-				for (const auto& surfaceObjectStorage : chunk.featureList) {
-					for (const auto& point : surfaceObjectStorage.points) {
-						renderer.debug.add_debug_sphere(point.position, point.size, point.color, 10, 10);
-					}
-				}
-			}
-			if (is3DCamera) {
-				if (firstChunk) {
-					renderer.surface.addFirstChunk(chunk);
-					firstChunk = false;
-				} else {
-					renderer.surface.addChunk(chunk);
-				}
-			} else {
-				auto heightMap = libv::glr::Texture2D::RGBA32F();
-				heightMap.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
-				heightMap.set(libv::gl::MagFilter::Nearest);
-				heightMap.set(libv::gl::MinFilter::Nearest);
-				heightMap.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-				if (currentHeatMap == HeatMapType::height) {
-					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.height).data());
-				} else if (currentHeatMap == HeatMapType::temperature) {
-					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.temperature).data());
-				} else if (currentHeatMap == HeatMapType::humidity) {
-					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.humidity).data());
-				} else if (currentHeatMap == HeatMapType::fertility) {
-					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
-				}
-
-				if (firstChunk) {
-					renderer.surfaceTexture.addFirstTexture(heightMap, chunk.position);
-					firstChunk = false;
-				} else {
-					renderer.surfaceTexture.addTexture(heightMap, chunk.position);
-				}
-			}
-			// after std::move, entity is empty
-			chunks.emplace_back(std::move(chunk));
-		}
-		renderer.debug.add_debug_sphere(
-				{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
-		renderer.debug.add_debug_sphere(
-				{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
-		renderer.debug.add_debug_sphere(
-				{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
+	if (changed) {
+		buildChunks();
 		changed = false;
-		isCameraChanged = false;
-		isTextureChanged = false;
 	}
+
+	if (isCameraChanged || isTextureChanged) {
+		buildRenderObjects();
+		isCameraChanged = false;
+	}
+
+//	if (isTextureChanged) {
+//		const auto heatMap = buildTexture(chunk);
+//		renderer.surfaceTexture.addTexture(heatMap, chunk.position);
+//		isTextureChanged = false;
+//	}
 
 	//render surface texture/_3d
 	if (is3DCamera) {

@@ -51,6 +51,12 @@ public:
 	explicit SurfaceCanvas(libv::ui::UI& ui);
 private:
 	void setupRenderStates(libv::glr::Queue& glr);
+	libv::glr::Texture2D::RGBA32F buildTexture(const Chunk& chunk);
+	void addGizmo();
+	void buildChunks();
+	void buildRenderObject(const Chunk& chunk);
+	void buildRenderObjects();
+	void clearRenderObjects();
 	virtual void attach() override;
 	virtual void render(libv::glr::Queue& glr) override;
 };

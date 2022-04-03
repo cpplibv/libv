@@ -916,7 +916,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
-void RendererSurface::addChunk(surface::Chunk& chunk) {
+void RendererSurface::addChunk(const surface::Chunk& chunk) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
@@ -942,15 +942,12 @@ void RendererSurface::addChunk(surface::Chunk& chunk) {
 	vi += rowSize;
 }
 
-void RendererSurface::addFirstChunk(surface::Chunk& chunk) {
+void RendererSurface::clear() {
 	mesh.clear();
 	vi = 0;
-	addChunk(chunk);
 }
 
 void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-//void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
-//	build_mesh(chunks);
 
 	glr.program(shader.program());
 	{
@@ -969,19 +966,7 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
-}
-
-void RendererSurfaceTexture::addTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos) {
-	const auto texture_pos = ChunkTexture{texture, chunkPos};
-	chunks.emplace_back(texture_pos); //std::move?
-}
-
-void RendererSurfaceTexture::addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos) {
-	chunks.clear();
-	mesh.clear();
-	const auto chunk = ChunkTexture{texture, chunkPos};
-	build_mesh();
-	addTexture(texture, chunkPos); //std::move?
+//	build_mesh();
 }
 
 void RendererSurfaceTexture::build_mesh() {
@@ -1004,7 +989,19 @@ void RendererSurfaceTexture::build_mesh() {
 	index.quad(0, 1, 2, 3);
 }
 
+void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos) {
+	const auto texture_pos = ChunkTexture{texture, chunkPos};
+	chunks.emplace_back(texture_pos); //std::move?
+}
+
+void RendererSurfaceTexture::clear() {
+	chunks.clear();
+	mesh.clear();
+}
+
 void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+	build_mesh();
+
 	glr.program(shader.program());
 
 	for (const auto& chunk : chunks) {
