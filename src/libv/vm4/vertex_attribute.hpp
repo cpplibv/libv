@@ -1,9 +1,9 @@
-// Project: libv.vm4, File: src/libv/vm4/fwd.hpp
+// Project: libv.vm4, File: src/libv/vm4/material.hpp
 
 #pragma once
 
-// std
-#include <cstdint>
+// fwd
+#include <libv/vm4/fwd.hpp>
 
 
 namespace libv {
@@ -11,18 +11,15 @@ namespace vm4 {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Material;
-
-struct Animation;
-struct AnimationChannel;
-struct Vertex;
-struct Mesh;
-struct Node;
-struct LOD;
-struct Model;
-
-enum class TextureType : int32_t;
-enum class VertexAttribute : int32_t;
+enum class VertexAttribute : int32_t {
+	position,
+	normal,
+	tangent,
+	bitangent,
+	texture0,
+	boneID,
+	boneWeight,
+};
 
 // -------------------------------------------------------------------------------------------------
 
