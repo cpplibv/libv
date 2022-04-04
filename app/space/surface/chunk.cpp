@@ -1,12 +1,19 @@
 // Created by dbobula on 1/16/2022.
 
 #include <space/surface/chunk.hpp>
+
 //timer
 #include <libv/noise/noise.hpp>
 #include <iostream>
 #include <memory>
 //libv
 #include <libv/math/fract.hpp>
+
+//space
+#include <space/surface/biome.hpp>
+
+//ext
+#include <fmt/format.h>
 
 
 namespace surface {
@@ -16,11 +23,14 @@ bool isPointInTriangle(libv::vec2f p, float step) {
 	return libv::fract(p.x / step) + libv::fract(p.y / step) < 1;
 }
 
+
+
 // -------------------------------------------------------------------------------------------------
 
 Chunk::Chunk(const size_t size_, const libv::vec2f position_) {
 	size = size_;
 	position = position_;
+	surface = libv::vector_2D<SurfacePoint>{size_, size_};
 	height = libv::vector_2D<SurfacePoint>{size_, size_};
 	temperature = libv::vector_2D<SurfacePoint>{size_, size_};
 	humidity = libv::vector_2D<SurfacePoint>{size_, size_};
@@ -28,7 +38,7 @@ Chunk::Chunk(const size_t size_, const libv::vec2f position_) {
 }
 
 //collusion query
-float Chunk::getHeight(const libv::vec2f position) {
+float Chunk::getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap) {
 	//	             (1,1)
 	// O    NW O  upY  O NE
 	//       leftX  * rightX
@@ -38,7 +48,7 @@ float Chunk::getHeight(const libv::vec2f position) {
 	// |    \  |
 	// O - - - O       O
 	// (0,0)
-	const auto numQuad = (height.size_x() - 1);
+	const auto numQuad = (heatMap.size_x() - 1);
 	const auto step = 1.f / numQuad;
 
 	const auto leftX = static_cast<int>(std::floor(position.x / step));
@@ -46,10 +56,10 @@ float Chunk::getHeight(const libv::vec2f position) {
 	const auto downY = static_cast<int>(std::floor(position.y / step));
 	const auto upY = downY + 1;
 
-	const auto NW = height(leftX, upY).pos;
-	const auto NE = height(rightX, upY).pos;
-	const auto SW = height(leftX, downY).pos;
-	const auto SE = height(rightX, downY).pos;
+	const auto NW = heatMap(leftX, upY).pos;
+	const auto NE = heatMap(rightX, upY).pos;
+	const auto SW = heatMap(leftX, downY).pos;
+	const auto SE = heatMap(rightX, downY).pos;
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
 	const auto isPointInNWSWSE = isPointInTriangle(position, step);
 
@@ -86,6 +96,25 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 		throw std::runtime_error("Unknown plant distribution type");
 }
 
+//void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
+//	const auto numQuad = config.resolution;
+//	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
+//
+//	for (const auto& object : config.objects) {
+//		SurfaceObjectStorage surfaceObjectStorage;
+//		surfaceObjectStorage.type = object.type;
+//		surfaceObjectStorage.points.reserve(object.count);
+//
+//		for (int i = 0; i < object.count; ++i) {
+//			const auto x = ratio(range);
+//			const auto y = ratio(range);
+//			const auto z = chunk.getHeight({x, y});
+//			surfaceObjectStorage.points.emplace_back(libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}, object.size, object.color);
+//		}
+//		chunk.featureList.emplace_back(surfaceObjectStorage);
+//	}
+//}
+
 void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 	const auto numQuad = config.resolution;
 	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
@@ -98,7 +127,12 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 		for (int i = 0; i < object.count; ++i) {
 			const auto x = ratio(range);
 			const auto y = ratio(range);
-			const auto z = chunk.getHeight({x, y});
+			const auto z = chunk.getHeight({x, y}, chunk.height);
+//			const auto temp = chunk.getHeight({x, y}, chunk.temperature);
+//			const auto wet = chunk.getHeight({x, y}, chunk.humidity);
+//			const auto fertility = chunk.getHeight({x, y}, chunk.fertility);
+
+
 			surfaceObjectStorage.points.emplace_back(libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}, object.size, object.color);
 		}
 		chunk.featureList.emplace_back(surfaceObjectStorage);
@@ -157,7 +191,7 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 
 	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
 		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);
-		const auto point = libv::vec3f{x, y, noise_value * 0.1f};
+		const auto point = libv::vec3f{x, y, noise_value};
 		const auto color = colorGrad.sample(noise_value);
 		return SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
 	};
@@ -176,6 +210,33 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 			chunk.temperature(xi, yi) = calc(config.temperature.rootNode, config.temperature.colorGrad, x, y);
 			chunk.humidity(xi, yi) = calc(config.humidity.rootNode, config.humidity.colorGrad, x, y);
 			chunk.fertility(xi, yi) = calc(config.fertility.rootNode, config.fertility.colorGrad, x, y);
+
+			const auto height = chunk.height(xi, yi).pos.z;
+			const auto temp = chunk.temperature(xi, yi).pos.z;
+			const auto wet = chunk.humidity(xi, yi).pos.z;
+			const auto fertilityOffset = chunk.fertility(xi, yi).pos.z;
+//			const auto biome = categorizeZone(temp);
+//			const auto biomeIt = config.biomes.find(biome);
+//			if (biomeIt == config.biomes.end())
+//				throw std::runtime_error(fmt::format("Biome not found: {}", std::to_underlying(biome)));
+			auto picker = BiomePicker();
+			auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
+			auto biome = mix.primary();
+//			const auto forest = categorizeForest(wet);
+//			std::cout << "height: " << height;
+//			std::cout << " temp: " << temp;
+//			std::cout << " wet: " << wet;
+//			std::cout << " fertilityOffset: " << fertilityOffset;
+//			const auto fertility =
+//					calculateFertility(0.25f, getMin(0.25f, temp),
+//							0.33f, getMin(0.33f, wet),
+//							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
+			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunkPosition, 0},
+					biome.colorGrad.sample(0.7f)};
+//			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunkPosition, 0},
+//					{1,0,0,1}};
+//			std::cout << " fertility: " << fertility<<std::endl;
+
 		}
 	});
 	return chunk;

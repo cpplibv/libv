@@ -64,13 +64,15 @@ private:
 	size_t size;
 public:
 	libv::vec2f position;
+	libv::vector_2D<SurfacePoint> surface;
+
 	libv::vector_2D<SurfacePoint> height;
 	libv::vector_2D<SurfacePoint> temperature;
 	libv::vector_2D<SurfacePoint> humidity;
 	libv::vector_2D<SurfacePoint> fertility;
 	std::vector<SurfaceObjectStorage> featureList;
 public:
-	float getHeight(const libv::vec2f position);
+	[[nodiscard]] static float getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap);
 
 	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
 };

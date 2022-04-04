@@ -103,6 +103,10 @@ SurfaceViewer::SurfaceViewer() :
 		currentHeatMap = HeatMapType::fertility;
 		isTextureChanged = true;
 	});
+	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
+		currentHeatMap = HeatMapType::surface;
+		isTextureChanged = true;
+	});
 
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
 	controls.bind("surface.switch_camera", "F3 [press]");
@@ -110,6 +114,7 @@ SurfaceViewer::SurfaceViewer() :
 	controls.bind("surface.temperature_texture", "2 [press]");
 	controls.bind("surface.humidity_texture", "3 [press]");
 	controls.bind("surface.fertility_texture", "4 [press]");
+	controls.bind("surface.surface_texture", "5 [press]");
 //	controls.bind("surface.temperature_heat_map", "1 [press]");
 
 //		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {

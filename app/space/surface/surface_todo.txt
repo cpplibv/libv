@@ -12,7 +12,7 @@ TODO revive texture
  =================================================================================================
 69 - 78 nap
 60 nap -
-doksi: 15 nap
+doksi: 15 nap 12500-16000 szo, 65-75 oldal
 csuszasok: 15 nap
 implementacio + kutatas: 30nap 03.13-04.13
 EPICS:
@@ -64,6 +64,7 @@ EPICS:
 		vegetation textures
 
 
+BUG: Pixel ismetles
 hook shader error overlay
 3D noise algok:
 	DONE: seed csere

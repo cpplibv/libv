@@ -156,10 +156,22 @@ config = {
 	plantDistribution = PlantDistribution.random,
 	circleNumber = 50,
 	circleSize = 0.01,
+
+--                      /\
+--  COLD|BARREN        /  \ Polar
+--                    /    \
+--      ^            /      \ Subpolar
+--      |           /        \
+--      |          /          \ Temperate
+--                /            \
+--  HOT|FERTILE  /              \ Tropical
+--               ================
+--  HUMID|WET|FERTILE   -->   ARID|DRY|BARREN
+
 	objects = {
 		--asd = 12,
 		{
-			type = "tree",
+			type = "tropical rain forest - tree",
 			size = 0.02,
 			count = 60,
 			color = "hsv(120, 70%, 75%)",
@@ -185,6 +197,109 @@ config = {
 		--},
 	},
 
+}
+
+--BiomeZone = {
+--	tropical = 0,
+--	temperate = 1,
+--	subpolar = 2,
+--	polar = 3,
+--};
+
+--not regions, biomes-forest types
+biomes = {
+	{
+		name = "no-biome",
+		coord = vec2f(0.25, 0.75),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.6),
+		colorGrad = {
+			{0, "black"},
+			{1, "white"}
+		}
+	},
+	{
+		name = "polar",
+		coord = vec2f(0.125, 0.125),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(191, 20%, 26%)"},
+			{1, "hsv(191, 20%, 76%)"}
+		}
+	},
+	{
+		name = "subpolar-boreal",
+		coord = vec2f(0.25, 0.25),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(41, 89%, 12%)"},
+			{1, "hsv(41, 89%, 62%)"}
+		}
+	},
+	{
+		name = "temperate-rainforest",
+		coord = vec2f(0.65, 0.65),
+		--radius = 0.05
+		--min cut off, max cut off
+		--dominance
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(130, 50%, 27%)"},
+			{1, "hsv(130, 60%, 50%)"}
+		}
+	},
+	{
+		name = "temperate-forest",
+		coord = vec2f(0.55, 0.4),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(110, 20%, 27%)"},
+			{1, "hsv(110, 50%, 40%)"}
+		}
+	},
+	{
+		name = "temperate-grassland",
+		coord = vec2f(0.5, 0.125),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(140, 20%, 27%)"},
+			{1, "hsv(140, 70%, 40%)"}
+		}
+	},
+	{
+		name = "tropical-rainforest",
+		coord = vec2f(0.8, 0.75),
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(100, 78%, 2%)"},
+			{1, "hsv(100, 78%, 52%)"}
+		}
+	},
+	--{
+	--	name = "tropical-savanna",
+	--	colorGrad = {
+	--		{0, "hsv(100, 78%, 2%)"},
+	--		{1, "hsv(100, 78%, 52%)"}
+	--	}
+	--},
+	--{
+	--	name = "subtropical-desert",
+	--	colorGrad = {
+	--		{0, "hsv(100, 78%, 2%)"},
+	--		{1, "hsv(100, 78%, 52%)"}
+	--	}
+	--}
 }
 
 height = {
@@ -271,19 +386,40 @@ temperature = {
 	name = "temperature",
 	heightSensitivity = 0.2,
 	colorGrad = {
-		{0.0 , "white"},
-		{1.0 , "blue"}
+		{ 0.0, "black" },
+		{ 1.0, "white" }
 	},
 	nodes =
-		simplexFractal {
-			seed = 1,
-			octaves = 6,
-			amplitude = 1,
-			frequency = 0.15,
-			lacunarity = 2.0,
-			persistence = 0.5,
+
+ add {
+	 simplexFractal {
+		 seed = 1,
+		 octaves = 6,
+		 amplitude = 0.5,
+		 frequency = 0.5,
+		 lacunarity = 2.0,
+		 persistence = 0.5,
+	 },
+	 warp{
+		 seed = 423,
+		 octaves = 5,
+		 amplitude = 4,
+		 frequency = 0.25,
+		 lacunarity = 2.5,
+		 persistence = 0.5,
+		 cellular {
+			 seed = 123,
+			 distanceFn = DistFun.euclidean,
+			 returnType = ReturnType.cellValue,
+			 jitter = 1,
+		 },
+	 },
+
+		constant {
+			value = 0.8
 		}
 	}
+}
 humidity = {
 	name = "humidity",
 	heightSensitivity = 0.2,
@@ -292,16 +428,30 @@ humidity = {
 		{1.0 , "gray"}
 	},
 	nodes =
+
+	add {
 		simplexFractal {
-			seed = 2,
+			seed = 123,
 			octaves = 6,
-			amplitude = 1,
-			frequency = 0.15,
+			amplitude = 0.5,
+			frequency = 0.5,
 			lacunarity = 2.0,
 			persistence = 0.5,
+		},
+	--cellular {
+	--	seed = 123,
+	--	distanceFn = DistFun.euclidean,
+	--	returnType = ReturnType.cellValue,
+	--	jitter = 1,
+	--},
+		constant{
+			value = 0.5
 		}
+	}
+
 
 }
+
 fertility =	{
 	name = "fertility",
 	heightSensitivity = 0.2,
@@ -310,14 +460,26 @@ fertility =	{
 		{1.0 , "green"}
 	},
 	nodes =
-		simplexFractal {
-			seed = 3,
-			octaves = 6,
+	add{
+		warp{
+			seed = 1233,
+			octaves = 2,
 			amplitude = 1,
-			frequency = 0.15,
-			lacunarity = 2.0,
+			frequency = 0.5,
+			lacunarity = 2,
 			persistence = 0.5,
-		}
+			cellular {
+				seed = 14523,
+				distanceFn = DistFun.euclidean,
+				returnType = ReturnType.cellValue,
+				jitter = 1,
+			},
+		},
+		constant {
+			value = 0.5
+		},
+	}
+
 
 }
 	--hardness = {

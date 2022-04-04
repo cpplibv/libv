@@ -100,6 +100,8 @@ libv::glr::Texture2D::RGBA32F SurfaceCanvas::buildTexture(const Chunk& chunk) {
 		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.humidity).data());
 	} else if (currentHeatMap == HeatMapType::fertility) {
 		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
+	} else if (currentHeatMap == HeatMapType::surface) {
+		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.surface).data());
 	}
 	return texture;
 

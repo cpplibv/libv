@@ -2,10 +2,13 @@
 
 #pragma once
 
-#include <libv/noise/noise.hpp>
 #include <space/surface/node.hpp>
+//#include <space/surface/biome.hpp>
+
+#include <libv/noise/noise.hpp>
 #include <libv/math/gradient.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/container/flat_set.hpp>
 
 
 namespace surface {
@@ -64,7 +67,28 @@ struct HeatMap {
 	std::unique_ptr<Node> rootNode;
 };
 
-struct Config {
+struct Biome {
+	std::string name;
+	libv::vec2f coord;
+	libv::vec2f cutOff;
+//	std::string name;
+	libv::gradientf<libv::vec4f> colorGrad;
+
+	friend inline bool operator<(const Biome& lhs, const Biome& rhs) noexcept {
+		return lhs.name < rhs.name;
+	}
+	friend inline bool operator<(const Biome& lhs, const std::string& rhs) noexcept {
+		return lhs.name < rhs;
+	}
+	friend inline bool operator<(const std::string& lhs, const Biome& rhs) noexcept {
+		return lhs < rhs.name;
+	}
+};
+
+
+
+class Config {
+public:
 	Visualization visualization;
 //	std::string currentHeatMap;
 	size_t resolution; /// Number of quads/pixels per side
@@ -74,12 +98,14 @@ struct Config {
 	int circleNumber;
 	float circleSize;
 	std::vector<SurfaceObject> objects;
+	libv::flat_set<Biome> biomes;
 //	libv::gradientf<libv::vec4f> colorGrad;
 //	std::unique_ptr<Node> rootNode;
 	HeatMap height;
 	HeatMap temperature;
 	HeatMap humidity;
 	HeatMap fertility;
+
 //	std::unique_ptr<Node> heightRootNode;
 //	std::unique_ptr<Node> temperatureOffsetRootNode;
 //	std::unique_ptr<Node> humidityRootNode;

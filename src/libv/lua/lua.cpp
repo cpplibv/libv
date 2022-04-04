@@ -19,6 +19,12 @@ namespace lua {
 State create_state(lualib libmask) {
 	State lua;
 
+	open_libraries(lua, libmask);
+
+	return lua;
+}
+
+void open_libraries(sol::state& lua, lualib libmask) {
 	if ((libv::to_underlying(libmask) & libv::to_underlying(lualib::base)) != 0) {
 		lua.open_libraries(sol::lib::base);
 		lua.open_libraries(sol::lib::coroutine);
@@ -44,8 +50,6 @@ State create_state(lualib libmask) {
 //	if ((libv::to_underlying(libmask) & libv::to_underlying(lualib::vm4)) != 0) {
 //		registerLuaVM4(lua, "vec4d");
 //	}
-
-	return lua;
 }
 
 // -------------------------------------------------------------------------------------------------

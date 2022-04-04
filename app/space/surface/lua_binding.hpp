@@ -2,9 +2,13 @@
 
 #pragma once
 
+//ext
 #include <sol/sol.hpp>
+
 #include <space/surface/config.hpp>
 #include <space/surface/node.hpp>
+
+#include <libv/container/flat_set.hpp>
 
 
 namespace surface {
@@ -22,6 +26,9 @@ private:
 	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
 	static HeatMap convertHeatMap(const sol::object& object);
 //	std::vector<HeatMap> convertHeatMaps(const sol::object& object);
+	static Biome convertBiome(const sol::object& object);
+	static libv::flat_set<Biome> convertBiomes(const sol::object& object);
+
 public:
 	SurfaceLuaBinding();
 	Config getConfigFromLuaScript(const std::string_view script);

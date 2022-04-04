@@ -32,6 +32,7 @@ struct State : sol::state {
 };
 
 State create_state(lualib libmask = lualib::base);
+void open_libraries(sol::state& lua, lualib libmask);
 
 // -------------------------------------------------------------------------------------------------
 

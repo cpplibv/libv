@@ -25,7 +25,8 @@ enum class HeatMapType {
 	height,
 	temperature,
 	humidity,
-	fertility
+	fertility,
+	surface
 };
 
 inline HeatMapType currentHeatMap = HeatMapType::height;

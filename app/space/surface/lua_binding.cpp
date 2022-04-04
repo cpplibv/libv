@@ -39,6 +39,38 @@ template <typename T, typename ConvertFn>
 	return result;
 }
 
+//template <typename T, size_t N>
+//[[nodiscard]] libv::vec_t<N, T> convertVec(const sol::object& object) {
+//	std::cout << "convertVec" << std::endl;
+//	const auto result = convertArray<T>(object, [](auto value){return value;});
+//	auto asd = libv::vec_t<N, T>();
+//}
+
+template <typename T, size_t N>
+[[nodiscard]] libv::vec_t<N, T> convertVec(const sol::object& object) {
+	std::cout << "convertVec" << std::endl;
+	const auto result = convertArray<T>(object, [](auto value) { return value; });
+	return [&result] <size_t... I>(std::index_sequence<I...>) {
+		return libv::vec_t<N, T>(result[I]...);
+	}(std::make_index_sequence<N>());
+
+//	const auto table = convertTable(object);
+//	return libv::vec_t<2, T>(table[1], table[2]);
+}
+
+template <typename T, typename ConvertFn>
+[[nodiscard]] libv::flat_set<T> convertArraySet(const sol::object& object, ConvertFn convert) {
+	libv::flat_set<T> result;
+	const auto table = convertTable(object);
+	const auto size = table.size();
+	result.reserve(size);
+	for (size_t i = 1; i <= size; ++i) {
+		const auto value = table[i];
+		result.emplace(convert(value));
+	}
+	return result;
+}
+
 [[nodiscard]] libv::gradientf<libv::vec4f> convertColorGradient(const sol::object& object) {
 	libv::gradientf<libv::vec4f> colorGrad;
 	const auto table = convertTable(object);
@@ -76,6 +108,7 @@ SurfaceLuaBinding::SurfaceLuaBinding() {
 	lua.open_libraries(sol::lib::table);
 	lua.open_libraries(sol::lib::string);
 	lua.open_libraries(sol::lib::math);
+	libv::lua::open_libraries(lua, libv::lua::lualib::vec);
 }
 
 std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& object, int depth) {
@@ -177,6 +210,23 @@ std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::o
 	return convertArray<SurfaceObject>(object, convertSurfaceObject);
 }
 
+Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	Biome result;
+	result.name = table["name"];
+	result.coord = table["coord"];
+	std::cout << "result.coord: " << result.coord << std::endl;
+	result.cutOff = table["cutOff"];
+	result.colorGrad = convertColorGradient(table["colorGrad"]);
+
+	return result;
+}
+
+libv::flat_set<Biome> SurfaceLuaBinding::convertBiomes(const sol::object& object) {
+	return convertArraySet<Biome>(object, convertBiome);
+}
+
 //std::vector<HeatMap> SurfaceLuaBinding::convertHeatMaps(const sol::object& object) {
 //	return convertArray<HeatMap>(object, convertHeatMap);
 //}
@@ -224,6 +274,7 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) 
 	result.humidity = convertHeatMap(env["humidity"]);
 	result.fertility = convertHeatMap(env["fertility"]);
 
+	result.biomes = convertBiomes(env["biomes"]);
 
 	return std::move(result);
 }
