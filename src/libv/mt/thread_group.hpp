@@ -29,9 +29,20 @@ public:
 		return group.size();
 	}
 
+	[[nodiscard]] inline bool joinable() const noexcept {
+		// Fake thread_group as always joinable, join will take care of the checks
+		return true;
+	}
+
 	inline void join() noexcept {
-		for (auto& thread : group)
-			thread.join();
+		for (auto& thread : group) {
+			if (thread.joinable())
+				try {
+					thread.join();
+				} catch (const std::system_error&) {
+					// It's not an error, ignore it
+				}
+		}
 	}
 };
 

@@ -125,7 +125,12 @@ inline void basic_worker_thread<Threads>::stop() {
 
 template <typename Threads>
 inline void basic_worker_thread<Threads>::join() {
-	context_.join();
+	if (context_.joinable())
+		try {
+			context_.join();
+		} catch (const std::system_error&) {
+			// It's not an error, ignore it
+		}
 }
 
 template <typename Threads>
