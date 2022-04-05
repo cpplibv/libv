@@ -35,6 +35,9 @@ void main() {
 	vec2 pixelSize = textureSize(textureMain, 0);
 	vec3 color = texture(textureMain, uv).rgb;
 
+	// --- Fog ---
+	// TODO
+
 	// --- Bloom ---
 	{
 		vec3 bloom = upsampleTent9(textureBloom, uv, pixelSize, 2.0).rgb;
@@ -44,17 +47,25 @@ void main() {
 		color += bloom;
 	}
 
+	// --- Bloom Dirt ---
+	// TODO
+
 	// --- Vignette ---
 	{
 		float roundness = mix(pixelSize.x / pixelSize.y, 1.0, vignetteRoundness);
 		color = vignette(color, uv, vignetteIntensity, vignetteSmoothness, vignetteRoundness, vignetteColor);
 	}
 
-	//	color *= postExposure;
+	// --- Exposure ---
+	{
+		// TODO
+		// color *= uniforms.exposure;
+	}
 
 	// --- Tone Mapping ---
 	{
-		color = tonemapNeutral(color);
+		color = tonemapAcesFilmic(color);
+//		color = tonemapNeutral(color);
 //		color = tonemapAces(color);
 //		color = tonemapReinhard(color);
 //		color = tonemapReinhard2(color);
