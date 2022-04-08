@@ -26,7 +26,7 @@ enum class HeatMapType {
 	temperature,
 	humidity,
 	fertility,
-	surface,
+	biome,
 
 	distribution,
 };

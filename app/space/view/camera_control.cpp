@@ -52,9 +52,8 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	};
 
 	// TODO P3: Refine c0 constants in camera control
-	static constexpr auto c0_orbit = 1.15f;
-	static constexpr auto c0_translate = 1.1f;
-	(void) c0_translate; // Suppressing a false warning
+	static constexpr auto c0_orbit = 1.15f;	(void) c0_orbit; // Suppressing a false warning
+	static constexpr auto c0_translate = 1.1f; (void) c0_translate; // Suppressing a false warning
 
 	controls.feature_analog<BaseCameraOrbit>("camera.orbit_roll", sg_rotate, [](const auto& arg, BaseCameraOrbit& ctx) {
 		const auto value = arg.value_f();
@@ -181,9 +180,9 @@ void CameraControl2D::register_controls(libv::ctrl::FeatureRegister controls) {
 			.js_analog = 0.08
 	};
 
-	// TODO P3: Refine c0 constants in camera control
-	static constexpr auto c0_zoom = 2.0f;
-	static constexpr auto c0_translate = 1.1f;
+	static constexpr auto c0_zoom = 2.0f; (void) c0_zoom; //suppressing false warning
+	static constexpr auto c0_translate = 1.1f; (void) c0_translate; //suppressing false warning
+
 //	(void) c0_translate; // Suppressing a false warning
 
 	controls.feature_analog<CameraOrtho>("camera2D.orbit_distance", sg_zoom, [](const auto& arg, CameraOrtho& ctx) {

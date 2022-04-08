@@ -64,7 +64,7 @@ SurfaceViewer::SurfaceViewer() :
 	});
 
 	frame.onContextUpdate.output([&](const auto&) {
-		if (isCameraChanged)
+		if (isCameraChanged) {
 			if (is3DCamera) {
 				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
 				controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera3D);
@@ -72,6 +72,7 @@ SurfaceViewer::SurfaceViewer() :
 				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
 				controls.context_enter<space::CameraOrtho>(&canvas.object().camera2D);
 			}
+		}
 	});
 
 	controls.attach(frame);
@@ -104,7 +105,7 @@ SurfaceViewer::SurfaceViewer() :
 		isTextureChanged = true;
 	});
 	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::surface;
+		currentHeatMap = HeatMapType::biome;
 		isTextureChanged = true;
 	});
 	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {

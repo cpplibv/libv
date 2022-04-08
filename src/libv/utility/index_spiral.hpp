@@ -9,7 +9,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline libv::vec2i index_spiral(const int32_t index) {
+[[nodiscard]] inline libv::vec2i index_spiral(const size_t index) {
 	//  _ _ 1 _ _
 	// |_|_|D|C|B|
 	// |_|4|3|2|A| 0
@@ -23,6 +23,8 @@ namespace libv {
 
 	auto temp = id - 1; //bc of id=0
 	auto posInRing = temp;
+
+	//TODO P3: This could be a math formula
 	int i = 0;
 	while (temp >= 0) {
 		posInRing = temp;
@@ -46,9 +48,9 @@ namespace libv {
 		posInSide -= halfSide + 1 + 3 * side;
 	} else {
 		posInSide -= halfSide + 1;
-		for (int i = 0; i < 3; ++i) {
-			if (halfSide + 1 + i * side <= posInRing && posInRing <= halfSide + 1 + (i + 1) * side - 1) {
-				sideId = i + 1;
+		for (int j = 0; j < 3; ++j) {
+			if (halfSide + 1 + j * side <= posInRing && posInRing <= halfSide + 1 + (j + 1) * side - 1) {
+				sideId = j + 1;
 				break;
 			}
 			posInSide -= side;

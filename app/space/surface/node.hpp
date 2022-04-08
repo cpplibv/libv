@@ -72,7 +72,6 @@ struct NodeSimplexFractal : BaseFractalNode {
 struct FractalNode : Node {
 	std::unique_ptr<Node> input;
 
-	Seed seed = 0x5EED; //not used
 	int octaves = 1;
 	float amplitude = 1.0;
 	float frequency = 1.0f;
@@ -80,7 +79,8 @@ struct FractalNode : Node {
 	float persistence = 0.5f;
 
 	virtual float evaluate(float x, float y) override {
-		return libv::noise_fractal(seed, x, y, [&](Seed seed, float x0, float y0) {
+		Seed not_used_seed = 0;
+		return libv::noise_fractal(not_used_seed, x, y, [&](Seed, float x0, float y0) {
 					return input->evaluate(x0, y0);
 				},
 				octaves, amplitude, frequency, lacunarity, persistence);

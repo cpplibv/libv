@@ -317,13 +317,14 @@ template <typename T, typename DistFn>
 	int xPrimed = (xr - 1) * PrimeX;
 	int yPrimedBase = (yr - 1) * PrimeY;
 
+
 	for (int xi = xr - 1; xi <= xr + 1; xi++) {
 		int yPrimed = yPrimedBase;
 		for (int yi = yr - 1; yi <= yr + 1; yi++) {
 			int hashVal = hash(seed, xPrimed, yPrimed);
 			int idx = hashVal & (255 << 1);
-			T vecX = static_cast<T>(xi - x) + Lookup<T>::RandVecs2D[idx] * cellularJitter;
-			T vecY = static_cast<T>(yi - y) + Lookup<T>::RandVecs2D[idx | 1] * cellularJitter;
+			T vecX = static_cast<T>(xi) - x + Lookup<T>::RandVecs2D[idx] * cellularJitter;
+			T vecY = static_cast<T>(yi) - y + Lookup<T>::RandVecs2D[idx | 1] * cellularJitter;
 			T newDistance = distFn(vecX, vecY);
 			distance1 = std::max(std::min(distance1, newDistance), distance0);
 			if (newDistance < distance0) {
@@ -344,21 +345,21 @@ template <typename T, typename DistFn>
 
 	switch (returnType) {
 	case CellularReturnType::cellValue:
-		return closestHash * (1 / 2147483648.0f);
+		return static_cast<float>(closestHash) * (1.f / 2147483648.0f);
 	case CellularReturnType::distance:
-		return distance0 - 1;
+		return distance0 - 1.f;
 	case CellularReturnType::distance2:
-		return distance1 - 1;
+		return distance1 - 1.f;
 	case CellularReturnType::distance2Add:
-		return (distance1 + distance0) * 0.5f - 1;
+		return (distance1 + distance0) * 0.5f - 1.f;
 	case CellularReturnType::distance2Sub:
-		return distance1 - distance0 - 1;
+		return distance1 - distance0 - 1.f;
 	case CellularReturnType::distance2Mul:
-		return distance1 * distance0 * 0.5f - 1;
+		return distance1 * distance0 * 0.5f - 1.f;
 	case CellularReturnType::distance2Div:
-		return distance0 / distance1 - 1;
+		return distance0 / distance1 - 1.f;
 	default:
-		return 0;
+		return 0.f;
 	}
 
 }

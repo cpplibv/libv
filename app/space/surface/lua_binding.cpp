@@ -33,7 +33,7 @@ template <typename T, typename ConvertFn>
 	const auto size = table.size();
 	result.reserve(size);
 	for (size_t i = 1; i <= size; ++i) {
-		const auto value = table[i];
+		const auto value = table.get<sol::object>(i);
 		result.emplace_back(convert(value));
 	}
 	return result;
@@ -65,7 +65,7 @@ template <typename T, typename ConvertFn>
 	const auto size = table.size();
 	result.reserve(size);
 	for (size_t i = 1; i <= size; ++i) {
-		const auto value = table[i];
+		const auto value = table.get<sol::object>(i);
 		result.emplace(convert(value));
 	}
 	return result;
@@ -75,16 +75,18 @@ template <typename T, typename ConvertFn>
 	libv::gradientf<libv::vec4f> colorGrad;
 	const auto table = convertTable(object);
 	for (const auto&[_, keyValue] : table) {
-		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size() != 2)
-			throw std::runtime_error("Invalid colorGrad key-value pair");
+		const auto keyValueTable = convertTable(keyValue);
+//		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size() != 2)
+//			throw std::runtime_error("Invalid colorGrad key-value pair");
 
-		const auto key = keyValue.as<sol::table>()[1];
-		const auto value = keyValue.as<sol::table>()[2];
+		const auto key = keyValueTable.get<sol::object>(1);
+		const auto value = keyValueTable.get<sol::object>(2);
+
 		if (key.get_type() != sol::type::number)
 			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::lua_type_to_string(key.get_type())));
 
 		const auto color = convertColor(value);
-		colorGrad.add(key.get<float>(), color);
+		colorGrad.add(key.as<float>(), color);
 	}
 	return colorGrad;
 }
@@ -196,7 +198,7 @@ SurfaceObject SurfaceLuaBinding::convertSurfaceObject(const sol::object& object)
 	SurfaceObject result;
 	result.size = table["size"];
 	result.count = table["count"];
-	result.color = convertColor(table["color"]);
+	result.color = convertColor(table.get<sol::object>("color"));
 
 	return result;
 }
@@ -207,9 +209,8 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object) {
 	HeatMap result;
 	result.name = table["name"];
 	result.heightSensitivity = table["heightSensitivity"];
-	result.colorGrad = convertColorGradient(table["colorGrad"]);
-	result.rootNode = convertNodeTree(table["nodes"]);
-	std::cout << "result.name: " << result.name << std::endl;
+	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
+	result.rootNode = convertNodeTree(table.get<sol::object>("nodes"));
 
 	return result;
 }
@@ -224,9 +225,8 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	Biome result;
 	result.name = table["name"];
 	result.coord = table["coord"];
-	std::cout << "result.coord: " << result.coord << std::endl;
 	result.cutOff = table["cutOff"];
-	result.colorGrad = convertColorGradient(table["colorGrad"]);
+	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
 
 	return result;
 }
@@ -251,7 +251,7 @@ Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 	result.plantDistribution = table["plantDistribution"];
 	result.circleNumber = table["circleNumber"];
 	result.circleSize = table["circleSize"];
-	result.objects = convertSurfaceObjects(table["objects"]);
+	result.objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;
 }
@@ -261,7 +261,7 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) 
 	lua.script(script, env);
 
 	//set config
-	sol::object luaConfig = env["config"];
+	sol::object luaConfig = env.get<sol::object>("config");
 	auto result = convertConfig(luaConfig);
 
 	//set rootNode
@@ -277,14 +277,13 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) 
 //		auto nodes = convertHeatMaps(luaHeatMaps);
 //		result.heatMaps = std::move(nodes);
 //	}
-	result.height = convertHeatMap(env["height"]);
-	result.temperature = convertHeatMap(env["temperature"]);
-	result.humidity = convertHeatMap(env["humidity"]);
-	result.fertility = convertHeatMap(env["fertility"]);
+	result.height = convertHeatMap(env.get<sol::object>("height"));
+	result.temperature = convertHeatMap(env.get<sol::object>("temperature"));
+	result.humidity = convertHeatMap(env.get<sol::object>("humidity"));
+	result.fertility = convertHeatMap(env.get<sol::object>("fertility"));
+	result.biomes = convertBiomes(env.get<sol::object>("biomes"));
 
-	result.biomes = convertBiomes(env["biomes"]);
-
-	return std::move(result);
+	return result;
 }
 // -------------------------------------------------------------------------------------------------
 

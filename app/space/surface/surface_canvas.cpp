@@ -28,7 +28,7 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
 {
 	camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
-	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event& event) {
+	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event&) {
 //			auto lock = std::unique_lock(mutex);
 		changed = true;
 	});
@@ -95,8 +95,8 @@ libv::vector_2D<float> SurfaceCanvas::buildSurfaceTexture() {
 		for (size_t y = 0; y < chunk.humidity.size_y(); ++y) {
 			for (size_t x = 0; x < chunk.humidity.size_x(); ++x) {
 				result(
-						std::clamp(static_cast<size_t>(std::max(0.f, chunk.humidity(x, y).pos.z) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
-						std::clamp(static_cast<size_t>(std::max(0.f, chunk.temperature(x, y).pos.z) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
+						std::clamp(static_cast<size_t>(std::max(0.f, chunk.humidity(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
+						std::clamp(static_cast<size_t>(std::max(0.f, chunk.temperature(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
 				) += 0.005f;
 			}
 		}
@@ -106,32 +106,34 @@ libv::vector_2D<float> SurfaceCanvas::buildSurfaceTexture() {
 }
 
 libv::glr::Texture SurfaceCanvas::buildTexture(const Chunk& chunk) {
-	auto texture = libv::glr::Texture2D::RGBA32F();
-	texture.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
-	texture.set(libv::gl::MagFilter::Nearest);
-	texture.set(libv::gl::MinFilter::Nearest);
-	texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-	if (currentHeatMap == HeatMapType::height) {
-		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.height).data());
-	} else if (currentHeatMap == HeatMapType::temperature) {
-		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.temperature).data());
-	} else if (currentHeatMap == HeatMapType::humidity) {
-		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.humidity).data());
-	} else if (currentHeatMap == HeatMapType::fertility) {
-		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
-	} else if (currentHeatMap == HeatMapType::surface) {
-		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.surface).data());
-	} else if (currentHeatMap == HeatMapType::distribution) {
-		//throw "Help me";
-//		auto texturef = libv::glr::Texture2D::R32F();
-//		texturef.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
-//		texturef.set(libv::gl::MagFilter::Nearest);
-//		texturef.set(libv::gl::MinFilter::Nearest);
+
+	if (currentHeatMap == HeatMapType::height || currentHeatMap == HeatMapType::biome) {
+		auto texture = libv::glr::Texture2D::RGBA32F();
+		texture.storage(1, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>());
+		texture.set(libv::gl::MagFilter::Nearest);
+		texture.set(libv::gl::MinFilter::Nearest);
+		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+		if (currentHeatMap == HeatMapType::height)
+			texture.image(0, libv::vec2i{0, 0}, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>(), chunk.getColors(chunk.height).data());
+		else if (currentHeatMap == HeatMapType::biome)
+			texture.image(0, libv::vec2i{0, 0}, chunk.biomeMap.size().cast<int32_t>(), chunk.biomeMap.data());
+
+		return texture;
+	} else {
+		auto texturef = libv::glr::Texture2D::R32F();
+		texturef.storage(1, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>());
+		texturef.set(libv::gl::MagFilter::Nearest);
+		texturef.set(libv::gl::MinFilter::Nearest);
 //		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-//		texturef.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, buildSurfaceTexture().data());
-//		return texturef;
+		if (currentHeatMap == HeatMapType::temperature)
+			texturef.image(0, libv::vec2i{0, 0}, chunk.temperature.size().cast<int32_t>(), chunk.temperature.data());
+		else if (currentHeatMap == HeatMapType::humidity)
+			texturef.image(0, libv::vec2i{0, 0}, chunk.humidity.size().cast<int32_t>(), chunk.humidity.data());
+		else if (currentHeatMap == HeatMapType::fertility)
+			texturef.image(0, libv::vec2i{0, 0}, chunk.fertility.size().cast<int32_t>(), chunk.fertility.data());
+
+		return texturef;
 	}
-	return texture;
 
 //	renderer.surfaceTexture.addTexture(heightMap, chunk.position);
 }
@@ -191,7 +193,7 @@ void SurfaceCanvas::buildChunks() {
 
 	//getChunk, render (availability alapjan)
 	chunks.clear();
-	for (int i = 0; i < config.numChunks; ++i) {
+	for (size_t i = 0; i < config.numChunks; ++i) {
 		const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
 		Chunk chunk = chunkGen.generateChunk(config, chunkPos);
 		chunkGen.placeVegetation(chunk, config);
@@ -234,6 +236,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	if (isCameraChanged || isTextureChanged) {
 		buildRenderObjects();
 		isCameraChanged = false;
+		isTextureChanged = false;
 	}
 
 //	if (isTextureChanged) {

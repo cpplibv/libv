@@ -5,6 +5,8 @@
 
 namespace surface {
 float NodeConstant::evaluate(float x, float y) {
+	(void) x;
+	(void) y;
 	return value;
 }
 

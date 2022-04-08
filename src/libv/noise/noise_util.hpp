@@ -47,7 +47,7 @@ static constexpr uint32_t PrimeZ = 1720413743;
 
 	hashVal *= hashVal;
 	hashVal ^= hashVal << 19;
-	return hashVal * (1 / 2147483648.0f);
+	return static_cast<float>(hashVal) * (1.f / 2147483648.0f);
 }
 
 [[nodiscard]] constexpr inline float hermiteInterp(float t) noexcept {

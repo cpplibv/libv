@@ -929,17 +929,19 @@ void RendererSurface::addChunk(const surface::Chunk& chunk) {
 		}
 	}
 
-	for (int i = 0; i < rowSize - 1; ++i) {
+	for (size_t i = 0; i < rowSize - 1; ++i) {
 		index(vi);
 		const auto colSize = chunk.height.size_x();
-		for (int j = 0; j < colSize; ++j) {
+		const auto colSizeVi = static_cast<libv::glr::VertexIndex>(colSize);
+
+		for (size_t j = 0; j < colSize; ++j) {
 			index(vi);
-			index(vi + colSize);
+			index(vi + colSizeVi);
 			vi += 1;
 		}
-		index(vi + colSize - 1);
+		index(vi + colSizeVi - 1);
 	}
-	vi += rowSize;
+	vi += static_cast<libv::glr::VertexIndex>(rowSize);
 }
 
 void RendererSurface::clear() {
