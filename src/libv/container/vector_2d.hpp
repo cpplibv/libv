@@ -19,7 +19,7 @@ private:
 	std::vector<T> storage;
 
 public:
-	constexpr inline vector_2D() = default;
+	constexpr inline vector_2D() noexcept = default;
 	constexpr inline vector_2D(const vector_2D&) = default;
 	constexpr inline vector_2D(vector_2D&&) noexcept = default;
 	constexpr inline vector_2D& operator=(const vector_2D&) & = default;
@@ -56,6 +56,12 @@ public:
 
 	[[nodiscard]] constexpr inline const T& operator()(std::size_t x, std::size_t y) const noexcept {
 		return storage[size_.x * y + x];
+	}
+
+public:
+	constexpr inline void fill(const T& value) {
+		for (auto& item : storage)
+			item = value;
 	}
 
 public:

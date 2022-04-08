@@ -2,18 +2,17 @@
 
 #include <space/surface/chunk.hpp>
 
-//timer
-#include <libv/noise/noise.hpp>
-#include <iostream>
-#include <memory>
-//libv
-#include <libv/math/fract.hpp>
-
-//space
-#include <space/surface/biome.hpp>
-
 //ext
 #include <fmt/format.h>
+//libv
+#include <libv/noise/noise.hpp>
+#include <libv/math/fract.hpp>
+// std
+#include <functional>
+#include <iostream>
+#include <memory>
+//space
+#include <space/surface/biome.hpp>
 
 
 namespace surface {
@@ -27,14 +26,15 @@ bool isPointInTriangle(libv::vec2f p, float step) {
 
 // -------------------------------------------------------------------------------------------------
 
-Chunk::Chunk(const size_t size_, const libv::vec2f position_) {
-	size = size_;
-	position = position_;
-	surface = libv::vector_2D<SurfacePoint>{size_, size_};
-	height = libv::vector_2D<SurfacePoint>{size_, size_};
-	temperature = libv::vector_2D<SurfacePoint>{size_, size_};
-	humidity = libv::vector_2D<SurfacePoint>{size_, size_};
-	fertility = libv::vector_2D<SurfacePoint>{size_, size_};
+Chunk::Chunk(const size_t size_, const libv::vec2f position_) :
+	size(size_),
+	position(position_),
+	surface(size_, size_),
+	height(size_, size_),
+	temperature(size_, size_),
+	humidity(size_, size_),
+	fertility(size_, size_),
+	temp_humidity_distribution(size_, size_) {
 }
 
 //collusion query
@@ -196,6 +196,8 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 		return SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
 	};
 
+	chunk.temp_humidity_distribution.fill(0.f);
+
 	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
 		const auto size_f = static_cast<float>(numQuad);
@@ -210,6 +212,11 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 			chunk.temperature(xi, yi) = calc(config.temperature.rootNode, config.temperature.colorGrad, x, y);
 			chunk.humidity(xi, yi) = calc(config.humidity.rootNode, config.humidity.colorGrad, x, y);
 			chunk.fertility(xi, yi) = calc(config.fertility.rootNode, config.fertility.colorGrad, x, y);
+
+//			chunk.temp_humidity_distribution(
+//					std::clamp(static_cast<size_t>(chunk.humidity(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_x() - 1),
+//					std::clamp(static_cast<size_t>(chunk.temperature(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_y() - 1)
+//			) += 0.1f;
 
 			const auto height = chunk.height(xi, yi).pos.z;
 			const auto temp = chunk.temperature(xi, yi).pos.z;

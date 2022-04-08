@@ -71,7 +71,7 @@ struct Biome {
 	std::string name;
 	libv::vec2f coord;
 	libv::vec2f cutOff;
-//	std::string name;
+	float dominance = 1.f;
 	libv::gradientf<libv::vec4f> colorGrad;
 
 	friend inline bool operator<(const Biome& lhs, const Biome& rhs) noexcept {

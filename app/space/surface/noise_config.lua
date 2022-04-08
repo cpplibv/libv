@@ -16,6 +16,7 @@ NodeType = {
 	simplexFractal = "simplexFractal",
 	warp = "warp",
 	add = "add",
+	mul = "mul",
 	pow = "pow",
 }
 
@@ -125,6 +126,12 @@ local add = function(args)
 	return args
 end
 
+local mul = function(args)
+	args = args or {}
+	args.nodeType = NodeType.mul
+	return args
+end
+
 local pow = function(args)
 	args = args or {}
 	args.nodeType = NodeType.pow
@@ -149,7 +156,7 @@ config = {
 
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
-	resolution = 64,
+	resolution = 256,
 	numChunks = 81,
 	amplitude = 0.5,
 	--treeSize = 0.003,
@@ -211,6 +218,7 @@ biomes = {
 	{
 		name = "no-biome",
 		coord = vec2f(0.25, 0.75),
+
 		--radius = 0.05
 		--min cut off, max cut off
 		cutOff = vec2f(0.1, 0.6),
@@ -386,8 +394,8 @@ temperature = {
 	name = "temperature",
 	heightSensitivity = 0.2,
 	colorGrad = {
-		{ 0.0, "black" },
-		{ 1.0, "white" }
+		{ 0.0, "white" },
+		{ 1.0, "red" }
 	},
 	nodes =
 
@@ -400,23 +408,23 @@ temperature = {
 		 lacunarity = 2.0,
 		 persistence = 0.5,
 	 },
-	 warp{
-		 seed = 423,
-		 octaves = 5,
-		 amplitude = 4,
-		 frequency = 0.25,
-		 lacunarity = 2.5,
-		 persistence = 0.5,
-		 cellular {
-			 seed = 123,
-			 distanceFn = DistFun.euclidean,
-			 returnType = ReturnType.cellValue,
-			 jitter = 1,
-		 },
-	 },
+	 --warp{
+		-- seed = 423,
+		-- octaves = 5,
+		-- amplitude = 4,
+		-- frequency = 0.25,
+		-- lacunarity = 2.5,
+		-- persistence = 0.5,
+		-- cellular {
+		--	 seed = 123,
+		--	 distanceFn = DistFun.euclidean,
+		--	 returnType = ReturnType.cellValue,
+		--	 jitter = 1,
+		-- },
+	 --},
 
 		constant {
-			value = 0.8
+			value = 0.5
 		}
 	}
 }
@@ -425,28 +433,56 @@ humidity = {
 	heightSensitivity = 0.2,
 	colorGrad = {
 		{0.0 , "white"},
-		{1.0 , "gray"}
+		{1.0 , "blue"}
 	},
 	nodes =
 
+	--add {
+	--	mul {
+	--	perlin {
+	--		seed = 10,
+	--
+	--	--	--octaves = 6,
+	--	--	--amplitude = 0.5,
+	--	--	--frequency = 0.5,
+	--	--	--lacunarity = 2.0,
+	--	--	--persistence = 0.5,
+	--	},
+	--		constant{
+	--			value = 1
+	--		}
+	--	},
+	----cellular {
+	----	seed = 123,
+	----	distanceFn = DistFun.euclidean,
+	----	returnType = ReturnType.cellValue,
+	----	jitter = 1,
+	----},
+	--	constant{
+	--		value = 0.5
+	--	}
+	--}
 	add {
 		simplexFractal {
-			seed = 123,
+			seed = 103421,
+
 			octaves = 6,
 			amplitude = 0.5,
 			frequency = 0.5,
 			lacunarity = 2.0,
 			persistence = 0.5,
 		},
-	--cellular {
-	--	seed = 123,
-	--	distanceFn = DistFun.euclidean,
-	--	returnType = ReturnType.cellValue,
-	--	jitter = 1,
-	--},
+		--cellular {
+		--	seed = 123,
+		--	distanceFn = DistFun.euclidean,
+		--	--distanceFn = DistFun.manhattan,
+		--	returnType = ReturnType.cellValue,
+		--	--returnType = ReturnType.distance,
+		--	jitter = 1,
+		--},
 		constant{
 			value = 0.5
-		}
+		},
 	}
 
 

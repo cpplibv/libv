@@ -67,9 +67,11 @@ public:
 	libv::vector_2D<SurfacePoint> surface;
 
 	libv::vector_2D<SurfacePoint> height;
-	libv::vector_2D<SurfacePoint> temperature;
+	libv::vector_2D<SurfacePoint> temperature; // TODO P1: Only store a float, surface point is overkill
 	libv::vector_2D<SurfacePoint> humidity;
 	libv::vector_2D<SurfacePoint> fertility;
+	libv::vector_2D<float> temp_humidity_distribution;
+
 	std::vector<SurfaceObjectStorage> featureList;
 public:
 	[[nodiscard]] static float getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap);

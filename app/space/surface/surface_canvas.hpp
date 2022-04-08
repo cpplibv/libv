@@ -26,7 +26,9 @@ enum class HeatMapType {
 	temperature,
 	humidity,
 	fertility,
-	surface
+	surface,
+
+	distribution,
 };
 
 inline HeatMapType currentHeatMap = HeatMapType::height;
@@ -52,7 +54,8 @@ public:
 	explicit SurfaceCanvas(libv::ui::UI& ui);
 private:
 	void setupRenderStates(libv::glr::Queue& glr);
-	libv::glr::Texture2D::RGBA32F buildTexture(const Chunk& chunk);
+	libv::vector_2D<float> buildSurfaceTexture();
+	libv::glr::Texture buildTexture(const Chunk& chunk);
 	void addGizmo();
 	void buildChunks();
 	void buildRenderObject(const Chunk& chunk);

@@ -163,10 +163,18 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 	} else if (nodeType == "add") {
 		auto x = NodePlus::container();
 
-		for (auto& child : children) {
+		for (auto& child : children)
 			x.emplace_back(std::move(child));
-		}
+
 		return std::make_unique<NodePlus>(std::move(x));
+
+	} else if (nodeType == "mul") {
+		auto x = NodeMul::container();
+
+		for (auto& child : children)
+			x.emplace_back(std::move(child));
+
+		return std::make_unique<NodeMul>(std::move(x));
 
 	} else if (nodeType == "pow") {
 

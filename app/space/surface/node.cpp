@@ -16,6 +16,14 @@ float NodePlus::evaluate(float x, float y) {
 	return result;
 }
 
+float NodeMul::evaluate(float x, float y) {
+	float result = 1.f;
+	for (const auto& input : inputs) {
+		result *= input->evaluate(x, y);
+	}
+	return result;
+}
+
 float NodePow::evaluate(float x, float y) {
 	auto base = input->evaluate(x, y);
 	if (base < 0)

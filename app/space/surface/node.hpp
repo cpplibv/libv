@@ -116,6 +116,23 @@ struct NodePlus : Node {
 	virtual float evaluate(float x, float y) override;
 };
 
+struct NodeMul : Node {
+	using container = boost::container::small_vector<std::unique_ptr<Node>, 4>;
+	container inputs;
+
+//	Node* input0;
+//	Node* input1;
+//
+//	virtual float evaluate(float x, float y) override {
+//		return
+//				input0->evaluate(x, y) +
+//						input1->evaluate(x, y);
+//	}
+	explicit NodeMul(container inputs) : inputs(std::move(inputs)) {}
+
+	virtual float evaluate(float x, float y) override;
+};
+
 struct NodePow : Node {
 	std::unique_ptr<Node> input;
 

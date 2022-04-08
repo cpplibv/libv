@@ -86,7 +86,26 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-libv::glr::Texture2D::RGBA32F SurfaceCanvas::buildTexture(const Chunk& chunk) {
+libv::vector_2D<float> SurfaceCanvas::buildSurfaceTexture() {
+	const auto size = config.resolution + 1;
+	libv::vector_2D<float> result{size, size};
+	result.fill(0.f);
+
+	for (const auto& chunk : chunks) {
+		for (size_t y = 0; y < chunk.humidity.size_y(); ++y) {
+			for (size_t x = 0; x < chunk.humidity.size_x(); ++x) {
+				result(
+						std::clamp(static_cast<size_t>(std::max(0.f, chunk.humidity(x, y).pos.z) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
+						std::clamp(static_cast<size_t>(std::max(0.f, chunk.temperature(x, y).pos.z) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
+				) += 0.005f;
+			}
+		}
+	}
+
+	return result;
+}
+
+libv::glr::Texture SurfaceCanvas::buildTexture(const Chunk& chunk) {
 	auto texture = libv::glr::Texture2D::RGBA32F();
 	texture.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
 	texture.set(libv::gl::MagFilter::Nearest);
@@ -102,6 +121,15 @@ libv::glr::Texture2D::RGBA32F SurfaceCanvas::buildTexture(const Chunk& chunk) {
 		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
 	} else if (currentHeatMap == HeatMapType::surface) {
 		texture.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.surface).data());
+	} else if (currentHeatMap == HeatMapType::distribution) {
+		//throw "Help me";
+//		auto texturef = libv::glr::Texture2D::R32F();
+//		texturef.storage(1, libv::vec2i{config.resolution + 1, config.resolution + 1});
+//		texturef.set(libv::gl::MagFilter::Nearest);
+//		texturef.set(libv::gl::MinFilter::Nearest);
+//		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+//		texturef.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, buildSurfaceTexture().data());
+//		return texturef;
 	}
 	return texture;
 
@@ -126,8 +154,21 @@ void SurfaceCanvas::clearRenderObjects() {
 void SurfaceCanvas::buildRenderObjects() {
 	clearRenderObjects();
 
-	for (const auto& chunk : chunks) {
-		buildRenderObject(chunk);
+	if (currentHeatMap != HeatMapType::distribution)
+		for (const auto& chunk : chunks) {
+			buildRenderObject(chunk);
+		}
+	else {
+		const auto data = buildSurfaceTexture();
+
+		auto texturef = libv::glr::Texture2D::R32F();
+		texturef.storage(1, data.size().cast<int32_t>());
+		texturef.set(libv::gl::MagFilter::Nearest);
+		texturef.set(libv::gl::MinFilter::Nearest);
+//		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+		texturef.image(0, libv::vec2i{0, 0}, data.size().cast<int32_t>(), data.data());
+
+		renderer.surfaceTexture.addTexture(texturef, {0, 0});
 	}
 }
 
@@ -160,7 +201,9 @@ void SurfaceCanvas::buildChunks() {
 
 		renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
 
-		buildRenderObject(chunk);
+		if (currentHeatMap != HeatMapType::distribution)
+			buildRenderObject(chunk);
+
 		//add features
 		if (config.visualization == Visualization::spheres) {
 			for (const auto& surfaceObjectStorage : chunk.featureList) {
@@ -171,6 +214,7 @@ void SurfaceCanvas::buildChunks() {
 		}
 		chunks.emplace_back(std::move(chunk));
 	}
+
 	addGizmo();
 }
 
