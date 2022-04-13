@@ -226,6 +226,7 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	result.name = table["name"];
 	result.coord = table["coord"];
 	result.cutOff = table["cutOff"];
+	result.dominance = table["dominance"] != sol::type::number ? 1.f : table["dominance"];
 	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
 
 	return result;

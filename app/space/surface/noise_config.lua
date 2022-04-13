@@ -156,8 +156,8 @@ config = {
 
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
-	resolution = 256,
-	numChunks = 81,
+	resolution = 64,
+	numChunks = 1,
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,
@@ -215,83 +215,86 @@ config = {
 
 --not regions, biomes-forest types
 biomes = {
-	{
-		name = "no-biome",
-		coord = vec2f(0.25, 0.75),
-
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.6),
-		colorGrad = {
-			{0, "black"},
-			{1, "white"}
-		}
-	},
-	{
-		name = "polar",
-		coord = vec2f(0.125, 0.125),
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			{0, "hsv(191, 20%, 26%)"},
-			{1, "hsv(191, 20%, 76%)"}
-		}
-	},
-	{
-		name = "subpolar-boreal",
-		coord = vec2f(0.25, 0.25),
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			{0, "hsv(41, 89%, 12%)"},
-			{1, "hsv(41, 89%, 62%)"}
-		}
-	},
-	{
-		name = "temperate-rainforest",
-		coord = vec2f(0.65, 0.65),
-		--radius = 0.05
-		--min cut off, max cut off
-		--dominance
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			{0, "hsv(130, 50%, 27%)"},
-			{1, "hsv(130, 60%, 50%)"}
-		}
-	},
+	--{
+	--	name = "no-biome",
+	--	coord = vec2f(0.25, 0.75),
+	--
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	cutOff = vec2f(0.1, 0.6),
+	--	colorGrad = {
+	--		{0, "black"},
+	--		{1, "white"}
+	--	}
+	--},
+	--{
+	--	name = "polar",
+	--	coord = vec2f(0.125, 0.125),
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		{0, "hsv(191, 20%, 26%)"},
+	--		{1, "hsv(191, 20%, 76%)"}
+	--	}
+	--},
+	--{
+	--	name = "subpolar-boreal",
+	--	coord = vec2f(0.25, 0.25),
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		{0, "hsv(41, 89%, 12%)"},
+	--		{1, "hsv(41, 89%, 62%)"}
+	--	}
+	--},
+	--{
+	--	name = "temperate-rainforest",
+	--	coord = vec2f(0.65, 0.65),
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	--dominance
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		{0, "hsv(130, 50%, 27%)"},
+	--		{1, "hsv(130, 60%, 50%)"}
+	--	}
+	--},
 	{
 		name = "temperate-forest",
-		coord = vec2f(0.55, 0.4),
+		coord = vec2f(1, 1),
 		--radius = 0.05
 		--min cut off, max cut off
+		dominance = 1.5,
+
 		cutOff = vec2f(0.1, 0.7),
 		colorGrad = {
 			{0, "hsv(110, 20%, 27%)"},
-			{1, "hsv(110, 50%, 40%)"}
+			{1, "hsv(10, 50%, 40%)"}
 		}
 	},
 	{
 		name = "temperate-grassland",
-		coord = vec2f(0.5, 0.125),
+		dominance = 1.9,
+		coord = vec2f(0, 0),
 		--radius = 0.05
 		--min cut off, max cut off
 		cutOff = vec2f(0.1, 0.7),
 		colorGrad = {
 			{0, "hsv(140, 20%, 27%)"},
-			{1, "hsv(140, 70%, 40%)"}
+			{1, "hsv(210, 70%, 40%)"}
 		}
 	},
 	{
 		name = "tropical-rainforest",
-		coord = vec2f(0.8, 0.75),
+		coord = vec2f(0, 1),
 		--radius = 0.05
 		--min cut off, max cut off
 		cutOff = vec2f(0.1, 0.7),
 		colorGrad = {
 			{0, "hsv(100, 78%, 2%)"},
-			{1, "hsv(100, 78%, 52%)"}
+			{1, "hsv(140, 78%, 52%)"}
 		}
 	},
 	--{
@@ -308,6 +311,18 @@ biomes = {
 	--		{1, "hsv(100, 78%, 52%)"}
 	--	}
 	--}
+	{
+		name = "desert",
+		coord = vec2f(1, 0),
+		dominance = 2.5,
+		--radius = 0.05
+		--min cut off, max cut off
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			{0, "hsv(110, 20%, 27%)"},
+			{1, "yellow"}
+		}
+	},
 }
 
 height = {

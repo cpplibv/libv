@@ -35,6 +35,7 @@ inline HeatMapType currentHeatMap = HeatMapType::height;
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
+	//scene
 	space::CameraPlayer camera3D;
 	space::CameraOrtho camera2D;
 //	CameraPlayer::screen_picker screen_picker;
@@ -42,26 +43,30 @@ public:
 private:
 //	libv::rev::RenderTarget renderTarget;
 //	libv::rev::PostProcessing postProcessing;
-	space::Renderer renderer;
 //	std::vector<libv::glr::Texture2D::RGBA32F> heightMapTextures;
-	std::vector<Chunk> chunks;
 //	std::mutex mutex;
+	//canvas/rendering/surface
+	space::Renderer renderer;
+	//surface
+	std::vector<Chunk> chunks;
+	Config config;
+	//vezerles
 	std::atomic<bool> changed = true;
 	SurfaceLuaBinding binding;
-	Config config;
 	libv::fsw::Watcher fileWatcher;
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui);
 private:
-	void setupRenderStates(libv::glr::Queue& glr);
 	libv::vector_2D<float> buildSurfaceTexture();
 	libv::glr::Texture buildTexture(const Chunk& chunk);
 	void addGizmo();
+	//hate member functions working on members
 	void buildChunks();
 	void buildRenderObject(const Chunk& chunk);
 	void buildRenderObjects();
 	void clearRenderObjects();
 	virtual void attach() override;
+	void setupRenderStates(libv::glr::Queue& glr);
 	virtual void render(libv::glr::Queue& glr) override;
 };
 }

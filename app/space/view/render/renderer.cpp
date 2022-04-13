@@ -991,8 +991,8 @@ void RendererSurfaceTexture::build_mesh() {
 	index.quad(0, 1, 2, 3);
 }
 
-void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos) {
-	const auto texture_pos = ChunkTexture{texture, chunkPos};
+void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size) {
+	const auto texture_pos = ChunkTexture{texture, chunkPos, size};
 	chunks.emplace_back(texture_pos); //std::move?
 }
 
@@ -1012,6 +1012,7 @@ void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuf
 
 		auto guard = glr.model.push_guard();
 		glr.model.translate(libv::vec3f{chunk.pos, 0});
+		glr.model.scale({chunk.size, 1});
 
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = glr.mvp();

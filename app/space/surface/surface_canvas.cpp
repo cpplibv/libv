@@ -156,11 +156,7 @@ void SurfaceCanvas::clearRenderObjects() {
 void SurfaceCanvas::buildRenderObjects() {
 	clearRenderObjects();
 
-	if (currentHeatMap != HeatMapType::distribution)
-		for (const auto& chunk : chunks) {
-			buildRenderObject(chunk);
-		}
-	else {
+	if (currentHeatMap == HeatMapType::distribution && !is3DCamera){
 		const auto data = buildSurfaceTexture();
 
 		auto texturef = libv::glr::Texture2D::R32F();
@@ -170,7 +166,12 @@ void SurfaceCanvas::buildRenderObjects() {
 //		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 		texturef.image(0, libv::vec2i{0, 0}, data.size().cast<int32_t>(), data.data());
 
-		renderer.surfaceTexture.addTexture(texturef, {0, 0});
+		renderer.surfaceTexture.addTexture(texturef, {-5.f, -5.f}, {10.f, 10.f});
+	}
+	else {
+		for (const auto& chunk : chunks) {
+			buildRenderObject(chunk);
+		}
 	}
 }
 

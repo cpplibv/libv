@@ -13,6 +13,9 @@
 #include <space/surface/config.hpp>
 
 #include <cmath>
+//std
+#include <iostream>
+
 
 
 namespace surface {
@@ -36,16 +39,17 @@ enum class VeggieType {
 
 };
 
-class WeightedEntry {
-public:
-	Biome biome;
-	float weight;
-
-public:
-	WeightedEntry(Biome biome, float weight) : biome(std::move(biome)), weight(weight) {};
-};
+//class WeightedEntry {
+//public:
+//	Biome biome;
+//	float weight;
+//
+//public:
+//	WeightedEntry(Biome biome, float weight) : biome(std::move(biome)), weight(weight) {};
+//};
 
 class BiomeMix {
+public:
 	struct WeightedEntry {
 		const Biome* biome = nullptr;
 		float weight;
@@ -61,8 +65,14 @@ public:
 		return entries[index];
 	}
 
-	[[nodiscard]] inline const Biome& primary() const noexcept {
+	[[nodiscard]] inline const Biome& primary()  noexcept {
 		assert(entries[0].biome != nullptr);
+//		assert(entries[1].biome != nullptr);
+		std::ranges::sort(entries, std::greater<>{}, &BiomeMix::WeightedEntry::weight);
+		std::cout << "result[0].biome->name: " << entries[0].biome->name;
+		std::cout << "result[0].weight: " << entries[0].weight << std::endl;
+		std::cout << "result[1].biome->name: " << entries[1].biome->name;
+		std::cout << "result[1].weight: " << entries[1].weight << std::endl;
 		return *entries[0].biome;
 	}
 //	BiomeMix(std::array<WeightedEntry, 4> candidates_):candidates(candidates_) {};

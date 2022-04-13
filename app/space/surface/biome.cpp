@@ -2,7 +2,6 @@
 
 #include <space/surface/biome.hpp>
 
-#include <iostream>
 #include <utility>
 #include <algorithm>
 
@@ -40,21 +39,30 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 	BiomeMix result;
 	float sum = 0.f;
 	size_t i = 0;
+	if (candidates.size() != 4) {
+		std::cout << "OOPS candidates.size: " << candidates.size() << std::endl;
+	}
 	for (const auto& candidate : candidates) {
-		if (candidate.biome == nullptr)
+		if (candidate.biome == nullptr) {
+			std::cout << "i: " << i << std::endl;
 			break;
+		}
 		const auto dist = std::sqrt(candidate.distance_sq);
 		result[i].biome = candidate.biome;
-		result[i].weight = 1/dist * candidate.biome->dominance;
+		result[i].weight = 1 / dist * candidate.biome->dominance;
+//		result[i].weight = 1.f - dist;
+//		result[i].weight = candidate.biome->dominance;
 		sum += result[i].weight;
+
+		i++;
 	}
 
 	for (auto& entry : result.entries) {
 		if (entry.biome == nullptr)
 			break;
 
-		entry.weight /= sum; //TODO: invert
-//		entry.weight = 1 - entry.weight; //TODO: normalize again
+		entry.weight /= sum;
+//		entry.weight = 1 - entry.weight;
 //		if (entry.biome.cutOff.x > ratio)
 //			entry = nullptr;
 //		if (entry.biome.cutOff.y < ratio) {
@@ -62,6 +70,9 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 //			return result;
 //		}
 	}
+
+	std::ranges::sort(result.entries, std::greater<>{}, &BiomeMix::WeightedEntry::weight);
+
 	return result;
 }
 
