@@ -30,6 +30,11 @@ public:
 	using result_type = uint64_t;
 
 private:
+	static constexpr uint64_t random_bits_0 = 1341429377760273161u;
+	static constexpr uint64_t random_bits_1 = 3340210110105959566u;
+	static constexpr uint64_t salt_bit45 = uint64_t{1} << 45u;
+	static constexpr uint64_t salt_bit49 = uint64_t{1} << 49u;
+
 	uint64_t s[2]{18231420318685880306u, 827006149519u};
 
 public:
@@ -37,15 +42,16 @@ public:
 
 	/// Accepts low quality seeds (like IDs or Indices)
 	explicit constexpr inline xoroshiro128(uint64_t s0) noexcept :
-		s{s0, s0 + 1} { // Seed cannot be {0, 0} and +1 will make sure of that
+		s{s0, s0 ^ random_bits_0} { // Seed cannot be {0, 0} and xor will make sure of that
 		jump(); // Call to jump() to accept low quality seed
 	}
 
 	/// Accepts low quality seeds (like IDs or Indices)
 	/// The seed cannot be {0, 0}
 	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1) noexcept :
-		s{s0, s1} {
-		assert((s0 != 0 || s1 != 0) && "The seed for xoroshiro128 cannot be {0, 0}");
+		s{(s0 ^ random_bits_0) | salt_bit45, (s1 ^ random_bits_1) | salt_bit49} {
+		// The seed for xoroshiro128 cannot be {0, 0} so 1-1 salt bit is forced to 1
+		// random_bits_0 and random_bits_1 is xor-ed into the seeds to improve entropy for low inputs
 		jump(); // Call to jump() to accept low quality seed
 	}
 
@@ -61,7 +67,7 @@ public:
 	/// Directly seeds the pseudorandom number generator internal state using s0.
 	/// The provided seed must be a high quality 64 random bits otherwise the starting sequence's quality will poor
 	static constexpr inline xoroshiro128 high_quality_seed(uint64_t s0) {
-		return xoroshiro128{~s0 ^ 1341429377760273161u, s0 ^ 1341429377760273161u, HighQ{}};
+		return xoroshiro128{~s0 ^ random_bits_0, s0 ^ random_bits_0, HighQ{}};
 	}
 
 	/// Directly seeds the pseudorandom number generator internal state using s0 and s1
