@@ -97,6 +97,8 @@ public:
 		while (work)
 			done_cv.wait(lock);
 //			done.wait(lock);
+
+		work = std::function<bool()>{}; // Reset work
 	}
 };
 

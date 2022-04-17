@@ -150,7 +150,6 @@ inline bool basic_worker_thread<Threads>::wait_for_empty() const {
 
 template <typename Threads>
 inline void basic_worker_thread<Threads>::run() {
-	libv::unique_function<void()> task;
 	std::unique_lock lock(queue_m);
 
 	while (true) {
@@ -181,7 +180,8 @@ inline void basic_worker_thread<Threads>::run() {
 		if (terminate)
 			break;
 
-		task = std::move(const_cast<queued_task&>(queue.top()).func); // NOTE: const_cast is safe as the task is popped anyways
+		auto task = std::move(const_cast<queued_task&>(queue.top()).func);
+		// NOTE: const_cast is safe as the task is popped anyways
 		queue.pop();
 
 		lock.unlock();
@@ -197,7 +197,8 @@ inline void basic_worker_thread<Threads>::run() {
 
 	// Process tasks that can be executed
 	while (!queue.empty() && queue.top().time <= std::chrono::steady_clock::now()) {
-		task = std::move(const_cast<queued_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
+		auto task = std::move(const_cast<queued_task&>(queue.top()).func);
+		// NOTE: const_cast is safe but ugly as the task is popped anyways
 		queue.pop();
 
 		lock.unlock();

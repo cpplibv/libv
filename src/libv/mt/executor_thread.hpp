@@ -70,9 +70,9 @@ public:
 
 private:
 	inline void process() {
-		std::function<void()> task;
-
 		while (true) {
+			std::function<void()> task;
+
 			{
 				std::unique_lock lock(queue_m);
 				if (queue.empty())

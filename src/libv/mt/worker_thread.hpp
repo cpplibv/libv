@@ -15,8 +15,10 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
+class impl_worker_thread;
+
 class worker_thread {
-	std::unique_ptr<class impl_worker_thread> self;
+	std::unique_ptr<impl_worker_thread> self;
 
 public:
 	explicit worker_thread(std::string name = "unnamed");
