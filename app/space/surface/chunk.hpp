@@ -51,6 +51,7 @@ struct SurfaceObjectStorage {
 };
 
 class Chunk {
+// no public by defualt unless dumb data (no invariant), add constructor
 public:
 	int size;
 	libv::vec2f position;
@@ -76,7 +77,7 @@ public:
 class ChunkGen {
 private:
 	libv::mt::thread_bulk threads{libv::mt::hardware_concurrency_or(4) - 2};
-	libv::xoroshiro128 range;
+	libv::xoroshiro128 range{123};
 
 	void placeVegetationClustered(Chunk& chunk, const Config& config);
 	void placeVegetationRandom(Chunk& chunk, const Config& config);

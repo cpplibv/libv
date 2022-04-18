@@ -25,7 +25,7 @@
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>
 
-#include <space/surface/surface.hpp>
+#include "space/surface/chunk.hpp"
 
 
 // =================================================================================================

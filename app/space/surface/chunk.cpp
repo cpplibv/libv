@@ -1,12 +1,12 @@
 // Created by dbobula on 1/16/2022.
 
-#include <space/surface/surface.hpp>
+#include <space/surface/chunk.hpp>
 //timer
 #include <libv/noise/noise.hpp>
 #include <iostream>
 #include <memory>
 //libv
-#include <libv/utility/approx.hpp>
+//#include <libv/utility/approx.hpp>
 //#include <libv/math/smoothstep.hpp>
 
 
@@ -14,7 +14,6 @@ namespace surface {
 
 //	ChunkGen::ChunkGen(space::Renderer& renderer):renderer(renderer) {
 ChunkGen::ChunkGen() {
-	range = libv::xoroshiro128(+123);
 }
 
 void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
@@ -22,9 +21,11 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 		placeVegetationRandom(chunk, config);
 	} else if (config.plantDistribution == PlantDistribution::clustered) {
 		placeVegetationClustered(chunk, config);
-	} else throw std::runtime_error("Unknown plant distribution type");
+	} else
+		throw std::runtime_error("Unknown plant distribution type");
 }
 
+// libv.math, templated version
 [[nodiscard]] float fract(float x) {
 	return x - std::floor(x);
 }
@@ -33,6 +34,7 @@ bool isPointInTriangle(libv::vec2f p, float step) {
 	return fract(p.x / step) + fract(p.y / step) < 1;
 }
 
+// could be a Chunk member
 //collusion query
 float getHeight(const libv::vec2f position, const Chunk& chunk) {
 	//	             (1,1)
@@ -68,34 +70,36 @@ float getHeight(const libv::vec2f position, const Chunk& chunk) {
 		return (-1 + u + v) * NE.z + (1 - u) * NW.z + (1 - v) * SE.z;
 }
 
-template <typename DistFn>
-libv::vec3f interpolateNeighbours(float x, float y, DistFn&& ratio, Chunk& chunk, libv::xoroshiro128& range) {
-
-	const auto r1 = ratio(range);
-	const auto r2 = ratio(range);
-	const auto r3 = ratio(range);
-	const auto r4 = ratio(range);
-	const auto point1 = chunk.points(x, y);
-	const auto point2 = chunk.points(x, y + 1);
-	const auto point3 = chunk.points(x + 1, y);
-	const auto point4 = chunk.points(x + 1, y + 1);
-	const auto sum = r1 + r2 + r3 + r4;
-	const auto r1_f = static_cast<float> (r1) / static_cast<float> (sum);
-	const auto r2_f = static_cast<float> (r2) / static_cast<float> (sum);
-	const auto r3_f = static_cast<float> (r3) / static_cast<float> (sum);
-	const auto r4_f = static_cast<float> (r4) / static_cast<float> (sum);
-//		libv::smoothstep();
-	const auto point = point1.point * r1_f + point2.point * r2_f + point3.point * r3_f + point4.point * r4_f;
-	return point;
-}
+//template <typename DistFn>
+//libv::vec3f interpolateNeighbours(float x, float y, DistFn&& ratio, Chunk& chunk, libv::xoroshiro128& range) {
+//
+//	const auto r1 = ratio(range);
+//	const auto r2 = ratio(range);
+//	const auto r3 = ratio(range);
+//	const auto r4 = ratio(range);
+//	const auto point1 = chunk.points(x, y);
+//	const auto point2 = chunk.points(x, y + 1);
+//	const auto point3 = chunk.points(x + 1, y);
+//	const auto point4 = chunk.points(x + 1, y + 1);
+//	const auto sum = r1 + r2 + r3 + r4;
+//	const auto r1_f = static_cast<float> (r1) / static_cast<float> (sum);
+//	const auto r2_f = static_cast<float> (r2) / static_cast<float> (sum);
+//	const auto r3_f = static_cast<float> (r3) / static_cast<float> (sum);
+//	const auto r4_f = static_cast<float> (r4) / static_cast<float> (sum);
+////		libv::smoothstep();
+//	const auto point = point1.point * r1_f + point2.point * r2_f + point3.point * r3_f + point4.point * r4_f;
+//	return point;
+//}
 
 void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 	const auto numQuad = config.resolution;
 	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
+
 	for (const auto& object : config.objects) {
 		SurfaceObjectStorage surfaceObjectStorage;
 		surfaceObjectStorage.type = object.type;
 		surfaceObjectStorage.points.reserve(object.count);
+
 		for (int i = 0; i < object.count; ++i) {
 			const auto x = ratio(range);
 			const auto y = ratio(range);
@@ -141,10 +145,10 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 //	std::cout << "chunk.size: " << chunk.size << std::endl;
 	chunk.points = {numVertex, numVertex};
 
-
 	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
 		const auto size_f = static_cast<float>(numQuad);
+
 		for (int xi = 0; xi < numVertex; ++xi) {
 			const auto xf = static_cast<float>(xi);
 			const auto noise_value = config.rootNode->evaluate(xf / size_f + chunkPosition.x, yf / size_f + chunkPosition.y);
