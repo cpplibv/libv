@@ -10,7 +10,7 @@
 #include <libv/rev/resource/material_loader.hpp>
 #include <libv/rev/resource/model_loader.hpp>
 #include <libv/rev/resource/texture_loader.hpp>
-#include <libv/rev/shader_loader.hpp>
+#include <libv/rev/resource/shader_loader.hpp>
 
 
 namespace libv {

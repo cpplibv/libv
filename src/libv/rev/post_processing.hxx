@@ -13,8 +13,8 @@
 // pro
 #include <libv/rev/fwd.hpp>
 #include <libv/rev/render_target.hpp>
-#include <libv/rev/shader.hpp>
-//#include <libv/rev/base_shader.hpp>
+#include <libv/rev/resource/shader.hpp>
+//#include <libv/rev/resource/shader_base.hpp>
 
 
 namespace libv {

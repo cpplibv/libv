@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/glsl_compose.hpp
+// Project: libv.rev, File: src/libv/rev/glsl/glsl_compose.hpp
 
 #pragma once
 
@@ -10,7 +10,7 @@
 // libv
 #include <libv/utility/function_ref.hpp>
 // pro
-#include <libv/rev/glsl_source_code.hpp>
+#include <libv/rev/glsl/glsl_source_code.hpp>
 
 
 namespace libv {

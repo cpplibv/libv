@@ -1,4 +1,4 @@
-//
+// Project: libv, File: app/codegen/example/cto.out.cpp
 // Generated source code
 // Generator version: v3.0.1
 // Input file: app/codegen/example/cto.lua

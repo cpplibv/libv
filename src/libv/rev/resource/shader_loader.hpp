@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/shader_loader.hpp
+// Project: libv.rev, File: src/libv/rev/resource/shader_loader.hpp
 
 #pragma once
 
@@ -12,8 +12,8 @@
 #include <memory>
 #include <string>
 // pro
-#include <libv/rev/shader.hpp>
-#include <libv/rev/shader_load_event.hpp>
+#include <libv/rev/resource/shader.hpp>
+#include <libv/rev/resource/shader_load_event.hpp>
 
 
 // TODO P5: First load should always load immediately, but reloads could use a small heat-up delay (to not conflict with multiple file saving)

@@ -12,9 +12,9 @@
 #include <mutex>
 #include <vector>
 // pro
-#include <libv/rev/base_shader.hpp>
-#include <libv/rev/glsl_source_loader.hpp>
-#include <libv/rev/shader_load_event.hpp>
+#include <libv/rev/glsl/glsl_source_loader.hpp>
+#include <libv/rev/resource/shader_base.hpp>
+#include <libv/rev/resource/shader_load_event.hpp>
 
 
 namespace libv {

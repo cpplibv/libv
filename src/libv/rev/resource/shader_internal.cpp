@@ -1,14 +1,14 @@
-// Project: libv.rev, File: src/libv/rev/internal_shader.cpp
+// Project: libv.rev, File: src/libv/rev/resource/shader_internal.cpp
 
 // fwd
 #include <libv/rev/fwd.hpp>
 // hpp
-#include <libv/rev/internal_shader.hxx>
+#include <libv/rev/resource/shader_internal.hxx>
 // libv
 #include <libv/algo/slice.hpp>
 #include <libv/utility/ordering.hpp>
 // pro
-#include <libv/rev/internal_shader_loader.hxx>
+#include <libv/rev/resource/shader_loader_internal.hxx>
 
 
 namespace libv {

@@ -10,8 +10,8 @@
 #include <libv/rev/log.hpp>
 #include <libv/rev/resource/material.hpp>
 #include <libv/rev/resource/material_scanner.hpp>
+#include <libv/rev/resource/shader_loader.hpp>
 #include <libv/rev/resource/texture_loader.hpp>
-#include <libv/rev/shader_loader.hpp>
 
 #include <libv/rev/materials/material_red.hpp>
 #include <libv/rev/materials/material_sprite_baker.hpp>

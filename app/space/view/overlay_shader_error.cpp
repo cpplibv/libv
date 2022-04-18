@@ -7,8 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 // libv
-#include <libv/rev/shader.hpp>
-#include <libv/rev/shader_load_event.hpp>
+#include <libv/rev/resource/shader.hpp>
+#include <libv/rev/resource/shader_load_event.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/parse/parse_size.hpp>

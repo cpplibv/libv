@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/shader_load_event.hpp
+// Project: libv.rev, File: src/libv/rev/resource/shader_load_event.hpp
 
 #pragma once
 

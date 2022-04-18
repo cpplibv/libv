@@ -12,8 +12,8 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/rev/shader.hpp>
-#include <libv/rev/shader_loader.hpp>
+#include <libv/rev/resource/shader.hpp>
+#include <libv/rev/resource/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>

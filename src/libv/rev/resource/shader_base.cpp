@@ -1,11 +1,11 @@
-// Project: libv.rev, File: src/libv/rev/base_shader.cpp
+// Project: libv.rev, File: src/libv/rev/resource/shader_base.cpp
 
 // hpp
-#include <libv/rev/shader.hpp>
+#include <libv/rev/resource/shader.hpp>
 // pro
-#include <libv/rev/internal_shader.hxx>
-#include <libv/rev/internal_shader_loader.hxx>
-#include <libv/rev/shader_loader.hpp>
+#include <libv/rev/resource/shader_internal.hxx>
+#include <libv/rev/resource/shader_loader.hpp>
+#include <libv/rev/resource/shader_loader_internal.hxx>
 
 
 namespace libv {

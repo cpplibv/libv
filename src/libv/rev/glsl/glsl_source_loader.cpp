@@ -1,7 +1,7 @@
-// Project: libv.rev, File: src/libv/rev/glsl_source_loader.cpp
+// Project: libv.rev, File: src/libv/rev/glsl/glsl_source_loader.cpp
 
 // hpp
-#include <libv/rev/glsl_source_loader.hpp>
+#include <libv/rev/glsl/glsl_source_loader.hpp>
 // libv
 #include <libv/algo/slice.hpp>
 #include <libv/utility/concat.hpp>
@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <libv/rev/glsl_compose.hpp>
+#include <libv/rev/glsl/glsl_compose.hpp>
 
 
 namespace libv {

@@ -11,7 +11,7 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ResourceManagerSettings {
+struct ResourceLoaderSettings {
 	std::string base_path; /// Relative resource path base
 
 	// bool track_files = true; /// Track every resource and reload resource upon file change
@@ -21,15 +21,15 @@ struct ResourceManagerSettings {
 	// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
 };
 
-struct TextureLoaderSettings : ResourceManagerSettings {
+struct TextureLoaderSettings : ResourceLoaderSettings {
 	//	bool builtin_colors_enabled = true;
 	//	std::string builtin_colors_prefix = "builtin:";
 };
 
 struct Settings {
 	TextureLoaderSettings texture = {"res/texture/"};
-	ResourceManagerSettings shader = {"res/shader/"};
-	ResourceManagerSettings model = {"res/model/"};
+	ResourceLoaderSettings shader = {"res/shader/"};
+	ResourceLoaderSettings model = {"res/model/"};
 };
 
 // -------------------------------------------------------------------------------------------------

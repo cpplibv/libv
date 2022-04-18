@@ -7,7 +7,7 @@
 #include <libv/glr/layout_std140.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/rev/shader.hpp>
+#include <libv/rev/resource/shader.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 
 

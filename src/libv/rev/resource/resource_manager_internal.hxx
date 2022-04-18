@@ -12,7 +12,7 @@
 #include <libv/utility/unique_function.hpp>
 // pro
 #include <libv/rev/log.hpp>
-#include <libv/rev/resource/settings.hpp>
+#include <libv/rev/settings.hpp>
 
 
 namespace libv {

@@ -27,8 +27,8 @@
 
 #include <libv/rev/post_processing.hpp>
 #include <libv/rev/render_target.hpp>
-#include <libv/rev/shader.hpp>
-#include <libv/rev/shader_loader.hpp>
+#include <libv/rev/resource/shader.hpp>
+#include <libv/rev/resource/shader_loader.hpp>
 
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>

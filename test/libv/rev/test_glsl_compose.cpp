@@ -3,7 +3,7 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
-#include <libv/rev/glsl_compose.hpp>
+#include <libv/rev/glsl/glsl_compose.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

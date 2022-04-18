@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/rev/shader.hpp>
+#include <libv/rev/resource/shader.hpp>
 
 
 namespace libv {

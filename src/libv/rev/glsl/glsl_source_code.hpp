@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/glsl_source_code.hpp
+// Project: libv.rev, File: src/libv/rev/glsl/glsl_source_code.hpp
 
 #pragma once
 
@@ -17,7 +17,7 @@ struct GLSLSourceCode {
 	std::map<int, std::string> mappingIndexToFilename;
 
 public:
-	std::string translateErrorMessageFilenames(std::string_view errorMessage) const;
+	[[nodiscard]] std::string translateErrorMessageFilenames(std::string_view errorMessage) const;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -28,13 +28,13 @@
 
 #include <libv/rev/post_processing.hpp>
 #include <libv/rev/render_target.hpp>
-#include <libv/rev/shader.hpp>
-#include <libv/rev/shader_loader.hpp>
+#include <libv/rev/resource/shader.hpp>
+#include <libv/rev/resource/shader_loader.hpp>
 
-#include <libv/rev/resource/resource_manager.hpp>
-#include <libv/rev/resource/settings.hpp>
-#include <libv/rev/resource/texture.hpp>
-#include <libv/rev/resource/model.hpp>
+#include <libv/rev/model.hpp>
+#include <libv/rev/resource_manager.hpp>
+#include <libv/rev/settings.hpp>
+#include <libv/rev/texture.hpp>
 //#include <libv/rev/resource/texture_loader.hpp>
 
 

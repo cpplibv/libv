@@ -21,6 +21,10 @@ libv.rev: Post processing stack
 libv.rev: Tone mapping
 libv.rev: Vignette
 libv.rev: Bloom
+libv.rev: Resources: Models, Materials and Textures
+libv.rev: Move files: internal_ to internal/internal_
+libv.rev: Move files: glsl_ to glsl/glsl_
+libv.rev: Move files: *shader* to resource/*shader*
 
 
 
@@ -52,13 +56,6 @@ libv.rev: Bloom
 
 
 
-
-
-
-libv.rev: Move files: internal_ to internal/internal_
-libv.rev: Move files: glsl_ to glsl/glsl_
-libv.rev: Move files: *shader* to resource/*shader*
-libv.fsw: Rename WatchToken -> Token
 
 
 
@@ -116,7 +113,7 @@ libv.rev: Try to remove shaders (glr program include) from material headers
 
 struct TrackedFile {
 	libv::fsw::Watcher* watcher;
-	libv::fsw::WatchToken token;
+	libv::fsw::Token token;
 	std::string path;
 
 	void update(std::string&& data);

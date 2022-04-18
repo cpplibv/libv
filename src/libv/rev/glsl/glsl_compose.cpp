@@ -1,7 +1,7 @@
-// Project: libv.rev, File: src/libv/rev/glsl_compose.cpp
+// Project: libv.rev, File: src/libv/rev/glsl/glsl_compose.cpp
 
 // hpp
-#include <libv/rev/glsl_compose.hpp>
+#include <libv/rev/glsl/glsl_compose.hpp>
 // ext
 #include <ctre.hpp>
 // libv

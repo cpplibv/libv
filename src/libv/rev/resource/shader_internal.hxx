@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <libv/rev/glsl_source_code.hpp>
+#include <libv/rev/glsl/glsl_source_code.hpp>
 
 
 namespace libv {

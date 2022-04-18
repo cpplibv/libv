@@ -1,7 +1,7 @@
-// Project: libv.rev, File: src/libv/rev/glsl_source_code.cpp
+// Project: libv.rev, File: src/libv/rev/glsl/glsl_source_code.cpp
 
 // hpp
-#include <libv/rev/glsl_source_code.hpp>
+#include <libv/rev/glsl/glsl_source_code.hpp>
 // libv
 #include <libv/algo/slice.hpp>
 #include <libv/range/view_lines_string_view.hpp>
