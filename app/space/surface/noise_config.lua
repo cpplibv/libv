@@ -362,40 +362,40 @@ biomes = {
 			}
 		}
 	},
-	{
-		name = "tropical-rainforest",
-		coord = vec2f(0.2, 0.8),
-		dominance = 1.5,
-
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			--green
-			{0, "hsv(120, 60%, 30%)"},
-			{1, "hsv(120, 60%, 100%)"}
-		},
-		vegetation = {
-			{
-				name = "tree",
-				color = "hsv(120, 60%, 90%)",
-				size = 0.025,
-				probability = 0.2,
-				--fertilityRange = vec2f{0.6, 1.0},
-				--color = "hsv(120, 60%, 100%)",
-
-			},
-			{
-				name = "bush",
-				color = "hsv(129, 60%, 90%)",
-				size = 0.022,
-				probability = 0.2,
-
-
-
-			}
-		}
-	},
+	--{
+	--	name = "tropical-rainforest",
+	--	coord = vec2f(0.2, 0.8),
+	--	dominance = 1.5,
+	--
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		--green
+	--		{0, "hsv(120, 60%, 30%)"},
+	--		{1, "hsv(120, 60%, 100%)"}
+	--	},
+	--	vegetation = {
+	--		{
+	--			name = "tree",
+	--			color = "hsv(120, 60%, 90%)",
+	--			size = 0.025,
+	--			probability = 0.2,
+	--			--fertilityRange = vec2f{0.6, 1.0},
+	--			--color = "hsv(120, 60%, 100%)",
+	--
+	--		},
+	--		{
+	--			name = "bush",
+	--			color = "hsv(129, 60%, 90%)",
+	--			size = 0.022,
+	--			probability = 0.2,
+	--
+	--
+	--
+	--		}
+	--	}
+	--},
 	--{
 	--	name = "tropical-savanna",
 	--	colorGrad = {

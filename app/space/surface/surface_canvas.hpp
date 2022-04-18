@@ -17,11 +17,13 @@
 
 namespace surface {
 inline bool isPolygonFill = true;
+inline bool withVegetation = true;
 inline bool is3DCamera = true;
 inline bool isCameraChanged = true;
-inline bool isTextureChanged = true;
+inline bool hasSceneChanged = true;
 
-enum class HeatMapType {
+enum class SceneType {
+	_3d,
 	height,
 	temperature,
 	humidity,
@@ -31,7 +33,7 @@ enum class HeatMapType {
 	distribution,
 };
 
-inline HeatMapType currentHeatMap = HeatMapType::height;
+inline SceneType currentHeatMap = SceneType::height;
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:

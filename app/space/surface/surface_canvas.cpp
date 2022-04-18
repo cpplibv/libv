@@ -50,8 +50,8 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.state.blendSrc_SourceAlpha();
 	glr.state.blendDst_One_Minus_SourceAlpha();
 
-//	glr.state.enableCullFace();
-	glr.state.disableCullFace();
+	glr.state.enableCullFace();
+//	glr.state.disableCullFace();
 	glr.state.cullBackFace();
 	glr.state.frontFaceCCW();
 
@@ -63,14 +63,9 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 
 	if (is3DCamera) {
 		//TODO: get current position from the other camera type
-//		if (isCameraChanged)
-//			camera3D.look_at(camera2D.position(), libv::vec3f{xy(camera2D.position()),0});
 		glr.projection = camera3D.projection(canvas_size);
 		glr.view = camera3D.view();
 	} else {
-//		camera2D.look_at(camera3D.orbit_point(), libv::vec3f{xy(camera3D.orbit_point()), 0});
-//		if (isCameraChanged)
-//			camera2D.position(camera3D.eye());
 		glr.projection = camera2D.projection(canvas_size);
 		glr.view = camera2D.view();
 
@@ -107,15 +102,15 @@ libv::vector_2D<float> SurfaceCanvas::buildSurfaceTexture() {
 
 libv::glr::Texture SurfaceCanvas::buildTexture(const Chunk& chunk) {
 
-	if (currentHeatMap == HeatMapType::height || currentHeatMap == HeatMapType::biome) {
+	if (currentHeatMap == SceneType::height || currentHeatMap == SceneType::biome) {
 		auto texture = libv::glr::Texture2D::RGBA32F();
 		texture.storage(1, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>());
 		texture.set(libv::gl::MagFilter::Nearest);
 		texture.set(libv::gl::MinFilter::Nearest);
 		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-		if (currentHeatMap == HeatMapType::height)
+		if (currentHeatMap == SceneType::height)
 			texture.image(0, libv::vec2i{0, 0}, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>(), chunk.getColors(chunk.height).data());
-		else if (currentHeatMap == HeatMapType::biome)
+		else if (currentHeatMap == SceneType::biome)
 			texture.image(0, libv::vec2i{0, 0}, chunk.biomeMap.size().cast<int32_t>(), chunk.biomeMap.data());
 
 		return texture;
@@ -125,11 +120,11 @@ libv::glr::Texture SurfaceCanvas::buildTexture(const Chunk& chunk) {
 		texturef.set(libv::gl::MagFilter::Nearest);
 		texturef.set(libv::gl::MinFilter::Nearest);
 //		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-		if (currentHeatMap == HeatMapType::temperature)
+		if (currentHeatMap == SceneType::temperature)
 			texturef.image(0, libv::vec2i{0, 0}, chunk.temperature.size().cast<int32_t>(), chunk.temperature.data());
-		else if (currentHeatMap == HeatMapType::humidity)
+		else if (currentHeatMap == SceneType::humidity)
 			texturef.image(0, libv::vec2i{0, 0}, chunk.humidity.size().cast<int32_t>(), chunk.humidity.data());
-		else if (currentHeatMap == HeatMapType::fertility)
+		else if (currentHeatMap == SceneType::fertility)
 			texturef.image(0, libv::vec2i{0, 0}, chunk.fertility.size().cast<int32_t>(), chunk.fertility.data());
 
 		return texturef;
@@ -145,18 +140,42 @@ void SurfaceCanvas::buildRenderObject(const Chunk& chunk) {
 		const auto heatMap = buildTexture(chunk);
 		renderer.surfaceTexture.addTexture(heatMap, chunk.position);
 	}
+
+	//add features
+	//TODO: only build when necessary
+//	if (withVegetation) {
+		if (config.visualization == Visualization::spheres) {
+			for (const auto& veggie : chunk.veggies) {
+				if (is3DCamera)
+					renderer.debug.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
+				else
+					renderer.debug.add_debug_sphere(libv::vec3f{xy(veggie.pos), -2.5f}, veggie.size, veggie.color, 10, 10);
+			}
+		}
+//	}
+
 }
 
 void SurfaceCanvas::clearRenderObjects() {
 	renderer.surface.clear();
 	renderer.surfaceTexture.clear();
-//	renderer.debug.clear_spheres();
+	renderer.debug.clear_spheres();
+}
+
+void SurfaceCanvas::addGizmo() {
+	renderer.debug.add_debug_sphere(
+			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
+	renderer.debug.add_debug_sphere(
+			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
+	renderer.debug.add_debug_sphere(
+			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
 }
 
 void SurfaceCanvas::buildRenderObjects() {
 	clearRenderObjects();
+	addGizmo();
 
-	if (currentHeatMap == HeatMapType::distribution && !is3DCamera) {
+	if (currentHeatMap == SceneType::distribution && !is3DCamera) {
 		const auto data = buildSurfaceTexture();
 
 		auto texturef = libv::glr::Texture2D::R32F();
@@ -174,22 +193,12 @@ void SurfaceCanvas::buildRenderObjects() {
 	}
 }
 
-void SurfaceCanvas::addGizmo() {
-	renderer.debug.add_debug_sphere(
-			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
-	renderer.debug.add_debug_sphere(
-			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
-	renderer.debug.add_debug_sphere(
-			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
-}
 
 void SurfaceCanvas::buildChunks() {
 	libv::Timer timerChunkGen;
 	ChunkGen chunkGen;
 	auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
 	config = binding.getConfigFromLuaScript(script);
-	clearRenderObjects();
-	renderer.debug.clear_spheres();
 
 	//getChunk, render (availability alapjan)
 	chunks.clear();
@@ -201,24 +210,8 @@ void SurfaceCanvas::buildChunks() {
 		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
 		std::cout << std::endl;
 
-//		renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
-
-		if (currentHeatMap != HeatMapType::distribution)
-			buildRenderObject(chunk);
-
-		//add features
-		if (config.visualization == Visualization::spheres) {
-			for (const auto& veggie : chunk.veggies) {
-				if (is3DCamera)
-					renderer.debug.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
-				else
-					renderer.debug.add_debug_sphere(libv::vec3f{xy(veggie.pos), -2.5f}, veggie.size, veggie.color, 10, 10);
-			}
-		}
 		chunks.emplace_back(std::move(chunk));
 	}
-
-	addGizmo();
 }
 
 
@@ -229,23 +222,18 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		renderTarget.size(canvas_size.cast<int32_t>());
 //		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
-	if (changed || isCameraChanged) {
-		buildChunks();
-		isCameraChanged = false;
-		changed = false;
-	}
 
-	if (isCameraChanged || isTextureChanged) {
+
+	if (isCameraChanged || hasSceneChanged || changed) {
+		std::cout << "is3DCamera: " << is3DCamera << std::endl;
+		if (changed) {
+			buildChunks();
+			changed = false;
+		}
 		buildRenderObjects();
 		isCameraChanged = false;
-		isTextureChanged = false;
+		hasSceneChanged = false;
 	}
-
-//	if (isTextureChanged) {
-//		const auto heatMap = buildTexture(chunk);
-//		renderer.surfaceTexture.addTexture(heatMap, chunk.position);
-//		isTextureChanged = false;
-//	}
 
 	//render surface texture/_3d
 	if (is3DCamera) {
@@ -255,21 +243,22 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	// render plant model/debug
-//	if (is3DCamera) {
-	if (config.visualization == Visualization::model)
-		for (const auto& chunk : chunks) {
-			for (const auto& veggie : chunk.veggies) {
-				const auto m2_guard = glr.model.push_guard();
-				glr.model.translate(veggie.pos);
-				glr.model.scale(veggie.size * 0.01f);
-				glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+	if (withVegetation) {
+		if (config.visualization == Visualization::model)
+			for (const auto& chunk : chunks) {
+				for (const auto& veggie : chunk.veggies) {
+					const auto m2_guard = glr.model.push_guard();
+					glr.model.translate(veggie.pos);
+					glr.model.scale(veggie.size * 0.01f);
+					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
 
-				renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+				}
 			}
-		}
-	else
-		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
-//	}
+		else
+			renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+	}
+
 }
 
 // -------------------------------------------------------------------------------------------------

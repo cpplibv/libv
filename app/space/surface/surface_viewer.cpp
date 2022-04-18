@@ -80,42 +80,48 @@ SurfaceViewer::SurfaceViewer() :
 	ui.attach(frame);
 	ui.add(canvas);
 
-	//switch between triangle fill and wireframe
+	/// switch between triangle fill and wireframe
 	controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
 		isPolygonFill = !isPolygonFill;
 	});
-	//switch between camera 3D and 2D
+	/// switch between camera 3D and 2D
 	controls.feature_action<void>("surface.switch_camera", [](const auto&) {
 		is3DCamera = !is3DCamera;
 		isCameraChanged = true;
 	});
+	/// switch between add vegetation and no vegetation
+	controls.feature_action<void>("surface.switch_vegetation_mode", [](const auto&) {
+		withVegetation = !withVegetation;
+//		isCameraChanged = true;
+	});
 	controls.feature_action<void>("surface.normal_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::height;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::height;
+		hasSceneChanged = true;
 	});
 	controls.feature_action<void>("surface.temperature_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::temperature;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::temperature;
+		hasSceneChanged = true;
 	});
 	controls.feature_action<void>("surface.humidity_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::humidity;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::humidity;
+		hasSceneChanged = true;
 	});
 	controls.feature_action<void>("surface.fertility_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::fertility;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::fertility;
+		hasSceneChanged = true;
 	});
 	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::biome;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::biome;
+		hasSceneChanged = true;
 	});
 	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
-		currentHeatMap = HeatMapType::distribution;
-		isTextureChanged = true;
+		currentHeatMap = SceneType::distribution;
+		hasSceneChanged = true;
 	});
 
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
 	controls.bind("surface.switch_camera", "F3 [press]");
+	controls.bind("surface.switch_vegetation_mode", "F4 [press]");
 	controls.bind("surface.normal_texture", "1 [press]");
 	controls.bind("surface.temperature_texture", "2 [press]");
 	controls.bind("surface.humidity_texture", "3 [press]");
