@@ -20,7 +20,7 @@ namespace fsw {
 class Watcher {
 public:
 	using callback_type = std::function<void(const Event&)>;
-	using token_type = WatchToken;
+	using token_type = Token;
 
 private:
 	std::unique_ptr<class ImplWatcher> self;

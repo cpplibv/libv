@@ -123,7 +123,7 @@ std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_u
 }
 
 void InternalShaderLoader::update_fs() {
-	auto old_tokens = std::vector<libv::fsw::WatchToken>{};
+	auto old_tokens = std::vector<libv::fsw::Token>{};
 
 	while (auto internal_opt = queue_source_reload.pop_optional()) {
 		auto& internal = *internal_opt;

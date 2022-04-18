@@ -24,7 +24,7 @@ namespace rev {
 
 struct InternalIncludedSource {
 	std::string path;
-	libv::fsw::WatchToken fsw_token;
+	libv::fsw::Token fsw_token;
 };
 
 struct InternalShaderStage {
