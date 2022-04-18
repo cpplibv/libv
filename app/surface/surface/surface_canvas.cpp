@@ -1,6 +1,6 @@
 // Created by dbobula on 3/25/2022.
 
-#include <space/surface/surface_canvas.hpp>
+#include <surface/surface/surface_canvas.hpp>
 
 // std
 #include <iostream>
@@ -14,8 +14,8 @@
 //#include <libv/rev/post_processing.hpp>
 
 //space
-#include <space/log.hpp>
-#include <space/surface/chunk.hpp>
+#include <surface/log.hpp>
+#include <surface/surface/chunk.hpp>
 
 
 namespace surface {
@@ -244,18 +244,18 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	// render plant model/debug
 	if (withVegetation) {
-		if (config.visualization == Visualization::model)
-			for (const auto& chunk : chunks) {
-				for (const auto& veggie : chunk.veggies) {
-					const auto m2_guard = glr.model.push_guard();
-					glr.model.translate(veggie.pos);
-					glr.model.scale(veggie.size * 0.01f);
-					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
-
-					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-				}
-			}
-		else
+//		if (config.visualization == Visualization::model)
+//			for (const auto& chunk : chunks) {
+//				for (const auto& veggie : chunk.veggies) {
+//					const auto m2_guard = glr.model.push_guard();
+//					glr.model.translate(veggie.pos);
+//					glr.model.scale(veggie.size * 0.01f);
+//					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+//
+//					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+//				}
+//			}
+//		else
 			renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 	}
 

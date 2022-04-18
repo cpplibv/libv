@@ -7,7 +7,7 @@
 #include <libv/ui/ui.hpp>
 
 //space
-#include <space/view/frame.hpp>
+#include <surface/view/frame.hpp>
 
 
 
@@ -17,13 +17,13 @@ class SurfaceViewer {
 public:
 //	libv::rev::RenderTarget renderTarget;
 //	libv::rev::PostProcessing postProcessing;
-	space::SpaceFrame frame;
+	surface::SurfaceFrame frame;
 	libv::ctrl::Controls controls;
 	libv::ui::UI ui;
 
-//	space::Renderer renderer;
-//	space::CameraPlayer camera;
-//	space::CameraPlayer::screen_picker screen_picker;
+//	surface::Renderer renderer;
+//	surface::CameraPlayer camera;
+//	surface::CameraPlayer::screen_picker screen_picker;
 
 public:
 	SurfaceViewer();

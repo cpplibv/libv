@@ -4,8 +4,8 @@
 #include <filesystem>
 
 // space
-#include <space/log.hpp>
-#include <space/surface/surface_viewer.hpp>
+#include <surface/log.hpp>
+#include <surface/surface/surface_viewer.hpp>
 
 #include <iostream>
 
@@ -13,7 +13,7 @@
 //#include <libv/noise/noise.hpp>
 //#include <libv/utility/random/xoroshiro128.hpp>
 //#include <libv/utility/random/uniform_distribution.hpp>
-//#include <space/view/camera.hpp>
+//#include <surface/view/camera.hpp>
 //#include <libv/meta/resolve.hpp>
 
 
@@ -28,20 +28,20 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 
 	try {
-		space::log_space.info("Hello Surface!");
+		surface::log_surface.info("Hello Surface!");
 
 		// Change working directory
-		if (std::filesystem::exists("app/space/"))
-			std::filesystem::current_path("app/space/");
+		if (std::filesystem::exists("app/surface/"))
+			std::filesystem::current_path("app/surface/");
 		else
-			std::filesystem::current_path("../app/space/"); // During development binary artifacts created under /bin
+			std::filesystem::current_path("../app/surface/"); // During development binary artifacts created under /bin
 
 		// Run the game
 		surface::SurfaceViewer surfaceViewer;
 		surfaceViewer.execute();
 
 	} catch (const std::exception& e) {
-		space::log_space.fatal("Execution failed with an exception: {}", e.what());
+		surface::log_surface.fatal("Execution failed with an exception: {}", e.what());
 		std::cerr << "Execution failed with an exception: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}

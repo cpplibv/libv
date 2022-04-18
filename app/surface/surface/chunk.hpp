@@ -14,9 +14,9 @@
 #include <array>
 #include <map>
 
-#include <space/surface/config.hpp>
-#include <space/surface/biome.hpp>
-#include <space/surface/node.hpp>
+#include <surface/surface/config.hpp>
+#include <surface/surface/biome.hpp>
+#include <surface/surface/node.hpp>
 
 #include <libv/math/gradient.hpp>
 #include <libv/utility/random/xoroshiro128.hpp> // fwdable
@@ -111,13 +111,13 @@ private:
 
 
 
-//	space::Renderer renderer;
+//	surface::Renderer renderer;
 //	sol::state lua;
 //	Config config;
 
 public:
 //	gimme_surface();
-//	explicit ChunkGen(space::Renderer& renderer);
+//	explicit ChunkGen(surface::Renderer& renderer);
 	ChunkGen();
 
 	[[nodiscard]] Chunk generateChunk(const Config& yi, const libv::vec2i chunkPosition);

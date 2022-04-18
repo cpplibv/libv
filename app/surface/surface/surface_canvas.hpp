@@ -8,11 +8,11 @@
 #include <libv/fsw/watcher.hpp>
 
 //space
-#include <space/view/camera.hpp>
-#include <space/view/render/renderer.hpp>
+#include <surface/view/camera.hpp>
+#include <surface/view/render/renderer.hpp>
 
 //surface
-#include <space/surface/lua_binding.hpp>
+#include <surface/surface/lua_binding.hpp>
 
 
 namespace surface {
@@ -38,8 +38,8 @@ inline SceneType currentHeatMap = SceneType::height;
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
 	//scene
-	space::CameraPlayer camera3D;
-	space::CameraOrtho camera2D;
+	surface::CameraPlayer camera3D;
+	surface::CameraOrtho camera2D;
 //	CameraPlayer::screen_picker screen_picker;
 
 private:
@@ -48,7 +48,7 @@ private:
 //	std::vector<libv::glr::Texture2D::RGBA32F> heightMapTextures;
 //	std::mutex mutex;
 	//canvas/rendering/surface
-	space::Renderer renderer;
+	surface::Renderer renderer;
 	//surface
 	std::vector<Chunk> chunks;
 	Config config;

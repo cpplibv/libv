@@ -1,7 +1,7 @@
 // Project: libv, File: app/space/view/render/renderer.cpp
 
 // hpp
-#include <space/view/render/renderer.hpp>
+#include <surface/view/render/renderer.hpp>
 // libv
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
@@ -13,274 +13,15 @@
 #include <libv/utility/read_file.hpp>
 #include <libv/vm4/load.hpp>
 // pro
-//#include <space/view/camera.hpp>
-//#include <space/command.hpp>
-//#include <space/game/game_instance.hpp>
-//#include <space/sim/playout/playout.hpp>
-//#include <space/sim/universe.hpp>
-#include <space/log.hpp>
+//#include <surface/view/camera.hpp>
+//#include <surface/command.hpp>
+//#include <surface/game/game_instance.hpp>
+//#include <surface/sim/playout/playout.hpp>
+//#include <surface/sim/universe.hpp>
+#include <surface/log.hpp>
 
 
-namespace space {
-
-// -------------------------------------------------------------------------------------------------
-
-RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "editor_background.vs", "editor_background.fs") {
-
-	// TODO P1: Switch to blue noise once implemented
-	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
-	const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
-
-	background_texture_pattern.storage(1, noise_size);
-	background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
-	background_texture_pattern.set(libv::gl::MagFilter::Nearest);
-	background_texture_pattern.set(libv::gl::MinFilter::Nearest);
-	background_texture_pattern.set(libv::gl::Wrap::Repeat, libv::gl::Wrap::Repeat);
-
-	{
-		auto position = mesh_background.attribute(attribute_position);
-		auto index = mesh_background.index();
-
-		position(-1, -1, 1);
-		position(1, -1, 1);
-		position(1, 1, 1);
-		position(-1, 1, 1);
-
-		index.quad(0, 1, 2, 3);
-	}
-}
-
-void RendererEditorBackground::render(libv::glr::Queue& glr, libv::vec2f canvas_size) {
-	glr.program(shader.program());
-	const auto bg_noise = libv::vec4f(1, 1, 1, 0) * (5.f / 255.f);
-	const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f);
-	glr.uniform(shader.uniform().render_resolution, canvas_size);
-	glr.uniform(shader.uniform().noise_scale, bg_noise);
-	glr.uniform(shader.uniform().base_color, bg_color);
-	glr.texture(background_texture_pattern, textureChannel_pattern);
-	glr.render(mesh_background);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
-		shader{rctx.shader_loader, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
-}
-
-void RendererCommandArrow::restart_chain(float animation_offset) {
-//	if(!arrows.empty()){
-//		arrows.back().start_of_chain = true;
-//	}
-	curr_animation_offset = animation_offset;
-	curr_start_of_chain = true;
-}
-
-void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style) {
-	if (source == target) // Sanity check
-		return;
-
-	arrows.emplace_back(source, target, curr_animation_offset, style, std::exchange(curr_start_of_chain, false));
-}
-
-void RendererCommandArrow::add_debug_spiral() {
-	restart_chain(0);
-
-	add_arrow({0, 0, 0}, {1, 0.5f, 0.5f}, debug_arrow_style);
-	add_arrow({1, 0.5f, 0.5f}, {1, 1, 0}, debug_arrow_style);
-	add_arrow({1, 1, 0}, {1, 2, 2}, debug_arrow_style);
-	add_arrow({1, 2, 2}, {-1, -1, -1}, debug_arrow_style);
-
-	libv::vec3f prev_point;
-	for (int i = 0; i < 60; i++) {
-		const auto if_ = static_cast<float>(i);
-
-		const auto r = if_ / 30.f;
-		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
-		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
-
-		const auto curr_point = libv::vec3f{x, y, 0};
-		add_arrow(prev_point, curr_point, debug_arrow_style);
-		prev_point = curr_point;
-	}
-	for (int i = 60; i < 120; i++) {
-		const auto if_ = static_cast<float>(i);
-
-		const auto r = 2.f - (if_ - 60.f) / 30.f * 0.5f;
-		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
-		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
-		const auto z = std::sin(libv::deg_to_rad((if_ - 60.f) * 30.f)) * 0.25f;
-
-		const auto curr_point = libv::vec3f{x, y, z};
-		add_arrow(prev_point, curr_point, debug_arrow_style);
-		prev_point = curr_point;
-	}
-}
-
-void RendererCommandArrow::add_debug_view01() {
-	restart_chain(0);
-	for (int i = 0; i < 10; i++) {
-		const auto if_ = static_cast<float>(i);
-
-		add_arrow({5, std::pow(2.f, if_) - 1, 0}, {5, std::pow(2.f, if_ + 1) - 1, 0}, debug_arrow_style);
-	}
-}
-
-void RendererCommandArrow::add_debug_view02() {
-	const auto d = 0.5f;
-	const auto max_n = 30;
-
-	for (int i = 3; i <= max_n; ++i) {
-		const auto if_ = static_cast<float>(i);
-
-		restart_chain(0);
-		for (int j = 0; j < i; ++j) {
-			const auto jf = static_cast<float>(j);
-
-			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
-			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
-			const auto x2 = std::sin(libv::tau / if_ * (jf - 1)) * d;
-			const auto y2 = std::cos(libv::tau / if_ * (jf - 1)) * d;
-			add_arrow({x1 + 3, if_ - 3, y1}, {x2 + 3, if_ - 3, y2}, debug_arrow_style);
-		}
-	}
-}
-
-void RendererCommandArrow::add_debug_view03() {
-	const auto d = 0.5f;
-	const auto max_n = 30;
-
-	for (int i = 3; i <= max_n; ++i) {
-		const auto if_ = static_cast<float>(i);
-
-		restart_chain(0);
-		for (int j = 0; j < i; ++j) {
-			const auto jf = static_cast<float>(j);
-
-			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
-			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
-			add_arrow({x1 + 6, if_ - 3, y1}, {6, if_ - 3, 0}, debug_arrow_style);
-		}
-	}
-}
-
-void RendererCommandArrow::add_debug_view04() {
-	const auto d = 0.5f;
-	const auto max_n = 30;
-
-	for (int i = 3; i <= max_n; ++i) {
-		const auto if_ = static_cast<float>(i);
-
-		restart_chain(0);
-		for (int j = 0; j < i; ++j) {
-			const auto jf = static_cast<float>(j);
-
-			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
-			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
-			add_arrow({9, if_ - 3, 0}, {x1 + 9, if_ - 3, y1}, debug_arrow_style);
-		}
-	}
-}
-
-void RendererCommandArrow::add_debug_view05() {
-	for (int i = 0; i < 100; i++) {
-		const auto if_ = static_cast<float>(i);
-
-		restart_chain(0);
-		add_arrow({10, if_, 0}, {10 + (if_ + 1) * 0.25f, if_, 0}, debug_arrow_style);
-	}
-}
-
-void RendererCommandArrow::rebuild_mesh() {
-	mesh.clear(); // <<< Better support for Dynamic VAO data
-
-	auto position = mesh.attribute(attribute_position);
-	auto color0 = mesh.attribute(attribute_color0);
-	auto sp_ss_cp_cs = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, ChainPosition, ChainSize
-	auto ao_nu_nu_nu = mesh.attribute(attribute_custom1); // AnimationOffset, NotUsed, NotUsed, NotUsed
-	auto index = mesh.index();
-
-	libv::glr::VertexIndex i = 0;
-
-	auto chain_pos = 0.f;
-	auto chain_size = 0.f;
-
-	for (std::size_t j = 0; j < arrows.size(); ++j) {
-		const auto& arrow = arrows[j];
-		const auto length = (arrow.target - arrow.source).length();
-
-		if (arrow.start_of_chain == true) {
-			// TODO P5: Instead of forward scan on rebuild mesh, calculate and assign values on add_arrow() and on start_chain()
-			chain_pos = 0.f;
-			chain_size = length;
-			for (std::size_t k = j + 1; k < arrows.size() && !arrows[k].start_of_chain; ++k) {
-				const auto& a = arrows[k];
-				chain_size += (a.target - a.source).length();
-			}
-		}
-
-		position(arrow.source);
-		position(arrow.target);
-
-		color0(arrow.style.color_source);
-		color0(arrow.style.color_target);
-
-		ao_nu_nu_nu(arrow.animation_offset, 0, 0, 0);
-		ao_nu_nu_nu(arrow.animation_offset, 0, 0, 0);
-
-		sp_ss_cp_cs(0, length, chain_pos, chain_size);
-		sp_ss_cp_cs(length, length, chain_pos + length, chain_size);
-
-		index.line(i + 0, i + 1);
-		i += 2;
-
-		chain_pos += length;
-	}
-
-	arrows.clear();
-
-	//	float chain_length = 0;
-	//	float current_length = 0;
-	//
-	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-	//		chain_length += (b - a).length();
-	//	});
-	//
-	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-	//		const auto length = (b - a).length();
-	//
-	//		sp_ss_tp_ts(0, length, current_length, chain_length);
-	//		sp_ss_tp_ts(length, length, current_length, chain_length);
-	//
-	//		current_length += length;
-	//	});
-}
-
-void RendererCommandArrow::render(libv::glr::Queue& glr, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
-	rebuild_mesh();
-
-	// TODO P2: This will require to re upload to VAO every render
-	//  		but it could be optimized if we give it a 'pretend' start offset
-	//  		single uniform value that adjust the 'fake' starting point (not only the first section could have this)
-	//			This also means VAO update only required on NEW command (SUPER GOOD), every normal render only changes some uniform
-	//			| MAJOR ISSUE: Command arrows that move, like follow would break this system
-	//				Resolution ideas: indirections?, uniform array as coordinates?, VBA update is okey?
-	//			and/or Command arrows could be merged into a single VAO and use sub-meshes to render
-
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
-
-	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.uniform(shader.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
-	glr.uniform(shader.uniform().render_resolution, canvas_size);
-	glr.uniform(shader.uniform().test_mode, global_test_mode);
-	glr.uniform(shader.uniform().time, global_time);
-	glr.render(mesh);
-}
+namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -712,69 +453,33 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 
 // -------------------------------------------------------------------------------------------------
 
-RendererFleet::RendererFleet(RendererResourceContext& rctx) :
-// <<< P2: Model loader
-		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),
-//		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
-//		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
-//		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
-		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
-
-//	log_space.fatal("RendererFleet...");
+//RendererFleet::RendererFleet(RendererResourceContext& rctx) :
+//// <<< P2: Model loader
+//		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),
+////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
+////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
+////		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
+//		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
 //
-//	log_space.fatal("read_file_or_throw...");
-//	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4");
-//	log_space.fatal("load_or_throw...");
-//	auto model_t = libv::vm4::load_or_throw(file);
-//	// !!! exception from here gets silently ignored
-//	log_space.fatal("done...");
+////	log_surface.fatal("RendererFleet...");
+////
+////	log_surface.fatal("read_file_or_throw...");
+////	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4");
+////	log_surface.fatal("load_or_throw...");
+////	auto model_t = libv::vm4::load_or_throw(file);
+////	// !!! exception from here gets silently ignored
+////	log_surface.fatal("done...");
+////
+////	model.emplace(std::move(model_t));
+//}
 //
-//	model.emplace(std::move(model_t));
-}
-
-void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status) {
-	glr.program(shader.program());
-	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
-	glr.uniform(shader.uniform().selected, libv::to_underlying(selection_status));
-
-	model->render(glr, shader, uniform_stream);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-RendererPlanet::RendererPlanet(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "planet.vs", "planet.fs") {
-	build_mesh(mesh);
-}
-
-void RendererPlanet::build_mesh(libv::glr::Mesh& mesh) {
-	auto position = mesh.attribute(attribute_position);
-	auto normal = mesh.attribute(attribute_normal);
-	auto texture0 = mesh.attribute(attribute_texture0);
-	auto index = mesh.index();
-
-	libv::glr::generateSpherifiedCube(12, position, normal, texture0, index);
-	//      libv::glr::generateCube(position, normal, texture0, index);
-}
-
-void RendererPlanet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, const Planet& planet) {
-
-	const auto m_guard = gl.model.push_guard();
-	gl.model.scale(planet.radius);
-
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
-
-	gl.program(shader.program());
-	gl.uniform(shader.uniform().base_color0, planet.color0);
-	gl.uniform(shader.uniform().base_color1, planet.color1);
-//	gl.uniform(shader.uniform().selected, selected);
-	gl.uniform(std::move(uniforms));
-	gl.render(mesh);
-}
+//void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status) {
+//	glr.program(shader.program());
+//	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
+//	glr.uniform(shader.uniform().selected, libv::to_underlying(selection_status));
+//
+//	model->render(glr, shader, uniform_stream);
+//}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -914,6 +619,120 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 
 // -------------------------------------------------------------------------------------------------
 
+RendererSurface::RendererSurface(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
+
+void RendererSurface::addChunk(const surface::Chunk& chunk) {
+	auto position = mesh.attribute(attribute_position);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto index = mesh.index();
+
+	const auto rowSize = chunk.height.size_y();
+	for (unsigned int y = 0; y < rowSize; y++) {
+		for (unsigned int x = 0; x < chunk.height.size_x(); ++x) {
+			position(chunk.height(x, y).pos);
+			color0(chunk.biomeMap(x, y));
+		}
+	}
+
+	for (size_t i = 0; i < rowSize - 1; ++i) {
+		index(vi);
+		const auto colSize = chunk.height.size_x();
+		const auto colSizeVi = static_cast<libv::glr::VertexIndex>(colSize);
+
+		for (size_t j = 0; j < colSize; ++j) {
+			index(vi);
+			index(vi + colSizeVi);
+			vi += 1;
+		}
+		index(vi + colSizeVi - 1);
+	}
+	vi += static_cast<libv::glr::VertexIndex>(rowSize);
+}
+
+void RendererSurface::clear() {
+	mesh.clear();
+	vi = 0;
+}
+
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+
+	glr.program(shader.program());
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+
+RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
+//	build_mesh();
+}
+
+void RendererSurfaceTexture::build_mesh() {
+	auto position = mesh.attribute(attribute_position);
+	auto texture0 = mesh.attribute(attribute_texture0);
+	auto index = mesh.index();
+
+	position(0, 0, 0); //left-down
+	texture0(0, 0);
+
+	position(1, 0, 0); //right-down
+	texture0(1, 0);
+
+	position(1, 1, 0); //right-up
+	texture0(1, 1);
+
+	position(0, 1, 0); //left-up
+	texture0(0, 1);
+
+	index.quad(0, 1, 2, 3);
+}
+
+void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size) {
+	const auto texture_pos = ChunkTexture{texture, chunkPos, size};
+	chunks.emplace_back(texture_pos); //std::move?
+}
+
+void RendererSurfaceTexture::clear() {
+	chunks.clear();
+	mesh.clear();
+}
+
+void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+	build_mesh();
+
+	glr.program(shader.program());
+
+	for (const auto& chunk : chunks) {
+		auto texture = chunk.texture;
+		glr.texture(texture, textureChannel_diffuse);
+
+		auto guard = glr.model.push_guard();
+		glr.model.translate(libv::vec3f{chunk.pos, 0});
+		glr.model.scale({chunk.size, 1});
+
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh);
+	}
+
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Renderer::Renderer(libv::ui::UI& ui) {
 	resource_context.shader_loader.attach_libv_ui_hub(ui.event_hub());
 	text.font = ui.context().font("consola.ttf");
@@ -928,4 +747,4 @@ void Renderer::prepare_for_render(libv::glr::Queue& glr) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace space
+} // namespace surface

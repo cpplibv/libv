@@ -5,8 +5,8 @@
 //ext
 #include <sol/sol.hpp>
 
-#include <space/surface/config.hpp>
-#include <space/surface/node.hpp>
+#include <surface/surface/config.hpp>
+#include <surface/surface/node.hpp>
 
 #include <libv/container/flat_set.hpp>
 

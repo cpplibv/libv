@@ -3,7 +3,7 @@
 #pragma once
 
 // fwd
-#include <space/fwd.hpp>
+#include <surface/fwd.hpp>
 // libv
 #include <libv/ctrl/fwd.hpp>
 #include <libv/glr/attribute.hpp>
@@ -18,12 +18,12 @@
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
-//#include <space/sim/universe.hpp>
-#include <space/sim/fleet.hpp> // For selection status
-#include <space/sim/planet.hpp> // For nothing (yet)
-#include <space/view/camera.hpp>
-#include <space/view/render/model.hpp>
-#include <space/view/render/shaders.hpp>
+//#include <surface/sim/universe.hpp>
+#include <surface/view/camera.hpp>
+//#include <surface/view/render/model.hpp>
+#include <surface/view/render/shaders.hpp>
+
+#include <surface/surface/chunk.hpp>
 
 
 // =================================================================================================
@@ -34,7 +34,7 @@ inline int32_t global_test_mode = 0;
 
 // =================================================================================================
 
-namespace space {
+namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -52,62 +52,6 @@ struct RendererResourceContext {
 };
 
 // -------------------------------------------------------------------------------------------------
-
-struct RendererEditorBackground {
-	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
-	ShaderEditorBackground shader;
-	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-
-	static constexpr libv::vec2i noise_size = {128, 128};
-
-public:
-	explicit RendererEditorBackground(RendererResourceContext& rctx);
-	void render(libv::glr::Queue& glr, libv::vec2f canvas_size);
-};
-
-struct RendererCommandArrow {
-	struct ArrowStyle {
-		libv::vec4f color_source;
-		libv::vec4f color_target;
-//		float size;
-//		Pattern pattern;
-	};
-	struct ArrowData {
-		libv::vec3f source;
-		libv::vec3f target;
-		float animation_offset;
-		ArrowStyle style;
-		bool start_of_chain;
-	};
-
-	float curr_animation_offset = 0.f;
-	bool curr_start_of_chain = true;
-	std::vector<ArrowData> arrows;
-	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StreamDraw};
-	ShaderCommandArrow shader;
-
-public:
-	explicit RendererCommandArrow(RendererResourceContext& rctx);
-
-public:
-	void restart_chain(float animation_offset);
-	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
-
-public:
-	ArrowStyle debug_arrow_style{libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f), libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f)};
-
-	void add_debug_spiral();
-	void add_debug_view01();
-	void add_debug_view02();
-	void add_debug_view03();
-	void add_debug_view04();
-	void add_debug_view05();
-
-public:
-	void rebuild_mesh();
-	void render(libv::glr::Queue& glr, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream);
-};
 
 struct RendererDebug {
 	struct Point {
@@ -218,6 +162,46 @@ public:
 //	void renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
+struct RendererSurface {
+private:
+	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+	ShaderSurface shader;
+	libv::glr::VertexIndex vi = 0;
+//	bool dirty = true;
+
+//	void build_mesh(const std::vector<surface::Chunk>& chunks);
+public:
+	explicit RendererSurface(RendererResourceContext& rctx);
+
+	void addChunk(const surface::Chunk& chunk);
+	void clear();
+//	void addFirstChunk(const surface::Chunk& chunk);
+
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+};
+
+struct RendererSurfaceTexture {
+	struct ChunkTexture {
+		libv::glr::Texture texture;
+		libv::vec2f pos; //down-left corner
+		libv::vec2f size;
+	};
+private:
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	ShaderSurface shader;
+	std::vector<ChunkTexture> chunks;
+
+	void build_mesh();
+public:
+	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size = {1.f, 1.f});
+	void clear();
+//	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
+	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
+
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+};
+
 struct RendererGizmo {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader;
@@ -240,29 +224,16 @@ public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct RendererFleet {
-//	Model model;
-	std::optional<Model> model;
-	ShaderFleet shader;
-
-public:
-	explicit RendererFleet(RendererResourceContext& rctx);
-
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status = Fleet::Selection::notSelected);
-};
-
-struct RendererPlanet {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderPlanet shader;
-
-private:
-	void build_mesh(libv::glr::Mesh& mesh);
-
-public:
-	explicit RendererPlanet(RendererResourceContext& rctx);
-
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Planet& planet);
-};
+//struct RendererFleet {
+////	Model model;
+//	std::optional<Model> model;
+//	ShaderFleet shader;
+//
+//public:
+//	explicit RendererFleet(RendererResourceContext& rctx);
+//
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status = Fleet::Selection::notSelected);
+//};
 
 struct RendererText {
 private:
@@ -306,13 +277,12 @@ public:
 struct Renderer {
 	RendererResourceContext resource_context;
 
-	RendererEditorBackground editorBackground{resource_context};
 	RendererEditorGrid editorGrid{resource_context};
 	RendererGizmo gizmo{resource_context};
 	RendererDebug debug{resource_context};
-	RendererCommandArrow arrow{resource_context};
-	RendererFleet fleet{resource_context};
-	RendererPlanet planet{resource_context};
+//	RendererFleet fleet{resource_context};
+	RendererSurface surface{resource_context};
+	RendererSurfaceTexture surfaceTexture{resource_context};
 	RendererText text{resource_context};
 
 public:
@@ -322,4 +292,4 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace space
+} // namespace surface

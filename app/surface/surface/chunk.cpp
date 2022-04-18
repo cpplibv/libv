@@ -1,6 +1,6 @@
 // Created by dbobula on 1/16/2022.
 
-#include <space/surface/chunk.hpp>
+#include <surface/surface/chunk.hpp>
 
 //ext
 #include <fmt/format.h>
@@ -12,7 +12,7 @@
 #include <iostream>
 #include <memory>
 //space
-#include <space/surface/biome.hpp>
+#include <surface/surface/biome.hpp>
 
 
 namespace surface {

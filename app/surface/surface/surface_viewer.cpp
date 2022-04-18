@@ -1,6 +1,6 @@
 // Created by dbobula on 3/25/2022.
 
-#include <space/surface/surface_viewer.hpp>
+#include <surface/surface/surface_viewer.hpp>
 
 //libv
 #include <libv/ui/settings.hpp>
@@ -9,8 +9,8 @@
 #include <libv/ctrl/feature_register.hpp>
 
 //space
-#include <space/surface/surface_canvas.hpp>
-#include <space/view/camera_control.hpp>
+#include <surface/surface/surface_canvas.hpp>
+#include <surface/view/camera_control.hpp>
 
 
 namespace surface {
@@ -32,10 +32,10 @@ SurfaceViewer::SurfaceViewer() :
 	frame.setSize(1024, 1024);
 	frame.setAlwaysOnTop(true);
 
-	space::CameraControl::register_controls(controls);
-	space::CameraControl::bind_default_controls(controls);
-	space::CameraControl2D::register_controls(controls);
-	space::CameraControl2D::bind_default_controls(controls);
+	surface::CameraControl::register_controls(controls);
+	surface::CameraControl::bind_default_controls(controls);
+	surface::CameraControl2D::register_controls(controls);
+	surface::CameraControl2D::bind_default_controls(controls);
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
 
@@ -51,27 +51,27 @@ SurfaceViewer::SurfaceViewer() :
 	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
 		if (is3DCamera) {
 			if (e.gain()) {
-				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
-				controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
 			} else
-				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
 		} else {
 			if (e.gain()) {
-				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
-				controls.context_enter<space::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
 			} else
-				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
 		}
 	});
 
 	frame.onContextUpdate.output([&](const auto&) {
 		if (isCameraChanged) {
 			if (is3DCamera) {
-				controls.context_leave_if_matches<space::CameraOrtho>(&canvas.object().camera2D);
-				controls.context_enter<space::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
 			} else {
-				controls.context_leave_if_matches<space::BaseCameraOrbit>(&canvas.object().camera3D);
-				controls.context_enter<space::CameraOrtho>(&canvas.object().camera2D);
+				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
 			}
 		}
 	});
