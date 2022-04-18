@@ -70,6 +70,7 @@ struct Config {
 	Mode mode;
 	Visualization visualization;
 	size_t resolution; /// Number of quads/pixels per side
+	size_t numChunks; /// Number of quads/pixels per side
 	float amplitude;
 	PlantDistribution plantDistribution;
 	int circleNumber;

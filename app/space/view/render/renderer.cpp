@@ -861,43 +861,40 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
-void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<surface::Chunk>& chunks) {
+void RendererSurface::build_mesh(libv::glr::Mesh& mesh, const std::vector<surface::Chunk>& chunks) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
-	for (int y = 0; y < chunks.size_y(); ++y) {
-		for (int x = 0; x < chunks.size_x(); ++x) {
-			const auto& chunk = chunks(x, y);
-			const auto rowSize = chunk.points.size_y();
+	for (const auto& chunk : chunks) {
+		const auto rowSize = chunk.points.size_y();
 
-			for (unsigned int i = 0; i < rowSize; i++) {
-				const auto colSize = chunk.points.size_x();
-				for (unsigned int j = 0; j < colSize; ++j) {
-					position(chunk.points(i, j).point);
-					color0(chunk.points(i, j).color);
-				}
+		for (unsigned int i = 0; i < rowSize; i++) {
+			const auto colSize = chunk.points.size_x();
+			for (unsigned int j = 0; j < colSize; ++j) {
+				position(chunk.points(i, j).point);
+				color0(chunk.points(i, j).color);
 			}
+		}
 
 //			index(vi); //to create the chunk jump
-			size_t lastVi;
-			for (int i = 0; i < rowSize - 1; ++i) {
+		size_t lastVi;
+		for (int i = 0; i < rowSize - 1; ++i) {
+			index(vi);
+			const auto colSize = chunk.points.size_x();
+			for (int j = 0; j < colSize; ++j) {
 				index(vi);
-				const auto colSize = chunk.points.size_x();
-				for (int j = 0; j < colSize; ++j) {
-					index(vi);
-					index(vi + colSize);
-					vi += 1;
-				}
-				index(vi + colSize - 1);
-				lastVi = vi + colSize - 1;
-				//index(vi - 1);
+				index(vi + colSize);
+				vi += 1;
 			}
-			vi += rowSize;
-//			index(lastVi); //to create the chunk jump
-//			index(lastVi); //to create the chunk jump
+			index(vi + colSize - 1);
+			lastVi = vi + colSize - 1;
+			//index(vi - 1);
 		}
+		vi += rowSize;
+//			index(lastVi); //to create the chunk jump
+//			index(lastVi); //to create the chunk jump
 	}
 }
 

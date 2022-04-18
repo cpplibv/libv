@@ -30,11 +30,7 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 }
 
 bool isPointInTriangle(libv::vec2f p, float step) {
-	// a-----
-	//  |\  |
-	//  | \ |
-	// b|__>|c
-	return  fract(p.x/step) + fract(p.y/step) < 1;
+	return fract(p.x / step) + fract(p.y / step) < 1;
 }
 
 //collusion query
@@ -63,8 +59,8 @@ float getHeight(const libv::vec2f position, const Chunk& chunk) {
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
 	const auto isPointInNWSWSE = isPointInTriangle(position, step);
 
-	 auto u = fract(position.x / step);
-	 auto v = fract(position.y / step);
+	auto u = fract(position.x / step);
+	auto v = fract(position.y / step);
 
 	if (isPointInNWSWSE)
 		return (1 - u - v) * SW.z + u * SE.z + v * NW.z;
@@ -136,14 +132,13 @@ void ChunkGen::placeVegetationClustered(Chunk& chunk, const Config& config) {
 //	}
 }
 
-
 Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosition) {
 	Chunk chunk;
 	chunk.position = chunkPosition;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;
 	chunk.size = numQuad;
-	std::cout << "chunk.size: " << chunk.size << std::endl;
+//	std::cout << "chunk.size: " << chunk.size << std::endl;
 	chunk.points = {numVertex, numVertex};
 
 

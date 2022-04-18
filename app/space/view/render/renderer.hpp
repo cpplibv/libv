@@ -208,7 +208,7 @@ struct RendererSurface {
 
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
-	void build_mesh(libv::glr::Mesh& mesh, const libv::vector_2D<surface::Chunk>& chunk);
+	void build_mesh(libv::glr::Mesh& mesh, const std::vector<surface::Chunk>& chunk);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);

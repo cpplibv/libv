@@ -74,6 +74,7 @@ generation limit 16ms {seed, center_x, center_y, pregenerated_data} -> chunk
 		multithreading:  ui must remain responsive (one dedicated thread)
 		vector - > dynArray, vector<vector> -> vector_2D
 			surface.hpp Change container for surface points
+		vegetation gen can go parallel but not chunks gen bc we want every worker working on the current chunk which has top prio
 	glsl code gen from lua nodes
 	simd
 model rendering tricks:
@@ -93,7 +94,12 @@ biome heatmaps
 
 More than one chunk
 	DONE: 1. box (3x3)
+
 	2. spiral ( 4096*4096 vertex -> 16*16 256-os chunk, super high resolution chunk max 4db)
+		DONE: spiral(id) -> (x,y)
+		camera pos or camera ray should define first chunk?
+			pos <- mi van ha ott egy hegy az orrod elott?
+			next chunk? distance from camera pos + amerre nez
 	submesh update (chunk spiral scanning update)
 	chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
 		lod illesztes, ne lyukas: patching/vertex merging, skirt

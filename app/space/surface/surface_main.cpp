@@ -34,6 +34,7 @@
 #include <space/view/render/renderer.hpp>
 #include <libv/meta/resolve.hpp>
 #include <libv/fsw/watcher.hpp>
+#include <libv/utility/index_spiral.hpp>
 
 
 namespace surface {
@@ -50,8 +51,7 @@ private:
 //	libv::rev::PostProcessing postProcessing;
 	space::Renderer renderer;
 	libv::glr::Texture2D::RGBA32F heightMap;
-	libv::vector_2D<Chunk> chunks{3, 3};
-//	std::vector<Chunk> chunks;
+	std::vector<Chunk> chunks;
 //	std::mutex mutex;
 	std::atomic<bool> changed = true;
 	SurfaceLuaBinding binding;
@@ -66,15 +66,12 @@ public:
 	//postProcessing(renderer.resource_context.shader_loader, {100, 100})
 	{
 		camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
-//		auto config = binding.getConfigFromLuaScript("surface/noise_config.lua");
-//
 //		heightMap.storage(1, libv::vec2i{config.size, config.size});
 
 		fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event& event) {
 //			auto lock = std::unique_lock(mutex);
 			changed = true;
 		});
-//		renderer.surface.build_mesh(renderer.surface.mesh, surface);
 		//postProcessing.vignetteIntensity(0.15f);
 	}
 
@@ -132,35 +129,34 @@ private:
 			auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
 			config = binding.getConfigFromLuaScript(script);
 			renderer.debug.spheres.clear();
-			for (int i = 0; i < 3; ++i) {
-				for (int j = 0; j < 3; ++j) {
+			chunks.clear();
+			for (int i = 0; i < config.numChunks; ++i) {
+				const auto chunkPosi = libv::index_spiral(i);
+				const auto chunkPos = libv::vec2f(chunkPosi.x, chunkPosi.y);
+				Chunk chunk = chunkGen.generateChunk(config, chunkPos);
+				chunkGen.placeVegetation(chunk, config);
+				fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
+				std::cout << std::endl;
 
-					const auto chunkPos = libv::vec2f{static_cast<float> (i), static_cast<float> (j)};
-					Chunk chunk = chunkGen.generateChunk(config, chunkPos);
-					chunkGen.placeVegetation(chunk, config);
-					fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
-					std::cout << std::endl;
+				renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
+						{{chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10});
 
-					renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-							{{chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10});
-
-					if (config.visualization == Visualization::spheres) { //add features
-						for (const auto& surfaceObjectStorage : chunk.featureList) {
-							for (const auto& point : surfaceObjectStorage.points) {
-								renderer.debug.spheres.emplace_back(point.position, point.size, point.color, 10, 10);
-							}
+				if (config.visualization == Visualization::spheres) { //add features
+					for (const auto& surfaceObjectStorage : chunk.featureList) {
+						for (const auto& point : surfaceObjectStorage.points) {
+							renderer.debug.spheres.emplace_back(point.position, point.size, point.color, 10, 10);
 						}
-//						renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
 					}
-					chunks(i, j) = std::move(chunk);
+//						renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
 				}
+				chunks.emplace_back(std::move(chunk));
 			}
 			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-					{{0.5f, 0, 0}, 0.04f, {1, 0, 0, 1}, 10, 10});
+					{{0.5f, 0, 0}, 0.25f, {1, 0, 0, 1}, 10, 10});
 			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-					{{0, 0.5f, 0}, 0.04f, {0, 1, 0, 1}, 10, 10});
+					{{0, 0.5f, 0}, 0.25f, {0, 1, 0, 1}, 10, 10});
 			renderer.debug.spheres.emplace_back(space::RendererDebug::Sphere
-					{{0, 0, 0.5f}, 0.04f, {0, 0, 1, 1}, 10, 10});
+					{{0, 0, 0.5f}, 0.25f, {0, 0, 1, 1}, 10, 10});
 			renderer.debug.build_triangles_mesh(renderer.debug.mesh_triangle);
 			if (config.mode == Mode::_3d) {
 				renderer.surface.build_mesh(renderer.surface.mesh, chunks);
@@ -181,18 +177,15 @@ private:
 				renderer.surfaceTexture.render(glr, renderer.resource_context.uniform_stream, heightMap);
 		// render plant model
 		if (config.visualization == Visualization::model)
-			for (int i = 0; i < 3; ++i) {
-				for (int j = 0; j < 3; ++j) {
-					const auto& chunk = chunks(i, j);
-					for (const auto& feature : chunk.featureList) {
-						for (const auto& point : feature.points) {
-							const auto m2_guard = glr.model.push_guard();
-							glr.model.translate(point.position);
-							glr.model.scale(point.size * 0.01f);
-							glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+			for (const auto& chunk : chunks) {
+				for (const auto& feature : chunk.featureList) {
+					for (const auto& point : feature.points) {
+						const auto m2_guard = glr.model.push_guard();
+						glr.model.translate(point.position);
+						glr.model.scale(point.size * 0.01f);
+						glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
 
-							renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-						}
+						renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
 					}
 				}
 			}

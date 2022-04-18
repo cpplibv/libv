@@ -62,30 +62,15 @@ std::vector<SurfaceObject> convertSurfaceObjects(const sol::table& solSurfaceObj
 
 void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
 	config.colorGrad = convertColorGradient(luaConfig["colorGrad"]);
-//	config.colorGrad.add(0, {1, 1, 1, 1});
 	config.mode = luaConfig["mode"];
 	config.visualization = luaConfig["visualization"];
 	config.resolution = luaConfig["resolution"];
+	config.numChunks = luaConfig["numChunks"];
 	config.amplitude = luaConfig["amplitude"];
 	config.plantDistribution = luaConfig["plantDistribution"];
 	config.circleNumber = luaConfig["circleNumber"];
 	config.circleSize = luaConfig["circleSize"];
 	config.objects = convertSurfaceObjects(luaConfig["objects"]);
-//	config.treeSize = luaConfig["treeSize"];
-//	config.treeNumber = luaConfig["treeNumber"];
-//	config.treeColor = convertColor(luaConfig["treeColor"]);
-//	config.bushSize = luaConfig["bushSize"];
-//	config.bushNumber = luaConfig["bushNumber"];
-//	config.bushColor = convertColor(luaConfig["bushColor"]);
-//	config.rockSize = luaConfig["rockSize"];
-//	config.rockNumber = luaConfig["rockNumber"];
-//	config.rockColor = convertColor(luaConfig["rockColor"]);
-//	config.colorGrad = luaConfig["colorGrad"];
-//	config.frequency = luaConfig["frequency"];
-//	config.lacunarity = luaConfig["lacunarity"];
-//	config.persistence = luaConfig["persistence"];
-//	config.seed = luaConfig["seed"];
-//	config.noiseType = luaConfig["noiseType"];
 }
 
 libv::gradientf<libv::vec4f> SurfaceLuaBinding::convertColorGradient(const sol::table& table) {
@@ -113,12 +98,12 @@ libv::gradientf<libv::vec4f> SurfaceLuaBinding::convertColorGradient(const sol::
 std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, int depth) {
 	std::vector<std::unique_ptr<Node>> children;
 	for (const auto&[key, value] : table) {
-		std::cout << std::string(depth, '\t');
+//		std::cout << std::string(depth, '\t');
 		if (value.get_type() == sol::type::table) {
-			std::cout << key.as<std::string_view>() << ":" << std::endl;
+//			std::cout << key.as<std::string_view>() << ":" << std::endl;
 			children.emplace_back(getNodeTree(value, depth + 1));
 		} else {
-			std::cout << key.as<std::string_view>() << " = " << value.as<std::string_view>() << std::endl;
+//			std::cout << key.as<std::string_view>() << " = " << value.as<std::string_view>() << std::endl;
 		}
 	}
 
