@@ -925,7 +925,7 @@ void RendererSurface::addChunk(const surface::Chunk& chunk) {
 	for (unsigned int y = 0; y < rowSize; y++) {
 		for (unsigned int x = 0; x < chunk.height.size_x(); ++x) {
 			position(chunk.height(x, y).pos);
-			color0(chunk.height(x, y).color);
+			color0(chunk.biomeMap(x, y));
 		}
 	}
 

@@ -13,7 +13,7 @@ namespace color {
 
 // TODO P5: Refactor color parser to use libv::color
 
-// Converts from pure Hue to linear RGB
+/// Converts from pure Hue to linear RGB
 [[nodiscard]] constexpr inline libv::vec3f hue_to_rgb(float hue) noexcept {
 	float R = std::abs(hue * 6.f - 3.f) - 1.f;
 	float G = 2.f - std::abs(hue * 6.f - 2.f);
@@ -21,16 +21,22 @@ namespace color {
 	return libv::vec::clamp(libv::vec3f(R, G, B), 0.f, 1.f);
 }
 
-// Converts from HSV to linear RGB
+/// Converts from HSV to linear RGB
 [[nodiscard]] constexpr inline libv::vec3f hsv_to_rgb(libv::vec3f hsv) noexcept {
 	libv::vec3f rgb = hue_to_rgb(hsv.x);
 	return ((rgb - 1.f) * hsv.y + 1.f) * hsv.z;
 }
 
-// Converts from HSVA to linear RGBA
+/// Converts from HSVA to linear RGBA
 [[nodiscard]] constexpr inline libv::vec4f hsv_to_rgb(libv::vec4f hsva) noexcept {
 	return {hsv_to_rgb(xyz(hsva)), hsva.w};
 }
+
+/// Converts from RGBA to linear HSVA
+[[nodiscard]] constexpr inline libv::vec3f rgb_to_hsv(libv::vec3f rgba) noexcept;
+
+/// Converts from RGBA to linear HSVA
+[[nodiscard]] constexpr inline libv::vec4f rgb_to_hsv(libv::vec4f rgba) noexcept;
 
 // -------------------------------------------------------------------------------------------------
 

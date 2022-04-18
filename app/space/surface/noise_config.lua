@@ -156,13 +156,15 @@ config = {
 
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
-	resolution = 64,
-	numChunks = 1,
+	resolution = 126,
+	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
+	numChunks = 81,
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,
-	circleNumber = 50,
-	circleSize = 0.01,
+	--circleNumber = 50,
+	--circleSize = 0.01,
+	numVeggie = 100,
 
 --                      /\
 --  COLD|BARREN        /  \ Polar
@@ -261,40 +263,137 @@ biomes = {
 	--		{1, "hsv(130, 60%, 50%)"}
 	--	}
 	--},
+	--{
+	--	name = "temperate-forest",
+	--	coord = vec2f(0.8, 0.8),
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	dominance = 1.8,
+	--
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		--redish brown
+	--		{0, "hsv(10, 50%, 30%)"},
+	--		{1, "hsv(10, 50%, 100%)"}
+	--	},
+	--	vegetation = {
+	--		{
+	--			name = "tree",
+	--			color = "hsv(10, 50%, 90%)",
+	--			size = 0.025,
+	--			probability = 0.85,
+	--			--fertilityRange = vec2f{0.6, 1.0},
+	--			--color = "hsv(120, 60%, 100%)",
+	--
+	--		},
+	--		{
+	--			name = "bush",
+	--			color = "hsv(19, 50%, 90%)",
+	--			size = 0.012,
+	--			probability = 0.15,
+	--
+	--
+	--		}
+	--	}
+	--},
+	--{
+	--	name = "temperate-grassland",
+	--	dominance = 1.0,
+	--	coord = vec2f(0.2, 0.2),
+	--	--radius = 0.05
+	--	--min cut off, max cut off
+	--	cutOff = vec2f(0.1, 0.7),
+	--	colorGrad = {
+	--		--blue
+	--		{0, "hsv(190, 70%, 30%)"},
+	--		{1, "hsv(190, 70%, 100%)"}
+	--	},
+	--	vegetation = {
+	--		{
+	--			name = "tree",
+	--			color = "hsv(190, 70%, 100%)",
+	--			size = 0.05,
+	--			probability = 0.2,
+	--			--fertilityRange = vec2f{0.6, 1.0},
+	--			--color = "hsv(120, 60%, 100%)",
+	--
+	--		},
+	--		{
+	--			name = "bush",
+	--			color = "hsv(199, 70%, 100%)",
+	--			size = 0.02,
+	--			probability = 0.2,
+	--
+	--
+	--
+	--		}
+	--	}
+	--},
 	{
-		name = "temperate-forest",
-		coord = vec2f(1, 1),
+		name = "temperate-grassland-mid",
+		dominance = 1.0,
+		coord = vec2f(0.5, 0.5),
 		--radius = 0.05
 		--min cut off, max cut off
-		dominance = 1.5,
+		cutOff = vec2f(0.1, 0.7),
+		colorGrad = {
+			--blue
+			{0, "hsv(210, 70%, 30%)"},
+			{1, "hsv(210, 70%, 100%)"}
+		},
+		vegetation = {
+			{
+				name = "tree",
+				color = "hsv(210, 70%, 100%)",
+				size = 0.05,
+				probability = 0.2,
+				--fertilityRange = vec2f{0.6, 1.0},
+				--color = "hsv(120, 60%, 100%)",
 
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			{0, "hsv(110, 20%, 27%)"},
-			{1, "hsv(10, 50%, 40%)"}
-		}
-	},
-	{
-		name = "temperate-grassland",
-		dominance = 1.9,
-		coord = vec2f(0, 0),
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
-		colorGrad = {
-			{0, "hsv(140, 20%, 27%)"},
-			{1, "hsv(210, 70%, 40%)"}
+			},
+			{
+				name = "bush",
+				color = "hsv(219, 70%, 100%)",
+				size = 0.02,
+				probability = 0.2,
+
+
+
+			}
 		}
 	},
 	{
 		name = "tropical-rainforest",
-		coord = vec2f(0, 1),
+		coord = vec2f(0.2, 0.8),
+		dominance = 1.5,
+
 		--radius = 0.05
 		--min cut off, max cut off
 		cutOff = vec2f(0.1, 0.7),
 		colorGrad = {
-			{0, "hsv(100, 78%, 2%)"},
-			{1, "hsv(140, 78%, 52%)"}
+			--green
+			{0, "hsv(120, 60%, 30%)"},
+			{1, "hsv(120, 60%, 100%)"}
+		},
+		vegetation = {
+			{
+				name = "tree",
+				color = "hsv(120, 60%, 90%)",
+				size = 0.025,
+				probability = 0.2,
+				--fertilityRange = vec2f{0.6, 1.0},
+				--color = "hsv(120, 60%, 100%)",
+
+			},
+			{
+				name = "bush",
+				color = "hsv(129, 60%, 90%)",
+				size = 0.022,
+				probability = 0.2,
+
+
+
+			}
 		}
 	},
 	--{
@@ -313,14 +412,35 @@ biomes = {
 	--}
 	{
 		name = "desert",
-		coord = vec2f(1, 0),
-		dominance = 2.5,
-		--radius = 0.05
+		coord = vec2f(0.8, 0.2),
+		dominance = 1.0,
+		--radius = 0.025
 		--min cut off, max cut off
 		cutOff = vec2f(0.1, 0.7),
 		colorGrad = {
-			{0, "hsv(110, 20%, 27%)"},
-			{1, "yellow"}
+			--yellow
+			{0, "hsv(60, 80%, 30%)"},
+			{1, "hsv(60, 80%, 100%)"}
+		},
+		vegetation = {
+			{
+				name = "tree",
+				color = "hsv(60, 80%, 100%)",
+				size = 0.025,
+				probability = 0.2,
+				--fertilityRange = vec2f{0.6, 1.0},
+				--color = "hsv(120, 60%, 100%)",
+
+			},
+			{
+				name = "bush",
+				color = "hsv(69, 80%, 100%)",
+				size = 0.022,
+				probability = 0.2,
+
+
+
+			}
 		}
 	},
 }
@@ -368,7 +488,7 @@ height = {
 				simplexFractal {
 					seed = 810,
 					octaves = 6,
-					amplitude = 0.7,
+					amplitude = 0.4,
 					frequency = 0.5,
 					lacunarity = 2.0,
 					persistence = 0.5,
@@ -391,7 +511,7 @@ height = {
 			--	persistence = 0.5,
 			--},
 			constant {
-				value = 0.5
+				value = 0.2
 			},
 			--cellular {
 			--	distanceFn = DistFun.manhattan,
@@ -407,7 +527,7 @@ height = {
 --heatMaps = {
 temperature = {
 	name = "temperature",
-	heightSensitivity = 0.2,
+	heightSensitivity = 5, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
@@ -445,7 +565,7 @@ temperature = {
 }
 humidity = {
 	name = "humidity",
-	heightSensitivity = 0.2,
+	--heightSensitivity = 0.2,
 	colorGrad = {
 		{0.0 , "white"},
 		{1.0 , "blue"}

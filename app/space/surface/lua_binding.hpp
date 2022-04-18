@@ -28,6 +28,8 @@ private:
 //	std::vector<HeatMap> convertHeatMaps(const sol::object& object);
 	static Biome convertBiome(const sol::object& object);
 	static libv::flat_set<Biome> convertBiomes(const sol::object& object);
+	static VeggieType convertVeggieType(const sol::object& object);
+	static std::vector<VeggieType> convertVeggieTypes(const sol::object& object);
 
 public:
 	SurfaceLuaBinding();

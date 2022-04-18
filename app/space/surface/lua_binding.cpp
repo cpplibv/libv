@@ -219,6 +219,24 @@ std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::o
 	return convertArray<SurfaceObject>(object, convertSurfaceObject);
 }
 
+VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	VeggieType result;
+	result.name = table["name"];
+	result.size = table["size"];
+	result.color = convertColor(table.get<sol::object>("color"));
+	result.probability = table["probability"] != sol::type::number ? 1.f : table["probability"];
+//	std::cout << "result.name: " << result.name << std::endl;
+//	std::cout << "result.name: " << result.size << std::endl;
+//	std::cout << "result.name: " << result.color << std::endl;
+	return result;
+}
+
+std::vector<VeggieType> SurfaceLuaBinding::convertVeggieTypes(const sol::object& object) {
+	return convertArray<VeggieType>(object, convertVeggieType);
+}
+
 Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	const auto table = convertTable(object);
 
@@ -228,6 +246,7 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	result.cutOff = table["cutOff"];
 	result.dominance = table["dominance"] != sol::type::number ? 1.f : table["dominance"];
 	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
+	result.vegetation = convertVeggieTypes(table.get<sol::object>("vegetation"));
 
 	return result;
 }
@@ -235,10 +254,6 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 libv::flat_set<Biome> SurfaceLuaBinding::convertBiomes(const sol::object& object) {
 	return convertArraySet<Biome>(object, convertBiome);
 }
-
-//std::vector<HeatMap> SurfaceLuaBinding::convertHeatMaps(const sol::object& object) {
-//	return convertArray<HeatMap>(object, convertHeatMap);
-//}
 
 Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 	const auto table = convertTable(object);
@@ -248,6 +263,7 @@ Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 //	result.currentHeatMap = table["currentHeatMap"];
 	result.resolution = table["resolution"];
 	result.numChunks = table["numChunks"];
+	result.numVeggie = table["numVeggie"];
 	result.amplitude = table["amplitude"];
 	result.plantDistribution = table["plantDistribution"];
 	result.circleNumber = table["circleNumber"];
@@ -255,6 +271,31 @@ Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 	result.objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;
+}
+
+Biome emptyBiome(){
+	Biome result;
+	result.name = "empty";
+	result.coord = {0,0};
+//	result.cutOff = table["cutOff"];
+	result.dominance = 0.0001f;
+	libv::gradientf<libv::vec4f> colorGrad;
+	colorGrad.add(0.f, libv::vec4f{1,1,1,1});
+	colorGrad.add(1.f, libv::vec4f{0,0,0,1});
+
+	result.colorGrad = colorGrad;
+//	result.vegetation = convertVeggieTypes(table["vegetation"]);
+
+	return result;
+}
+
+void extendBiomes(libv::flat_set<Biome> biomes){
+	auto size = biomes.size();
+	while(size < 5){
+		biomes.insert(emptyBiome());
+		size++;
+	}
+//	return biomes;
 }
 
 Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
@@ -283,6 +324,7 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) 
 	result.humidity = convertHeatMap(env.get<sol::object>("humidity"));
 	result.fertility = convertHeatMap(env.get<sol::object>("fertility"));
 	result.biomes = convertBiomes(env.get<sol::object>("biomes"));
+//	extendBiomes(result.biomes);
 
 	return result;
 }

@@ -13,9 +13,9 @@
 #include <space/surface/config.hpp>
 
 #include <cmath>
+#include <optional>
 //std
 #include <iostream>
-
 
 
 namespace surface {
@@ -27,7 +27,7 @@ enum class ForrestType {
 };
 
 
-enum class VeggieType {
+enum class VeggieClass {
 	evergreen,
 	tree,
 	sapling, //facsemete
@@ -37,6 +37,25 @@ enum class VeggieType {
 	fern // pafrany
 // ice, rock, grass
 
+};
+
+
+using VeggieId = int32_t;
+
+class Veggie {
+public:
+	//id
+	VeggieId id;
+	libv::vec3f pos;
+	//vec3 normal vector (up) / kvaternio
+	libv::vec3f normal;
+	float rotation;
+	float height;
+	libv::vec3f hsvDiff;
+
+	VeggieType type;
+	//size
+	//colorDiff
 };
 
 //class WeightedEntry {
@@ -49,6 +68,8 @@ enum class VeggieType {
 //};
 
 class BiomeMix {
+private:
+//	libv::xoroshiro128 rng{123};
 public:
 	struct WeightedEntry {
 		const Biome* biome = nullptr;
@@ -65,16 +86,80 @@ public:
 		return entries[index];
 	}
 
-	[[nodiscard]] inline const Biome& primary()  noexcept {
+	[[nodiscard]] inline const Biome& primary() noexcept {
 		assert(entries[0].biome != nullptr);
-//		assert(entries[1].biome != nullptr);
-		std::ranges::sort(entries, std::greater<>{}, &BiomeMix::WeightedEntry::weight);
-		std::cout << "result[0].biome->name: " << entries[0].biome->name;
-		std::cout << "result[0].weight: " << entries[0].weight << std::endl;
-		std::cout << "result[1].biome->name: " << entries[1].biome->name;
-		std::cout << "result[1].weight: " << entries[1].weight << std::endl;
 		return *entries[0].biome;
 	}
+
+	[[nodiscard]] inline const Biome& random(libv::xoroshiro128& rng) {
+		//TODO: Extract weighted selection algorithm with projection
+		auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
+		auto number = ratio(rng);
+		for (const auto& entry : entries) {
+			if (number <= entry.weight)
+				return *entry.biome;
+			number -= entry.weight;
+		}
+		return primary();
+
+		//TODO: reached error, fix
+		//make_uniform_distribution_inclusive -> exclusive solved it?
+//		throw std::runtime_error("BiomeMix.random() has reached end unexpectedly");
+	}
+
+	[[nodiscard]] inline const libv::vec4f blendedColor(float fertility) noexcept {
+		libv::vec4f result;
+		for (const auto& entry : entries) {
+			if (entry.biome == nullptr) {
+				continue;
+			}
+			result += entry.biome->colorGrad.sample(fertility) * entry.weight;
+		}
+		return result;
+	}
+
+
+//	normalize(probalities)
+//	veggieType=getWeigthedRandom
+//	veggie=makeRandomVeggie(veggieType, biome?, fertility?)
+//	return veggie
+	[[nodiscard]] inline std::optional<VeggieType> getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng) {
+//		float sum = 0.f;
+//		for (const auto & veggieType : biome.vegetation) {
+//			sum += veggieType.probability;
+//		}
+		auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
+		auto number = ratio(rng);
+//		VeggieType result;
+		for (const auto& veggieType : biome.vegetation) {
+			if (number < veggieType.probability) {
+//				result = veggieType;
+				return veggieType;
+			}
+			number -= veggieType.probability;
+		}
+		return std::nullopt;
+//		throw std::runtime_error("BiomeMix.getRandomVeggieType() has reached end unexpectedly");
+	}
+
+	[[nodiscard]] inline std::optional<Veggie> getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng);
+//		if(const auto type = getRandomVeggieType(biome, rng)){
+//			Veggie result;
+//			result.type = type.value();
+//			result.id = ;
+//			result.height = ;
+//
+//			result.hsvDiff = ;
+//			result.rotation = ;
+//		}
+//
+//
+//	}
+//		auto type = getRandomVeggieType(biome, rng);
+//		return Veggie()
+//
+//
+//	}
 //	BiomeMix(std::array<WeightedEntry, 4> candidates_):candidates(candidates_) {};
 
 	//Biome pick();
@@ -94,7 +179,7 @@ public:
 	//[[nodiscard]] Biome categorize(const libv::vec2f point);
 };
 
-////[0,1]
+//[0,1]
 //inline float calculateFertility(float tempStep, float tempBiomeZoneMin, float wetStep, float wetForrestMin,
 //		float height, float temp, float wet,
 //		float fertilityOffset, float heightSensitivity) {

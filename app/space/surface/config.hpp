@@ -67,23 +67,51 @@ struct HeatMap {
 	std::unique_ptr<Node> rootNode;
 };
 
+template <typename T>
+struct Range {
+	T min;
+	T max;
+};
+
+struct VeggieType {
+	std::string name;
+	float probability = 1.0f;
+	float size = 1.0f;
+	libv::vec3f pos;
+	libv::vec4f color;
+
+
+//	Range<float> fertility;
+//	std::string path;
+//	Range<float> height;
+//	//hsv diff color: saturation, value mehet, hue 20-30 fok vec3f(hue, saturation, value)
+//	Range<float> hue;
+//	Range<float> saturation;
+//	Range<float> value;
+
+};
+
 struct Biome {
 	std::string name;
 	libv::vec2f coord;
 	libv::vec2f cutOff;
 	float dominance = 1.f;
 	libv::gradientf<libv::vec4f> colorGrad;
+	std::vector<VeggieType> vegetation;
 
 	friend inline bool operator<(const Biome& lhs, const Biome& rhs) noexcept {
 		return lhs.name < rhs.name;
 	}
+
 	friend inline bool operator<(const Biome& lhs, const std::string& rhs) noexcept {
 		return lhs.name < rhs;
 	}
+
 	friend inline bool operator<(const std::string& lhs, const Biome& rhs) noexcept {
 		return lhs < rhs.name;
 	}
 };
+
 
 
 
@@ -93,6 +121,7 @@ public:
 //	std::string currentHeatMap;
 	size_t resolution; /// Number of quads/pixels per side
 	size_t numChunks; /// Number of quads/pixels per side
+	size_t numVeggie;
 	float amplitude;
 	PlantDistribution plantDistribution;
 	int circleNumber;

@@ -15,6 +15,7 @@
 #include <map>
 
 #include <space/surface/config.hpp>
+#include <space/surface/biome.hpp>
 #include <space/surface/node.hpp>
 
 #include <libv/math/gradient.hpp>
@@ -56,14 +57,28 @@ struct SurfaceObjectStorage {
 	SurfaceObjectType type;
 };
 
+class QueryResult {
+	float height;
+	float temp;
+	float wet;
+	float fertility;
+};
+
+class BiomeCell {
+	libv::vec4f color;
+	Biome config;
+};
+
 // no public by defualt unless dumb data (no invariant), add constructor
 class Chunk {
-public:
-	Chunk(const size_t size_, const libv::vec2f position_);
 private:
 	size_t size;
+//	size_t biomeCellNumber;
+	libv::xoroshiro128 rng;
+
 public:
 	libv::vec2f position;
+//	libv::vector_2D<BiomeCell> biomeMap;
 	libv::vector_2D<libv::vec4f> biomeMap;
 
 	libv::vector_2D<SurfacePoint> height;
@@ -71,10 +86,18 @@ public:
 	libv::vector_2D<float> humidity;
 	libv::vector_2D<float> fertility;
 	libv::vector_2D<float> temp_humidity_distribution;
+//	std::vector<SurfaceObjectStorage> featureList;
+	std::vector<VeggieType> veggies;
 
-	std::vector<SurfaceObjectStorage> featureList;
 public:
+//	Chunk(const size_t size_, const size_t biomeCellNumber_, const libv::vec2f position_);
+	Chunk(const size_t size_, const libv::vec2i index, const libv::vec2f position_);
+public:
+	void placeVegetationClustered(const Config& config);
+	void placeVegetationRandom(const Config& config);
+
 	[[nodiscard]] static float getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap);
+//	[[nodiscard]] float getInterpolatedValue(const libv::vec2f position, const libv::vector_2D<float>& heatMap);
 
 	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
 };
@@ -84,10 +107,9 @@ public:
 class ChunkGen {
 private:
 	libv::mt::thread_bulk threads{libv::mt::hardware_concurrency_or(4) - 2};
-	libv::xoroshiro128 range{123};
+	libv::xoroshiro128 rng{123};
 
-	void placeVegetationClustered(Chunk& chunk, const Config& config);
-	void placeVegetationRandom(Chunk& chunk, const Config& config);
+
 
 //	space::Renderer renderer;
 //	sol::state lua;
@@ -98,7 +120,7 @@ public:
 //	explicit ChunkGen(space::Renderer& renderer);
 	ChunkGen();
 
-	[[nodiscard]] Chunk generateChunk(const Config& yi, const libv::vec2f chunkPosition);
+	[[nodiscard]] Chunk generateChunk(const Config& yi, const libv::vec2i chunkPosition);
 //	[[nodiscard]] libv::vector_2D<TexturePoint> generateTexturePoints();
 	void placeVegetation(Chunk& chunk, const Config& config);
 //		void placeVegetation(const Config& config);

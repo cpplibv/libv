@@ -35,12 +35,14 @@ EPICS:
 		more lua config support
 			template iterate table
 			convert basic stuff
+				convert [optional] number
 			error handling
 		multiple root node
 		vegetation, biomes, planet primary properties from config
 	BIOMES:
 		color palette
 		cellular blend, smooth step, hermit interpolation on edges
+		TODO: global, local dominance
 	VEGETATION:
 		requirement traits (legyen levego, viz alatti)
 		rocks, grass, bushes, trees with fertility requirement

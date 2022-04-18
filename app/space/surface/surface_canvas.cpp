@@ -50,8 +50,8 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.state.blendSrc_SourceAlpha();
 	glr.state.blendDst_One_Minus_SourceAlpha();
 
-	glr.state.enableCullFace();
-//	glr.state.disableCullFace();
+//	glr.state.enableCullFace();
+	glr.state.disableCullFace();
 	glr.state.cullBackFace();
 	glr.state.frontFaceCCW();
 
@@ -156,7 +156,7 @@ void SurfaceCanvas::clearRenderObjects() {
 void SurfaceCanvas::buildRenderObjects() {
 	clearRenderObjects();
 
-	if (currentHeatMap == HeatMapType::distribution && !is3DCamera){
+	if (currentHeatMap == HeatMapType::distribution && !is3DCamera) {
 		const auto data = buildSurfaceTexture();
 
 		auto texturef = libv::glr::Texture2D::R32F();
@@ -167,8 +167,7 @@ void SurfaceCanvas::buildRenderObjects() {
 		texturef.image(0, libv::vec2i{0, 0}, data.size().cast<int32_t>(), data.data());
 
 		renderer.surfaceTexture.addTexture(texturef, {-5.f, -5.f}, {10.f, 10.f});
-	}
-	else {
+	} else {
 		for (const auto& chunk : chunks) {
 			buildRenderObject(chunk);
 		}
@@ -195,24 +194,25 @@ void SurfaceCanvas::buildChunks() {
 	//getChunk, render (availability alapjan)
 	chunks.clear();
 	for (size_t i = 0; i < config.numChunks; ++i) {
-		const auto chunkPos = libv::vec2f(libv::index_spiral(i).cast<float>());
-		Chunk chunk = chunkGen.generateChunk(config, chunkPos);
+		const auto chunkIndex = libv::index_spiral(i).cast<int32_t>();
+		Chunk chunk = chunkGen.generateChunk(config, chunkIndex);
 		chunkGen.placeVegetation(chunk, config);
 		// more log needed
 		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
 		std::cout << std::endl;
 
-		renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
+//		renderer.debug.add_debug_sphere({chunk.position, 0}, 0.1f, {1, 0, 0, 1}, 10, 10);
 
 		if (currentHeatMap != HeatMapType::distribution)
 			buildRenderObject(chunk);
 
 		//add features
 		if (config.visualization == Visualization::spheres) {
-			for (const auto& surfaceObjectStorage : chunk.featureList) {
-				for (const auto& point : surfaceObjectStorage.points) {
-					renderer.debug.add_debug_sphere(point.position, point.size, point.color, 10, 10);
-				}
+			for (const auto& veggie : chunk.veggies) {
+				if (is3DCamera)
+					renderer.debug.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
+				else
+					renderer.debug.add_debug_sphere(libv::vec3f{xy(veggie.pos), -2.5f}, veggie.size, veggie.color, 10, 10);
 			}
 		}
 		chunks.emplace_back(std::move(chunk));
@@ -229,8 +229,9 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		renderTarget.size(canvas_size.cast<int32_t>());
 //		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
-	if (changed) {
+	if (changed || isCameraChanged) {
 		buildChunks();
+		isCameraChanged = false;
 		changed = false;
 	}
 
@@ -254,23 +255,21 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	// render plant model/debug
-	if (is3DCamera) {
-		if (config.visualization == Visualization::model)
-			for (const auto& chunk : chunks) {
-				for (const auto& feature : chunk.featureList) {
-					for (const auto& point : feature.points) {
-						const auto m2_guard = glr.model.push_guard();
-						glr.model.translate(point.position);
-						glr.model.scale(point.size * 0.01f);
-						glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+//	if (is3DCamera) {
+	if (config.visualization == Visualization::model)
+		for (const auto& chunk : chunks) {
+			for (const auto& veggie : chunk.veggies) {
+				const auto m2_guard = glr.model.push_guard();
+				glr.model.translate(veggie.pos);
+				glr.model.scale(veggie.size * 0.01f);
+				glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
 
-						renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-					}
-				}
+				renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
 			}
-		else
-			renderer.debug.render(glr, renderer.resource_context.uniform_stream);
-	}
+		}
+	else
+		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+//	}
 }
 
 // -------------------------------------------------------------------------------------------------
