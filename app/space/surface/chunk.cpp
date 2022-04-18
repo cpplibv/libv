@@ -6,37 +6,29 @@
 #include <iostream>
 #include <memory>
 //libv
-//#include <libv/utility/approx.hpp>
-//#include <libv/math/smoothstep.hpp>
+#include <libv/math/fract.hpp>
 
 
 namespace surface {
-
-//	ChunkGen::ChunkGen(space::Renderer& renderer):renderer(renderer) {
-ChunkGen::ChunkGen() {
-}
-
-void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
-	if (config.plantDistribution == PlantDistribution::random) {
-		placeVegetationRandom(chunk, config);
-	} else if (config.plantDistribution == PlantDistribution::clustered) {
-		placeVegetationClustered(chunk, config);
-	} else
-		throw std::runtime_error("Unknown plant distribution type");
-}
-
-// libv.math, templated version
-[[nodiscard]] float fract(float x) {
-	return x - std::floor(x);
-}
+// -------------------------------------------------------------------------------------------------
 
 bool isPointInTriangle(libv::vec2f p, float step) {
-	return fract(p.x / step) + fract(p.y / step) < 1;
+	return libv::fract(p.x / step) + libv::fract(p.y / step) < 1;
 }
 
-// could be a Chunk member
+// -------------------------------------------------------------------------------------------------
+
+Chunk::Chunk(const size_t size_, const libv::vec2f position_) {
+	size = size_;
+	position = position_;
+	height = libv::vector_2D<SurfacePoint>{size_, size_};
+	temperature = libv::vector_2D<SurfacePoint>{size_, size_};
+	humidity = libv::vector_2D<SurfacePoint>{size_, size_};
+	fertility = libv::vector_2D<SurfacePoint>{size_, size_};
+}
+
 //collusion query
-float getHeight(const libv::vec2f position, const Chunk& chunk) {
+float Chunk::getHeight(const libv::vec2f position) {
 	//	             (1,1)
 	// O    NW O  upY  O NE
 	//       leftX  * rightX
@@ -46,7 +38,7 @@ float getHeight(const libv::vec2f position, const Chunk& chunk) {
 	// |    \  |
 	// O - - - O       O
 	// (0,0)
-	const auto numQuad = (chunk.points.size_x() - 1);
+	const auto numQuad = (height.size_x() - 1);
 	const auto step = 1.f / numQuad;
 
 	const auto leftX = static_cast<int>(std::floor(position.x / step));
@@ -54,15 +46,15 @@ float getHeight(const libv::vec2f position, const Chunk& chunk) {
 	const auto downY = static_cast<int>(std::floor(position.y / step));
 	const auto upY = downY + 1;
 
-	const auto NW = chunk.points(leftX, upY).point;
-	const auto NE = chunk.points(rightX, upY).point;
-	const auto SW = chunk.points(leftX, downY).point;
-	const auto SE = chunk.points(rightX, downY).point;
+	const auto NW = height(leftX, upY).pos;
+	const auto NE = height(rightX, upY).pos;
+	const auto SW = height(leftX, downY).pos;
+	const auto SE = height(rightX, downY).pos;
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
 	const auto isPointInNWSWSE = isPointInTriangle(position, step);
 
-	auto u = fract(position.x / step);
-	auto v = fract(position.y / step);
+	auto u = libv::fract(position.x / step);
+	auto v = libv::fract(position.y / step);
 
 	if (isPointInNWSWSE)
 		return (1 - u - v) * SW.z + u * SE.z + v * NW.z;
@@ -70,26 +62,29 @@ float getHeight(const libv::vec2f position, const Chunk& chunk) {
 		return (-1 + u + v) * NE.z + (1 - u) * NW.z + (1 - v) * SE.z;
 }
 
-//template <typename DistFn>
-//libv::vec3f interpolateNeighbours(float x, float y, DistFn&& ratio, Chunk& chunk, libv::xoroshiro128& range) {
-//
-//	const auto r1 = ratio(range);
-//	const auto r2 = ratio(range);
-//	const auto r3 = ratio(range);
-//	const auto r4 = ratio(range);
-//	const auto point1 = chunk.points(x, y);
-//	const auto point2 = chunk.points(x, y + 1);
-//	const auto point3 = chunk.points(x + 1, y);
-//	const auto point4 = chunk.points(x + 1, y + 1);
-//	const auto sum = r1 + r2 + r3 + r4;
-//	const auto r1_f = static_cast<float> (r1) / static_cast<float> (sum);
-//	const auto r2_f = static_cast<float> (r2) / static_cast<float> (sum);
-//	const auto r3_f = static_cast<float> (r3) / static_cast<float> (sum);
-//	const auto r4_f = static_cast<float> (r4) / static_cast<float> (sum);
-////		libv::smoothstep();
-//	const auto point = point1.point * r1_f + point2.point * r2_f + point3.point * r3_f + point4.point * r4_f;
-//	return point;
-//}
+std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
+	std::vector<libv::vec4f> colors;
+	colors.reserve(points_.size_x() * points_.size_y());
+	for (int y = 0; y < points_.size_y(); ++y) {
+		for (int x = 0; x < points_.size_x(); ++x) {
+			colors.emplace_back(points_(x, y).color);
+		}
+	}
+	return colors;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+ChunkGen::ChunkGen() {}
+
+void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
+	if (config.plantDistribution == PlantDistribution::random) {
+		placeVegetationRandom(chunk, config);
+	} else if (config.plantDistribution == PlantDistribution::clustered) {
+		placeVegetationClustered(chunk, config);
+	} else
+		throw std::runtime_error("Unknown plant distribution type");
+}
 
 void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 	const auto numQuad = config.resolution;
@@ -103,7 +98,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 		for (int i = 0; i < object.count; ++i) {
 			const auto x = ratio(range);
 			const auto y = ratio(range);
-			const auto z = getHeight({x, y}, chunk);
+			const auto z = chunk.getHeight({x, y});
 			surfaceObjectStorage.points.emplace_back(libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}, object.size, object.color);
 		}
 		chunk.featureList.emplace_back(surfaceObjectStorage);
@@ -136,14 +131,36 @@ void ChunkGen::placeVegetationClustered(Chunk& chunk, const Config& config) {
 //	}
 }
 
+//void Chunk::setTexturePoints(const Config& config) {
+//	const auto numQuad = config.resolution;
+//	const auto numVertex = numQuad + 1;
+//
+//	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
+//		const auto yf = static_cast<float>(yi);
+//		const auto size_f = static_cast<float>(numQuad);
+//
+//		for (int xi = 0; xi < numVertex; ++xi) {
+//			const auto xf = static_cast<float>(xi);
+//			const auto noise_value = config.rootNode->evaluate(xf / size_f + position.x, yf / size_f + position.y);
+//			const auto point = libv::vec3f{xf / size_f, yf / size_f, noise_value * 0.1f};
+//			const auto color = config.colorGrad.sample(noise_value);
+//
+//			points(xi, yi) = SurfacePoint{point + libv::vec3f{position, 0}, color};
+//		}
+//	});
+//}
+
 Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosition) {
-	Chunk chunk;
-	chunk.position = chunkPosition;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;
-	chunk.size = numQuad;
-//	std::cout << "chunk.size: " << chunk.size << std::endl;
-	chunk.points = {numVertex, numVertex};
+	Chunk chunk = Chunk(numVertex, chunkPosition);
+
+	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
+		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+		const auto point = libv::vec3f{x, y, noise_value * 0.1f};
+		const auto color = colorGrad.sample(noise_value);
+		return SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
+	};
 
 	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
@@ -151,14 +168,18 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2f chunkPosit
 
 		for (int xi = 0; xi < numVertex; ++xi) {
 			const auto xf = static_cast<float>(xi);
-			const auto noise_value = config.rootNode->evaluate(xf / size_f + chunkPosition.x, yf / size_f + chunkPosition.y);
-			const auto point = libv::vec3f{xf / size_f, yf / size_f, noise_value * 0.1f};
-			const auto color = config.colorGrad.sample(noise_value);
+			const auto x = xf / size_f;
+			const auto y = yf / size_f;
 
-			chunk.points(xi, yi) = SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
+			/// Calculate heatmaps' point
+			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
+			chunk.temperature(xi, yi) = calc(config.temperature.rootNode, config.temperature.colorGrad, x, y);
+			chunk.humidity(xi, yi) = calc(config.humidity.rootNode, config.humidity.colorGrad, x, y);
+			chunk.fertility(xi, yi) = calc(config.fertility.rootNode, config.fertility.colorGrad, x, y);
 		}
 	});
 	return chunk;
 }
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface

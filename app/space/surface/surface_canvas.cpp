@@ -95,7 +95,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
 
-	if (changed || isCameraChanged) {
+	if (changed || isCameraChanged || isTextureChanged) {
 		libv::Timer timerChunkGen;
 		ChunkGen chunkGen;
 		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
@@ -134,7 +134,16 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 				heightMap.set(libv::gl::MagFilter::Nearest);
 				heightMap.set(libv::gl::MinFilter::Nearest);
 				heightMap.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-				heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors().data());
+				if (currentHeatMap == HeatMapType::height) {
+					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.height).data());
+				} else if (currentHeatMap == HeatMapType::temperature) {
+					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.temperature).data());
+				} else if (currentHeatMap == HeatMapType::humidity) {
+					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.humidity).data());
+				} else if (currentHeatMap == HeatMapType::fertility) {
+					heightMap.image(0, libv::vec2i{0, 0}, libv::vec2i{config.resolution + 1, config.resolution + 1}, chunk.getColors(chunk.fertility).data());
+				}
+
 				if (firstChunk) {
 					renderer.surfaceTexture.addFirstTexture(heightMap, chunk.position);
 					firstChunk = false;
@@ -153,6 +162,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 				{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
 		changed = false;
 		isCameraChanged = false;
+		isTextureChanged = false;
 	}
 
 	//render surface texture/_3d
@@ -163,21 +173,23 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	// render plant model/debug
-	if (config.visualization == Visualization::model)
-		for (const auto& chunk : chunks) {
-			for (const auto& feature : chunk.featureList) {
-				for (const auto& point : feature.points) {
-					const auto m2_guard = glr.model.push_guard();
-					glr.model.translate(point.position);
-					glr.model.scale(point.size * 0.01f);
-					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
+	if (is3DCamera) {
+		if (config.visualization == Visualization::model)
+			for (const auto& chunk : chunks) {
+				for (const auto& feature : chunk.featureList) {
+					for (const auto& point : feature.points) {
+						const auto m2_guard = glr.model.push_guard();
+						glr.model.translate(point.position);
+						glr.model.scale(point.size * 0.01f);
+						glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
 
-					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+						renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
+					}
 				}
 			}
-		}
-	else
-		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+		else
+			renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

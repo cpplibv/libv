@@ -14,10 +14,21 @@
 //surface
 #include <space/surface/lua_binding.hpp>
 
+
 namespace surface {
 inline bool isPolygonFill = true;
 inline bool is3DCamera = true;
 inline bool isCameraChanged = true;
+inline bool isTextureChanged = true;
+
+enum class HeatMapType {
+	height,
+	temperature,
+	humidity,
+	fertility
+};
+
+inline HeatMapType currentHeatMap = HeatMapType::height;
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:

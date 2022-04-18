@@ -12,6 +12,7 @@
 
 // std
 #include <array>
+#include <map>
 
 #include <space/surface/config.hpp>
 #include <space/surface/node.hpp>
@@ -24,10 +25,15 @@
 namespace surface {
 
 struct SurfacePoint {
-	libv::vec3f point;
+	libv::vec3f pos;
 	libv::vec4f color;
 //	bool hasTree = false;
 };
+
+//struct TexturePoint {
+//	libv::vec2f pos;
+//	libv::vec4f color;
+//};
 
 struct SurfaceObjectPoint {
 	libv::vec3f position;
@@ -50,26 +56,23 @@ struct SurfaceObjectStorage {
 	SurfaceObjectType type;
 };
 
-class Chunk {
 // no public by defualt unless dumb data (no invariant), add constructor
+class Chunk {
 public:
-	int size;
+	Chunk(const size_t size_, const libv::vec2f position_);
+private:
+	size_t size;
+public:
 	libv::vec2f position;
-//	std::vector<std::vector<SurfacePoint>> points;
-	libv::vector_2D<SurfacePoint> points{256, 256}; //constructor
+	libv::vector_2D<SurfacePoint> height;
+	libv::vector_2D<SurfacePoint> temperature;
+	libv::vector_2D<SurfacePoint> humidity;
+	libv::vector_2D<SurfacePoint> fertility;
 	std::vector<SurfaceObjectStorage> featureList;
+public:
+	float getHeight(const libv::vec2f position);
 
-//	libv::vec4f color;
-	[[nodiscard]]std::vector<libv::vec4f> getColors() const {
-		std::vector<libv::vec4f> colors;
-		colors.reserve(points.size_x() * points.size_y());
-		for (int y = 0; y < points.size_y(); ++y) {
-			for (int x = 0; x < points.size_x(); ++x) {
-				colors.emplace_back(points(x, y).color);
-			}
-		}
-		return colors;
-	}
+	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -91,7 +94,8 @@ public:
 //	explicit ChunkGen(space::Renderer& renderer);
 	ChunkGen();
 
-	Chunk generateChunk(const Config& yi, const libv::vec2f chunkPosition);
+	[[nodiscard]] Chunk generateChunk(const Config& yi, const libv::vec2f chunkPosition);
+//	[[nodiscard]] libv::vector_2D<TexturePoint> generateTexturePoints();
 	void placeVegetation(Chunk& chunk, const Config& config);
 //		void placeVegetation(const Config& config);
 

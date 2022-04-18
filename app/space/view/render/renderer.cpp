@@ -921,17 +921,17 @@ void RendererSurface::addChunk(surface::Chunk& chunk) {
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 
-	const auto rowSize = chunk.points.size_y();
+	const auto rowSize = chunk.height.size_y();
 	for (unsigned int y = 0; y < rowSize; y++) {
-		for (unsigned int x = 0; x < chunk.points.size_x(); ++x) {
-			position(chunk.points(x, y).point);
-			color0(chunk.points(x, y).color);
+		for (unsigned int x = 0; x < chunk.height.size_x(); ++x) {
+			position(chunk.height(x, y).pos);
+			color0(chunk.height(x, y).color);
 		}
 	}
 
 	for (int i = 0; i < rowSize - 1; ++i) {
 		index(vi);
-		const auto colSize = chunk.points.size_x();
+		const auto colSize = chunk.height.size_x();
 		for (int j = 0; j < colSize; ++j) {
 			index(vi);
 			index(vi + colSize);

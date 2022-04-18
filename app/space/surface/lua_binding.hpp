@@ -12,16 +12,19 @@ namespace surface {
 class SurfaceLuaBinding {
 private:
 	sol::state lua;
-	Config config;
+//	Config config;
 
-	void setConfig(const sol::table& luaConfig);
-	libv::gradientf<libv::vec4f> convertColorGradient(const sol::table& table);
+	Config convertConfig(const sol::object& object);
 //	void setFractalConfig(const sol::table& luaConfig);
 
+	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, int depth = 0);
+	static SurfaceObject convertSurfaceObject(const sol::object& object);
+	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
+	static HeatMap convertHeatMap(const sol::object& object);
+//	std::vector<HeatMap> convertHeatMaps(const sol::object& object);
 public:
-	std::unique_ptr<Node> getNodeTree(const sol::table& table, int depth = 0);
 	SurfaceLuaBinding();
-	Config getConfigFromLuaScript(std::string_view script);
+	Config getConfigFromLuaScript(const std::string_view script);
 //	NodeTree getNodeTreeFromLuaScript(std::string_view script);
 };
 

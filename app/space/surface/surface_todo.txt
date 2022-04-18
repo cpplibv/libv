@@ -33,6 +33,9 @@ EPICS:
 		node with multiple return value
 	SURFACE CONFIG:
 		more lua config support
+			template iterate table
+			convert basic stuff
+			error handling
 		multiple root node
 		vegetation, biomes, planet primary properties from config
 	BIOMES:

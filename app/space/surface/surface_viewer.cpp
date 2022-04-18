@@ -87,9 +87,30 @@ SurfaceViewer::SurfaceViewer() :
 		is3DCamera = !is3DCamera;
 		isCameraChanged = true;
 	});
+	controls.feature_action<void>("surface.normal_texture", [](const auto&) {
+		currentHeatMap = HeatMapType::height;
+		isTextureChanged = true;
+	});
+	controls.feature_action<void>("surface.temperature_texture", [](const auto&) {
+		currentHeatMap = HeatMapType::temperature;
+		isTextureChanged = true;
+	});
+	controls.feature_action<void>("surface.humidity_texture", [](const auto&) {
+		currentHeatMap = HeatMapType::humidity;
+		isTextureChanged = true;
+	});
+	controls.feature_action<void>("surface.fertility_texture", [](const auto&) {
+		currentHeatMap = HeatMapType::fertility;
+		isTextureChanged = true;
+	});
 
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
 	controls.bind("surface.switch_camera", "F3 [press]");
+	controls.bind("surface.normal_texture", "1 [press]");
+	controls.bind("surface.temperature_texture", "2 [press]");
+	controls.bind("surface.humidity_texture", "3 [press]");
+	controls.bind("surface.fertility_texture", "4 [press]");
+//	controls.bind("surface.temperature_heat_map", "1 [press]");
 
 //		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {
 //			if (e.keycode == libv::input::Keycode::H) {

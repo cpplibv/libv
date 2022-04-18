@@ -146,26 +146,8 @@ end
 --end
 
 config = {
-	colorGrad = {
-		{-1.0 , "hsv(240, 80%, 20%)"},
-		{-0.01 , "hsv(240, 80%, 60%)"},
-		--{0.0 , "hsv(240, 70%, 99%)"},
-		{0.0 , "hsv(220, 80%, 60%)"},
-		{0.01 , "hsv(60, 80%, 90%)"},
-		{0.05 , "hsv(120, 70%, 75%)"},
-		{0.1 , "hsv(120, 100%, 50%)"},
-		{0.5 , "hsv(120, 100%, 60%)"},
-		{0.6 , "hsv(120, 60%, 60%)"},
-		{1.0 , "hsv(220, 5%, 95%)"},
-		--{key = -2.0 ,value =  "blue"},
-		--{key = 0.0 , value = "yellow"},
-		--{key = 1.0 , value = "green"},
-		--{key = 2.0 , value = "grey"},
-		--[-2.0] = "blue",
-		--[0.0] = "yellow",
-		--[1.0] = "green",
-		--[2.0] = "grey",
-	},
+
+	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
 	resolution = 64,
 	numChunks = 81,
@@ -179,19 +161,19 @@ config = {
 		{
 			type = "tree",
 			size = 0.02,
-			count = 0,
+			count = 60,
 			color = "hsv(120, 70%, 75%)",
 		},
 		{
 			type = "bush",
 			size = 0.012,
-			count = 0,
+			count = 30,
 			color= "hsv(160, 70%, 75%)",
 		},
 		{
 			type = "rock",
 			size = 0.008,
-			count = 0,
+			count = 20,
 			color = "grey",
 		},
 		--{
@@ -205,14 +187,36 @@ config = {
 
 }
 
-nodes =
-	pow{
+height = {
+	name = "height",
+	heightSensitivity = 0.0,
+	colorGrad = {
+		{ -1.0, "hsv(240, 80%, 20%)" },
+		{ -0.01, "hsv(240, 80%, 60%)" },
+		--{0.0 , "hsv(240, 70%, 99%)"},
+		{ 0.0, "hsv(220, 80%, 60%)" },
+		{ 0.01, "hsv(60, 80%, 90%)" },
+		{ 0.05, "hsv(120, 70%, 75%)" },
+		{ 0.1, "hsv(120, 100%, 50%)" },
+		{ 0.5, "hsv(120, 100%, 60%)" },
+		{ 0.6, "hsv(120, 60%, 60%)" },
+		{ 1.0, "hsv(220, 5%, 95%)" },
+		--{key = -2.0 ,value =  "blue"},
+		--{key = 0.0 , value = "yellow"},
+		--{key = 1.0 , value = "green"},
+		--{key = 2.0 , value = "grey"},
+		--[-2.0] = "blue",
+		--[0.0] = "yellow",
+		--[1.0] = "green",
+		--[2.0] = "grey",
+	},
+	nodes = pow {
 		exponent = 2.0,
 		--	}
 		--}
-		add{
+		add {
 			--perlin{},
-			warp{
+			warp {
 				--value = 0.5,
 				seed = 423,
 				octaves = 5,
@@ -248,7 +252,7 @@ nodes =
 			--	lacunarity = 2.0,
 			--	persistence = 0.5,
 			--},
-			constant{
+			constant {
 				value = 0.5
 			},
 			--cellular {
@@ -259,45 +263,67 @@ nodes =
 
 		}
 	}
-
-heatMaps = {
-	temperature = {
-		heightSensitivity = 0.2,
-		simplexFractal {
-			seed = 810,
-			octaves = 6,
-			amplitude = 1,
-			frequency = 0.0015,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		}
-	},
-	humidity = {
-		heightSensitivity = 0.2,
-		simplexFractal {
-			seed = 810,
-			octaves = 6,
-			amplitude = 1,
-			frequency = 0.0015,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		}
-	},
-	fertility = {
-		heightSensitivity = 0.2,
-		simplexFractal {
-			seed = 810,
-			octaves = 6,
-			amplitude = 1,
-			frequency = 0.0015,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		}
-	},
-	hardness = {
-		...
-	}
 }
+
+
+--heatMaps = {
+temperature = {
+	name = "temperature",
+	heightSensitivity = 0.2,
+	colorGrad = {
+		{0.0 , "white"},
+		{1.0 , "blue"}
+	},
+	nodes =
+		simplexFractal {
+			seed = 1,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.15,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+	}
+humidity = {
+	name = "humidity",
+	heightSensitivity = 0.2,
+	colorGrad = {
+		{0.0 , "white"},
+		{1.0 , "gray"}
+	},
+	nodes =
+		simplexFractal {
+			seed = 2,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.15,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+
+}
+fertility =	{
+	name = "fertility",
+	heightSensitivity = 0.2,
+	colorGrad = {
+		{0.0 , "white"},
+		{1.0 , "green"}
+	},
+	nodes =
+		simplexFractal {
+			seed = 3,
+			octaves = 6,
+			amplitude = 1,
+			frequency = 0.15,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		}
+
+}
+	--hardness = {
+	--	...
+	--}
+--}
 
 --option 3
 --NodeTree = {

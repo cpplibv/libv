@@ -18,9 +18,7 @@ public:
 //	libv::rev::RenderTarget renderTarget;
 //	libv::rev::PostProcessing postProcessing;
 	space::SpaceFrame frame;
-
 	libv::ctrl::Controls controls;
-
 	libv::ui::UI ui;
 
 //	space::Renderer renderer;

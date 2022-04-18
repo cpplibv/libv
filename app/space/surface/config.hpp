@@ -59,11 +59,14 @@ struct SurfaceObject {
 struct HeatMap {
 	std::string name;
 	float heightSensitivity;
+//	libv::vec4f color;
+	libv::gradientf<libv::vec4f> colorGrad;
 	std::unique_ptr<Node> rootNode;
 };
 
 struct Config {
 	Visualization visualization;
+//	std::string currentHeatMap;
 	size_t resolution; /// Number of quads/pixels per side
 	size_t numChunks; /// Number of quads/pixels per side
 	float amplitude;
@@ -71,9 +74,12 @@ struct Config {
 	int circleNumber;
 	float circleSize;
 	std::vector<SurfaceObject> objects;
-	libv::gradientf<libv::vec4f> colorGrad;
-	std::unique_ptr<Node> rootNode;
-	std::vector<HeatMap> heatMaps;
+//	libv::gradientf<libv::vec4f> colorGrad;
+//	std::unique_ptr<Node> rootNode;
+	HeatMap height;
+	HeatMap temperature;
+	HeatMap humidity;
+	HeatMap fertility;
 //	std::unique_ptr<Node> heightRootNode;
 //	std::unique_ptr<Node> temperatureOffsetRootNode;
 //	std::unique_ptr<Node> humidityRootNode;

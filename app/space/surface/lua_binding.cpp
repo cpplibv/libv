@@ -1,106 +1,91 @@
 // Created by dbobula on 2/20/2022.
 
-#include <space/surface/lua_binding.hpp>
-
-#include <iostream>
+//libv
 #include <libv/lua/sol_type_to_string.hpp>
 #include <libv/lua/convert_color.hpp>
+//space
+#include <space/surface/lua_binding.hpp>
+//pro
+#include <iostream>
+#include <fmt/format.h>
 
 
 namespace surface {
 
+[[nodiscard]] sol::table convertTable(const sol::object& object) {
+	if (object.get_type() != sol::type::table)
+		throw std::runtime_error(fmt::format("Expected a lua table but received a {}", libv::lua::lua_type_to_string(object.get_type())));
+	return object.as<sol::table>();
+}
+
+[[nodiscard]] libv::vec4f convertColor(const sol::object& object) {
+	const auto color = libv::lua::convert_color(object);
+	if (!color.has_value())
+		throw std::runtime_error("Color given in config couldn't be converted");
+	return color.value();
+}
+
+//TODO: template container
+template <typename T, typename ConvertFn>
+[[nodiscard]] std::vector<T> convertArray(const sol::object& object, ConvertFn convert) {
+	std::vector<T> result;
+	const auto table = convertTable(object);
+	const auto size = table.size();
+	result.reserve(size);
+	for (size_t i = 1; i <= size; ++i) {
+		const auto value = table[i];
+		result.emplace_back(convert(value));
+	}
+	return result;
+}
+
+[[nodiscard]] libv::gradientf<libv::vec4f> convertColorGradient(const sol::object& object) {
+	libv::gradientf<libv::vec4f> colorGrad;
+	const auto table = convertTable(object);
+	for (const auto&[_, keyValue] : table) {
+		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size() != 2)
+			throw std::runtime_error("Invalid colorGrad key-value pair");
+
+		const auto key = keyValue.as<sol::table>()[1];
+		const auto value = keyValue.as<sol::table>()[2];
+		if (key.get_type() != sol::type::number)
+			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::lua_type_to_string(key.get_type())));
+
+		const auto color = convertColor(value);
+		colorGrad.add(key.get<float>(), color);
+	}
+	return colorGrad;
+}
+
 template <typename T>
-void setFractalConfig(T& node, const sol::table& luaConfig) {
-	node.seed = luaConfig["seed"];
-	node.octaves = luaConfig["octaves"];
-	node.amplitude = luaConfig["amplitude"];
-	node.frequency = luaConfig["frequency"];
-	node.lacunarity = luaConfig["lacunarity"];
-	node.persistence = luaConfig["persistence"];
+void setFractalConfig(T& node, const sol::object& object) {
+	const auto table = convertTable(object);
+	node.seed = table["seed"];
+	node.octaves = table["octaves"];
+	node.amplitude = table["amplitude"];
+	node.frequency = table["frequency"];
+	node.lacunarity = table["lacunarity"];
+	node.persistence = table["persistence"];
 //	config.noiseType = luaConfig["noiseType"];
 }
+
+// -------------------------------------------------------------------------------------------------
 
 SurfaceLuaBinding::SurfaceLuaBinding() {
 	lua.open_libraries(sol::lib::base);
 	lua.open_libraries(sol::lib::table);
 	lua.open_libraries(sol::lib::string);
 	lua.open_libraries(sol::lib::math);
-//	lua.open_libraries(sol::lib::math);
-//	std::cout << "scriptStr: " << scriptStr << std::endl;
-//	int x = 0;
-//	lua.set_function("beep", [&x]{ ++x; });
-//		lua.set_function("size", [this](int size) { config.size = size; });
-
-//		std::cout << "luaConfig: " << luaConfig << std::endl;
 }
 
-libv::vec4f convertColor(const sol::object& solColor) {
-	const auto color = libv::lua::convert_color(solColor);
-	if (!color.has_value())
-		throw std::runtime_error("Color given in config couldn't be converted");
-	return color.value();
-}
-
-SurfaceObject convertSurfaceObject(const sol::table& solSurfaceObject) {
-	SurfaceObject result;
-	result.size = solSurfaceObject["size"];
-	result.count = solSurfaceObject["count"];
-	result.color = convertColor(solSurfaceObject["color"]);
-	return result;
-}
-
-std::vector<SurfaceObject> convertSurfaceObjects(const sol::table& solSurfaceObjects) {
-	std::vector<SurfaceObject> result;
-	result.reserve(solSurfaceObjects.size());
-	for (const auto &[key, value] : solSurfaceObjects) {
-		if (value.get_type() != sol::type::table)
-			throw std::runtime_error("Lua type has to be table");
-		result.emplace_back(convertSurfaceObject(value.as<sol::table>()));
-	}
-	return result;
-}
-
-void SurfaceLuaBinding::setConfig(const sol::table& luaConfig) {
-	config.colorGrad = convertColorGradient(luaConfig["colorGrad"]);
-	config.visualization = luaConfig["visualization"];
-	config.resolution = luaConfig["resolution"];
-	config.numChunks = luaConfig["numChunks"];
-	config.amplitude = luaConfig["amplitude"];
-	config.plantDistribution = luaConfig["plantDistribution"];
-	config.circleNumber = luaConfig["circleNumber"];
-	config.circleSize = luaConfig["circleSize"];
-	config.objects = convertSurfaceObjects(luaConfig["objects"]);
-}
-
-libv::gradientf<libv::vec4f> SurfaceLuaBinding::convertColorGradient(const sol::table& table) {
-	libv::gradientf<libv::vec4f> colorGrad;
-	for (const auto&[_, keyValue] : table) {
-		if (keyValue.get_type() != sol::type::table || keyValue.as<sol::table>().size() != 2)
-			throw std::runtime_error("Invalid colorGrad key-value pair");
-
-//		colorGrad.add(12.4f, libv::lua::convert_color(std::string{"magenta"}));
-//if(miniTable. != sol::type::table)
-
-		const auto key = keyValue.as<sol::table>()[1];
-		const auto value = keyValue.as<sol::table>()[2];
-		if (key.get_type() != sol::type::number)
-			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::lua_type_to_string(key.get_type())));
-		const auto color = convertColor(value);
-
-//		std::cout << key.get<std::string_view>() << " = " << value.get<std::string_view>() << std::endl;
-
-		colorGrad.add(key.get<float>(), color);
-	}
-	return colorGrad;
-}
-
-std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, int depth) {
+std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& object, int depth) {
+	const auto table = convertTable(object);
 	std::vector<std::unique_ptr<Node>> children;
 	for (const auto&[key, value] : table) {
 //		std::cout << std::string(depth, '\t');
 		if (value.get_type() == sol::type::table) {
 //			std::cout << key.as<std::string_view>() << ":" << std::endl;
-			children.emplace_back(getNodeTree(value, depth + 1));
+			children.emplace_back(convertNodeTree(value, depth + 1));
 		} else {
 //			std::cout << key.as<std::string_view>() << " = " << value.as<std::string_view>() << std::endl;
 		}
@@ -163,33 +148,85 @@ std::unique_ptr<Node> SurfaceLuaBinding::getNodeTree(const sol::table& table, in
 		throw std::runtime_error("Unknown node type: " + table.as<std::string>());
 }
 
-Config SurfaceLuaBinding::getConfigFromLuaScript(std::string_view script) {
-	auto env = sol::environment(lua, sol::create, lua.globals());
-	lua.script(script, env);
-	sol::table luaNodes = env["nodes"];
-	sol::table luaConfig = env["config"];
-	if (luaNodes.get_type() != sol::type::table)
-		throw std::runtime_error(std::string("Expected lua table with name \"Config\" but received: ") + std::string(libv::lua::lua_type_to_string(luaNodes.get_type())));
-	auto nodes = getNodeTree(luaNodes);
-	config.rootNode = std::move(nodes);
-	setConfig(luaConfig);
-	return std::move(config);
+
+SurfaceObject SurfaceLuaBinding::convertSurfaceObject(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	SurfaceObject result;
+	result.size = table["size"];
+	result.count = table["count"];
+	result.color = convertColor(table["color"]);
+
+	return result;
 }
 
-//NodeTree SurfaceLuaBinding::getNodeTreeFromLuaScript(std::string_view script) {
-////		auto scriptStr = libv::read_file_str_or_throw(filepath);
-//	auto env = sol::environment(lua, sol::create, lua.globals());
-//	lua.script(script, env);
-//	sol::table luaConfig = env["NodeTree"];
-//	if (luaConfig.get_type() != sol::type::table) {
-//		//TODO: log error
-////		return config;
-//		throw std::runtime_error(std::string("Expected lua table with name \"Config\" but received: ") + std::string(libv::lua::lua_type_to_string(luaConfig.get_type())));
-//	}
-//	//getNodeTree(luaConfig);
-//
-//	setConfig(luaConfig);
-//	return config;
+HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	HeatMap result;
+	result.name = table["name"];
+	result.heightSensitivity = table["heightSensitivity"];
+	result.colorGrad = convertColorGradient(table["colorGrad"]);
+	result.rootNode = convertNodeTree(table["nodes"]);
+	std::cout << "result.name: " << result.name << std::endl;
+
+	return result;
+}
+
+std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::object& object) {
+	return convertArray<SurfaceObject>(object, convertSurfaceObject);
+}
+
+//std::vector<HeatMap> SurfaceLuaBinding::convertHeatMaps(const sol::object& object) {
+//	return convertArray<HeatMap>(object, convertHeatMap);
 //}
+
+Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	Config result;
+	result.visualization = table["visualization"];
+//	result.currentHeatMap = table["currentHeatMap"];
+	result.resolution = table["resolution"];
+	result.numChunks = table["numChunks"];
+	result.amplitude = table["amplitude"];
+	result.plantDistribution = table["plantDistribution"];
+	result.circleNumber = table["circleNumber"];
+	result.circleSize = table["circleSize"];
+	result.objects = convertSurfaceObjects(table["objects"]);
+
+	return result;
+}
+
+Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
+	const auto env = sol::environment(lua, sol::create, lua.globals());
+	lua.script(script, env);
+
+	//set config
+	sol::object luaConfig = env["config"];
+	auto result = convertConfig(luaConfig);
+
+	//set rootNode
+//	{
+//		sol::object luaNodes = env["nodes"];
+//		auto nodes = convertNodeTree(luaNodes);
+//		result.rootNode = std::move(nodes);
+//	}
+
+//	//set heatMaps
+//	{
+//		sol::object luaHeatMaps = env["heatMaps"];
+//		auto nodes = convertHeatMaps(luaHeatMaps);
+//		result.heatMaps = std::move(nodes);
+//	}
+	result.height = convertHeatMap(env["height"]);
+	result.temperature = convertHeatMap(env["temperature"]);
+	result.humidity = convertHeatMap(env["humidity"]);
+	result.fertility = convertHeatMap(env["fertility"]);
+
+
+	return std::move(result);
+}
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface

@@ -19,7 +19,7 @@ private:
 	std::vector<T> storage;
 
 public:
-	constexpr inline vector_2D() = delete;
+	constexpr inline vector_2D() = default;
 	constexpr inline vector_2D(const vector_2D&) = default;
 	constexpr inline vector_2D(vector_2D&&) noexcept = default;
 	constexpr inline vector_2D& operator=(const vector_2D&) & = default;
