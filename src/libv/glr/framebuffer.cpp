@@ -9,6 +9,7 @@
 #include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/meta/similar.hpp>
 // std
+#include <span>
 #include <variant>
 // pro
 #include <libv/glr/destroy_queue.hpp>
@@ -60,7 +61,7 @@ public:
 	libv::gl::Framebuffer object;
 	bool dirty = true;
 
-	boost::container::small_vector<Attachment, 2> attachments; /// Pending attachments
+	boost::container::small_vector<Attachment, 2> pendingAttachments; /// Pending attachments
 
 private:
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
@@ -129,11 +130,20 @@ void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 			else
 				gl(object).attach_read3D(a.attachment, AttorneyRemoteTexture::sync_no_bind(a.texture, gl, remote_), a.level, a.layer);
 		}
+
+		return a.attachment;
 	};
 
-	for (Attachment& attachment : attachments)
-		std::visit(visitor, attachment);
-	attachments.clear();
+	std::size_t drawAttachmentCount = 0;
+	libv::gl::Attachment drawAttachments[19];
+	for (Attachment& item : pendingAttachments) {
+		const auto attachmentCode = std::visit(visitor, item);
+		if (attachmentCode != libv::gl::Attachment::Depth && attachmentCode != libv::gl::Attachment::DepthStencil)
+			drawAttachments[drawAttachmentCount++] = attachmentCode;
+	}
+	pendingAttachments.clear();
+
+	gl(object).drawBuffers(std::span<libv::gl::Attachment>(drawAttachments, drawAttachmentCount));
 
 	dirty = false;
 }
@@ -170,27 +180,27 @@ Framebuffer::Framebuffer() noexcept :
 	remote(std::make_shared<RemoteFramebuffer>()) { }
 
 void Framebuffer::attach(libv::gl::Attachment attachment, Renderbuffer renderbuffer) noexcept {
-	remote->attachments.emplace_back(std::in_place_type<RemoteFramebuffer::AttachmentR>, attachment, std::move(renderbuffer));
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::AttachmentR>, attachment, std::move(renderbuffer));
 	remote->dirty = true;
 }
 
 void Framebuffer::attach1D(libv::gl::Attachment attachment, Texture texture, int32_t level) noexcept {
-	remote->attachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment1D>, attachment, std::move(texture), level);
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment1D>, attachment, std::move(texture), level);
 	remote->dirty = true;
 }
 
 void Framebuffer::attach2D(libv::gl::Attachment attachment, Texture texture, int32_t level) noexcept {
-	remote->attachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2D>, attachment, std::move(texture), level);
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2D>, attachment, std::move(texture), level);
 	remote->dirty = true;
 }
 
 void Framebuffer::attach2D(libv::gl::Attachment attachment, Texture texture, libv::gl::CubeSide side, int32_t level) noexcept {
-	remote->attachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2DCube>, attachment, std::move(texture), side, level);
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2DCube>, attachment, std::move(texture), side, level);
 	remote->dirty = true;
 }
 
 void Framebuffer::attach3D(libv::gl::Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
-	remote->attachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment3D>, attachment, std::move(texture), level, layer);
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment3D>, attachment, std::move(texture), level, layer);
 	remote->dirty = true;
 }
 
