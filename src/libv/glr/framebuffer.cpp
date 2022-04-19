@@ -61,6 +61,9 @@ public:
 	libv::gl::Framebuffer object;
 	bool dirty = true;
 
+	std::size_t drawAttachmentCount = 0;
+	libv::gl::Attachment drawAttachments[8];
+
 	boost::container::small_vector<Attachment, 2> pendingAttachments; /// Pending attachments
 
 private:
@@ -74,6 +77,11 @@ public:
 	void bind(libv::gl::GL& gl, Remote& remote_) noexcept;
 	void bind_draw(libv::gl::GL& gl, Remote& remote_) noexcept;
 	void bind_read(libv::gl::GL& gl, Remote& remote_) noexcept;
+
+	void use_draw_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
+	void use_read_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
+	void reset_draw_buffer(libv::gl::GL& gl) noexcept;
+	void reset_read_buffer(libv::gl::GL& gl) noexcept;
 
 public:
 	~RemoteFramebuffer() noexcept;
@@ -134,16 +142,17 @@ void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		return a.attachment;
 	};
 
-	std::size_t drawAttachmentCount = 0;
-	libv::gl::Attachment drawAttachments[19];
 	for (Attachment& item : pendingAttachments) {
 		const auto attachmentCode = std::visit(visitor, item);
-		if (attachmentCode != libv::gl::Attachment::Depth && attachmentCode != libv::gl::Attachment::DepthStencil)
+		if (attachmentCode != libv::gl::Attachment::Depth && attachmentCode != libv::gl::Attachment::DepthStencil) {
+			assert(drawAttachmentCount < 8);
 			drawAttachments[drawAttachmentCount++] = attachmentCode;
+		}
 	}
 	pendingAttachments.clear();
 
-	gl(object).drawBuffers(std::span<libv::gl::Attachment>(drawAttachments, drawAttachmentCount));
+	if constexpr (Both || Draw)
+		gl(object).drawBuffers(std::span<libv::gl::Attachment>(drawAttachments, drawAttachmentCount));
 
 	dirty = false;
 }
@@ -167,6 +176,22 @@ void RemoteFramebuffer::bind_read(libv::gl::GL& gl, Remote& remote_) noexcept {
 		update<false, false, true>(gl, remote_);
 	else
 		gl(object).bind_read();
+}
+
+void RemoteFramebuffer::use_draw_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+	gl(object).drawBuffer(attachment);
+}
+
+void RemoteFramebuffer::use_read_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+	gl(object).readBuffer(attachment);
+}
+
+void RemoteFramebuffer::reset_draw_buffer(libv::gl::GL& gl) noexcept {
+	gl(object).drawBuffers(std::span<libv::gl::Attachment>(drawAttachments, drawAttachmentCount));
+}
+
+void RemoteFramebuffer::reset_read_buffer(libv::gl::GL& gl) noexcept {
+	gl(object).readBuffer(libv::gl::Attachment::Color0);
 }
 
 RemoteFramebuffer::~RemoteFramebuffer() noexcept {
@@ -206,6 +231,12 @@ void Framebuffer::attach3D(libv::gl::Attachment attachment, Texture texture, int
 
 // -------------------------------------------------------------------------------------------------
 
+libv::gl::Framebuffer& Framebuffer::out_of_order_gl() {
+	return remote->object;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void AttorneyRemoteFramebuffer::bind(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
 	framebuffer.remote->bind(gl, remote_);
 }
@@ -216,6 +247,22 @@ void AttorneyRemoteFramebuffer::bind_draw(const Framebuffer& framebuffer, libv::
 
 void AttorneyRemoteFramebuffer::bind_read(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
 	framebuffer.remote->bind_read(gl, remote_);
+}
+
+void AttorneyRemoteFramebuffer::use_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+	framebuffer.remote->use_draw_buffer(gl, attachment);
+}
+
+void AttorneyRemoteFramebuffer::use_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+	framebuffer.remote->use_read_buffer(gl, attachment);
+}
+
+void AttorneyRemoteFramebuffer::reset_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept {
+	framebuffer.remote->reset_draw_buffer(gl);
+}
+
+void AttorneyRemoteFramebuffer::reset_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept {
+	framebuffer.remote->reset_read_buffer(gl);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -98,6 +98,12 @@ public:
 private:
 	void sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
 	void sync_might_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
+
+public:
+	[[nodiscard]] libv::gl::Texture out_of_order_gl() const noexcept {
+		auto& head = *static_cast<RemoteTextureHead*>(static_cast<void*>(remote.get()));
+		return head.texture;
+	}
 };
 
 struct AttorneyRemoteTexture {

@@ -76,8 +76,24 @@ public:
 
 public:
 	void viewport(libv::vec2i position, libv::vec2i size);
-	libv::vec2i viewport_position() const;
-	libv::vec2i viewport_size() const;
+
+	[[nodiscard]] inline auto viewport_guard(libv::vec2i position, libv::vec2i size) {
+		const auto vp = viewport_position();
+		const auto vs = viewport_size();
+		viewport(position, size);
+		return libv::guard([this, vp, vs] {
+			viewport(vp, vs);
+		});
+	}
+	[[nodiscard]] inline auto viewport_guard() {
+		const auto vp = viewport_position();
+		const auto vs = viewport_size();
+		return libv::guard([this, vp, vs] {
+			viewport(vp, vs);
+		});
+	}
+	[[nodiscard]] libv::vec2i viewport_position() const;
+	[[nodiscard]] libv::vec2i viewport_size() const;
 
 public:
 	void framebuffer(Framebuffer framebuffer);
@@ -89,7 +105,9 @@ public:
 
 public:
 	void blit(Framebuffer src, Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
+	void blit(Framebuffer src, Framebuffer dst, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::gl::Attachment dst_att, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
 	void blit_to_default(Framebuffer src, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
+	void blit_to_default(Framebuffer src, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
 	void blit_from_default(Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
 	void blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
 

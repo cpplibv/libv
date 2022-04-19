@@ -282,6 +282,8 @@ struct QueueTaskBlit {
 	SequenceNumber sequenceNumber;
 	std::optional<Framebuffer> framebuffer_src;
 	std::optional<Framebuffer> framebuffer_dst;
+	std::optional<libv::gl::Attachment> attachment_src;
+	std::optional<libv::gl::Attachment> attachment_dst;
 	libv::vec2i src_pos;
 	libv::vec2i src_size;
 	libv::vec2i dst_pos;
@@ -309,7 +311,17 @@ struct QueueTaskBlit {
 			AttorneyRemoteFramebuffer::bind_draw(*framebuffer_dst, gl, remote);
 		}
 
+		if (attachment_src && framebuffer_src)
+			AttorneyRemoteFramebuffer::use_read_buffer(*framebuffer_src, gl, *attachment_src);
+		if (attachment_dst && framebuffer_dst)
+			AttorneyRemoteFramebuffer::use_draw_buffer(*framebuffer_dst, gl, *attachment_dst);
+
 		gl.blit(src_pos, src_size, dst_pos, dst_size, mask, filter);
+
+		if (attachment_src && framebuffer_src)
+			AttorneyRemoteFramebuffer::reset_read_buffer(*framebuffer_src, gl);
+		if (attachment_dst && framebuffer_dst)
+			AttorneyRemoteFramebuffer::reset_draw_buffer(*framebuffer_dst, gl);
 
 		gl.framebuffer_read(previous_read);
 		gl.framebuffer_draw(previous_draw);
@@ -468,25 +480,37 @@ void Queue::framebuffer_read_default() {
 
 void Queue::blit(Framebuffer src, Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
 	sequencePoint();
-	self->add<QueueTaskBlit>(std::move(src), std::move(dst), src_pos, src_size, dst_pos, dst_size, mask, filter);
+	self->add<QueueTaskBlit>(std::move(src), std::move(dst), std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+	sequencePoint();
+}
+
+void Queue::blit(Framebuffer src, Framebuffer dst, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::gl::Attachment dst_att, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+	sequencePoint();
+	self->add<QueueTaskBlit>(std::move(src), std::move(dst), src_att, dst_att, src_pos, src_size, dst_pos, dst_size, mask, filter);
 	sequencePoint();
 }
 
 void Queue::blit_to_default(Framebuffer src, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
 	sequencePoint();
-	self->add<QueueTaskBlit>(std::move(src), std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+	self->add<QueueTaskBlit>(std::move(src), std::nullopt, std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+	sequencePoint();
+}
+
+void Queue::blit_to_default(Framebuffer src, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+	sequencePoint();
+	self->add<QueueTaskBlit>(std::move(src), std::nullopt, src_att, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
 	sequencePoint();
 }
 
 void Queue::blit_from_default(Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
 	sequencePoint();
-	self->add<QueueTaskBlit>(std::nullopt, std::move(dst), src_pos, src_size, dst_pos, dst_size, mask, filter);
+	self->add<QueueTaskBlit>(std::nullopt, std::move(dst), std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
 	sequencePoint();
 }
 
 void Queue::blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
 	sequencePoint();
-	self->add<QueueTaskBlit>(std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+	self->add<QueueTaskBlit>(std::nullopt, std::nullopt, std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
 	sequencePoint();
 }
 
