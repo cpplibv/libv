@@ -6,6 +6,8 @@
 #include <GL/glew.h>
 // libv
 #include <libv/utility/guard.hpp>
+// std
+#include <span>
 // pro
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
@@ -227,6 +229,42 @@ public:
 
 	inline void attach3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
 		attach_draw3D(attachment, texture, level, layer);
+	}
+
+public:
+	inline void readBuffer(Attachment attachment) noexcept {
+		glReadBuffer(libv::to_underlying(attachment));
+		checkGL();
+	}
+
+	inline void drawBuffer(Attachment attachment) noexcept {
+		glDrawBuffer(libv::to_underlying(attachment));
+		checkGL();
+	}
+	inline void drawBuffers(Attachment a0) noexcept {
+		glDrawBuffers(1, reinterpret_cast<GLenum*>(&a0));
+		checkGL();
+	}
+	inline void drawBuffers(Attachment a0, Attachment a1) noexcept {
+		Attachment attachments[] = {a0, a1};
+		glDrawBuffers(2, reinterpret_cast<GLenum*>(attachments));
+		checkGL();
+	}
+	inline void drawBuffers(Attachment a0, Attachment a1, Attachment a2) noexcept {
+		Attachment attachments[] = {a0, a1, a2};
+		glDrawBuffers(3, reinterpret_cast<GLenum*>(attachments));
+		checkGL();
+	}
+	inline void drawBuffers(Attachment a0, Attachment a1, Attachment a2, Attachment a3) noexcept {
+		Attachment attachments[] = {a0, a1, a2, a3};
+		glDrawBuffers(4, reinterpret_cast<GLenum*>(attachments));
+		checkGL();
+	}
+	inline void drawBuffers(std::span<Attachment> attachments) noexcept {
+		glDrawBuffers(
+				static_cast<GLsizei>(attachments.size()),
+				reinterpret_cast<GLenum*>(attachments.data()));
+		checkGL();
 	}
 
 public:

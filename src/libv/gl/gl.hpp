@@ -621,49 +621,49 @@ private:
 	static constexpr inline std::size_t convertToTargetIndex(TextureTarget target) noexcept;
 
 public:
-	inline GLint getMaxColorAttachments() const {
+	[[nodiscard]] inline GLint getMaxColorAttachments() const {
 		return get<GLint>(GL_MAX_COLOR_ATTACHMENTS);
 	}
-	inline GLint getMaxUniformBlockSize() const {
+	[[nodiscard]] inline GLint getMaxUniformBlockSize() const {
 		return get<GLint>(GL_MAX_UNIFORM_BLOCK_SIZE);
 	}
-	inline GLint getMaxUniformBufferBindings() const {
+	[[nodiscard]] inline GLint getMaxUniformBufferBindings() const {
 		return get<GLint>(GL_MAX_UNIFORM_BUFFER_BINDINGS);
 	}
-	inline GLint getMaxVertexAttribs() const {
+	[[nodiscard]] inline GLint getMaxVertexAttribs() const {
 		return get<GLint>(GL_MAX_VERTEX_ATTRIBS);
 	}
-	inline GLint getMaxVertexUniformComponents() const {
+	[[nodiscard]] inline GLint getMaxVertexUniformComponents() const {
 		return get<GLint>(GL_MAX_VERTEX_UNIFORM_COMPONENTS);
 	}
-	inline GLint getMaxSamples() const {
+	[[nodiscard]] inline GLint getMaxSamples() const {
 		return get<GLint>(GL_MAX_SAMPLES);
 	}
-	inline GLint getMaxSamplesInteger() const {
+	[[nodiscard]] inline GLint getMaxSamplesInteger() const {
 		return get<GLint>(GL_MAX_INTEGER_SAMPLES);
 	}
-	inline GLint getMaxTextureImageUnits() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnits() const {
 		return get<GLint>(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsVertex() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsVertex() const {
 		return get<GLint>(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsGeometry() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsGeometry() const {
 		return get<GLint>(GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsCompute() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsCompute() const {
 		return get<GLint>(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsTessControl() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsTessControl() const {
 		return get<GLint>(GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsTessEvaluation() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsTessEvaluation() const {
 		return get<GLint>(GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getMaxTextureImageUnitsFragment() const {
+	[[nodiscard]] inline GLint getMaxTextureImageUnitsFragment() const {
 		return get<GLint>(GL_MAX_TEXTURE_IMAGE_UNITS);
 	}
-	inline GLint getCurrentAvailableVideoMemory() const {
+	[[nodiscard]] inline GLint getCurrentAvailableVideoMemory() const {
 		GLint availableKB[4];
 
 		if (GLEW_NVX_gpu_memory_info)
@@ -679,10 +679,10 @@ public:
 
 		return availableKB[0];
 	}
-	inline GLint getMaxTextureSize() const {
+	[[nodiscard]] inline GLint getMaxTextureSize() const {
 		return get<GLint>(GL_MAX_TEXTURE_SIZE);
 	}
-	inline GLint getUniformBufferOffsetAlignment() const {
+	[[nodiscard]] inline GLint getUniformBufferOffsetAlignment() const {
 		return get<GLint>(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT);
 	}
 
