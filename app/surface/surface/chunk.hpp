@@ -99,7 +99,7 @@ public:
 	[[nodiscard]] static float getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap);
 //	[[nodiscard]] float getInterpolatedValue(const libv::vec2f position, const libv::vector_2D<float>& heatMap);
 
-	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
+//	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -85,49 +85,68 @@ SurfaceViewer::SurfaceViewer() :
 		isPolygonFill = !isPolygonFill;
 	});
 	/// switch between camera 3D and 2D
-	controls.feature_action<void>("surface.switch_camera", [](const auto&) {
-		is3DCamera = !is3DCamera;
-		isCameraChanged = true;
-	});
+//	controls.feature_action<void>("surface.switch_camera", [](const auto&) {
+//		is3DCamera = !is3DCamera;
+//		isCameraChanged = true;
+//	});
 	/// switch between add vegetation and no vegetation
 	controls.feature_action<void>("surface.switch_vegetation_mode", [](const auto&) {
 		withVegetation = !withVegetation;
 //		isCameraChanged = true;
 	});
+	controls.feature_action<void>("surface._3d", [](const auto&) {
+		currentHeatMap = SceneType::_3d;
+		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == false;
+		is3DCamera = true;
+	});
 	controls.feature_action<void>("surface.normal_texture", [](const auto&) {
 		currentHeatMap = SceneType::height;
 		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == true;
+		is3DCamera = false;
 	});
 	controls.feature_action<void>("surface.temperature_texture", [](const auto&) {
 		currentHeatMap = SceneType::temperature;
 		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == true;
+		is3DCamera = false;
 	});
 	controls.feature_action<void>("surface.humidity_texture", [](const auto&) {
 		currentHeatMap = SceneType::humidity;
 		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == true;
+		is3DCamera = false;
 	});
 	controls.feature_action<void>("surface.fertility_texture", [](const auto&) {
 		currentHeatMap = SceneType::fertility;
 		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == true;
+		is3DCamera = false;
 	});
 	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
 		currentHeatMap = SceneType::biome;
 		hasSceneChanged = true;
+		isCameraChanged = is3DCamera == true;
+		is3DCamera = false;
 	});
-	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
-		currentHeatMap = SceneType::distribution;
-		hasSceneChanged = true;
-	});
+//	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
+//		currentHeatMap = SceneType::distribution;
+//		hasSceneChanged = true;
+//		isCameraChanged = is3DCamera == true;
+//		is3DCamera = false;
+//	});
 
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
-	controls.bind("surface.switch_camera", "F3 [press]");
+//	controls.bind("surface.switch_camera", "F3 [press]");
 	controls.bind("surface.switch_vegetation_mode", "F4 [press]");
-	controls.bind("surface.normal_texture", "1 [press]");
-	controls.bind("surface.temperature_texture", "2 [press]");
-	controls.bind("surface.humidity_texture", "3 [press]");
-	controls.bind("surface.fertility_texture", "4 [press]");
-	controls.bind("surface.surface_texture", "5 [press]");
-	controls.bind("surface.distribution_texture", "6 [press]");
+	controls.bind("surface._3d", "1 [press]");
+	controls.bind("surface.normal_texture", "2 [press]");
+	controls.bind("surface.temperature_texture", "3 [press]");
+	controls.bind("surface.humidity_texture", "4 [press]");
+	controls.bind("surface.fertility_texture", "5 [press]");
+	controls.bind("surface.surface_texture", "6 [press]");
+//	controls.bind("surface.distribution_texture", "7 [press]");
 //	controls.bind("surface.temperature_heat_map", "1 [press]");
 
 //		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {

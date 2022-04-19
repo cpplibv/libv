@@ -162,45 +162,45 @@ public:
 //	void renderTriangles(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct RendererSurface {
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
-	ShaderSurface shader;
-	libv::glr::VertexIndex vi = 0;
-//	bool dirty = true;
+//struct RendererSurface {
+//private:
+//	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+//	ShaderSurface shader;
+//	libv::glr::VertexIndex vi = 0;
+////	bool dirty = true;
+//
+////	void build_mesh(const std::vector<surface::Chunk>& chunks);
+//public:
+//	explicit RendererSurface(RendererResourceContext& rctx);
+//
+//	void addChunk(const surface::Chunk& chunk);
+//	void clear();
+////	void addFirstChunk(const surface::Chunk& chunk);
+//
+////	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+//};
 
-//	void build_mesh(const std::vector<surface::Chunk>& chunks);
-public:
-	explicit RendererSurface(RendererResourceContext& rctx);
-
-	void addChunk(const surface::Chunk& chunk);
-	void clear();
-//	void addFirstChunk(const surface::Chunk& chunk);
-
-//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
-
-struct RendererSurfaceTexture {
-	struct ChunkTexture {
-		libv::glr::Texture texture;
-		libv::vec2f pos; //down-left corner
-		libv::vec2f size;
-	};
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderSurface shader;
-	std::vector<ChunkTexture> chunks;
-
-	void build_mesh();
-public:
-	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size = {1.f, 1.f});
-	void clear();
-//	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
-	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
-
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
+//struct RendererSurfaceTexture {
+//	struct ChunkTexture {
+//		libv::glr::Texture texture;
+//		libv::vec2f pos; //down-left corner
+//		libv::vec2f size;
+//	};
+//private:
+//	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+//	ShaderSurface shader;
+//	std::vector<ChunkTexture> chunks;
+//
+//	void build_mesh();
+//public:
+//	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size = {1.f, 1.f});
+//	void clear();
+////	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
+//	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
+//
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+//};
 
 struct RendererGizmo {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
@@ -281,8 +281,8 @@ struct Renderer {
 	RendererGizmo gizmo{resource_context};
 	RendererDebug debug{resource_context};
 //	RendererFleet fleet{resource_context};
-	RendererSurface surface{resource_context};
-	RendererSurfaceTexture surfaceTexture{resource_context};
+//	RendererSurface surface{resource_context};
+//	RendererSurfaceTexture surfaceTexture{resource_context};
 	RendererText text{resource_context};
 
 public:

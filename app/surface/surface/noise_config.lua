@@ -335,7 +335,7 @@ biomes = {
 		coord = vec2f(0.5, 0.5),
 		--radius = 0.05
 		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
+		cutOff = vec2f(0.1, 0.525),
 		colorGrad = {
 			--blue
 			{0, "hsv(210, 70%, 30%)"},
@@ -416,7 +416,7 @@ biomes = {
 		dominance = 1.0,
 		--radius = 0.025
 		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.7),
+		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			--yellow
 			{0, "hsv(60, 80%, 30%)"},

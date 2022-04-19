@@ -96,7 +96,7 @@ public:
 		auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
 		auto number = ratio(rng);
 		for (const auto& entry : entries) {
-			if (number <= entry.weight)
+			if (number <= entry.weight || entry.weight >= entry.biome->cutOff.y)
 				return *entry.biome;
 			number -= entry.weight;
 		}

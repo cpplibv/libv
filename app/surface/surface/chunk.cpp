@@ -71,16 +71,16 @@ float Chunk::getHeight(const libv::vec2f position, const libv::vector_2D<Surface
 		return (-1 + u + v) * NE.z + (1 - u) * NW.z + (1 - v) * SE.z;
 }
 
-std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
-	std::vector<libv::vec4f> colors;
-	colors.reserve(points_.size_x() * points_.size_y());
-	for (size_t y = 0; y < points_.size_y(); ++y) {
-		for (size_t x = 0; x < points_.size_x(); ++x) {
-			colors.emplace_back(points_(x, y).color);
-		}
-	}
-	return colors;
-}
+//std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
+//	std::vector<libv::vec4f> colors;
+//	colors.reserve(points_.size_x() * points_.size_y());
+//	for (size_t y = 0; y < points_.size_y(); ++y) {
+//		for (size_t x = 0; x < points_.size_x(); ++x) {
+//			colors.emplace_back(points_(x, y).color);
+//		}
+//	}
+//	return colors;
+//}
 
 void Chunk::placeVegetationRandom(const Config& config) {
 	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
