@@ -351,7 +351,12 @@ public:
 
 public:
 	ImplQueue(gl::GL& gl) :
-		gl(gl) {}
+		gl(gl) {
+		programStack.emplace();
+		auto current_viewport = gl.getViewport();
+		current_viewport_size = current_viewport.size;
+		current_viewport_position = current_viewport.position;
+	}
 
 public:
 	template <typename T, typename... Args>
@@ -364,7 +369,6 @@ public:
 
 Queue::Queue(Remote& remote) :
 	self(std::make_unique<ImplQueue>(remote.gl())) {
-	self->programStack.emplace();
 }
 
 Queue::Queue(Queue&&) noexcept = default;

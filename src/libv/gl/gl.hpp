@@ -621,6 +621,26 @@ private:
 	static constexpr inline std::size_t convertToTargetIndex(TextureTarget target) noexcept;
 
 public:
+	[[nodiscard]] inline auto getViewport() const {
+		GLint m_viewport[4];
+		glGetIntegerv(GL_VIEWPORT, m_viewport);
+		struct Result {
+			libv::vec2i position;
+			libv::vec2i size;
+		};
+		return Result{
+				libv::vec2i{m_viewport[0], m_viewport[1]},
+				libv::vec2i{m_viewport[2], m_viewport[3]}
+		};
+	}
+	[[nodiscard]] inline libv::vec2i getViewportPosition() const {
+		return getViewport().position;
+	}
+	[[nodiscard]] inline libv::vec2i getViewportSize() const {
+		return getViewport().size;
+	}
+
+public:
 	[[nodiscard]] inline GLint getMaxColorAttachments() const {
 		return get<GLint>(GL_MAX_COLOR_ATTACHMENTS);
 	}
