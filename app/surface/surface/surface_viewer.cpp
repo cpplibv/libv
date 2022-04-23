@@ -50,13 +50,11 @@ SurfaceViewer::SurfaceViewer() :
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
 
-	controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
-		// switch between triangle fill and wireframe
-		isPolygonFill = !isPolygonFill;
+	controls.feature_action<void>("surface.toggle_wireframe", [](const auto&) {
+		enableWireframe = !enableWireframe;
 	});
-	controls.feature_action<void>("surface.switch_vegetation_mode", [](const auto&) {
-		// switch between add vegetation and no vegetation
-		withVegetation = !withVegetation;
+	controls.feature_action<void>("surface.toggle_vegetation", [](const auto&) {
+		enableVegetation = !enableVegetation;
 	});
 	controls.feature_action<void>("surface.cycle_camera", [](const auto&) {
 		switch (currentCameraMode) {
@@ -68,7 +66,11 @@ SurfaceViewer::SurfaceViewer() :
 			break;
 		}
 	});
-	controls.feature_action<void>("surface._3d", [this](const auto&) {
+	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
+		enableGrid = !enableGrid;
+	});
+
+	controls.feature_action<void>("surface.3d", [this](const auto&) {
 		log_surface.info("Changing scene to: 3D Surface");
 		sceneTitle.text("3D Surface");
 		currentHeatMap = SceneType::_3d;
@@ -153,10 +155,12 @@ SurfaceViewer::SurfaceViewer() :
 	});
 
 	controls.bind("surface.show_controls", "F1");
-	controls.bind("surface.switch_polygon_mode", "F2 [press]");
+	controls.bind("surface.toggle_wireframe", "F2 [press]");
 	controls.bind("surface.cycle_camera", "F3 [press]");
-	controls.bind("surface.switch_vegetation_mode", "F4 [press]");
-	controls.bind("surface._3d", "1 [press]");
+	controls.bind("surface.toggle_vegetation", "F4 [press]");
+	controls.bind("surface.toggle_grid", "F5 [press]");
+
+	controls.bind("surface.3d", "1 [press]");
 	controls.bind("surface.height_texture", "2 [press]");
 //	controls.bind("surface.normal_texture", "?? [press]");
 	controls.bind("surface.temperature_texture", "3 [press]");

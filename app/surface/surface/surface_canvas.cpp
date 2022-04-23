@@ -56,10 +56,10 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.state.frontFaceCCW();
 
 	glr.state.clipPlanes(0);
-	if (isPolygonFill)
-		glr.state.polygonModeFill();
-	else
+	if (enableWireframe)
 		glr.state.polygonModeLine();
+	else
+		glr.state.polygonModeFill();
 
 	switch (currentCameraMode) {
 	case CameraMode::_2d:
@@ -147,7 +147,7 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 //
 //	//add features
 //	//TODO: only build when necessary
-////	if (withVegetation) {
+////	if (enableVegetation) {
 //	if (config.visualization == Visualization::spheres) {
 //		for (const auto& veggie : chunk.veggies) {
 //			if (is3DCamera)
@@ -264,7 +264,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		std::cout << std::endl;
 //		timerChunkGen.reset();
 
-		if (withVegetation)
+		if (enableVegetation)
 			currentScene->buildVeggie(chunks);
 
 //		std::cout << "Building veggie has finished" << std::endl;
@@ -277,7 +277,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	currentScene->render(glr, renderer.resource_context.uniform_stream);
 
 	// render plant model/debug
-	if (withVegetation) {
+	if (enableVegetation) {
 //		if (config.visualization == Visualization::model)
 //			for (const auto& chunk : chunks) {
 //				for (const auto& veggie : chunk.veggies) {
@@ -295,6 +295,12 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 	}
 
+	if (currentHeatMap == SceneType::_3d && enableGrid) {
+		const auto s_guard = glr.state.push_guard();
+		glr.state.polygonModeFill(); // In case we are wireframe mode, force poly fill for the grid
+		glr.state.disableDepthMask();
+		renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

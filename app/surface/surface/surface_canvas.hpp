@@ -28,6 +28,7 @@ inline CameraMode previousCameraMode = currentCameraMode;
 
 enum class SceneType {
 	_3d,
+
 	height,
 	temperature,
 	humidity,
@@ -40,8 +41,9 @@ enum class SceneType {
 inline SceneType currentHeatMap = SceneType::_3d;
 inline bool hasSceneChanged = true;
 
-inline bool isPolygonFill = true;
-inline bool withVegetation = true;
+inline bool enableWireframe = false;
+inline bool enableVegetation = true;
+inline bool enableGrid = true;
 
 // -------------------------------------------------------------------------------------------------
 
