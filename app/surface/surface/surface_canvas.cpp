@@ -85,14 +85,14 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-void SurfaceCanvas::addGizmo() {
-	renderer.debug.add_debug_sphere(
-			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
-	renderer.debug.add_debug_sphere(
-			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
-	renderer.debug.add_debug_sphere(
-			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
-}
+//void SurfaceCanvas::addGizmo() {
+//	renderer.debug.add_debug_sphere(
+//			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
+//	renderer.debug.add_debug_sphere(
+//			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
+//	renderer.debug.add_debug_sphere(
+//			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
+//}
 
 void SurfaceCanvas::buildChunks() {
 	libv::Timer timerChunkGen;
@@ -166,8 +166,8 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		std::cout << std::endl;
 //		timerChunkGen.reset();
 
-		if (enableVegetation)
-			currentScene->buildVeggie(chunks);
+//		if (enableVegetation)
+		currentScene->buildVeggie(chunks);
 
 //		std::cout << "Building veggie has finished" << std::endl;
 //		fmt::print("currentScene->buildVeggie(): {:8.4f} ms", timerChunkGen.timed_ms().count());
