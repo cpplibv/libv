@@ -5,6 +5,7 @@
 // libv
 #include <libv/ctrl/controls.hpp>
 #include <libv/ui/component/fwd.hpp>
+#include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/ui.hpp>
 // pro
@@ -24,6 +25,7 @@ public:
 	libv::ui::UI ui;
 
 	libv::ui::PanelAnchor mainLayers;
+	libv::ui::Label sceneTitle;
 
 //	surface::Renderer renderer;
 //	surface::CameraPlayer camera;

@@ -36,7 +36,8 @@ SurfaceViewer::SurfaceViewer() :
 			settings.track_style_scripts = true;
 			return settings;
 		}()),
-		mainLayers("layers") {
+		mainLayers("layers"),
+		sceneTitle("sceneTitle") {
 
 	frame.setSize(1024, 1024);
 //	frame.setAlwaysOnTop(true);
@@ -66,38 +67,44 @@ SurfaceViewer::SurfaceViewer() :
 			break;
 		}
 	});
-	controls.feature_action<void>("surface._3d", [](const auto&) {
-		log_surface.info("Changing scene to: 3D");
+	controls.feature_action<void>("surface._3d", [this](const auto&) {
+		log_surface.info("Changing scene to: 3D Surface");
+		sceneTitle.text("3D Surface");
 		currentHeatMap = SceneType::_3d;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_3d;
 	});
-	controls.feature_action<void>("surface.height_texture", [](const auto&) {
+	controls.feature_action<void>("surface.height_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Height");
+		sceneTitle.text("Texture: Height");
 		currentHeatMap = SceneType::height;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
-	controls.feature_action<void>("surface.temperature_texture", [](const auto&) {
+	controls.feature_action<void>("surface.temperature_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Temperature");
+		sceneTitle.text("Texture: Temperature");
 		currentHeatMap = SceneType::temperature;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
-	controls.feature_action<void>("surface.humidity_texture", [](const auto&) {
+	controls.feature_action<void>("surface.humidity_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Humidity");
+		sceneTitle.text("Texture: Humidity");
 		currentHeatMap = SceneType::humidity;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
-	controls.feature_action<void>("surface.fertility_texture", [](const auto&) {
+	controls.feature_action<void>("surface.fertility_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Fertility");
+		sceneTitle.text("Texture: Fertility");
 		currentHeatMap = SceneType::fertility;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
-	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
+	controls.feature_action<void>("surface.surface_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Biome");
+		sceneTitle.text("Texture: Biome");
 		currentHeatMap = SceneType::biome;
 		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
@@ -214,10 +221,18 @@ void SurfaceViewer::initUI() {
 
 	libv::ui::Label label("version_lbl");
 	label.text("Surface v1.0");
-	label.font_color(libv::vec4f(1, 1, 1, 1));
+	label.font_color(libv::vec4f(0.8f, 0.8f, 0.8f, 0.6f));
 	label.align_horizontal(libv::ui::AlignHorizontal::right);
 	label.align_vertical(libv::ui::AlignVertical::bottom);
+	label.margin(8, 0);
 	mainLayers.add(label);
+
+	sceneTitle.text("3D Surface");
+	sceneTitle.font_color(libv::vec4f(1, 1, 1, 1));
+	sceneTitle.align_horizontal(libv::ui::AlignHorizontal::center);
+	sceneTitle.align_vertical(libv::ui::AlignVertical::top);
+	sceneTitle.margin(6);
+	mainLayers.add(sceneTitle);
 
 	mainLayers.add(overlay_shader_error());
 }
