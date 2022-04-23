@@ -1,3 +1,34 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===================================================================================================
+
+
+
+
 DONE: next step: mesh triangle strips, shader a depth miatt (flat)
 DONE: bug image size (heightMap.storage meret allitas is kell)
 only build mesh when change
