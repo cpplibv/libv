@@ -3,14 +3,18 @@
 // hpp
 #include <surface/surface/surface_viewer.hpp>
 // libv
+#include <libv/ctrl/binding.hpp>
 #include <libv/ctrl/binding_register.hpp>
+#include <libv/ctrl/feature.hpp>
 #include <libv/ctrl/feature_register.hpp>
+#include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/settings.hpp>
-//#include <libv/ui/component/label.hpp>
 // pro
 #include <surface/log.hpp>
 #include <surface/surface/surface_canvas.hpp>
 #include <surface/view/camera_control.hpp>
+#include <surface/view/overlay_shader_error.hpp>
 
 
 namespace surface {
@@ -31,7 +35,9 @@ SurfaceViewer::SurfaceViewer() :
 
 			settings.track_style_scripts = true;
 			return settings;
-		}()) {
+		}()),
+		mainLayers("layers") {
+
 	frame.setSize(1024, 1024);
 //	frame.setAlwaysOnTop(true);
 
@@ -41,66 +47,6 @@ SurfaceViewer::SurfaceViewer() :
 	surface::CameraControl2D::bind_default_controls(controls);
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
-
-//		libv::ui::Label label("helloLabel");
-//		label.text("Surface app");
-//		label.font_color(libv::vec4f(1, 1, 1, 1));
-//		label.align_horizontal(libv::ui::AlignHorizontal::center);
-//		label.align_vertical(libv::ui::AlignVertical::center);
-//		ui.add(label);
-
-	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui);
-	canvas.z_index_offset(-100);
-
-	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
-		if (e.gain())
-			switch (currentCameraMode) {
-			case CameraMode::_2d:
-				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-				break;
-			case CameraMode::_3d:
-				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-				break;
-			}
-		else
-			switch (previousCameraMode) {
-			case CameraMode::_2d:
-				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-				break;
-			case CameraMode::_3d:
-				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-				break;
-			}
-	});
-
-	frame.onContextUpdate.output([this, canvas](const auto&) mutable {
-		if (currentCameraMode == previousCameraMode)
-			return;
-
-		switch (previousCameraMode) {
-		case CameraMode::_2d:
-			controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-			break;
-		case CameraMode::_3d:
-			controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			break;
-		}
-
-		switch (currentCameraMode) {
-		case CameraMode::_2d:
-			controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-			break;
-		case CameraMode::_3d:
-			controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			break;
-		}
-
-		previousCameraMode = currentCameraMode;
-	});
-
-	controls.attach(frame);
-	ui.attach(frame);
-	ui.add(canvas);
 
 	controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
 		// switch between triangle fill and wireframe
@@ -163,6 +109,37 @@ SurfaceViewer::SurfaceViewer() :
 //		currentCameraMode = CameraMode::_2d;
 //	});
 
+	controls.feature_binary<void>("surface.show_controls", [this](libv::ctrl::arg_binary arg) {
+		static constexpr auto helpComponentName = "controls-help";
+		if (arg.value) {
+			std::ostringstream os;
+
+			std::size_t maxFeatureLength = 0;
+			controls.foreach_bindings([&](const libv::ctrl::Binding& binding) {
+				maxFeatureLength = std::max(maxFeatureLength, binding.feature_name().size());
+			});
+
+			controls.foreach_bindings([&](const libv::ctrl::Binding& binding) {
+//				os << fmt::format("{:{}} : {}\n", binding.feature_name(), maxFeatureLength, binding.sequence().to_string_symbol());
+				os << fmt::format("{:{}} : {}\n", binding.feature_name(), maxFeatureLength, binding.sequence().to_string_name());
+			});
+
+			auto text = std::move(os).str();
+			if (!text.empty())
+				text.pop_back(); // Discard the last \n character
+
+			libv::ui::Label label(helpComponentName);
+			label.font_color({1, 1, 1, 1});
+			//label.style("overlay.controls-help.lbl");
+			label.text(std::move(text));
+
+			mainLayers.add(label);
+		} else {
+			mainLayers.remove(helpComponentName);
+		}
+	});
+
+	controls.bind("surface.show_controls", "F1");
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
 	controls.bind("surface.cycle_camera", "F3 [press]");
 	controls.bind("surface.switch_vegetation_mode", "F4 [press]");
@@ -176,11 +153,73 @@ SurfaceViewer::SurfaceViewer() :
 //	controls.bind("surface.distribution_texture", "7 [press]");
 //	controls.bind("surface.temperature_heat_map", "1 [press]");
 
-//		frame.onKey.output([canvas](const libv::input::EventKey& e) mutable {
-//			if (e.keycode == libv::input::Keycode::H) {
-//				canvas.object().camera.move_up(-1.f);
-//			}
-//		});
+	initUI();
+
+	controls.attach(frame);
+	ui.attach(frame);
+	ui.add(mainLayers);
+}
+
+void SurfaceViewer::initUI() {
+	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui);
+	canvas.z_index_offset(-100);
+
+	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
+		if (e.gain())
+			switch (currentCameraMode) {
+			case CameraMode::_2d:
+				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
+				break;
+			case CameraMode::_3d:
+				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				break;
+			}
+		else
+			switch (previousCameraMode) {
+			case CameraMode::_2d:
+				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
+				break;
+			case CameraMode::_3d:
+				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				break;
+			}
+	});
+
+	frame.onContextUpdate.output([this, canvas](const auto&) mutable {
+		if (currentCameraMode == previousCameraMode)
+			return;
+
+		switch (previousCameraMode) {
+		case CameraMode::_2d:
+			controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
+			break;
+		case CameraMode::_3d:
+			controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+			break;
+		}
+
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
+			break;
+		case CameraMode::_3d:
+			controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+			break;
+		}
+
+		previousCameraMode = currentCameraMode;
+	});
+
+	mainLayers.add(canvas);
+
+	libv::ui::Label label("version_lbl");
+	label.text("Surface v1.0");
+	label.font_color(libv::vec4f(1, 1, 1, 1));
+	label.align_horizontal(libv::ui::AlignHorizontal::right);
+	label.align_vertical(libv::ui::AlignVertical::bottom);
+	mainLayers.add(label);
+
+	mainLayers.add(overlay_shader_error());
 }
 
 void SurfaceViewer::execute() {
