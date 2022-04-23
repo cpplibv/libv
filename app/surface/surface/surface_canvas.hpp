@@ -2,27 +2,29 @@
 
 #pragma once
 
-//libv
-#include <libv/ui/component/canvas.hpp>
-#include <libv/glr/texture.hpp>
+// libv
 #include <libv/fsw/watcher.hpp>
-
-//space
+#include <libv/glr/texture.hpp>
+#include <libv/ui/component/canvas.hpp>
+// pro
+#include <surface/surface/lua_binding.hpp>
 #include <surface/view/camera.hpp>
 #include <surface/view/render/renderer.hpp>
-
-//surface
-#include <surface/surface/lua_binding.hpp>
-#include <surface/view/render/renderer_surface_texture.hpp>
 #include <surface/view/render/renderer_surface.hpp>
+#include <surface/view/render/renderer_surface_texture.hpp>
 
 
 namespace surface {
-inline bool isPolygonFill = true;
-inline bool withVegetation = true;
-inline bool is3DCamera = true;
-inline bool isCameraChanged = true;
-inline bool hasSceneChanged = true;
+
+// -------------------------------------------------------------------------------------------------
+
+enum class CameraMode {
+	_2d,
+	_3d,
+};
+
+inline CameraMode currentCameraMode = CameraMode::_3d;
+inline CameraMode previousCameraMode = currentCameraMode;
 
 enum class SceneType {
 	_3d,
@@ -32,10 +34,16 @@ enum class SceneType {
 	fertility,
 	biome,
 
-	distribution,
+//	distribution,
 };
 
-inline SceneType currentHeatMap = SceneType::height;
+inline SceneType currentHeatMap = SceneType::_3d;
+inline bool hasSceneChanged = true;
+
+inline bool isPolygonFill = true;
+inline bool withVegetation = true;
+
+// -------------------------------------------------------------------------------------------------
 
 struct Scene {
 protected:
@@ -253,4 +261,7 @@ private:
 //	void render(SurfaceRenderer renderer, VeggieRenderer veggieRenderer);
 // scene.render()
 };
-}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace surface

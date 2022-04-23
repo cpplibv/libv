@@ -1,23 +1,26 @@
 // Created by dbobula on 3/25/2022.
 
+// hpp
 #include <surface/surface/surface_viewer.hpp>
-
-//libv
-#include <libv/ui/settings.hpp>
-//#include <libv/ui/component/label.hpp>
+// libv
 #include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/feature_register.hpp>
-
-//space
+#include <libv/ui/settings.hpp>
+//#include <libv/ui/component/label.hpp>
+// pro
+#include <surface/log.hpp>
 #include <surface/surface/surface_canvas.hpp>
 #include <surface/view/camera_control.hpp>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
+
 SurfaceViewer::SurfaceViewer() :
 		ui([] {
 			libv::ui::Settings settings;
-			// TODO P1: Internalize used UI resources under space, currently: app/space/../../res/
+			// TODO P1: Internalize used UI resources under surface, currently: app/surface/../../res/
 			settings.res_font.base_path = "../../res/font/";
 			settings.res_shader.base_path = "../../res/shader/";
 			settings.res_texture.base_path = "../../res/texture/";
@@ -30,7 +33,7 @@ SurfaceViewer::SurfaceViewer() :
 			return settings;
 		}()) {
 	frame.setSize(1024, 1024);
-	frame.setAlwaysOnTop(true);
+//	frame.setAlwaysOnTop(true);
 
 	surface::CameraControl::register_controls(controls);
 	surface::CameraControl::bind_default_controls(controls);
@@ -48,100 +51,124 @@ SurfaceViewer::SurfaceViewer() :
 
 	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui);
 	canvas.z_index_offset(-100);
+
 	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
-		if (is3DCamera) {
-			if (e.gain()) {
-				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			} else
-				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-		} else {
-			if (e.gain()) {
-				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+		if (e.gain())
+			switch (currentCameraMode) {
+			case CameraMode::_2d:
 				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-			} else
+				break;
+			case CameraMode::_3d:
+				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				break;
+			}
+		else
+			switch (previousCameraMode) {
+			case CameraMode::_2d:
 				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-		}
+				break;
+			case CameraMode::_3d:
+				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+				break;
+			}
 	});
 
-	frame.onContextUpdate.output([&](const auto&) {
-		if (isCameraChanged) {
-			if (is3DCamera) {
-				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			} else {
-				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-			}
+	frame.onContextUpdate.output([this, canvas](const auto&) mutable {
+		if (currentCameraMode == previousCameraMode)
+			return;
+
+		switch (previousCameraMode) {
+		case CameraMode::_2d:
+			controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
+			break;
+		case CameraMode::_3d:
+			controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+			break;
 		}
+
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
+			break;
+		case CameraMode::_3d:
+			controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
+			break;
+		}
+
+		previousCameraMode = currentCameraMode;
 	});
 
 	controls.attach(frame);
 	ui.attach(frame);
 	ui.add(canvas);
 
-	/// switch between triangle fill and wireframe
 	controls.feature_action<void>("surface.switch_polygon_mode", [](const auto&) {
+		// switch between triangle fill and wireframe
 		isPolygonFill = !isPolygonFill;
 	});
-	/// switch between camera 3D and 2D
-//	controls.feature_action<void>("surface.switch_camera", [](const auto&) {
-//		is3DCamera = !is3DCamera;
-//		isCameraChanged = true;
-//	});
-	/// switch between add vegetation and no vegetation
 	controls.feature_action<void>("surface.switch_vegetation_mode", [](const auto&) {
+		// switch between add vegetation and no vegetation
 		withVegetation = !withVegetation;
-//		isCameraChanged = true;
+	});
+	controls.feature_action<void>("surface.cycle_camera", [](const auto&) {
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			currentCameraMode = CameraMode::_3d;
+			break;
+		case CameraMode::_3d:
+			currentCameraMode = CameraMode::_2d;
+			break;
+		}
 	});
 	controls.feature_action<void>("surface._3d", [](const auto&) {
+		log_surface.info("Changing scene to: 3D");
 		currentHeatMap = SceneType::_3d;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == false;
-		is3DCamera = true;
+		currentCameraMode = CameraMode::_3d;
 	});
-	controls.feature_action<void>("surface.normal_texture", [](const auto&) {
+	controls.feature_action<void>("surface.height_texture", [](const auto&) {
+		log_surface.info("Changing scene to: Texture Height");
 		currentHeatMap = SceneType::height;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == true;
-		is3DCamera = false;
+		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.temperature_texture", [](const auto&) {
+		log_surface.info("Changing scene to: Texture Temperature");
 		currentHeatMap = SceneType::temperature;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == true;
-		is3DCamera = false;
+		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.humidity_texture", [](const auto&) {
+		log_surface.info("Changing scene to: Texture Humidity");
 		currentHeatMap = SceneType::humidity;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == true;
-		is3DCamera = false;
+		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.fertility_texture", [](const auto&) {
+		log_surface.info("Changing scene to: Texture Fertility");
 		currentHeatMap = SceneType::fertility;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == true;
-		is3DCamera = false;
+		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.surface_texture", [](const auto&) {
+		log_surface.info("Changing scene to: Texture Biome");
 		currentHeatMap = SceneType::biome;
 		hasSceneChanged = true;
-		isCameraChanged = is3DCamera == true;
-		is3DCamera = false;
+		currentCameraMode = CameraMode::_2d;
 	});
 //	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
+//		log_surface.info("Changing scene to: Texture distribution");
 //		currentHeatMap = SceneType::distribution;
 //		hasSceneChanged = true;
-//		isCameraChanged = is3DCamera == true;
-//		is3DCamera = false;
+//		currentCameraMode = CameraMode::_2d;
 //	});
 
 	controls.bind("surface.switch_polygon_mode", "F2 [press]");
-//	controls.bind("surface.switch_camera", "F3 [press]");
+	controls.bind("surface.cycle_camera", "F3 [press]");
 	controls.bind("surface.switch_vegetation_mode", "F4 [press]");
 	controls.bind("surface._3d", "1 [press]");
-	controls.bind("surface.normal_texture", "2 [press]");
+	controls.bind("surface.height_texture", "2 [press]");
+//	controls.bind("surface.normal_texture", "?? [press]");
 	controls.bind("surface.temperature_texture", "3 [press]");
 	controls.bind("surface.humidity_texture", "4 [press]");
 	controls.bind("surface.fertility_texture", "5 [press]");
@@ -160,5 +187,7 @@ void SurfaceViewer::execute() {
 	frame.show();
 	frame.join();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface

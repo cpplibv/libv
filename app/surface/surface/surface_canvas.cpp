@@ -61,13 +61,18 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	else
 		glr.state.polygonModeLine();
 
-	if (is3DCamera) {
-		//TODO: get current position from the other camera type
-		glr.projection = camera3D.projection(canvas_size);
-		glr.view = camera3D.view();
-	} else {
+	switch (currentCameraMode) {
+	case CameraMode::_2d:
 		glr.projection = camera2D.projection(canvas_size);
 		glr.view = camera2D.view();
+		break;
+	case CameraMode::_3d:
+		// TODO: get current position from the other camera type
+		glr.projection = camera3D.projection(canvas_size);
+		glr.view = camera3D.view();
+		break;
+	default:
+		assert(false && "Invalid CameraMode enum value");
 	}
 
 	glr.model = libv::mat4f::identity();
