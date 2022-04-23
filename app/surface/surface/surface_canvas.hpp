@@ -12,6 +12,7 @@
 #include <surface/view/render/renderer.hpp>
 #include <surface/view/render/renderer_surface.hpp>
 #include <surface/view/render/renderer_surface_texture.hpp>
+#include <surface/view/render/renderer_veggie.hpp>
 
 
 namespace surface {
@@ -54,9 +55,10 @@ protected:
 //	libv::glr::UniformBuffer& uniform_stream;
 //	libv::glr::Queue& glr;
 	Renderer& renderer;
+	RendererDebug rendererVeggie;
 
 public:
-	explicit Scene(Renderer& renderer) : renderer(renderer) {}
+	explicit Scene(Renderer& renderer) : renderer(renderer), rendererVeggie(renderer.resource_context) {}
 
 
 	virtual void build(const std::vector<Chunk>& chunks) = 0;
@@ -65,7 +67,7 @@ public:
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
 	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-		renderer.debug.render(glr, uniform_stream);
+		rendererVeggie.render(glr, uniform_stream);
 	}
 
 	virtual ~Scene() = default;
@@ -90,11 +92,11 @@ struct SurfaceScene : Scene {
 	virtual void buildVeggie(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk.veggies)
-				renderer.debug.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
+				rendererVeggie.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-//		renderer.debug.render(glr, uniform_stream);
+//		rendererVeggie.render(glr, uniform_stream);
 //	}
 };
 
@@ -131,11 +133,11 @@ struct TextureScene : Scene {
 	virtual void buildVeggie(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk.veggies)
-				renderer.debug.add_debug_sphere(libv::vec3f{xy(veggie.pos), -2.5f}, veggie.size, veggie.color, 10, 10);
+				rendererVeggie.add_debug_sphere(libv::vec3f{xy(veggie.pos), 0.f}, veggie.size, veggie.color, 10, 10);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-//		renderer.debug.render(glr, uniform_stream);
+//		rendererVeggie.render(glr, uniform_stream);
 //	}
 
 };
