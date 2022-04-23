@@ -5,7 +5,7 @@
 // libv
 #include <libv/math/vec.hpp>
 // std
-#include <vector>
+#include <memory>
 
 
 namespace libv {
@@ -16,7 +16,7 @@ template <typename T>
 class vector_2D {
 private:
 	libv::vec2z size_;
-	std::vector<T> storage;
+	std::unique_ptr<T[]> storage;
 
 public:
 	constexpr inline vector_2D() noexcept = default;
@@ -26,20 +26,20 @@ public:
 	constexpr inline vector_2D& operator=(vector_2D&&) & noexcept = default;
 
 	explicit constexpr inline vector_2D(libv::vec2z size) :
-			size_(size),
-			storage(size.x * size.y) {}
+			vector_2D(size.x, size.y) {}
 
-	explicit constexpr inline vector_2D(libv::vec2z size, const T& init_value) :
-			size_(size),
-			storage(size.x * size.y, init_value) {}
+	constexpr inline vector_2D(libv::vec2z size, const T& init_value) :
+			vector_2D(size.x, size.y, init_value) {}
 
 	constexpr inline vector_2D(std::size_t x, std::size_t y) :
 			size_(x, y),
-			storage(x * y) {}
+			storage(std::make_unique_for_overwrite<T[]>(x * y)) {}
 
 	constexpr inline vector_2D(std::size_t x, std::size_t y, const T& init_value) :
 			size_(x, y),
-			storage(x * y, init_value) {}
+			storage(std::make_unique_for_overwrite<T[]>(x * y)) {
+		fill(init_value);
+	}
 
 public:
 	[[nodiscard]] constexpr inline T& operator()(libv::vec2z xy) noexcept {
@@ -60,8 +60,8 @@ public:
 
 public:
 	constexpr inline void fill(const T& value) {
-		for (auto& item : storage)
-			item = value;
+		for (std::size_t i = 0; i < size_.x * size_.y; ++i)
+			storage[i] = value;
 	}
 
 public:
@@ -79,11 +79,11 @@ public:
 
 public:
 	[[nodiscard]] constexpr inline T* data() noexcept {
-		return storage.data();
+		return storage.get();
 	}
 
 	[[nodiscard]] constexpr inline const T* data() const noexcept {
-		return storage.data();
+		return storage.get();
 	}
 };
 
