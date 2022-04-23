@@ -24,20 +24,22 @@ bool isPointInTriangle(libv::vec2f p, float step) {
 
 // -------------------------------------------------------------------------------------------------
 
-Chunk::Chunk(const size_t size_, const libv::vec2i index, const libv::vec2f position_) :
-		size(size_),
-		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32)),
-		position(position_),
-		biomeMap(size_, size_),
-		height(size_, size_),
-		temperature(size_, size_),
-		humidity(size_, size_),
-		fertility(size_, size_),
-		temp_humidity_distribution(size_, size_) {
+Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t resolution) :
+		index(index),
+		position(position),
+		size(size),
+		resolution(resolution),
+		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32u)),
+		biomeMap(resolution, resolution),
+		height(resolution, resolution),
+		temperature(resolution, resolution),
+		humidity(resolution, resolution),
+		fertility(resolution, resolution),
+		temp_humidity_distribution(resolution, resolution) {
 }
 
 //collusion query
-float Chunk::getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap) {
+float Chunk::getHeight(libv::vec2f query_position) const {
 	//	             (1,1)
 	// O    NW O  upY  O NE
 	//       leftX  * rightX
@@ -47,23 +49,26 @@ float Chunk::getHeight(const libv::vec2f position, const libv::vector_2D<Surface
 	// |    \  |
 	// O - - - O       O
 	// (0,0)
-	const auto numQuad = (heatMap.size_x() - 1);
+
+	query_position /= size; // Remap query to the [0..1] quad
+
+	const auto numQuad = resolution - 1;
 	const auto step = 1.f / static_cast<float>(numQuad);
 
-	const auto leftX = static_cast<int>(std::floor(position.x / step));
+	const auto leftX = static_cast<int>(std::floor(query_position.x / step));
 	const auto rightX = leftX + 1;
-	const auto downY = static_cast<int>(std::floor(position.y / step));
+	const auto downY = static_cast<int>(std::floor(query_position.y / step));
 	const auto upY = downY + 1;
 
-	const auto NW = heatMap(leftX, upY).pos;
-	const auto NE = heatMap(rightX, upY).pos;
-	const auto SW = heatMap(leftX, downY).pos;
-	const auto SE = heatMap(rightX, downY).pos;
+	const auto NW = height(leftX, upY).pos;
+	const auto NE = height(rightX, upY).pos;
+	const auto SW = height(leftX, downY).pos;
+	const auto SE = height(rightX, downY).pos;
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
-	const auto isPointInNWSWSE = isPointInTriangle(position, step);
+	const auto isPointInNWSWSE = isPointInTriangle(query_position, step);
 
-	auto u = libv::fract(position.x / step);
-	auto v = libv::fract(position.y / step);
+	auto u = libv::fract(query_position.x / step);
+	auto v = libv::fract(query_position.y / step);
 
 	if (isPointInNWSWSE)
 		return (1 - u - v) * SW.z + u * SE.z + v * NW.z;
@@ -82,38 +87,10 @@ float Chunk::getHeight(const libv::vec2f position, const libv::vector_2D<Surface
 //	return colors;
 //}
 
-void Chunk::placeVegetationRandom(const Config& config) {
-	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
-
-	for (size_t i = 0; i < config.numVeggie; ++i) {
-		const auto x = ratio(rng);
-		const auto y = ratio(rng);
-		const auto z = getHeight({x, y}, height);
-
-		const auto temp = config.temperature.rootNode->evaluate(x + position.x, y + position.y) - z * config.temperature.heightSensitivity;
-		const auto wet = config.humidity.rootNode->evaluate(x + position.x, y + position.y);
-//		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
-
-		auto picker = BiomePicker();
-		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-		auto biome = mix.random(rng);
-
-		if(auto veggieType = mix.getRandomVeggieType(biome, rng)) { //TODO: This should be veggie
-			veggieType->pos = libv::vec3f{x + position.x, y + position.y, z}; //TODO: TAKE THIS OUT
-			veggies.emplace_back(veggieType.value());
-		}
-//		Veggie result;
-//		result.
-
-	}
-
-}
-
 //generalunk cluster centereket radiussal, aztan pedig ezekben a cluster korokben
 // generalunk random pontokat az interpolacioval
-
-void Chunk::placeVegetationClustered(const Config& config) {
-	(void) config;
+//
+//void Chunk::placeVegetationClustered(const Config& config) {
 //	auto chunkSize = libv::make_uniform_distribution_exclusive(0, config.resolution - 1);
 //	auto ratio = libv::make_uniform_distribution_inclusive(0.f, 1.f);
 ////	float sum = 0.f;
@@ -134,6 +111,34 @@ void Chunk::placeVegetationClustered(const Config& config) {
 ////			chunk.vegetation.emplace_back(VegetationPoint{point});
 //		}
 //	}
+//}
+
+void Chunk::placeVegetationRandom(const Config& config) {
+	auto distX = libv::make_uniform_distribution_exclusive(0.f, size.x);
+	auto distY = libv::make_uniform_distribution_exclusive(0.f, size.y);
+
+	for (size_t i = 0; i < config.numVeggie; ++i) {
+		const auto x = distX(rng);
+		const auto y = distY(rng);
+		const auto z = getHeight({x, y});
+
+		const auto temp = config.temperature.rootNode->evaluate(x + position.x, y + position.y) - z * config.temperature.heightSensitivity;
+		const auto wet = config.humidity.rootNode->evaluate(x + position.x, y + position.y);
+//		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
+
+		auto picker = BiomePicker();
+		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
+		auto biome = mix.random(rng);
+
+		if(auto veggieType = mix.getRandomVeggieType(biome, rng)) { //TODO: This should be veggie
+			veggieType->pos = libv::vec3f{x + position.x, y + position.y, z}; //TODO: TAKE THIS OUT
+			veggies.emplace_back(veggieType.value());
+		}
+//		Veggie result;
+//		result.
+
+	}
+
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -144,7 +149,8 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 	if (config.plantDistribution == PlantDistribution::random) {
 		chunk.placeVegetationRandom(config);
 	} else if (config.plantDistribution == PlantDistribution::clustered) {
-		chunk.placeVegetationClustered(config);
+//		chunk.placeVegetationClustered(config);
+		throw std::runtime_error("Clustered plant distribution type not yet supported");
 	} else
 		throw std::runtime_error("Unknown plant distribution type");
 }
@@ -188,10 +194,14 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 //}
 
 Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
-	const auto chunkPosition = chunkIndex.cast<float>();
+	const auto chunkSize = libv::vec2f{2, 2};
+	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;
-	Chunk chunk = Chunk(numVertex, chunkIndex, chunkPosition);
+	const auto step = chunkSize / static_cast<float>(numQuad);
+//	const auto step = chunkSize / static_cast<float>(chunkResolution);
+
+	Chunk chunk = Chunk(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex));
 
 	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
 		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);
@@ -202,14 +212,13 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 
 	chunk.temp_humidity_distribution.fill(0.f);
 
-	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
+	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
-		const auto size_f = static_cast<float>(numQuad);
 
-		for (size_t xi = 0; xi < numVertex; ++xi) {
+		for (std::size_t xi = 0; xi < numVertex; ++xi) {
 			const auto xf = static_cast<float>(xi);
-			const auto x = xf / size_f;
-			const auto y = yf / size_f;
+			const auto x = xf * step.x;
+			const auto y = yf * step.y;
 
 			/// Calculate heatmaps' point
 			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
@@ -254,6 +263,7 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 	});
 	return chunk;
 }
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace surface

@@ -40,7 +40,7 @@ SurfaceViewer::SurfaceViewer() :
 		mainLayers("layers"),
 		sceneTitle("sceneTitle") {
 
-	frame.setSize(1024, 1024);
+//	frame.setSize(1024, 1024);
 //	frame.setAlwaysOnTop(true);
 
 	surface::CameraControl::register_controls(controls);

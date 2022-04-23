@@ -153,7 +153,7 @@ struct HeightHeatMap : TextureScene {
 	virtual void build(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(getColors(chunk.height));
-			rendererTexture.addTexture(heatMap, chunk.position);
+			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
 		}
 	}
 };
@@ -164,7 +164,7 @@ struct BiomeHeatMap : TextureScene {
 	virtual void build(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk.biomeMap);
-			rendererTexture.addTexture(heatMap, chunk.position);
+			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
 		}
 	}
 };
@@ -175,7 +175,7 @@ struct TemperatureHeatMap : TextureScene {
 	virtual void build(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk.temperature);
-			rendererTexture.addTexture(heatMap, chunk.position);
+			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
 		}
 	}
 };
@@ -186,7 +186,7 @@ struct HumidityHeatMap : TextureScene {
 	virtual void build(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk.humidity);
-			rendererTexture.addTexture(heatMap, chunk.position);
+			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
 		}
 	}
 };

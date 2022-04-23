@@ -19,7 +19,7 @@
 #include <surface/surface/node.hpp>
 
 #include <libv/math/gradient.hpp>
-#include <libv/utility/random/xoroshiro128.hpp> // fwdable
+#include <libv/utility/random/xoroshiro128.hpp>
 #include <libv/utility/random/uniform_distribution.hpp>
 
 
@@ -27,8 +27,8 @@ namespace surface {
 
 struct SurfacePoint {
 	libv::vec3f pos;
+//	float height;
 	libv::vec4f color;
-//	bool hasTree = false;
 };
 
 //struct TexturePoint {
@@ -71,13 +71,14 @@ class BiomeCell {
 
 // no public by defualt unless dumb data (no invariant), add constructor
 class Chunk {
-private:
-	size_t size;
-//	size_t biomeCellNumber;
+public:
+	libv::vec2i index;
+	libv::vec2f position;
+	libv::vec2f size;
+	uint32_t resolution;
 	libv::xoroshiro128 rng;
 
 public:
-	libv::vec2f position;
 //	libv::vector_2D<BiomeCell> biomeMap;
 	libv::vector_2D<libv::vec4f> biomeMap;
 
@@ -90,13 +91,14 @@ public:
 	std::vector<VeggieType> veggies;
 
 public:
-//	Chunk(const size_t size_, const size_t biomeCellNumber_, const libv::vec2f position_);
-	Chunk(const size_t size_, const libv::vec2i index, const libv::vec2f position_);
+	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution);
+
 public:
 	void placeVegetationClustered(const Config& config);
 	void placeVegetationRandom(const Config& config);
 
-	[[nodiscard]] static float getHeight(const libv::vec2f position, const libv::vector_2D<SurfacePoint>& heatMap);
+public:
+	[[nodiscard]] float getHeight(const libv::vec2f query_position) const;
 //	[[nodiscard]] float getInterpolatedValue(const libv::vec2f position, const libv::vector_2D<float>& heatMap);
 
 //	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);

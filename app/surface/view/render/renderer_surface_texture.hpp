@@ -20,7 +20,7 @@ private:
 
 	void build_mesh();
 public:
-	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size = {1.f, 1.f});
+	void addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size);
 	void clear();
 //	void addFirstTexture(libv::glr::Texture& texture, const libv::vec2f chunkPos);
 	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
