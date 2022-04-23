@@ -76,7 +76,7 @@ void CorePanelAnchor::doLayout2(const ContextLayout2& layout_env) {
 			const auto has_ratio = child.size()[i].ratio != 0.f;
 
 			if (has_ratio)
-				size[i] = env_size[i];
+				size[i] = env_size[i] - child.margin_size3()[i];
 			else
 				size[i] =
 						child.size()[i].pixel +
@@ -86,15 +86,11 @@ void CorePanelAnchor::doLayout2(const ContextLayout2& layout_env) {
 
 		// Position ---
 
-		size += child.core().margin_size3();
-
 		const auto position =
 				+ padding_LB3()
 				+ child.core().margin_LB3()
 				+ info(child.anchor()).rate() * env_size
-				- info(child.anchor()).rate() * size;
-
-		size -= child.core().margin_size3();
+				- info(child.anchor()).rate() * (size + child.core().margin_size3());
 
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
