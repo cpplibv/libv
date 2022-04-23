@@ -85,87 +85,6 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-//libv::vector_2D<float> SurfaceCanvas::buildSurfaceTexture() {
-//	const auto size = config.resolution + 1;
-//	libv::vector_2D<float> result{size, size};
-//	result.fill(0.f);
-//
-//	for (const auto& chunk : chunks) {
-//		for (size_t y = 0; y < chunk.humidity.size_y(); ++y) {
-//			for (size_t x = 0; x < chunk.humidity.size_x(); ++x) {
-//				result(
-//						std::clamp(static_cast<size_t>(std::max(0.f, chunk.humidity(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
-//						std::clamp(static_cast<size_t>(std::max(0.f, chunk.temperature(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
-//				) += 0.005f;
-//			}
-//		}
-//	}
-//
-//	return result;
-//}
-
-//libv::glr::Texture SurfaceCanvas::buildTexture(const Chunk& chunk) {
-//
-//	if (currentHeatMap == SceneType::height || currentHeatMap == SceneType::biome) {
-//		auto texture = libv::glr::Texture2D::RGBA32F();
-//		texture.storage(1, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>());
-//		texture.set(libv::gl::MagFilter::Nearest);
-//		texture.set(libv::gl::MinFilter::Nearest);
-//		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-//		if (currentHeatMap == SceneType::height)
-//			texture.image(0, libv::vec2i{0, 0}, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>(), chunk.getColors(chunk.height).data());
-//		else if (currentHeatMap == SceneType::biome)
-//			texture.image(0, libv::vec2i{0, 0}, chunk.biomeMap.size().cast<int32_t>(), chunk.biomeMap.data());
-//
-//		return texture;
-//	} else {
-//		auto texturef = libv::glr::Texture2D::R32F();
-//		texturef.storage(1, libv::vec2z{config.resolution + 1, config.resolution + 1}.cast<int>());
-//		texturef.set(libv::gl::MagFilter::Nearest);
-//		texturef.set(libv::gl::MinFilter::Nearest);
-////		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-//		if (currentHeatMap == SceneType::temperature)
-//			texturef.image(0, libv::vec2i{0, 0}, chunk.temperature.size().cast<int32_t>(), chunk.temperature.data());
-//		else if (currentHeatMap == SceneType::humidity)
-//			texturef.image(0, libv::vec2i{0, 0}, chunk.humidity.size().cast<int32_t>(), chunk.humidity.data());
-//		else if (currentHeatMap == SceneType::fertility)
-//			texturef.image(0, libv::vec2i{0, 0}, chunk.fertility.size().cast<int32_t>(), chunk.fertility.data());
-//
-//		return texturef;
-//	}
-
-//	renderer.surfaceTexture.addTexture(heightMap, chunk.position);
-//}
-
-//void SurfaceCanvas::buildRenderObject(const Chunk& chunk) {
-//	if (is3DCamera) {
-//		renderer.surface.addChunk(chunk);
-//	} else {
-//		const auto heatMap = buildTexture(chunk);
-//		renderer.surfaceTexture.addTexture(heatMap, chunk.position);
-//	}
-//
-//	//add features
-//	//TODO: only build when necessary
-////	if (enableVegetation) {
-//	if (config.visualization == Visualization::spheres) {
-//		for (const auto& veggie : chunk.veggies) {
-//			if (is3DCamera)
-//				renderer.debug.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 10, 10);
-//			else
-//				renderer.debug.add_debug_sphere(libv::vec3f{xy(veggie.pos), -2.5f}, veggie.size, veggie.color, 10, 10);
-//		}
-//	}
-////	}
-//
-//}
-
-//void SurfaceCanvas::clearRenderObjects() {
-//	renderer.surface.clear();
-//	renderer.surfaceTexture.clear();
-//	renderer.debug.clear_spheres();
-//}
-
 void SurfaceCanvas::addGizmo() {
 	renderer.debug.add_debug_sphere(
 			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
@@ -174,29 +93,6 @@ void SurfaceCanvas::addGizmo() {
 	renderer.debug.add_debug_sphere(
 			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
 }
-
-//void SurfaceCanvas::buildRenderObjects() {
-//	clearRenderObjects();
-//	addGizmo();
-//
-//	if (currentHeatMap == SceneType::distribution && !is3DCamera) {
-//		const auto data = buildSurfaceTexture();
-//
-//		auto texturef = libv::glr::Texture2D::R32F();
-//		texturef.storage(1, data.size().cast<int32_t>());
-//		texturef.set(libv::gl::MagFilter::Nearest);
-//		texturef.set(libv::gl::MinFilter::Nearest);
-////		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-//		texturef.image(0, libv::vec2i{0, 0}, data.size().cast<int32_t>(), data.data());
-//
-//		renderer.surfaceTexture.addTexture(texturef, {-5.f, -5.f}, {10.f, 10.f});
-//	} else {
-//		for (const auto& chunk : chunks) {
-//			buildRenderObject(chunk);
-//		}
-//	}
-//}
-
 
 void SurfaceCanvas::buildChunks() {
 	libv::Timer timerChunkGen;
@@ -227,8 +123,8 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	const auto s_guard = glr.state.push_guard();
 
 
-	if (hasSceneChanged || changed) {
-		hasSceneChanged = false;
+	if (previousHeatMap != currentHeatMap || changed) {
+		previousHeatMap = currentHeatMap;
 		libv::Timer timerChunkGen;
 		if (changed) {
 			buildChunks();
@@ -241,21 +137,27 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 			timerChunkGen.reset();
 		}
 
-
-		if (currentHeatMap == SceneType::_3d) {
+		switch (currentHeatMap) {
+		case SceneType::_3d:
 			currentScene = std::make_unique<SurfaceScene>(renderer, renderer.resource_context);
-		} else if (currentHeatMap == SceneType::height) {
+			break;
+		case SceneType::height:
 			currentScene = std::make_unique<HeightHeatMap>(renderer, renderer.resource_context);
-		} else if (currentHeatMap == SceneType::temperature) {
+			break;
+		case SceneType::temperature:
 			currentScene = std::make_unique<TemperatureHeatMap>(renderer, renderer.resource_context);
-		} else if (currentHeatMap == SceneType::humidity) {
+			break;
+		case SceneType::humidity:
 			currentScene = std::make_unique<HumidityHeatMap>(renderer, renderer.resource_context);
-//		} else if (currentHeatMap == SceneType::fertility) {
+			break;
+		case SceneType::fertility:
 //			auto newScene = fert(renderer, renderer.resource_context);
-		} else if (currentHeatMap == SceneType::biome) {
+			currentScene = std::make_unique<FertilityHeatMap>(renderer, renderer.resource_context);
+			break;
+		case SceneType::biome:
 			currentScene = std::make_unique<BiomeHeatMap>(renderer, renderer.resource_context);
-		} else {
-			throw std::runtime_error("Unsupported scene type");
+
+			break;
 		}
 
 		currentScene->build(chunks);

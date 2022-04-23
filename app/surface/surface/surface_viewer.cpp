@@ -74,42 +74,36 @@ SurfaceViewer::SurfaceViewer() :
 		log_surface.info("Changing scene to: 3D Surface");
 		sceneTitle.text("3D Surface");
 		currentHeatMap = SceneType::_3d;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_3d;
 	});
 	controls.feature_action<void>("surface.height_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Height");
 		sceneTitle.text("Texture: Height");
 		currentHeatMap = SceneType::height;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.temperature_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Temperature");
 		sceneTitle.text("Texture: Temperature");
 		currentHeatMap = SceneType::temperature;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.humidity_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Humidity");
 		sceneTitle.text("Texture: Humidity");
 		currentHeatMap = SceneType::humidity;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.fertility_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Fertility");
 		sceneTitle.text("Texture: Fertility");
 		currentHeatMap = SceneType::fertility;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
-	controls.feature_action<void>("surface.surface_texture", [this](const auto&) {
+	controls.feature_action<void>("surface.biome_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Biome");
 		sceneTitle.text("Texture: Biome");
 		currentHeatMap = SceneType::biome;
-		hasSceneChanged = true;
 		currentCameraMode = CameraMode::_2d;
 	});
 //	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
@@ -166,7 +160,7 @@ SurfaceViewer::SurfaceViewer() :
 	controls.bind("surface.temperature_texture", "3 [press]");
 	controls.bind("surface.humidity_texture", "4 [press]");
 	controls.bind("surface.fertility_texture", "5 [press]");
-	controls.bind("surface.surface_texture", "6 [press]");
+	controls.bind("surface.biome_texture", "6 [press]");
 //	controls.bind("surface.distribution_texture", "7 [press]");
 //	controls.bind("surface.temperature_heat_map", "1 [press]");
 

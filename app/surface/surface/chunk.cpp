@@ -158,7 +158,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
 		auto picker = BiomePicker();
 		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-		auto biome = mix.random(rngLocal);
+		const auto& biome = mix.random(rngLocal);
 
 		if(auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
 			veggieType->pos = libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}; //TODO: TAKE THIS OUT
@@ -258,7 +258,7 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 //				throw std::runtime_error(fmt::format("Biome not found: {}", std::to_underlying(biome)));
 			auto picker = BiomePicker();
 			auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-//			auto biome = mix.primary();
+			const auto& biome = mix.primary();
 //			auto weight = mix.primaryWeight();
 //			const auto forest = categorizeForest(wet);
 //			const auto fertility =
@@ -266,7 +266,8 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 //							0.33f, getMin(0.33f, wet),
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
-			chunk.biomeMap(xi, yi) = mix.blendedColor(0.7f);
+//			chunk.biomeMap(xi, yi) = mix.blendedColor(0.7f);
+			chunk.biomeMap(xi, yi) = biome.colorGrad.sample(0.7f);
 
 //			chunk.biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
 //			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunkPosition, 0},

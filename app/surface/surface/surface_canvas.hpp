@@ -39,7 +39,9 @@ enum class SceneType {
 };
 
 inline SceneType currentHeatMap = SceneType::_3d;
-inline bool hasSceneChanged = true;
+inline SceneType previousHeatMap = currentHeatMap;
+
+//inline bool hasSceneChanged = true;
 
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
@@ -138,12 +140,21 @@ struct TextureScene : Scene {
 
 };
 
-inline libv::vector_2D<float> getColors(const libv::vector_2D<SurfacePoint>& points_) {
-	libv::vector_2D<float> heatmap{points_.size()};
+//inline libv::vector_2D<float> getFloats(const libv::vector_2D<SurfacePoint>& points_) {
+//	libv::vector_2D<float> heatmap{points_.size()};
+////	colors.reserve(points_.size_x() * points_.size_y());
+//	for (size_t y = 0; y < points_.size_y(); ++y)
+//		for (size_t x = 0; x < points_.size_x(); ++x)
+//			heatmap(x, y) = points_(x, y).color.z;
+//	return heatmap;
+//}
+
+inline libv::vector_2D<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_) {
+	libv::vector_2D<libv::vec4f> heatmap{points_.size()};
 //	colors.reserve(points_.size_x() * points_.size_y());
 	for (size_t y = 0; y < points_.size_y(); ++y)
 		for (size_t x = 0; x < points_.size_x(); ++x)
-			heatmap(x, y) = points_(x, y).color.z;
+			heatmap(x, y) = points_(x, y).color;
 	return heatmap;
 }
 
@@ -186,6 +197,17 @@ struct HumidityHeatMap : TextureScene {
 	virtual void build(const std::vector<Chunk>& chunks) override {
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk.humidity);
+			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
+		}
+	}
+};
+
+struct FertilityHeatMap : TextureScene {
+	using TextureScene::TextureScene;
+
+	virtual void build(const std::vector<Chunk>& chunks) override {
+		for (const auto& chunk : chunks) {
+			const auto heatMap = createTexture(chunk.fertility);
 			rendererTexture.addTexture(heatMap, chunk.position, chunk.size);
 		}
 	}
