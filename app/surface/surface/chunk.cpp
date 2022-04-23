@@ -87,10 +87,24 @@ float Chunk::getHeight(libv::vec2f query_position) const {
 //	return colors;
 //}
 
+// -------------------------------------------------------------------------------------------------
+
+ChunkGen::ChunkGen() {}
+
+void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
+	if (config.plantDistribution == PlantDistribution::random) {
+		placeVegetationRandom(chunk, config);
+	} else if (config.plantDistribution == PlantDistribution::clustered) {
+//		chunk.placeVegetationClustered(config);
+		throw std::runtime_error("Clustered plant distribution type not yet supported");
+	} else
+		throw std::runtime_error("Unknown plant distribution type");
+}
+
 //generalunk cluster centereket radiussal, aztan pedig ezekben a cluster korokben
 // generalunk random pontokat az interpolacioval
 //
-//void Chunk::placeVegetationClustered(const Config& config) {
+//void Chunk::placeVegetationClustered(Chunk& chunk, const Config& config) {
 //	auto chunkSize = libv::make_uniform_distribution_exclusive(0, config.resolution - 1);
 //	auto ratio = libv::make_uniform_distribution_inclusive(0.f, 1.f);
 ////	float sum = 0.f;
@@ -113,46 +127,46 @@ float Chunk::getHeight(libv::vec2f query_position) const {
 //	}
 //}
 
-void Chunk::placeVegetationRandom(const Config& config) {
-	auto distX = libv::make_uniform_distribution_exclusive(0.f, size.x);
-	auto distY = libv::make_uniform_distribution_exclusive(0.f, size.y);
+void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
-	for (size_t i = 0; i < config.numVeggie; ++i) {
-		const auto x = distX(rng);
-		const auto y = distY(rng);
-		const auto z = getHeight({x, y});
+	std::mutex chunkGuard;
+	std::mutex rngGuard;
+	chunk.veggies.reserve(config.numVeggie); // TODO P3: Should check if reserving for 20% isn't memory wasteful
 
-		const auto temp = config.temperature.rootNode->evaluate(x + position.x, y + position.y) - z * config.temperature.heightSensitivity;
-		const auto wet = config.humidity.rootNode->evaluate(x + position.x, y + position.y);
+	// NOTE: This parallelism doesn't yield too much gain, but still better than single thread
+	// The entire generation of 81 chunk with 100 veggie per chunk in milliseconds:
+	// Baseline / No operation: 145 - 148
+	// Single thread: 170 - 180
+	// Multi-thread: 159 - 162 (current)
+	// Multi-thread lockless assigment: 158 - 161 (would need post merge, possible)
+
+	libv::mt::parallel_for(threads, 0uz, config.numVeggie, [&](auto) {
+		auto distX = libv::make_uniform_distribution_exclusive(0.f, chunk.size.x);
+		auto distY = libv::make_uniform_distribution_exclusive(0.f, chunk.size.y);
+
+		auto rngLock = std::unique_lock(rngGuard);
+		auto rngLocal = rng.fork(); // RNG has to be forked under a mutex
+		rngLock.unlock();
+
+		const auto x = distX(rngLocal);
+		const auto y = distY(rngLocal);
+		const auto z = chunk.getHeight({x, y});
+
+		const auto temp = config.temperature.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y) - z * config.temperature.heightSensitivity;
+		const auto wet = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 //		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
 		auto picker = BiomePicker();
 		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-		auto biome = mix.random(rng);
+		auto biome = mix.random(rngLocal);
 
-		if(auto veggieType = mix.getRandomVeggieType(biome, rng)) { //TODO: This should be veggie
-			veggieType->pos = libv::vec3f{x + position.x, y + position.y, z}; //TODO: TAKE THIS OUT
-			veggies.emplace_back(veggieType.value());
+		if(auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
+			veggieType->pos = libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}; //TODO: TAKE THIS OUT
+
+			auto lock = std::unique_lock(chunkGuard);
+			chunk.veggies.emplace_back(std::move(veggieType.value()));
 		}
-//		Veggie result;
-//		result.
-
-	}
-
-}
-
-// -------------------------------------------------------------------------------------------------
-
-ChunkGen::ChunkGen() {}
-
-void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
-	if (config.plantDistribution == PlantDistribution::random) {
-		chunk.placeVegetationRandom(config);
-	} else if (config.plantDistribution == PlantDistribution::clustered) {
-//		chunk.placeVegetationClustered(config);
-		throw std::runtime_error("Clustered plant distribution type not yet supported");
-	} else
-		throw std::runtime_error("Unknown plant distribution type");
+	});
 }
 
 //void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {

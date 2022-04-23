@@ -94,10 +94,6 @@ public:
 	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution);
 
 public:
-	void placeVegetationClustered(const Config& config);
-	void placeVegetationRandom(const Config& config);
-
-public:
 	[[nodiscard]] float getHeight(const libv::vec2f query_position) const;
 //	[[nodiscard]] float getInterpolatedValue(const libv::vec2f position, const libv::vector_2D<float>& heatMap);
 
@@ -127,6 +123,9 @@ public:
 	void placeVegetation(Chunk& chunk, const Config& config);
 //		void placeVegetation(const Config& config);
 
+private:
+	void placeVegetationClustered(Chunk& chunk, const Config& config);
+	void placeVegetationRandom(Chunk& chunk, const Config& config);
 };
 
 
