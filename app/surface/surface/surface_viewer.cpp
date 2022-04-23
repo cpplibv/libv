@@ -9,6 +9,7 @@
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
+#include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/settings.hpp>
 // pro
 #include <surface/log.hpp>
@@ -144,6 +145,11 @@ SurfaceViewer::SurfaceViewer() :
 		} else {
 			mainLayers.remove(helpComponentName);
 		}
+	});
+
+	ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
+		log_surface.info("Controls intercepted: {}", event.controls_intercepted());
+		controls.ignore_events(event.controls_intercepted());
 	});
 
 	controls.bind("surface.show_controls", "F1");
