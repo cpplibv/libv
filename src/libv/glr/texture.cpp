@@ -408,7 +408,7 @@ void Texture::generate_mipmaps() noexcept {
 }
 
 void Texture::sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept {
-	auto previous = gl.bound_texture(remote->head.texture.target);
+	auto previous = gl.boundTexture(remote->head.texture.target);
 	remote->update(gl, remote_);
 	gl.bind(previous);
 }

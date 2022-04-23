@@ -27,10 +27,11 @@ namespace gl {
 class AccessVertexArray {
 private:
 	VertexArray& object;
+	GL& gl;
 
 public:
-	inline AccessVertexArray(VertexArray& object) noexcept :
-		object(object) { }
+	inline AccessVertexArray(VertexArray& object, GL& gl) noexcept :
+		object(object), gl(gl) { }
 
 public:
 	inline void create() noexcept {
@@ -48,14 +49,12 @@ public:
 public:
 	inline void bind() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-	    glBindVertexArray(object.id);
-		checkGL();
+		gl.bind(object);
 	}
 
 	inline void unbind() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-	    glBindVertexArray(0);
-		checkGL();
+		gl.unbindVertexArray();
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {

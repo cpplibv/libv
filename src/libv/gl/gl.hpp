@@ -46,15 +46,15 @@ inline float deg(float radians) {
 
 // -------------------------------------------------------------------------------------------------
 
-struct AccessArrayBuffer;
-struct AccessBuffer;
-struct AccessFramebuffer;
-struct AccessProgram;
-struct AccessRenderbuffer;
-struct AccessShader;
-template <typename T> struct AccessTexture;
-struct AccessUniformBuffer;
-struct AccessVertexArray;
+class AccessArrayBuffer;
+class AccessBuffer;
+class AccessFramebuffer;
+class AccessProgram;
+class AccessRenderbuffer;
+class AccessShader;
+template <typename T> class AccessTexture;
+class AccessUniformBuffer;
+class AccessVertexArray;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -521,13 +521,15 @@ public:
 	MaskSetter mask;
 
 private:
+	VertexArray currentVertexArray{0};
+
 	TextureChannel currentActiveTexture{0};
 	std::array<std::array<uint32_t, 16>, 11> textureBindings; /// Target -> Channel -> ID
 
-	Program current_program_{0};
+	Program currentProgram_{0};
 
-	Framebuffer framebuffer_read_{0};
-	Framebuffer framebuffer_draw_{0};
+	Framebuffer framebufferRead_{0};
+	Framebuffer framebufferDraw_{0};
 
 private:
 	void init() {
@@ -778,7 +780,7 @@ public:
 	}
 
 	inline void readTextureImage(const Texture& texture, int32_t level, ReadFormat format, DataType type, void* data) {
-		auto prev = bound_texture(texture.target);
+		auto prev = boundTexture(texture.target);
 		bind(texture);
 		glGetTexImage(libv::to_value(texture.target), level, libv::to_value(format), libv::to_value(type), data);
 		bind(prev);
@@ -800,6 +802,11 @@ private:
 	inline void bind(TextureTarget target, uint32_t id);
 
 public:
+	inline void bind(const VertexArray& object) noexcept;
+	inline void unbindVertexArray() noexcept;
+	inline VertexArray boundVertexArray() noexcept;
+
+public:
 	template <TextureTarget Target>
 	inline void bind(const Texture_t<Target>& texture);
 	inline void bind(const Texture& texture);
@@ -807,11 +814,11 @@ public:
 	inline void unbind(const Texture_t<Target>& texture);
 	inline void unbind(const Texture& texture);
 
-	inline Texture bound_texture(TextureTarget target) noexcept;
+	inline Texture boundTexture(TextureTarget target) noexcept;
 
 public:
-	inline void use_program(const Program& program) noexcept;
-	inline Program bound_program() noexcept;
+	inline void useProgram(const Program& program) noexcept;
+	inline Program boundProgram() noexcept;
 
 public:
 	inline void framebuffer(Framebuffer object) noexcept;
@@ -859,7 +866,7 @@ public:
 	}
 	template <typename Access = AccessVertexArray>
 	inline Access operator()(VertexArray& object) noexcept {
-		return Access{object};
+		return Access{object, *this};
 	}
 	template <TextureTarget Target, typename Access = AccessTexture<Texture_t<Target>>>
 	inline Access operator()(Texture_t<Target>& object) noexcept {
@@ -938,6 +945,25 @@ inline void GL::clear(BufferBit buffers) {
 
 // -------------------------------------------------------------------------------------------------
 
+inline void GL::bind(const VertexArray& object) noexcept {
+	if (currentVertexArray.id != object.id) {
+		currentVertexArray.id = object.id;
+		glBindVertexArray(object.id);
+		checkGL();
+	}
+}
+
+inline void GL::unbindVertexArray() noexcept {
+	glBindVertexArray(0);
+	checkGL();
+}
+
+inline VertexArray GL::boundVertexArray() noexcept {
+	return currentVertexArray;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline void GL::bind(TextureTarget target, uint32_t id) {
 	std::size_t targetID = convertToTargetIndex(target);
 
@@ -962,7 +988,7 @@ inline void GL::unbind(const Texture& texture) {
 	bind(texture.target, 0);
 }
 
-inline Texture GL::bound_texture(TextureTarget target) noexcept {
+inline Texture GL::boundTexture(TextureTarget target) noexcept {
 	std::size_t targetID = convertToTargetIndex(target);
 
 	return Texture{textureBindings[targetID][libv::to_value(currentActiveTexture)], target};
@@ -970,69 +996,70 @@ inline Texture GL::bound_texture(TextureTarget target) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-inline void GL::use_program(const Program& program) noexcept {
-	if (current_program_.id != program.id) {
+inline void GL::useProgram(const Program& program) noexcept {
+	if (currentProgram_.id != program.id) {
+		currentProgram_.id = program.id;
 		glUseProgram(program.id);
-		current_program_.id = program.id;
+		checkGL();
 	}
 }
 
-inline Program GL::bound_program() noexcept {
-	return current_program_;
+inline Program GL::boundProgram() noexcept {
+	return currentProgram_;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 inline void GL::framebuffer(Framebuffer object) noexcept {
-	if (framebuffer_draw_.id != object.id || framebuffer_read_.id != object.id) {
+	if (framebufferDraw_.id != object.id || framebufferRead_.id != object.id) {
 		glBindFramebuffer(GL_FRAMEBUFFER, object.id);
-		framebuffer_draw_.id = object.id;
-		framebuffer_read_.id = object.id;
+		framebufferDraw_.id = object.id;
+		framebufferRead_.id = object.id;
 	}
 }
 
 inline void GL::framebuffer_draw(Framebuffer object) noexcept {
-	if (framebuffer_draw_.id != object.id) {
+	if (framebufferDraw_.id != object.id) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, object.id);
-		framebuffer_draw_.id = object.id;
+		framebufferDraw_.id = object.id;
 	}
 }
 
 inline void GL::framebuffer_read(Framebuffer object) noexcept {
-	if (framebuffer_read_.id != object.id) {
+	if (framebufferRead_.id != object.id) {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, object.id);
-		framebuffer_read_.id = object.id;
+		framebufferRead_.id = object.id;
 	}
 }
 
 inline void GL::framebuffer_default() noexcept {
-	if (framebuffer_draw_.id != 0 || framebuffer_read_.id != 0) {
+	if (framebufferDraw_.id != 0 || framebufferRead_.id != 0) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		framebuffer_draw_.id = 0;
-		framebuffer_read_.id = 0;
+		framebufferDraw_.id = 0;
+		framebufferRead_.id = 0;
 	}
 }
 
 inline void GL::framebuffer_default_draw() noexcept {
-	if (framebuffer_draw_.id != 0) {
+	if (framebufferDraw_.id != 0) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		framebuffer_draw_.id = 0;
+		framebufferDraw_.id = 0;
 	}
 }
 
 inline void GL::framebuffer_default_read() noexcept {
-	if (framebuffer_read_.id != 0) {
+	if (framebufferRead_.id != 0) {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-		framebuffer_read_.id = 0;
+		framebufferRead_.id = 0;
 	}
 }
 
 inline Framebuffer GL::framebuffer_draw() const noexcept {
-	return framebuffer_draw_;
+	return framebufferDraw_;
 }
 
 inline Framebuffer GL::framebuffer_read() const noexcept {
-	return framebuffer_read_;
+	return framebufferRead_;
 }
 
 // -------------------------------------------------------------------------------------------------

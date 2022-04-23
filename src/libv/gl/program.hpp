@@ -117,7 +117,7 @@ public:
 public:
 	inline void use() const noexcept {
 		// object.id is allowed to be 0
-		gl.use_program(object);
+		gl.useProgram(object);
 		checkGL();
 	}
 

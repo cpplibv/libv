@@ -219,7 +219,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 		}
 	};
 
-	auto previous_program = gl.bound_program();
+	auto previous_program = gl.boundProgram();
 
 	while (auto internal_opt = queue_shader_failed_load.pop_optional()) {
 		// For those who failed to load: just assign the fallback
