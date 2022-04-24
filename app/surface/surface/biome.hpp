@@ -66,6 +66,97 @@ public:
 //public:
 //	WeightedEntry(Biome biome, float weight) : biome(std::move(biome)), weight(weight) {};
 //};
+//template<class T>
+//float optionalToString(T* obj)
+//{
+//	constexpr bool has_toString = requires(const T& t) {
+//		t.weight;
+//	};
+//
+//	if constexpr (has_toString)
+//		return obj->toString();
+//	else
+//		return 1.0f;
+//}
+
+
+template <typename T>
+//template <typename T>
+requires requires(const T entry){ entry.weight; }
+//concept ccSnapshotArchive = requires(const T entry) {
+//	{ entry.weight } -> std::same_as<float>;
+//	{ car.isShared() } -> std::same_as<bool>;
+//};
+class WeightedContainer {
+public:
+	std::vector<T> entries;
+
+private:
+
+	void normalize() {
+		float sum = 0.f;
+		for (const auto& entry : entries) {
+			sum += entry.weight;
+		}
+
+		assert(sum != 0.f);
+
+		for (auto& entry : entries) {
+			entry.weight /= sum;
+		}
+	}
+
+public:
+	WeightedContainer() {
+		entries.reserve(5);
+	}
+
+	explicit WeightedContainer(std::vector<T> entries_) {
+		entries = std::vector<T>(entries_.begin(), entries_.end());
+		normalize();
+	}
+
+//	explicit WeightedContainer(const std::vector<T>& entries) : entries(entries) {}
+
+	void insert(const T& entry) {
+		entries.emplace_back(entry);
+		normalize();
+	}
+
+	void erase(const T& entry) {
+		const auto it = std::find(entries.begin(), entries.end(), entry);
+		if (it == entries.end())
+			assert(false);
+
+		entries.erase(it);
+		normalize();
+	}
+
+	void eraseAll(const std::vector<T>& entries_) {
+		for (const auto& entry : entries_) {
+			const auto it = std::find(entries.begin(), entries.end(), entry);
+			if (it == entries.end())
+				assert(false);
+
+			entries.erase(it);
+		}
+		normalize();
+	}
+//	void addAll()
+};
+
+struct WeightedEntry {
+	const Biome* biome = nullptr;
+	float weight = 0.f;
+
+	WeightedEntry() {}
+
+	WeightedEntry(const Biome* biome, float weight) : biome(biome), weight(weight) {}
+
+	bool operator==(const WeightedEntry& other) const {
+		return other.biome == biome;
+	}
+};
 
 class BiomeMix {
 private:

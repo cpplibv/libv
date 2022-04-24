@@ -26,61 +26,32 @@ namespace surface {
 BiomePicker::BiomePicker() {}
 
 BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f point) {
-	struct CandidateBiome {
-		const Biome* biome;
-		float weight;
-//		float distance_sq;
-		libv::vec2f point; // Hacky
-
-		void operator=(const Biome& source) {
-			biome = &source;
-			weight = source.dominance / (source.coord - point).length();
-		}
-	};
 
 	std::array<CandidateBiome, 5> candidates;
 	candidates.fill(CandidateBiome{nullptr, 0.f, point});
 
 	std::ranges::partial_sort_copy(biomes, candidates,
-			std::less<>{},
+			std::greater<>{},
 			[&](const Biome& biome) { return biome.dominance / (biome.coord - point).length(); },
 			[&](const CandidateBiome& biome) { return biome.weight; }
 	);
 
 	BiomeMix result;
-	float sum = 0.f;
 	int i = 0;
-//	const auto last = candidates[candidates.size()-1];
-	const auto smallestWeight = candidates[candidates.size()-1].weight;
+	const auto smallest = candidates[candidates.size() - 1];
+	std::vector<WeightedEntry> entries;
 	for (const auto& candidate : candidates) {
 		if (candidate.biome == nullptr)
 			break;
 
-		result[i].biome = candidate.biome;
 		//TODO: remap so highest remains the old, stretch out to original ratio
-		result[i].weight = candidate.weight - smallestWeight;
-//		result[i].weight = 1.f - dist;
-//		result[i].weight = candidate.biome->dominance;
-		sum += result[i].weight;
-		i++;
+		const auto weight = candidate.weight - smallest.weight;
+		const auto& entry = WeightedEntry(candidate.biome, candidate.weight);
+		entries.emplace_back(entry);
 	}
-
-//		const auto weight = dist;
-//		const auto weight = std::max(0.01f,-candidate.biome->dominance * dist + 1);
-//		const auto weight = candidate.biome->dominance / (dist + candidate.biome->dominance);
-//		const auto weight = (1 - dist) * candidate.biome->dominance;
-
-	///normalization
-	for (auto& entry : result.entries) {
-		if (entry.biome == nullptr)
-			continue;
-
-		entry.weight /= sum;
-	}
-	std::ranges::sort(result.entries, std::greater<>{}, &BiomeMix::WeightedEntry::weight);
-
-
+	result.container = WeightedContainer<WeightedEntry>(entries);
 	return result;
 }
+
 
 } // namespace surface
