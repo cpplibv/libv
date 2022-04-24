@@ -2,10 +2,67 @@
 
 #pragma once
 
+#include <libv/mt/worker_thread.hpp>
+
+#include <vector>
+#include <queue>
+
+#include <surface/surface/chunk.hpp>
+
+
 namespace surface {
 
-class SurfaceManager {
-	// =================================================================================================
+class SurfaceGen {
+private:
+//	std::atomic<bool> cancelled = false;
+	std::stop_source stopSource;
+	libv::mt::worker_thread control{"gen_control"};
+	std::mutex chunksGuard;
+	std::shared_ptr<std::queue<std::shared_ptr<Chunk>>> readyChunks;
+	ChunkGen chunkGen;
+
+
+public:
+	SurfaceGen(){}
+//	void buildChunk(size_t index, const Config& config);
+	void buildChunks(const std::shared_ptr<const Config>& config);
+	std::shared_ptr<Chunk> tryPopReadyChunk();
+};
+
+class Surface {
+private:
+	std::vector<std::shared_ptr<Chunk>> chunks;
+//	std::mutex chunksGuard;
+//	std::shared_ptr<const Config> config = nullptr;
+	SurfaceGen surfaceGen;
+
+public:
+//	explicit Surface(Config&& config_) : config(std::move(config_)) {
+//	}
+
+	inline const std::vector<std::shared_ptr<Chunk>>& getChunks() {
+		return chunks;
+	}
+
+	inline void gen(std::shared_ptr<const Config>&& config) {
+	//void cancel
+		chunks.clear();
+		surfaceGen.buildChunks(std::move(config));
+	}
+
+	bool update() {
+		bool changed = false;
+		while (auto chunk = surfaceGen.tryPopReadyChunk()){
+			chunks.emplace_back(std::move(chunk));
+			changed = true;
+		}
+		return changed;
+	}
+};
+
+
+
+// =================================================================================================
 
 //	struct What {
 //		// inheritance ?
@@ -52,7 +109,6 @@ class SurfaceManager {
 // =================================================================================================
 
 
-};
 
 
 } // namespace surface

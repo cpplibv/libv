@@ -27,7 +27,7 @@ private:
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
 
-	void addChunk(const surface::Chunk& chunk);
+	void addChunk(const std::shared_ptr<surface::Chunk>& chunk);
 	void clear();
 //	void addFirstChunk(const surface::Chunk& chunk);
 

@@ -255,20 +255,20 @@ libv::flat_set<Biome> SurfaceLuaBinding::convertBiomes(const sol::object& object
 	return convertArraySet<Biome>(object, convertBiome);
 }
 
-Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
+std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& object) {
 	const auto table = convertTable(object);
 
-	Config result;
-	result.visualization = table["visualization"];
-//	result.currentHeatMap = table["currentHeatMap"];
-	result.resolution = table["resolution"];
-	result.numChunks = table["numChunks"];
-	result.numVeggie = table["numVeggie"];
-	result.amplitude = table["amplitude"];
-	result.plantDistribution = table["plantDistribution"];
-	result.circleNumber = table["circleNumber"];
-	result.circleSize = table["circleSize"];
-	result.objects = convertSurfaceObjects(table.get<sol::object>("objects"));
+	auto result = std::make_shared<Config>();
+	result->visualization = table["visualization"];
+//	result->currentHeatMap = table["currentHeatMap"];
+	result->resolution = table["resolution"];
+	result->numChunks = table["numChunks"];
+	result->numVeggie = table["numVeggie"];
+	result->amplitude = table["amplitude"];
+	result->plantDistribution = table["plantDistribution"];
+	result->circleNumber = table["circleNumber"];
+	result->circleSize = table["circleSize"];
+	result->objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;
 }
@@ -298,7 +298,7 @@ Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 ////	return biomes;
 //}
 
-Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
+std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
 	const auto env = sol::environment(lua, sol::create, lua.globals());
 	lua.script(script, env);
 
@@ -319,11 +319,11 @@ Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) 
 //		auto nodes = convertHeatMaps(luaHeatMaps);
 //		result.heatMaps = std::move(nodes);
 //	}
-	result.height = convertHeatMap(env.get<sol::object>("height"));
-	result.temperature = convertHeatMap(env.get<sol::object>("temperature"));
-	result.humidity = convertHeatMap(env.get<sol::object>("humidity"));
-	result.fertility = convertHeatMap(env.get<sol::object>("fertility"));
-	result.biomes = convertBiomes(env.get<sol::object>("biomes"));
+	result->height = convertHeatMap(env.get<sol::object>("height"));
+	result->temperature = convertHeatMap(env.get<sol::object>("temperature"));
+	result->humidity = convertHeatMap(env.get<sol::object>("humidity"));
+	result->fertility = convertHeatMap(env.get<sol::object>("fertility"));
+	result->biomes = convertBiomes(env.get<sol::object>("biomes"));
 //	extendBiomes(result.biomes);
 
 	return result;

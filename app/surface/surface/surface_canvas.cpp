@@ -6,12 +6,9 @@
 #include <iostream>
 
 //libv
-#include <libv/utility/timer.hpp>
+//#include <libv/utility/timer.hpp>
 #include <libv/utility/index_spiral.hpp>
 #include <libv/glr/queue.hpp>
-//#include <src/libv/utility/screen_picker.hpp>
-//#include <libv/rev/render_target.hpp>
-//#include <libv/rev/post_processing.hpp>
 
 //space
 #include <surface/log.hpp>
@@ -22,17 +19,35 @@ namespace surface {
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
 		renderer(ui)
-//screen_picker(camera.picker({100, 100})),
-//renderTarget({100, 100}, 4),
-//postProcessing(renderer.resource_context.shader_loader, {100, 100})
 {
 	camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
 	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event&) {
-//			auto lock = std::unique_lock(mutex);
 		changed = true;
 	});
-	//postProcessing.vignetteIntensity(0.15f);
+
+	surface = std::make_unique<Surface>();
+	currentScene = createScene(currentHeatMap);
+}
+
+std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
+	switch (scene) {
+	case SceneType::_3d:
+		return std::make_unique<SurfaceScene>(renderer, renderer.resource_context);
+	case SceneType::height:
+		return std::make_unique<HeightHeatMap>(renderer, renderer.resource_context);
+	case SceneType::temperature:
+		return std::make_unique<TemperatureHeatMap>(renderer, renderer.resource_context);
+	case SceneType::humidity:
+		return std::make_unique<HumidityHeatMap>(renderer, renderer.resource_context);
+	case SceneType::fertility:
+		return std::make_unique<FertilityHeatMap>(renderer, renderer.resource_context);
+	case SceneType::biome:
+		return std::make_unique<BiomeHeatMap>(renderer, renderer.resource_context);
+	}
+
+	assert(false && "Invalid SceneType enum value");
+	return nullptr;
 }
 
 void SurfaceCanvas::attach() {
@@ -77,109 +92,59 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 
 	glr.model = libv::mat4f::identity();
 
-	// Set framebuffer to the post-processing target
-	//glr.framebuffer_draw(renderTarget.framebuffer());
-
 	glr.setClearColor(0, 0, 0, 1);
 	glr.clearColor();
 	glr.clearDepth();
 }
 
-//void SurfaceCanvas::addGizmo() {
-//	renderer.debug.add_debug_sphere(
-//			{0.7f, 0, 0}, 0.15f, {1, 0, 0, 1});
-//	renderer.debug.add_debug_sphere(
-//			{0, 0.7f, 0}, 0.15f, {0, 1, 0, 1});
-//	renderer.debug.add_debug_sphere(
-//			{0, 0, 0.7f}, 0.15f, {0, 0, 1, 1});
-//}
+void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
+	(void) delta_time;
 
-void SurfaceCanvas::buildChunks() {
-	libv::Timer timerChunkGen;
-	ChunkGen chunkGen;
-	auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
-	config = binding.getConfigFromLuaScript(script);
+	if (changed) {
+		changed = false;
 
-	//getChunk, render (availability alapjan)
-	chunks.clear();
-	for (size_t i = 0; i < config.numChunks; ++i) {
-		const auto chunkIndex = libv::index_spiral(i).cast<int32_t>();
-		Chunk chunk = chunkGen.generateChunk(config, chunkIndex);
-		chunkGen.placeVegetation(chunk, config);
-		// more log needed
-		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
-		std::cout << std::endl;
+		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
+		auto conf = binding.getConfigFromLuaScript(script);
 
-		chunks.emplace_back(std::move(chunk));
+		surface->gen(std::move(conf));
+//			buildChunks();
+//			std::cout << "Building chunks has finished" << std::endl;
+//			fmt::print("BuildChunks(): {:8.4f} ms", timerChunkGen.timed_ms().count());
+//			std::cout << std::endl;
+//			timerChunkGen.reset();
 	}
+
+	surfaceDirty = surface->update();
 }
 
-//	virtual void update(libv::ui::time_duration delta_time) override {}
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	setupRenderStates(glr);
-	//		screen_picker = camera.picker(canvas_size);
-//		renderTarget.size(canvas_size.cast<int32_t>());
-//		postProcessing.size(canvas_size.cast<int32_t>());
 	const auto s_guard = glr.state.push_guard();
 
-
-	if (previousHeatMap != currentHeatMap || changed) {
+	if (previousHeatMap != currentHeatMap) {
 		previousHeatMap = currentHeatMap;
-		libv::Timer timerChunkGen;
-		if (changed) {
-			buildChunks();
-			changed = false;
+		//libv::Timer timerChunkGen;
 
-			std::cout << "Building chunks has finished" << std::endl;
-			fmt::print("BuildChunks(): {:8.4f} ms", timerChunkGen.timed_ms().count());
-			std::cout << std::endl;
-
-			timerChunkGen.reset();
-		}
-
-		switch (currentHeatMap) {
-		case SceneType::_3d:
-			currentScene = std::make_unique<SurfaceScene>(renderer, renderer.resource_context);
-			break;
-		case SceneType::height:
-			currentScene = std::make_unique<HeightHeatMap>(renderer, renderer.resource_context);
-			break;
-		case SceneType::temperature:
-			currentScene = std::make_unique<TemperatureHeatMap>(renderer, renderer.resource_context);
-			break;
-		case SceneType::humidity:
-			currentScene = std::make_unique<HumidityHeatMap>(renderer, renderer.resource_context);
-			break;
-		case SceneType::fertility:
-//			auto newScene = fert(renderer, renderer.resource_context);
-			currentScene = std::make_unique<FertilityHeatMap>(renderer, renderer.resource_context);
-			break;
-		case SceneType::biome:
-			currentScene = std::make_unique<BiomeHeatMap>(renderer, renderer.resource_context);
-
-			break;
-		}
-
-		currentScene->build(chunks);
-//		std::cout << "Building render objects has finished" << std::endl;
-//		fmt::print("currentScene->build(): {:8.4f} ms", timerChunkGen.timed_ms().count());
-//		std::cout << std::endl;
-//		timerChunkGen.reset();
-
-//		if (enableVegetation)
-		currentScene->buildVeggie(chunks);
-
-//		std::cout << "Building veggie has finished" << std::endl;
-//		fmt::print("currentScene->buildVeggie(): {:8.4f} ms", timerChunkGen.timed_ms().count());
-//		std::cout << std::endl;
+		currentScene = createScene(currentHeatMap);
 	}
 
-
 	//render surface texture/_3d
-	currentScene->render(glr, renderer.resource_context.uniform_stream);
+	if (!surface->getChunks().empty()) {
+		if (surfaceDirty) {
+			currentScene->build(surface->getChunks());
+	//		std::cout << "Building render objects has finished" << std::endl;
+	//		fmt::print("currentScene->build(): {:8.4f} ms", timerChunkGen.timed_ms().count());
+	//		std::cout << std::endl;
+	//		timerChunkGen.reset();
 
-	// render plant model/debug
-	if (enableVegetation) {
+	//		if (enableVegetation)  //there is veggies
+			currentScene->buildVeggie(surface->getChunks());
+		}
+
+		currentScene->render(glr, renderer.resource_context.uniform_stream);
+
+		// render plant model/debug
+		if (enableVegetation) {
 //		if (config.visualization == Visualization::model)
 //			for (const auto& chunk : chunks) {
 //				for (const auto& veggie : chunk.veggies) {
@@ -192,9 +157,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //				}
 //			}
 //		else
-		currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
+			currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 
 //		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+		}
 	}
 
 	if (currentHeatMap == SceneType::_3d && enableGrid) {

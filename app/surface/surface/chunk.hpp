@@ -118,7 +118,7 @@ public:
 //	explicit ChunkGen(surface::Renderer& renderer);
 	ChunkGen();
 
-	[[nodiscard]] Chunk generateChunk(const Config& yi, const libv::vec2i chunkPosition);
+	[[nodiscard]] std::shared_ptr<Chunk> generateChunk(const Config& yi, const libv::vec2i chunkPosition);
 //	[[nodiscard]] libv::vector_2D<TexturePoint> generateTexturePoints();
 	void placeVegetation(Chunk& chunk, const Config& config);
 //		void placeVegetation(const Config& config);

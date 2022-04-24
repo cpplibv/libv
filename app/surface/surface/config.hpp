@@ -100,7 +100,7 @@ struct Biome {
 	libv::gradientf<libv::vec4f> colorGrad;
 	std::vector<VeggieType> vegetation;
 
-	~Biome(){
+	~Biome() {
 		log_surface.error("Biome dtor");
 	}
 
@@ -116,10 +116,7 @@ struct Biome {
 		return lhs < rhs.name;
 	}
 
-
 };
-
-
 
 
 class Config {
@@ -142,6 +139,7 @@ public:
 	HeatMap humidity;
 	HeatMap fertility;
 
+
 //	std::unique_ptr<Node> heightRootNode;
 //	std::unique_ptr<Node> temperatureOffsetRootNode;
 //	std::unique_ptr<Node> humidityRootNode;
@@ -161,6 +159,10 @@ public:
 //	libv::CellularDistanceFunction distanceFn = libv::CellularDistanceFunction::euclidean;
 //	libv::CellularReturnType returnType = libv::CellularReturnType::cellValue;
 //	float jitter = 1.0f;
+
+	~Config() {
+		log_surface.error("Config dtor");
+	}
 
 };
 } // namespace surface

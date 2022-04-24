@@ -156,15 +156,15 @@ config = {
 
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
-	resolution = 512,
+	resolution = 128,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
-	numChunks = 25,
+	numChunks = 1,
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,
 	--circleNumber = 50,
 	--circleSize = 0.01,
-	numVeggie = 400,
+	numVeggie = 100,
 
 --                      /\
 --  COLD|BARREN        /  \ Polar

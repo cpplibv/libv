@@ -18,9 +18,8 @@ private:
 	sol::state lua;
 //	Config config;
 
-	Config convertConfig(const sol::object& object);
 //	void setFractalConfig(const sol::table& luaConfig);
-
+private:
 	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, int depth = 0);
 	static SurfaceObject convertSurfaceObject(const sol::object& object);
 	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
@@ -31,9 +30,11 @@ private:
 	static VeggieType convertVeggieType(const sol::object& object);
 	static std::vector<VeggieType> convertVeggieTypes(const sol::object& object);
 
+	std::shared_ptr<Config> convertConfig(const sol::object& object);
+
 public:
 	SurfaceLuaBinding();
-	Config getConfigFromLuaScript(const std::string_view script);
+	std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script);
 //	NodeTree getNodeTreeFromLuaScript(std::string_view script);
 };
 

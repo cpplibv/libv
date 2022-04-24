@@ -156,11 +156,16 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 		const auto wet = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 //		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
-		auto picker = BiomePicker();
-		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-		const auto& biome = mix.random(rngLocal);
+//		auto picker = BiomePicker();
+//		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
+//		mix.blendForVeggies();
+//		const auto& biome = mix.random(rngLocal);
+//		const auto& biome = mix.primary();
+		const auto& biome = *config.biomes.begin();
+		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
 
-		if(auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
+		{
+//		if(auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
 			veggieType->pos = libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}; //TODO: TAKE THIS OUT
 
 			auto lock = std::unique_lock(chunkGuard);
@@ -207,7 +212,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //	});
 //}
 
-Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
+std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
 	const auto chunkSize = libv::vec2f{2, 2};
 	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
 	const auto numQuad = config.resolution;
@@ -215,7 +220,7 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 	const auto step = chunkSize / static_cast<float>(numQuad);
 //	const auto step = chunkSize / static_cast<float>(chunkResolution);
 
-	Chunk chunk = Chunk(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex));
+	std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex));
 
 	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
 		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);
@@ -224,7 +229,7 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 		return SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
 	};
 
-	chunk.temp_humidity_distribution.fill(0.f);
+	chunk->temp_humidity_distribution.fill(0.f);
 
 	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
@@ -235,21 +240,21 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 			const auto y = yf * step.y;
 
 			/// Calculate heatmaps' point
-			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
-			chunk.temperature(xi, yi) = config.temperature.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
-			chunk.humidity(xi, yi) = config.humidity.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+			chunk->height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
+			chunk->temperature(xi, yi) = config.temperature.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+			chunk->humidity(xi, yi) = config.humidity.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
 
-			chunk.fertility(xi, yi) = config.fertility.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+			chunk->fertility(xi, yi) = config.fertility.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
 
-//			chunk.temp_humidity_distribution(
-//					std::clamp(static_cast<size_t>(chunk.humidity(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_x() - 1),
-//					std::clamp(static_cast<size_t>(chunk.temperature(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_y() - 1)
+//			chunk->temp_humidity_distribution(
+//					std::clamp(static_cast<size_t>(chunk->humidity(xi, yi).pos.z * 127.f), 0uz, chunk->temp_humidity_distribution.size_x() - 1),
+//					std::clamp(static_cast<size_t>(chunk->temperature(xi, yi).pos.z * 127.f), 0uz, chunk->temp_humidity_distribution.size_y() - 1)
 //			) += 0.1f;
 
-			const auto height = chunk.height(xi, yi).pos.z;
-			const auto temp = chunk.temperature(xi, yi) - height * config.temperature.heightSensitivity;
-			const auto wet = chunk.humidity(xi, yi);
-			const auto fertilityOffset = chunk.fertility(xi, yi);
+			const auto height = chunk->height(xi, yi).pos.z;
+			const auto temp = chunk->temperature(xi, yi) - height * config.temperature.heightSensitivity;
+			const auto wet = chunk->humidity(xi, yi);
+			const auto fertilityOffset = chunk->fertility(xi, yi);
 
 			(void) fertilityOffset;
 //			const auto biome = categorizeZone(temp);
@@ -258,7 +263,8 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 //				throw std::runtime_error(fmt::format("Biome not found: {}", std::to_underlying(biome)));
 			auto picker = BiomePicker();
 			auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-			const auto& biome = mix.primary();
+//			const auto& biome = mix.primary();
+//			const auto& biome = mix.random(rng);
 //			auto weight = mix.primaryWeight();
 //			const auto forest = categorizeForest(wet);
 //			const auto fertility =
@@ -266,11 +272,11 @@ Chunk ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex
 //							0.33f, getMin(0.33f, wet),
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
-//			chunk.biomeMap(xi, yi) = mix.blendedColor(0.7f);
-			chunk.biomeMap(xi, yi) = biome.colorGrad.sample(0.7f);
+			chunk->biomeMap(xi, yi) = mix.blendedColor(1.0f);
+//			chunk->biomeMap(xi, yi) = biome.colorGrad.sample(0.7f);
 
-//			chunk.biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
-//			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunkPosition, 0},
+//			chunk->biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
+//			chunk->surface(xi, yi) = SurfacePoint{chunk->height(xi, yi).pos + libv::vec3f{chunkPosition, 0},
 //					{1,0,0,1}};
 //			std::cout << " fertility: " << fertility<<std::endl;
 

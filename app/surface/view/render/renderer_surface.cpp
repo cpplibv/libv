@@ -12,22 +12,22 @@ namespace surface {
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
-void RendererSurface::addChunk(const surface::Chunk& chunk) {
+void RendererSurface::addChunk(const std::shared_ptr<surface::Chunk>& chunk) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 
-	const auto rowSize = chunk.height.size_y();
+	const auto rowSize = chunk->height.size_y();
 	for (unsigned int y = 0; y < rowSize; y++) {
-		for (unsigned int x = 0; x < chunk.height.size_x(); ++x) {
-			position(chunk.height(x, y).pos);
-			color0(chunk.biomeMap(x, y));
+		for (unsigned int x = 0; x < chunk->height.size_x(); ++x) {
+			position(chunk->height(x, y).pos);
+			color0(chunk->biomeMap(x, y));
 		}
 	}
 
 	for (size_t i = 0; i < rowSize - 1; ++i) {
 		index(vi);
-		const auto colSize = chunk.height.size_x();
+		const auto colSize = chunk->height.size_x();
 		const auto colSizeVi = static_cast<libv::glr::VertexIndex>(colSize);
 
 		for (size_t j = 0; j < colSize; ++j) {
