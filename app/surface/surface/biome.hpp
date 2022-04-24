@@ -162,103 +162,50 @@ class BiomeMix {
 private:
 //	libv::xoroshiro128 rng{123};
 public:
-	struct WeightedEntry {
-		const Biome* biome = nullptr;
-		float weight;
-	};
+
 
 public:
-	std::array<WeightedEntry, 4> entries;
+//	std::array<WeightedEntry, 4> entries;
+	WeightedContainer<WeightedEntry> container;
 
 public:
-	BiomeMix() {};
-
-	[[nodiscard]] WeightedEntry& operator[](size_t index) {
-		return entries[index];
-	}
-
-	[[nodiscard]] inline const Biome& primary() noexcept {
-		assert(entries[0].biome != nullptr);
-		return *entries[0].biome;
-	}
-
-	[[nodiscard]] inline const Biome& random(libv::xoroshiro128& rng) {
-		//TODO: Extract weighted selection algorithm with projection
-		auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
-		auto number = ratio(rng);
-		for (const auto& entry : entries) {
-			if (number <= entry.weight || entry.weight >= entry.biome->cutOff.y)
-				return *entry.biome;
-			number -= entry.weight;
-		}
-		return primary();
-
-		//TODO: reached error, fix
-		//make_uniform_distribution_inclusive -> exclusive solved it?
-//		throw std::runtime_error("BiomeMix.random() has reached end unexpectedly");
-	}
-
-	[[nodiscard]] inline const libv::vec4f blendedColor(float fertility) noexcept {
-		libv::vec4f result;
-		for (const auto& entry : entries) {
-			if (entry.biome == nullptr) {
-				continue;
-			}
-			result += entry.biome->colorGrad.sample(fertility) * entry.weight;
-		}
-		return result;
-	}
-
-
-//	normalize(probalities)
-//	veggieType=getWeigthedRandom
-//	veggie=makeRandomVeggie(veggieType, biome?, fertility?)
-//	return veggie
-	[[nodiscard]] inline std::optional<VeggieType> getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng) {
-//		float sum = 0.f;
-//		for (const auto & veggieType : biome.vegetation) {
-//			sum += veggieType.probability;
-//		}
-		auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
-		auto number = ratio(rng);
-//		VeggieType result;
-		for (const auto& veggieType : biome.vegetation) {
-			if (number < veggieType.probability) {
-//				result = veggieType;
-				return veggieType;
-			}
-			number -= veggieType.probability;
-		}
-		return std::nullopt;
-//		throw std::runtime_error("BiomeMix.getRandomVeggieType() has reached end unexpectedly");
-	}
-
-	[[nodiscard]] inline std::optional<Veggie> getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng);
-//		if(const auto type = getRandomVeggieType(biome, rng)){
-//			Veggie result;
-//			result.type = type.value();
-//			result.id = ;
-//			result.height = ;
-//
-//			result.hsvDiff = ;
-//			result.rotation = ;
-//		}
-//
-//
+	BiomeMix();
+	void blendForVeggies();
+//	void blendForTiles();
+//	void normalize();
+//	void replaceWithNullEntry(WeightedEntry& entry);
+//	void replaceOthersWithNullEntries(WeightedEntry& entry);
+//	[[nodiscard]] WeightedEntry& operator[](size_t index) {
+//		return container.entries[index];
 //	}
-//		auto type = getRandomVeggieType(biome, rng);
-//		return Veggie()
-//
-//
-//	}
-//	BiomeMix(std::array<WeightedEntry, 4> candidates_):candidates(candidates_) {};
 
-	//Biome pick();
-//	Biome evaluate();
-//	Vegi evaluate(libv::xoroshiro128& rng);
+	[[nodiscard]] const Biome& primary() noexcept;
+	[[nodiscard]] const Biome& random(libv::xoroshiro128& rng);
+	[[nodiscard]] libv::vec4f blendedColor(float fertility) noexcept;
+
+	[[nodiscard]] std::optional<VeggieType> getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng);
+	[[nodiscard]] std::optional<Veggie> getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng);
+
 };
 
 class BiomePicker {
+private:
+	struct CandidateBiome {
+		const Biome* biome;
+		float weight;
+//		float distance_sq;
+		libv::vec2f point; // Hacky
+		CandidateBiome(){}
+
+		CandidateBiome(const Biome* biome, float weight, libv::vec2f point) :
+			biome(biome), weight(weight), point(point) {}
+
+		void operator=(const Biome& source) {
+			biome = &source;
+			weight = source.dominance / (source.coord - point).length();
+		}
+	};
+
 public:
 //	libv::flat_set<Biome> biomes;
 //	std::array<CandidateBiome, 4> output;
@@ -266,7 +213,10 @@ public:
 
 public:
 	explicit BiomePicker();
+	Biome* emptyBiome();
+
 	[[nodiscard]] BiomeMix mix(const libv::flat_set<Biome>& biomes, const libv::vec2f point);
+//	[[nodiscard]] BiomeMix veggieMix(const libv::flat_set<Biome>& biomes, const libv::vec2f point);
 	//[[nodiscard]] Biome categorize(const libv::vec2f point);
 };
 

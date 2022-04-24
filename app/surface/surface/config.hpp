@@ -9,6 +9,7 @@
 #include <libv/math/gradient.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/container/flat_set.hpp>
+#include <surface/log.hpp>
 
 
 namespace surface {
@@ -99,6 +100,10 @@ struct Biome {
 	libv::gradientf<libv::vec4f> colorGrad;
 	std::vector<VeggieType> vegetation;
 
+	~Biome(){
+		log_surface.error("Biome dtor");
+	}
+
 	friend inline bool operator<(const Biome& lhs, const Biome& rhs) noexcept {
 		return lhs.name < rhs.name;
 	}
@@ -110,6 +115,8 @@ struct Biome {
 	friend inline bool operator<(const std::string& lhs, const Biome& rhs) noexcept {
 		return lhs < rhs.name;
 	}
+
+
 };
 
 

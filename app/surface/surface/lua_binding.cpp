@@ -273,30 +273,30 @@ Config SurfaceLuaBinding::convertConfig(const sol::object& object) {
 	return result;
 }
 
-Biome emptyBiome() {
-	Biome result;
-	result.name = "empty";
-	result.coord = {0, 0};
-//	result.cutOff = table["cutOff"];
-	result.dominance = 0.f;
-	libv::gradientf<libv::vec4f> colorGrad;
-	colorGrad.add(0.f, libv::vec4f{1, 1, 1, 1});
-	colorGrad.add(1.f, libv::vec4f{0, 0, 0, 1});
+//Biome emptyBiome() {
+//	Biome result;
+//	result.name = "empty";
+//	result.coord = {0, 0};
+////	result.cutOff = table["cutOff"];
+//	result.dominance = 0.f;
+//	libv::gradientf<libv::vec4f> colorGrad;
+//	colorGrad.add(0.f, libv::vec4f{1, 1, 1, 1});
+//	colorGrad.add(1.f, libv::vec4f{0, 0, 0, 1});
+//
+//	result.colorGrad = colorGrad;
+////	result.vegetation = convertVeggieTypes(table["vegetation"]);
+//
+//	return result;
+//}
 
-	result.colorGrad = colorGrad;
-//	result.vegetation = convertVeggieTypes(table["vegetation"]);
-
-	return result;
-}
-
-void extendBiomes(libv::flat_set<Biome> biomes) {
-	auto size = biomes.size();
-	while (size < 5) {
-		biomes.insert(emptyBiome());
-		size++;
-	}
-//	return biomes;
-}
+//void extendBiomes(libv::flat_set<Biome> biomes) {
+//	auto size = biomes.size();
+//	while (size < 5) {
+//		biomes.insert(emptyBiome());
+//		size++;
+//	}
+////	return biomes;
+//}
 
 Config SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
 	const auto env = sol::environment(lua, sol::create, lua.globals());

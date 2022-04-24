@@ -156,15 +156,15 @@ config = {
 
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
-	resolution = 126,
+	resolution = 512,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
-	numChunks = 81,
+	numChunks = 25,
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,
 	--circleNumber = 50,
 	--circleSize = 0.01,
-	numVeggie = 100,
+	numVeggie = 400,
 
 --                      /\
 --  COLD|BARREN        /  \ Polar
@@ -219,166 +219,129 @@ config = {
 biomes = {
 	--{
 	--	name = "no-biome",
-	--	coord = vec2f(0.25, 0.75),
-	--
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	cutOff = vec2f(0.1, 0.6),
-	--	colorGrad = {
-	--		{0, "black"},
-	--		{1, "white"}
-	--	}
-	--},
-	--{
 	--	name = "polar",
-	--	coord = vec2f(0.125, 0.125),
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	cutOff = vec2f(0.1, 0.7),
-	--	colorGrad = {
-	--		{0, "hsv(191, 20%, 26%)"},
-	--		{1, "hsv(191, 20%, 76%)"}
-	--	}
-	--},
-	--{
 	--	name = "subpolar-boreal",
-	--	coord = vec2f(0.25, 0.25),
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	cutOff = vec2f(0.1, 0.7),
-	--	colorGrad = {
-	--		{0, "hsv(41, 89%, 12%)"},
-	--		{1, "hsv(41, 89%, 62%)"}
-	--	}
-	--},
-	--{
 	--	name = "temperate-rainforest",
-	--	coord = vec2f(0.65, 0.65),
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	--dominance
-	--	cutOff = vec2f(0.1, 0.7),
-	--	colorGrad = {
-	--		{0, "hsv(130, 50%, 27%)"},
-	--		{1, "hsv(130, 60%, 50%)"}
-	--	}
-	--},
-	--{
 	--	name = "temperate-forest",
-	--	coord = vec2f(0.8, 0.8),
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	dominance = 1.8,
-	--
-	--	cutOff = vec2f(0.1, 0.7),
+	--	name = "temperate-grassland",
+	--	name = "tropical-savanna",
+	--{
+	--	name = "red",
+	--	dominance = 1.0,
+	--	coord = vec2f(0.3, 0.3),
+	--	cutOff = vec2f(0.3, 0.6),
 	--	colorGrad = {
-	--		--redish brown
-	--		{0, "hsv(10, 50%, 30%)"},
-	--		{1, "hsv(10, 50%, 100%)"}
+	--		--red
+	--		{0, "hsv(20, 100%, 30%)"},
+	--		{1, "hsv(20, 100%, 80%)"}
 	--	},
 	--	vegetation = {
 	--		{
 	--			name = "tree",
-	--			color = "hsv(10, 50%, 90%)",
-	--			size = 0.025,
-	--			probability = 0.85,
-	--			--fertilityRange = vec2f{0.6, 1.0},
-	--			--color = "hsv(120, 60%, 100%)",
-	--
+	--			color = "hsv(25, 100%, 100%)",
+	--			size = 0.03,
+	--			probability = 0.2,
 	--		},
 	--		{
 	--			name = "bush",
-	--			color = "hsv(19, 50%, 90%)",
-	--			size = 0.012,
-	--			probability = 0.15,
-	--
-	--
+	--			color = "hsv(30, 100%, 100%)",
+	--			size = 0.02,
+	--			probability = 0.2,
 	--		}
 	--	}
 	--},
 	--{
-	--	name = "temperate-grassland",
+	--	name = "blue",
 	--	dominance = 1.0,
-	--	coord = vec2f(0.2, 0.2),
-	--	--radius = 0.05
-	--	--min cut off, max cut off
-	--	cutOff = vec2f(0.1, 0.7),
+	--	coord = vec2f(0.6, 0.6),
+	--	cutOff = vec2f(0.3, 0.6),
 	--	colorGrad = {
 	--		--blue
-	--		{0, "hsv(190, 70%, 30%)"},
-	--		{1, "hsv(190, 70%, 100%)"}
+	--		{0, "hsv(210, 70%, 30%)"},
+	--		{1, "hsv(210, 70%, 100%)"}
 	--	},
 	--	vegetation = {
 	--		{
 	--			name = "tree",
-	--			color = "hsv(190, 70%, 100%)",
-	--			size = 0.05,
+	--			color = "hsv(210, 70%, 100%)",
+	--			size = 0.03,
 	--			probability = 0.2,
-	--			--fertilityRange = vec2f{0.6, 1.0},
-	--			--color = "hsv(120, 60%, 100%)",
-	--
 	--		},
 	--		{
 	--			name = "bush",
-	--			color = "hsv(199, 70%, 100%)",
+	--			color = "hsv(219, 70%, 100%)",
 	--			size = 0.02,
 	--			probability = 0.2,
-	--
-	--
-	--
 	--		}
 	--	}
 	--},
 	{
-		name = "temperate-grassland-mid",
-		dominance = 1.0,
-		coord = vec2f(0.5, 0.5),
-		--radius = 0.05
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.525),
+		name = "dark-blue",
+		dominance = 1,
+		coord = vec2f(0.1, 0.9),
+		cutOff = vec2f(0.3, 0.9),
 		colorGrad = {
 			--blue
 			{0, "hsv(210, 70%, 30%)"},
-			{1, "hsv(210, 70%, 100%)"}
+			{1, "hsv(210, 70%, 50%)"}
 		},
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(210, 70%, 100%)",
-				size = 0.05,
+				color = "hsv(210, 70%, 70%)",
+				size = 0.03,
 				probability = 0.2,
-				--fertilityRange = vec2f{0.6, 1.0},
-				--color = "hsv(120, 60%, 100%)",
-
 			},
 			{
 				name = "bush",
-				color = "hsv(219, 70%, 100%)",
+				color = "hsv(219, 70%, 65%)",
 				size = 0.02,
 				probability = 0.2,
-
-
-
+			}
+		}
+	},
+	{
+		name = "green",
+		coord = vec2f(0.5, 0.8),
+		dominance = 1.0,
+		cutOff = vec2f(0.45, 0.5),
+		colorGrad = {
+			--green
+			{0, "hsv(120, 60%, 30%)"},
+			{1, "hsv(120, 60%, 100%)"}
+		},
+		vegetation = {
+			{
+				name = "tree",
+				color = "hsv(125, 60%, 100%)",
+				size = 0.025,
+				probability = 0.2,
+			},
+			{
+				name = "bush",
+				color = "hsv(129, 60%, 100%)",
+				size = 0.022,
+				probability = 0.2,
 			}
 		}
 	},
 	--{
-	--	name = "tropical-rainforest",
-	--	coord = vec2f(0.2, 0.8),
-	--	dominance = 1.5,
 	--
-	--	--radius = 0.05
+	--	name = "desert",
+	--	coord = vec2f(0.9, 0.1),
+	--	dominance = 1.0,
+	--	--radius = 0.025
 	--	--min cut off, max cut off
-	--	cutOff = vec2f(0.1, 0.7),
+	--	cutOff = vec2f(0.3, 0.6),
 	--	colorGrad = {
-	--		--green
-	--		{0, "hsv(120, 60%, 30%)"},
-	--		{1, "hsv(120, 60%, 100%)"}
+	--		--yellow
+	--		{0, "hsv(60, 80%, 30%)"},
+	--		{1, "hsv(60, 80%, 100%)"}
 	--	},
 	--	vegetation = {
 	--		{
 	--			name = "tree",
-	--			color = "hsv(120, 60%, 90%)",
+	--			color = "hsv(60, 80%, 100%)",
 	--			size = 0.025,
 	--			probability = 0.2,
 	--			--fertilityRange = vec2f{0.6, 1.0},
@@ -387,62 +350,12 @@ biomes = {
 	--		},
 	--		{
 	--			name = "bush",
-	--			color = "hsv(129, 60%, 90%)",
+	--			color = "hsv(69, 80%, 100%)",
 	--			size = 0.022,
 	--			probability = 0.2,
-	--
-	--
-	--
 	--		}
 	--	}
 	--},
-	--{
-	--	name = "tropical-savanna",
-	--	colorGrad = {
-	--		{0, "hsv(100, 78%, 2%)"},
-	--		{1, "hsv(100, 78%, 52%)"}
-	--	}
-	--},
-	--{
-	--	name = "subtropical-desert",
-	--	colorGrad = {
-	--		{0, "hsv(100, 78%, 2%)"},
-	--		{1, "hsv(100, 78%, 52%)"}
-	--	}
-	--}
-	{
-		name = "desert",
-		coord = vec2f(0.8, 0.2),
-		dominance = 1.0,
-		--radius = 0.025
-		--min cut off, max cut off
-		cutOff = vec2f(0.1, 0.4),
-		colorGrad = {
-			--yellow
-			{0, "hsv(60, 80%, 30%)"},
-			{1, "hsv(60, 80%, 100%)"}
-		},
-		vegetation = {
-			{
-				name = "tree",
-				color = "hsv(60, 80%, 100%)",
-				size = 0.025,
-				probability = 0.2,
-				--fertilityRange = vec2f{0.6, 1.0},
-				--color = "hsv(120, 60%, 100%)",
-
-			},
-			{
-				name = "bush",
-				color = "hsv(69, 80%, 100%)",
-				size = 0.022,
-				probability = 0.2,
-
-
-
-			}
-		}
-	},
 }
 
 height = {
