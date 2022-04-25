@@ -156,16 +156,15 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 		const auto wet = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 //		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
-//		auto picker = BiomePicker();
-//		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-//		mix.blendForVeggies();
-//		const auto& biome = mix.random(rngLocal);
+		auto picker = BiomePicker();
+		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
+		mix.blendForVeggies();
+		const auto& biome = mix.random(rngLocal);
 //		const auto& biome = mix.primary();
-		const auto& biome = *config.biomes.begin();
-		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
+//		const auto& biome = *config.biomes.begin();
+//		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
 
-		{
-//		if(auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
+		if (auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
 			veggieType->pos = libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}; //TODO: TAKE THIS OUT
 
 			auto lock = std::unique_lock(chunkGuard);

@@ -5,64 +5,77 @@
 #include <utility>
 #include <algorithm>
 
+#include <libv/algo/erase_if_stable.hpp>
+
 
 namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 BiomeMix::BiomeMix() {};
 
+void BiomeMix::normalize() {
+	float sum = 0.f;
+	for (const auto& entry : entries) {
+		sum += entry.weight;
+	}
+
+	assert(sum != 0.f);
+
+	for (auto& entry : entries) {
+		entry.weight /= sum;
+	}
+}
+
+
 void BiomeMix::blendForVeggies() {
 	//cut-off
 	//TODO: This breaks the blending
 	bool winner = false;
-	for (auto& entry : container.entries) {
+	WeightedEntry winnerEntry;
+	for (auto& entry : entries) {
 //		if (entry.biome == nullptr)
 //			continue;
 		assert(entry.biome != nullptr);
 
 		if (entry.weight > entry.biome->cutOff.y) {
-			container = WeightedContainer<WeightedEntry>();
-			container.insert(entry);
+			winnerEntry = entry;
 			winner = true;
 			break;
 		}
 	}
-//
-	if (!winner) {
-		std::vector<WeightedEntry> toBeErased;
-		for (auto& entry : container.entries) {
-//		if (entry.biome == nullptr)
-//			continue;
-			assert(entry.biome != nullptr);
-			if (container.entries.size() == 1 + toBeErased.size())
-				break;
-
-			if (entry.weight < entry.biome->cutOff.x) {
-				toBeErased.emplace_back(entry);
-//			container.erase(entry);
-
-			}
-		}
-		container.eraseAll(toBeErased);
+	if (winner) {
+		entries.clear();
+		winnerEntry.weight = 1.0f;
+		entries.emplace_back(winnerEntry);
+	} else {
+		size_t i = 0;
+		libv::erase_if_stable(entries, [&i, this](const auto& x) {
+			assert(x.biome != nullptr);
+			const auto result = x.weight < x.biome->cutOff.x && i + 2 < entries.size();
+			if (result)
+				++i;
+			return result;
+		});
+		normalize();
 	}
 }
 
 //void BiomeMix::blendForTiles() {
-//	const auto& smallest = container.entries[container.entries.size() - 1];
+//	const auto& smallest = entries[entries.size() - 1];
 //	container.erase(smallest);
 //}
 
 const Biome& BiomeMix::primary() noexcept {
 
-	assert(container.entries[0].biome != nullptr);
-	return *container.entries[0].biome;
+	assert(entries[0].biome != nullptr);
+	return *entries[0].biome;
 }
 
 const Biome& BiomeMix::random(libv::xoroshiro128& rng) {
 	//TODO: Extract weighted selection algorithm with projection
 	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
 	auto number = ratio(rng);
-	for (const auto& entry : container.entries) {
+	for (const auto& entry : entries) {
 		assert(entry.biome != nullptr);
 		if (number <= entry.weight)
 			return *entry.biome;
@@ -77,7 +90,7 @@ const Biome& BiomeMix::random(libv::xoroshiro128& rng) {
 
 libv::vec4f BiomeMix::blendedColor(float fertility) noexcept {
 	libv::vec4f result;
-	for (const auto& entry : container.entries) {
+	for (const auto& entry : entries) {
 		assert(entry.biome != nullptr);
 		result += entry.biome->colorGrad.sample(fertility) * entry.weight;
 	}
@@ -136,8 +149,6 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 			[&](const CandidateBiome& biome) { return biome.weight; }
 	);
 
-	BiomeMix result;
-	int i = 0;
 	const auto smallest = candidates[candidates.size() - 1];
 	std::vector<WeightedEntry> entries;
 	for (const auto& candidate : candidates) {
@@ -146,12 +157,10 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 
 		//TODO: remap so highest remains the old, stretch out to original ratio
 		const auto weight = candidate.weight - smallest.weight;
-		const auto& entry = WeightedEntry(candidate.biome, candidate.weight);
+		const auto& entry = WeightedEntry(candidate.biome, weight);
 		entries.emplace_back(entry);
 	}
-	result.container = WeightedContainer<WeightedEntry>(entries);
-	return result;
+	return BiomeMix(entries);
 }
-
 
 } // namespace surface

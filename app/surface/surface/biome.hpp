@@ -92,7 +92,6 @@ public:
 	std::vector<T> entries;
 
 private:
-
 	void normalize() {
 		float sum = 0.f;
 		for (const auto& entry : entries) {
@@ -111,8 +110,8 @@ public:
 		entries.reserve(5);
 	}
 
-	explicit WeightedContainer(std::vector<T> entries_) {
-		entries = std::vector<T>(entries_.begin(), entries_.end());
+	explicit WeightedContainer(std::vector<T> entries_) :
+		entries(std::move(entries_)) {
 		normalize();
 	}
 
@@ -161,15 +160,21 @@ struct WeightedEntry {
 class BiomeMix {
 private:
 //	libv::xoroshiro128 rng{123};
-public:
-
-
-public:
+private:
 //	std::array<WeightedEntry, 4> entries;
-	WeightedContainer<WeightedEntry> container;
+//	WeightedContainer<WeightedEntry> container;
+	std::vector<WeightedEntry> entries;
+
+private:
+	void normalize();
 
 public:
 	BiomeMix();
+
+	BiomeMix(std::vector<WeightedEntry> entries) : entries(std::move(entries)) {
+		normalize();
+	}
+
 	void blendForVeggies();
 //	void blendForTiles();
 //	void normalize();
@@ -195,10 +200,10 @@ private:
 		float weight;
 //		float distance_sq;
 		libv::vec2f point; // Hacky
-		CandidateBiome(){}
+		CandidateBiome() {}
 
 		CandidateBiome(const Biome* biome, float weight, libv::vec2f point) :
-			biome(biome), weight(weight), point(point) {}
+				biome(biome), weight(weight), point(point) {}
 
 		void operator=(const Biome& source) {
 			biome = &source;
