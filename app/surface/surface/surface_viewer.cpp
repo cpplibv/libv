@@ -224,7 +224,7 @@ void SurfaceViewer::initUI() {
 	mainLayers.add(canvas);
 
 	libv::ui::Label label("version_lbl");
-	label.text("Surface v1.0");
+	label.text("v1.0");
 	label.font_color(libv::vec4f(0.8f, 0.8f, 0.8f, 0.6f));
 	label.align_horizontal(libv::ui::AlignHorizontal::right);
 	label.align_vertical(libv::ui::AlignVertical::bottom);

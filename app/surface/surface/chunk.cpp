@@ -38,8 +38,7 @@ Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t
 		temp_humidity_distribution(resolution, resolution) {
 }
 
-//collusion query
-float Chunk::getHeight(libv::vec2f query_position) const {
+float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	//	             (1,1)
 	// O    NW O  upY  O NE
 	//       leftX  * rightX
@@ -50,14 +49,12 @@ float Chunk::getHeight(libv::vec2f query_position) const {
 	// O - - - O       O
 	// (0,0)
 
-	query_position /= size; // Remap query to the [0..1] quad
-
 	const auto numQuad = resolution - 1;
 	const auto step = 1.f / static_cast<float>(numQuad);
 
-	const auto leftX = static_cast<int>(std::floor(query_position.x / step));
+	const auto leftX = static_cast<int>(uv.x / step);
 	const auto rightX = leftX + 1;
-	const auto downY = static_cast<int>(std::floor(query_position.y / step));
+	const auto downY = static_cast<int>(uv.y / step);
 	const auto upY = downY + 1;
 
 	const auto NW = height(leftX, upY).pos;
@@ -65,15 +62,24 @@ float Chunk::getHeight(libv::vec2f query_position) const {
 	const auto SW = height(leftX, downY).pos;
 	const auto SE = height(rightX, downY).pos;
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
-	const auto isPointInNWSWSE = isPointInTriangle(query_position, step);
+	const auto isPointInNWSWSE = isPointInTriangle(uv, step);
 
-	auto u = libv::fract(query_position.x / step);
-	auto v = libv::fract(query_position.y / step);
+	auto u = libv::fract(uv.x / step);
+	auto v = libv::fract(uv.y / step);
 
 	if (isPointInNWSWSE)
 		return (1 - u - v) * SW.z + u * SE.z + v * NW.z;
 	else
 		return (-1 + u + v) * NE.z + (1 - u) * NW.z + (1 - v) * SE.z;
+}
+
+libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
+	auto distUV = libv::make_uniform_distribution_exclusive(0.f, 1.f);
+	const auto u = distUV(rng);
+	const auto v = distUV(rng);
+
+	const auto z = getInterpolatedHeight({u, v});
+	return {position.x + u * size.x, position.y + v * size.y, z};
 }
 
 //std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
@@ -129,8 +135,8 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 
 void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
-	std::mutex chunkGuard;
-	std::mutex rngGuard;
+	std::mutex chunk_m;
+	std::mutex rng_m;
 	chunk.veggies.reserve(config.numVeggie); // TODO P3: Should check if reserving for 20% isn't memory wasteful
 
 	// NOTE: This parallelism doesn't yield too much gain, but still better than single thread
@@ -138,22 +144,17 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 	// Baseline / No operation: 145 - 148
 	// Single thread: 170 - 180
 	// Multi-thread: 159 - 162 (current)
-	// Multi-thread lockless assigment: 158 - 161 (would need post merge, possible)
+	// Multi-thread lockless assigment: 158 - 161 (would need post merge, possible, not enough gain)
 
 	libv::mt::parallel_for(threads, 0uz, config.numVeggie, [&](auto) {
-		auto distX = libv::make_uniform_distribution_exclusive(0.f, chunk.size.x);
-		auto distY = libv::make_uniform_distribution_exclusive(0.f, chunk.size.y);
-
-		auto rngLock = std::unique_lock(rngGuard);
-		auto rngLocal = rng.fork(); // RNG has to be forked under a mutex
+		auto rngLock = std::unique_lock(rng_m);
+		auto rngLocal = chunk.rng.fork(); // RNG has to be forked under a mutex
 		rngLock.unlock();
 
-		const auto x = distX(rngLocal);
-		const auto y = distY(rngLocal);
-		const auto z = chunk.getHeight({x, y});
+		const auto point = chunk.pickRandomPoint(rngLocal);
 
-		const auto temp = config.temperature.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y) - z * config.temperature.heightSensitivity;
-		const auto wet = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
+		const auto temp = config.temperature.rootNode->evaluate(point.x, point.y) - point.z * config.temperature.heightSensitivity;
+		const auto wet = config.humidity.rootNode->evaluate(point.x, point.y);
 //		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
 		auto picker = BiomePicker();
@@ -165,9 +166,9 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
 
 		if (auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
-			veggieType->pos = libv::vec3f{x + chunk.position.x, y + chunk.position.y, z}; //TODO: TAKE THIS OUT
+			veggieType->pos = point; //TODO: TAKE THIS OUT
 
-			auto lock = std::unique_lock(chunkGuard);
+			auto lock = std::unique_lock(chunk_m);
 			chunk.veggies.emplace_back(std::move(veggieType.value()));
 		}
 	});

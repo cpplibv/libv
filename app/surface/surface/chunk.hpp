@@ -94,7 +94,9 @@ public:
 	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution);
 
 public:
-	[[nodiscard]] float getHeight(const libv::vec2f query_position) const;
+	/// @param uv The relative local (uv) coordinates (in region of 0..1) of the requested point
+	[[nodiscard]] float getInterpolatedHeight(const libv::vec2f uv) const;
+	[[nodiscard]] libv::vec3f pickRandomPoint(libv::xoroshiro128& rng) const;
 //	[[nodiscard]] float getInterpolatedValue(const libv::vec2f position, const libv::vector_2D<float>& heatMap);
 
 //	[[nodiscard]] static std::vector<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_);
