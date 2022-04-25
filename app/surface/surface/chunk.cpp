@@ -79,7 +79,7 @@ libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
 	const auto v = distUV(rng);
 
 	const auto z = getInterpolatedHeight({u, v});
-	return {position.x + u * size.x, position.y + v * size.y, z};
+	return {position.x + (u - 0.5f) * size.x, position.y + (v - 0.5f) * size.y, z};
 }
 
 //std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
@@ -137,7 +137,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
 	std::mutex chunk_m;
 	std::mutex rng_m;
-	chunk.veggies.reserve(config.numVeggie); // TODO P3: Should check if reserving for 20% isn't memory wasteful
+	chunk.veggies.reserve(config.numVeggie / 5); // TODO P3: Should check if reserving for 20% isn't memory wasteful
 
 	// NOTE: This parallelism doesn't yield too much gain, but still better than single thread
 	// The entire generation of 81 chunk with 100 veggie per chunk in milliseconds:
@@ -236,8 +236,8 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 
 		for (std::size_t xi = 0; xi < numVertex; ++xi) {
 			const auto xf = static_cast<float>(xi);
-			const auto x = xf * step.x;
-			const auto y = yf * step.y;
+			const auto x = xf * step.x - chunk->size.x * 0.5f;
+			const auto y = yf * step.y - chunk->size.y * 0.5f;
 
 			/// Calculate heatmaps' point
 			chunk->height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);

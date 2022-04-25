@@ -56,7 +56,7 @@ void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuf
 		glr.texture(texture, textureChannel_diffuse);
 
 		auto guard = glr.model.push_guard();
-		glr.model.translate(libv::vec3f{chunk.pos, 0});
+		glr.model.translate(libv::vec3f{chunk.pos - chunk.size * 0.5f, 0});
 		glr.model.scale({chunk.size, 1});
 
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
