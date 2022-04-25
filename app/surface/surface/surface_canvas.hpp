@@ -81,6 +81,7 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererSurface.clear();
 		for (const auto& chunk : chunks) {
 			rendererSurface.addChunk(chunk);
 		}
@@ -91,6 +92,7 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererVeggie.clear_debug_shapes();
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies)
 				rendererVeggie.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 6, 6);

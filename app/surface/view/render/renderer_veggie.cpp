@@ -13,7 +13,7 @@ RendererDebug::RendererDebug(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
 }
 
-void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
+void RendererDebug::build_points_mesh(Mesh& mesh) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -30,7 +30,7 @@ void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
 	}
 }
 
-void RendererDebug::build_lines_mesh(libv::glr::Mesh& mesh) {
+void RendererDebug::build_lines_mesh(Mesh& mesh) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -119,7 +119,7 @@ void RendererDebug::build_lines_mesh(libv::glr::Mesh& mesh) {
 	}
 }
 
-void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
+void RendererDebug::build_triangles_mesh(Mesh& mesh) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);

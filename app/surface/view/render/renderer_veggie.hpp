@@ -92,16 +92,16 @@ private:
 	std::vector<Frustum> frustums;
 	std::vector<Sphere> spheres;
 
-	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	ShaderTestMode shader;
 	bool dirty = true;
 
-	void build_points_mesh(libv::glr::Mesh& mesh);
-	void build_lines_mesh(libv::glr::Mesh& mesh);
-	void build_triangles_mesh(libv::glr::Mesh& mesh);
+	void build_points_mesh(Mesh& mesh);
+	void build_lines_mesh(Mesh& mesh);
+	void build_triangles_mesh(Mesh& mesh);
 public:
 	explicit RendererDebug(RendererResourceContext& rctx);
 

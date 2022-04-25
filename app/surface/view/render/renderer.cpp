@@ -30,7 +30,7 @@ RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
 	build_gizmo_lines(mesh);
 }
 
-void RendererGizmo::build_gizmo_lines(libv::glr::Mesh& mesh) {
+void RendererGizmo::build_gizmo_lines(Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();

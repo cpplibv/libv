@@ -35,6 +35,7 @@ inline int32_t global_test_mode = 0;
 // =================================================================================================
 
 namespace surface {
+using Mesh = libv::glr::Mesh;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -55,18 +56,18 @@ struct RendererResourceContext {
 
 
 struct RendererGizmo {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader;
 
 public:
 	explicit RendererGizmo(RendererResourceContext& rctx);
 
-	void build_gizmo_lines(libv::glr::Mesh& mesh);
+	void build_gizmo_lines(Mesh& mesh);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererEditorGrid {
-	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader;
 
 public:
@@ -80,7 +81,7 @@ struct RendererText {
 private:
 	ShaderText shader;
 
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
+	Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
 
 	struct Entry {
 		libv::vec3f position;

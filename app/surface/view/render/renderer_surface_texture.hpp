@@ -6,6 +6,7 @@
 
 
 namespace surface {
+using Mesh = libv::glr::Mesh;
 
 struct RendererSurfaceTexture {
 	struct ChunkTexture {
@@ -14,7 +15,7 @@ struct RendererSurfaceTexture {
 		libv::vec2f size;
 	};
 private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderSurface shader;
 	std::vector<ChunkTexture> chunks;
 

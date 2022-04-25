@@ -12,15 +12,32 @@
 
 #include <surface/view/render/renderer.hpp>
 
+#include <libv/utility/hash.hpp>
+
 
 namespace surface {
+using Mesh = libv::glr::Mesh;
+
+struct VecHash {
+	auto operator()(libv::vec2i vec) const {
+		return libv::hash_combine(
+				libv::hash_int(static_cast<uint32_t>(vec.x)),
+				libv::hash_int(static_cast<uint32_t>(vec.y)));
+	}
+};
 
 
-struct RendererSurface{
+struct RendererSurface {
+//private:
+//	struct ChunkMesh {
+//		Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+////		Chunk chunk;
+//	};
 private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+//	Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+	std::unordered_map<libv::vec2i, Mesh, VecHash> chunkMeshMap;
 	ShaderSurface shader;
-	libv::glr::VertexIndex vi = 0;
+//	libv::glr::VertexIndex vi = 0;
 //	bool dirty = true;
 
 //	void build_mesh(const std::vector<surface::Chunk>& chunks);
@@ -34,7 +51,6 @@ public:
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
-
 
 } // namespace surface
 
