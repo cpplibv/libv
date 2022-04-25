@@ -18,8 +18,7 @@
 namespace surface {
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
-		renderer(ui)
-{
+		renderer(ui) {
 	camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
 	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event&) {
@@ -107,11 +106,6 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 		auto conf = binding.getConfigFromLuaScript(script);
 
 		surface->gen(std::move(conf));
-//			buildChunks();
-//			std::cout << "Building chunks has finished" << std::endl;
-//			fmt::print("BuildChunks(): {:8.4f} ms", timerChunkGen.timed_ms().count());
-//			std::cout << std::endl;
-//			timerChunkGen.reset();
 	}
 
 	surfaceDirty = surface->update();
@@ -123,44 +117,28 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (previousHeatMap != currentHeatMap) {
 		previousHeatMap = currentHeatMap;
-		//libv::Timer timerChunkGen;
-
 		currentScene = createScene(currentHeatMap);
+//		if (surfaceDirty) {
+			//build mesh
+			currentScene->build(surface->getChunks());
+			currentScene->buildVeggie(surface->getChunks());
+//		}
 	}
 
-	//render surface texture/_3d
 	if (!surface->getChunks().empty()) {
 		if (surfaceDirty) {
+			//build mesh
 			currentScene->build(surface->getChunks());
-	//		std::cout << "Building render objects has finished" << std::endl;
-	//		fmt::print("currentScene->build(): {:8.4f} ms", timerChunkGen.timed_ms().count());
-	//		std::cout << std::endl;
-	//		timerChunkGen.reset();
-
-	//		if (enableVegetation)  //there is veggies
 			currentScene->buildVeggie(surface->getChunks());
 		}
 
+		//render surface texture/_3d
 		currentScene->render(glr, renderer.resource_context.uniform_stream);
 
 		// render plant model/debug
-		if (enableVegetation) {
-//		if (config.visualization == Visualization::model)
-//			for (const auto& chunk : chunks) {
-//				for (const auto& veggie : chunk.veggies) {
-//					const auto m2_guard = glr.model.push_guard();
-//					glr.model.translate(veggie.pos);
-//					glr.model.scale(veggie.size * 0.01f);
-//					glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(1, 0, 0));
-//
-//					renderer.fleet.render(glr, renderer.resource_context.uniform_stream);
-//				}
-//			}
-//		else
+		if (enableVegetation)
 			currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 
-//		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
-		}
 	}
 
 	if (currentHeatMap == SceneType::_3d && enableGrid) {

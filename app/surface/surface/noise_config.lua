@@ -153,12 +153,12 @@ end
 --end
 
 config = {
-
 	--currentHeatMap = "temperature",
 	visualization = Visualization.spheres,
 	resolution = 128,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
-	numChunks = 2000,
+	numChunks = 200,
+
 	amplitude = 0.5,
 	--treeSize = 0.003,
 	plantDistribution = PlantDistribution.random,

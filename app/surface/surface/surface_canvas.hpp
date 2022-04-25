@@ -92,7 +92,7 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererVeggie.clear_debug_shapes();
+		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies)
 				rendererVeggie.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 6, 6);
@@ -134,6 +134,7 @@ struct TextureScene : Scene {
 	}
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies)
 				rendererVeggie.add_debug_sphere(libv::vec3f{xy(veggie.pos), 0.f}, veggie.size, veggie.color, 6, 6);
@@ -167,6 +168,7 @@ struct HeightHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(getColors(chunk->height));
 			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
@@ -178,6 +180,7 @@ struct BiomeHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->biomeMap);
 			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
@@ -189,6 +192,7 @@ struct TemperatureHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->temperature);
 			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
@@ -200,6 +204,7 @@ struct HumidityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->humidity);
 			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
@@ -211,6 +216,7 @@ struct FertilityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->fertility);
 			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
@@ -223,6 +229,7 @@ struct FertilityHeatMap : TextureScene {
 //struct TemperatureHumidityDistributionHeatMap : TextureScene {
 //
 //	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+//		rendererTexture.clear();
 //		const auto size = chunk->humidity.size_y() + 1;
 //		libv::vector_2D<float> result{size, size};
 //		result.fill(0.f);
