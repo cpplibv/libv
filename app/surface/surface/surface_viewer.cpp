@@ -69,6 +69,10 @@ SurfaceViewer::SurfaceViewer() :
 			break;
 		}
 	});
+	controls.feature_action<void>("surface.cycle_config", [](const auto&) {
+		configChanged = true;
+		refresh = true;
+	});
 	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
 		enableGrid = !enableGrid;
 	});
@@ -151,10 +155,11 @@ SurfaceViewer::SurfaceViewer() :
 		controls.ignore_events(event.controls_intercepted());
 	});
 
-	controls.bind("surface.refresh_surface", "R");
+	controls.bind("surface.refresh_surface", "R [press]");
 	controls.bind("surface.show_controls", "F1");
 	controls.bind("surface.toggle_wireframe", "F2 [press]");
 	controls.bind("surface.cycle_camera", "F3 [press]");
+	controls.bind("surface.cycle_config", "C [press]");
 	controls.bind("surface.toggle_vegetation", "F4 [press]");
 	controls.bind("surface.toggle_grid", "F5 [press]");
 

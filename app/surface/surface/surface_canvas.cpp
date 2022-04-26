@@ -21,9 +21,11 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls) :
 		cameraManager(controls),
 		renderer(ui) {
 
-	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event&) {
-		changed = true;
-	});
+	configPaths.emplace_back("config/noise_config.lua");
+	configPaths.emplace_back("config/noise_config2.lua");
+	configPaths.emplace_back("config/noise_config3.lua");
+
+	setConfig();
 
 	surface = std::make_unique<Surface>();
 	currentScene = createScene(currentHeatMap);
@@ -51,6 +53,15 @@ std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
 
 void SurfaceCanvas::attach() {
 	focus();
+}
+
+void SurfaceCanvas::setConfig() {
+	configCnt %= configPaths.size();
+	currentConfigPath = configPaths[configCnt];
+
+	fileWatcher.subscribe_file(currentConfigPath, [this](const libv::fsw::Event&) {
+		changed = true;
+	});
 }
 
 void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
@@ -90,7 +101,13 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	cameraManager.update();
 
-	if(refresh) {
+	if (configChanged) {
+		configChanged = false;
+		configCnt++;
+		setConfig();
+	}
+
+	if (refresh) {
 		refresh = false;
 		currentScene = createScene(currentHeatMap);
 		changed = true;
@@ -99,7 +116,7 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	if (changed) {
 		changed = false;
 
-		auto script = libv::read_file_str_or_throw("surface/noise_config.lua");
+		auto script = libv::read_file_str_or_throw(currentConfigPath);
 		auto conf = binding.getConfigFromLuaScript(script);
 
 		surface->gen(std::move(conf));

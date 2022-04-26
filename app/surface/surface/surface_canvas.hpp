@@ -39,6 +39,12 @@ inline bool enableWireframe = false;
 inline bool enableVegetation = true;
 inline bool enableGrid = true;
 inline bool refresh = true;
+inline bool configChanged = false;
+inline size_t configCnt = 0;
+
+inline std::atomic<bool> changed = true;
+
+
 
 
 // -------------------------------------------------------------------------------------------------
@@ -88,7 +94,7 @@ struct SurfaceScene : Scene {
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 //		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-				rendererVeggie.addVeggies(chunk->index, chunk->veggies, true);
+			rendererVeggie.addVeggies(chunk->index, chunk->veggies, true);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -128,7 +134,7 @@ struct TextureScene : Scene {
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 		for (const auto& chunk : chunks)
-				rendererVeggie.addVeggies(chunk->index, chunk->veggies, false);
+			rendererVeggie.addVeggies(chunk->index, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -255,8 +261,9 @@ private:
 	surface::Renderer renderer;
 
 	SurfaceLuaBinding binding;
+	std::vector<std::string> configPaths;
+	std::string currentConfigPath;
 	libv::fsw::Watcher fileWatcher;
-	std::atomic<bool> changed = true;
 
 private:
 	std::unique_ptr<Scene> currentScene;
@@ -272,6 +279,7 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
+	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;
 };
