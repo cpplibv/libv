@@ -90,6 +90,12 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	cameraManager.update();
 
+	if(refresh) {
+		refresh = false;
+		currentScene = createScene(currentHeatMap);
+		changed = true;
+	}
+
 	if (changed) {
 		changed = false;
 
@@ -110,9 +116,9 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		previousHeatMap = currentHeatMap;
 		currentScene = createScene(currentHeatMap);
 //		if (surfaceDirty) {
-			//build mesh
-			currentScene->build(surface->getChunks());
-			currentScene->buildVeggie(surface->getChunks());
+		//build mesh
+		currentScene->build(surface->getChunks());
+		currentScene->buildVeggie(surface->getChunks());
 //		}
 	}
 
