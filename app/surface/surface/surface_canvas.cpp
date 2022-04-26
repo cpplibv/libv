@@ -150,7 +150,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		currentScene->render(glr, renderer.resource_context.uniform_stream);
 
 		// render plant model/debug
-		if (enableVegetation)
+		if (enableVegetation && cameraManager.getHeight() < 10.f)
 			currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 
 	}

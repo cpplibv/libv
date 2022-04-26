@@ -115,6 +115,18 @@ public:
 		assert(false && "Invalid CameraMode enum value");
 		return libv::mat4f::identity();
 	}
+
+	float getHeight(){
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			return camera2D.position().z;
+		case CameraMode::_3d:
+			return camera3D.eye().z;
+		}
+
+		assert(false && "Invalid CameraMode enum value");
+		return 0.f;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
