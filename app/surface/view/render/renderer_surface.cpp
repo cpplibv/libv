@@ -10,7 +10,7 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
+		shader(rctx.shader_loader, "surface.vs", "surface.fs") {}
 
 void RendererSurface::addChunk(const std::shared_ptr<surface::Chunk>& chunk) {
 	const auto& pair = chunkMeshMap.emplace(chunk->index, libv::glr::Mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw});
@@ -19,14 +19,30 @@ void RendererSurface::addChunk(const std::shared_ptr<surface::Chunk>& chunk) {
 		mesh.clear();
 
 	auto position = mesh.attribute(attribute_position);
+	auto normal = mesh.attribute(attribute_normal);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
 
+	const auto calculateNormal = [&](uint32_t x, uint32_t y) {
+		if (x == 0 || x == chunk->height.size_x() - 1)
+			return libv::vec3f{0, 0, 1};
+		if (y == 0 || y == chunk->height.size_y() - 1)
+			return libv::vec3f{0, 0, 1};
+
+		const auto pL = chunk->height(x - 1, y).pos;
+		const auto pR = chunk->height(x + 1, y).pos;
+		const auto pU = chunk->height(x, y + 1).pos;
+		const auto pD = chunk->height(x, y - 1).pos;
+
+		return normalize(libv::cross(pR - pL, pU - pD));
+	};
+
 	const auto rowSize = chunk->height.size_y();
-	for (unsigned int y = 0; y < rowSize; y++) {
-		for (unsigned int x = 0; x < chunk->height.size_x(); ++x) {
+	for (uint32_t y = 0; y < rowSize; y++) {
+		for (uint32_t x = 0; x < chunk->height.size_x(); ++x) {
 			position(chunk->height(x, y).pos);
+			normal(calculateNormal(x, y));
 			color0(chunk->biomeMap(x, y));
 		}
 	}
