@@ -38,6 +38,8 @@ inline SceneType previousHeatMap = currentHeatMap;
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
 inline bool enableGrid = true;
+inline std::atomic<bool> changed = true;
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -255,7 +257,6 @@ private:
 
 	SurfaceLuaBinding binding;
 	libv::fsw::Watcher fileWatcher;
-	std::atomic<bool> changed = true;
 
 private:
 	std::unique_ptr<Scene> currentScene;
