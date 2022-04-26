@@ -162,7 +162,6 @@ SurfaceViewer::SurfaceViewer() :
 	controls.bind("surface.fertility_texture", "5 [press]");
 	controls.bind("surface.biome_texture", "6 [press]");
 //	controls.bind("surface.distribution_texture", "7 [press]");
-//	controls.bind("surface.temperature_heat_map", "1 [press]");
 
 	initUI();
 
@@ -172,53 +171,11 @@ SurfaceViewer::SurfaceViewer() :
 }
 
 void SurfaceViewer::initUI() {
-	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui);
+	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui, controls);
 	canvas.z_index_offset(-100);
 
 	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
-		if (e.gain())
-			switch (currentCameraMode) {
-			case CameraMode::_2d:
-				controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-				break;
-			case CameraMode::_3d:
-				controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-				break;
-			}
-		else
-			switch (previousCameraMode) {
-			case CameraMode::_2d:
-				controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-				break;
-			case CameraMode::_3d:
-				controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-				break;
-			}
-	});
-
-	frame.onContextUpdate.output([this, canvas](const auto&) mutable {
-		if (currentCameraMode == previousCameraMode)
-			return;
-
-		switch (previousCameraMode) {
-		case CameraMode::_2d:
-			controls.context_leave_if_matches<surface::CameraOrtho>(&canvas.object().camera2D);
-			break;
-		case CameraMode::_3d:
-			controls.context_leave_if_matches<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			break;
-		}
-
-		switch (currentCameraMode) {
-		case CameraMode::_2d:
-			controls.context_enter<surface::CameraOrtho>(&canvas.object().camera2D);
-			break;
-		case CameraMode::_3d:
-			controls.context_enter<surface::BaseCameraOrbit>(&canvas.object().camera3D);
-			break;
-		}
-
-		previousCameraMode = currentCameraMode;
+		canvas.object().cameraManager.enableControls(e.gain());
 	});
 
 	mainLayers.add(canvas);

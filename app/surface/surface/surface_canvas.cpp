@@ -17,9 +17,9 @@
 
 namespace surface {
 
-SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui) :
+SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls) :
+		cameraManager(controls),
 		renderer(ui) {
-	camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
 	fileWatcher.subscribe_file("surface/noise_config.lua", [this](const libv::fsw::Event&) {
 		changed = true;
@@ -75,19 +75,8 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	else
 		glr.state.polygonModeFill();
 
-	switch (currentCameraMode) {
-	case CameraMode::_2d:
-		glr.projection = camera2D.projection(canvas_size);
-		glr.view = camera2D.view();
-		break;
-	case CameraMode::_3d:
-		// TODO: get current position from the other camera type
-		glr.projection = camera3D.projection(canvas_size);
-		glr.view = camera3D.view();
-		break;
-	default:
-		assert(false && "Invalid CameraMode enum value");
-	}
+	glr.projection = cameraManager.projection(canvas_size);
+	glr.view = cameraManager.view();
 
 	glr.model = libv::mat4f::identity();
 
@@ -98,6 +87,8 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
+
+	cameraManager.update();
 
 	if (changed) {
 		changed = false;

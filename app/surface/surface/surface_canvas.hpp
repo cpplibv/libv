@@ -8,25 +8,17 @@
 #include <libv/ui/component/canvas.hpp>
 // pro
 #include <surface/surface/lua_binding.hpp>
-#include <surface/view/camera.hpp>
+#include <surface/surface/surface.hpp>
+#include <surface/view/camera_manager.hpp>
 #include <surface/view/render/renderer.hpp>
 #include <surface/view/render/renderer_surface.hpp>
 #include <surface/view/render/renderer_surface_texture.hpp>
 #include <surface/view/render/renderer_veggie.hpp>
-#include <surface/surface/surface.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
-
-enum class CameraMode {
-	_2d,
-	_3d,
-};
-
-inline CameraMode currentCameraMode = CameraMode::_3d;
-inline CameraMode previousCameraMode = currentCameraMode;
 
 enum class SceneType {
 	_3d,
@@ -42,8 +34,6 @@ enum class SceneType {
 
 inline SceneType currentHeatMap = SceneType::_3d;
 inline SceneType previousHeatMap = currentHeatMap;
-
-//inline bool hasSceneChanged = true;
 
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
@@ -258,9 +248,7 @@ struct FertilityHeatMap : TextureScene {
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
-	surface::CameraPlayer camera3D;
-	surface::CameraOrtho camera2D;
-//	CameraPlayer::screen_picker screen_picker;
+	CameraManager cameraManager;
 
 private:
 	surface::Renderer renderer;
@@ -275,7 +263,7 @@ private:
 	bool surfaceDirty = false;
 
 public:
-	explicit SurfaceCanvas(libv::ui::UI& ui);
+	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls);
 
 private:
 	[[nodiscard]] std::unique_ptr<Scene> createScene(SceneType scene);
