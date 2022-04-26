@@ -33,6 +33,7 @@ struct RendererDebug {
 	};
 
 	struct ChunkVegetation {
+		libv::vec2f pos;
 		std::vector<Sphere> veggies;
 		Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	};
@@ -45,13 +46,14 @@ private:
 	ShaderTestMode shader;
 	bool dirty = true;
 
-	void build_mesh(const std::vector<Sphere>& veggies, Mesh& mesh);
+	Mesh build_mesh(const std::vector<Sphere>& veggies);
 public:
 	explicit RendererDebug(RendererResourceContext& rctx);
 
 //	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
 
-	void addVeggies(const libv::vec2i index, std::vector<VeggieType>& veggies, bool is3D);
+	void addVeggies(const libv::vec2i& index, const libv::vec2f& chunkPos,
+			std::vector<VeggieType>& veggies, bool is3D);
 //	void clear_spheres();
 
 	//surface/canvas.cpp need these

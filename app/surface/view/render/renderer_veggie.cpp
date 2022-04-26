@@ -19,24 +19,23 @@ RendererDebug::RendererDebug(RendererResourceContext& rctx) :
 //	vegetationMap.insert_or_assign(index, sphere);
 //	dirty = true;
 //}
-
-void RendererDebug::addVeggies(const libv::vec2i index, std::vector<VeggieType>& veggies, bool is3D) {
+void RendererDebug::addVeggies(const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
 	ChunkVegetation chunkVegetation;
+	chunkVegetation.pos = chunkPos;
+
 	for (const auto& veggie : veggies) {
 		chunkVegetation.veggies.emplace_back(
 				is3D ? veggie.pos : libv::vec3f{xy(veggie.pos), 0.f},
 				veggie.size, veggie.color, 6, 6);
 	}
 
-	const auto& pair = vegetationMap.emplace(index, chunkVegetation);
-	auto& mesh = pair.first->second.mesh;
-	if (!pair.second)
-		mesh.clear();
+	chunkVegetation.mesh = build_mesh(chunkVegetation.veggies);
 
-	build_mesh(chunkVegetation.veggies, mesh);
+	vegetationMap.insert_or_assign(index, chunkVegetation);
 }
 
-void RendererDebug::build_mesh(const std::vector<Sphere>& veggies, Mesh& mesh) {
+Mesh RendererDebug::build_mesh(const std::vector<Sphere>& veggies) {
+	Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
@@ -79,6 +78,7 @@ void RendererDebug::build_mesh(const std::vector<Sphere>& veggies, Mesh& mesh) {
 			}
 		}
 	}
+	return mesh;
 }
 
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
@@ -86,14 +86,19 @@ void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 
 	glr.program(shader.program());
 	for (const auto&[_, chunkVeggie] : vegetationMap) {
-		const auto& mesh = chunkVeggie.mesh;
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
-		glr.uniform(std::move(uniforms));
-		glr.render(mesh);
+		const auto& eye = glr.eye();
+
+		if ((libv::vec3f(chunkVeggie.pos, 0.f) - eye).length() < 10.f) {
+			const auto& mesh = chunkVeggie.mesh;
+			auto uniforms = uniform_stream.block_unique(layout_matrices);
+			uniforms[layout_matrices.matMVP] = glr.mvp();
+			uniforms[layout_matrices.matM] = glr.model;
+			uniforms[layout_matrices.matP] = glr.projection;
+			uniforms[layout_matrices.eye] = glr.eye();
+			glr.uniform(std::move(uniforms));
+			glr.render(mesh);
+		}
+
 	}
 }
 

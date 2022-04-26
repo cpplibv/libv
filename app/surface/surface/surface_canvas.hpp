@@ -94,7 +94,7 @@ struct SurfaceScene : Scene {
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 //		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-			rendererVeggie.addVeggies(chunk->index, chunk->veggies, true);
+			rendererVeggie.addVeggies(chunk->index, chunk->position, chunk->veggies, true);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -134,7 +134,7 @@ struct TextureScene : Scene {
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 		for (const auto& chunk : chunks)
-			rendererVeggie.addVeggies(chunk->index, chunk->veggies, false);
+			rendererVeggie.addVeggies(chunk->index, chunk->position, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
