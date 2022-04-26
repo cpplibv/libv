@@ -51,7 +51,7 @@ SurfaceViewer::SurfaceViewer() :
 //		CanvasControl::bind_default_controls(controls);
 
 	controls.feature_action<void>("surface.refresh_surface", [](const auto&) {
-		changed = true;
+		refresh = true;
 	});
 	controls.feature_action<void>("surface.toggle_wireframe", [](const auto&) {
 		enableWireframe = !enableWireframe;

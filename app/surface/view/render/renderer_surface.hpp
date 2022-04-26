@@ -12,20 +12,10 @@
 
 #include <surface/view/render/renderer.hpp>
 
-#include <libv/utility/hash.hpp>
 
 
 namespace surface {
 using Mesh = libv::glr::Mesh;
-
-struct VecHash {
-	auto operator()(libv::vec2i vec) const {
-		return libv::hash_combine(
-				libv::hash_int(static_cast<uint32_t>(vec.x)),
-				libv::hash_int(static_cast<uint32_t>(vec.y)));
-	}
-};
-
 
 struct RendererSurface {
 //private:

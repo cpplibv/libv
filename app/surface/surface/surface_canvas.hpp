@@ -38,7 +38,7 @@ inline SceneType previousHeatMap = currentHeatMap;
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
 inline bool enableGrid = true;
-inline std::atomic<bool> changed = true;
+inline bool refresh = true;
 
 
 // -------------------------------------------------------------------------------------------------
@@ -56,6 +56,8 @@ public:
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
+//	virtual void clear() = 0;
+//	virtual void clear(size_t count) = 0;
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
@@ -73,7 +75,7 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererSurface.clear();
+//		rendererSurface.clear();
 		for (const auto& chunk : chunks) {
 			rendererSurface.addChunk(chunk);
 		}
@@ -84,10 +86,9 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererVeggie.clear_spheres();
+//		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-			for (const auto& veggie : chunk->veggies)
-				rendererVeggie.add_debug_sphere(veggie.pos, veggie.size, veggie.color, 6, 6);
+				rendererVeggie.addVeggies(chunk->index, chunk->veggies, true);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -126,10 +127,8 @@ struct TextureScene : Scene {
 	}
 
 	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-			for (const auto& veggie : chunk->veggies)
-				rendererVeggie.add_debug_sphere(libv::vec3f{xy(veggie.pos), 0.f}, veggie.size, veggie.color, 6, 6);
+				rendererVeggie.addVeggies(chunk->index, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -160,10 +159,10 @@ struct HeightHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererTexture.clear();
+//		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(getColors(chunk->height));
-			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
+			rendererTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
 };
@@ -172,10 +171,10 @@ struct BiomeHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererTexture.clear();
+//		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->biomeMap);
-			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
+			rendererTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
 };
@@ -184,10 +183,10 @@ struct TemperatureHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererTexture.clear();
+//		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->temperature);
-			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
+			rendererTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
 };
@@ -196,10 +195,10 @@ struct HumidityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererTexture.clear();
+//		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->humidity);
-			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
+			rendererTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
 };
@@ -208,10 +207,10 @@ struct FertilityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
 	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		rendererTexture.clear();
+//		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->fertility);
-			rendererTexture.addTexture(heatMap, chunk->position, chunk->size);
+			rendererTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
 };
@@ -257,6 +256,7 @@ private:
 
 	SurfaceLuaBinding binding;
 	libv::fsw::Watcher fileWatcher;
+	std::atomic<bool> changed = true;
 
 private:
 	std::unique_ptr<Scene> currentScene;

@@ -13,11 +13,10 @@ RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {}
 
 void RendererSurface::addChunk(const std::shared_ptr<surface::Chunk>& chunk) {
-	const auto it = chunkMeshMap.find(chunk->index);
-	if (it != chunkMeshMap.end())
-		return;
-
-	auto& mesh = chunkMeshMap.emplace(chunk->index, libv::glr::Mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw}).first->second;
+	const auto& pair = chunkMeshMap.emplace(chunk->index, libv::glr::Mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw});
+	auto& mesh = pair.first->second;
+	if(!pair.second)
+		mesh.clear();
 
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);

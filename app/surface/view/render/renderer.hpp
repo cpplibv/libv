@@ -25,6 +25,9 @@
 
 #include <surface/surface/chunk.hpp>
 
+#include <libv/utility/hash.hpp>
+
+
 
 // =================================================================================================
 
@@ -49,6 +52,16 @@ struct RendererResourceContext {
 		shader_loader.add_include_directory("", "../../res/shader/");
 //		// Include the res/model/ folder from libv
 //		model_loader.add_include_directory("", "../../res/model/");
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct VecHash {
+	auto operator()(libv::vec2i vec) const {
+		return libv::hash_combine(
+				libv::hash_int(static_cast<uint32_t>(vec.x)),
+				libv::hash_int(static_cast<uint32_t>(vec.y)));
 	}
 };
 

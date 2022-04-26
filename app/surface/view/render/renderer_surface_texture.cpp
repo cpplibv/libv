@@ -6,14 +6,13 @@
 #include <libv/math/vec.hpp>
 
 
-
 namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
-//	build_mesh();
+	build_mesh();
 }
 
 void RendererSurfaceTexture::build_mesh() {
@@ -36,22 +35,20 @@ void RendererSurfaceTexture::build_mesh() {
 	index.quad(0, 1, 2, 3);
 }
 
-void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2f chunkPos, const libv::vec2f size) {
-	const auto texture_pos = ChunkTexture{texture, chunkPos, size};
-	chunks.emplace_back(texture_pos); //std::move?
+void RendererSurfaceTexture::addTexture(const libv::glr::Texture& texture, const libv::vec2i& index,
+		const libv::vec2f chunkPos, const libv::vec2f size) {
+	chunkMap.insert_or_assign(index, ChunkTexture{texture, chunkPos, size});
 }
 
-void RendererSurfaceTexture::clear() {
-	chunks.clear();
-	mesh.clear();
-}
+//void RendererSurfaceTexture::clear() {
+//	chunks.clear();
+//	mesh.clear();
+//}
 
 void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	build_mesh();
-
 	glr.program(shader.program());
 
-	for (const auto& chunk : chunks) {
+	for (const auto&[_, chunk] : chunkMap) {
 		auto texture = chunk.texture;
 		glr.texture(texture, textureChannel_diffuse);
 
