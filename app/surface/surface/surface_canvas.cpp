@@ -4,23 +4,25 @@
 #include <surface/surface/surface_canvas.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+#include <libv/algo/wildcard.hpp>
 // pro
 #include <surface/log.hpp>
+//std
+#include <filesystem>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls) :
+SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_) :
 		cameraManager(controls),
-		renderer(ui) {
+		renderer(ui),
+		currentConfigPath(std::move(configPath_)) {
 
-	configPaths.emplace_back("config/noise_config.lua");
-	configPaths.emplace_back("config/noise_config2.lua");
-	configPaths.emplace_back("config/noise_config3.lua");
-
-	setConfig();
+	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event&) {
+		changed = true;
+	});
 
 	surface = std::make_unique<Surface>();
 	activeScene = createScene(currentScene);
@@ -48,15 +50,6 @@ std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
 
 void SurfaceCanvas::attach() {
 	focus();
-}
-
-void SurfaceCanvas::setConfig() {
-	configCnt %= configPaths.size();
-	currentConfigPath = configPaths[configCnt];
-
-	fileWatcher.subscribe_file(currentConfigPath, [this](const libv::fsw::Event&) {
-		changed = true;
-	});
 }
 
 void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
@@ -91,6 +84,41 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
+std::string SurfaceCanvas::cycleConfigs(const std::string& currentConfigPath_) {
+	const auto filter_pattern = "**.lua";
+
+	bool next = false;
+	bool first = true;
+	std::string firstConfig;
+	const auto dir = "config/";
+	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+		if (not entry.is_regular_file())
+			continue;
+
+		auto filepath = entry.path().generic_string();
+
+		if (not libv::match_wildcard_glob(filepath, filter_pattern))
+			continue;
+
+		log_surface.debug("filepath: {}", filepath);
+
+		if (first) {
+			first = false;
+			firstConfig = filepath;
+		}
+
+		if (next)
+			return filepath;
+
+		if (filepath == currentConfigPath_) {
+			next = true;
+		}
+	}
+
+	assert(not first && "Given directory is empty of lua config files");
+	return firstConfig;
+}
+
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
 
@@ -98,8 +126,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	if (configChanged) {
 		configChanged = false;
-		configCnt++;
-		setConfig();
+//		configCnt++;
+		currentConfigPath = cycleConfigs(currentConfigPath);
 	}
 
 	if (refresh) {
@@ -135,18 +163,18 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 //	if (!surface->getChunks().empty()) {
-		if (surfaceDirty) {
-			//build mesh
-			activeScene->build(surface->getChunks());
-			activeScene->buildVeggie(surface->getChunks());
-		}
+	if (surfaceDirty) {
+		//build mesh
+		activeScene->build(surface->getChunks());
+		activeScene->buildVeggie(surface->getChunks());
+	}
 
-		//render surface texture/_3d
-		activeScene->render(glr, renderer.resource_context.uniform_stream);
+	//render surface texture/_3d
+	activeScene->render(glr, renderer.resource_context.uniform_stream);
 
-		// render plant model/debug
-		if (enableVegetation)
-			activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
+	// render plant model/debug
+	if (enableVegetation)
+		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 //	}
 
 	if (currentScene == SceneType::_3d && enableGrid) {

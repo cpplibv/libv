@@ -40,7 +40,8 @@ inline bool enableVegetation = true;
 inline bool enableGrid = true;
 inline bool refresh = true;
 inline bool configChanged = false;
-inline size_t configCnt = 0;
+//inline size_t configCnt = 0;
+//inline std::string currentConfigPath = "config/noise_config.lua";
 
 inline std::atomic<bool> changed = true;
 
@@ -261,8 +262,8 @@ private:
 	surface::Renderer renderer;
 
 	SurfaceLuaBinding binding;
-	std::vector<std::string> configPaths;
 	std::string currentConfigPath;
+//	std::string configPaths;
 	libv::fsw::Watcher fileWatcher;
 
 private:
@@ -271,7 +272,7 @@ private:
 	bool surfaceDirty = false;
 
 public:
-	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls);
+	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);
 
 private:
 	[[nodiscard]] std::unique_ptr<Scene> createScene(SceneType scene);
@@ -279,7 +280,8 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
-	void setConfig();
+	std::string cycleConfigs(const std::string& currentConfigPath_);
+//	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;
 };

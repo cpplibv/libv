@@ -22,7 +22,7 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-SurfaceViewer::SurfaceViewer() :
+SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 		ui([] {
 			libv::ui::Settings settings;
 			// TODO P1: Internalize used UI resources under surface, currently: app/surface/../../res/
@@ -172,15 +172,15 @@ SurfaceViewer::SurfaceViewer() :
 	controls.bind("surface.biome_texture", "6 [press]");
 //	controls.bind("surface.distribution_texture", "7 [press]");
 
-	initUI();
+	initUI(configPath);
 
 	controls.attach(frame);
 	ui.attach(frame);
 	ui.add(mainLayers);
 }
 
-void SurfaceViewer::initUI() {
-	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui, controls);
+void SurfaceViewer::initUI(const std::string& configPath) {
+	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui, controls, configPath);
 	canvas.z_index_offset(-100);
 
 	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {

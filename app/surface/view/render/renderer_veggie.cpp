@@ -83,9 +83,9 @@ Mesh RendererDebug::build_mesh(const std::vector<Sphere>& veggies) {
 
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	glr.program(shader.program());
-	for (const auto&[_, chunkVeggie] : vegetationMap) {
-		const auto& eye = glr.eye();
 
+	const auto& eye = glr.eye();
+	for (const auto&[_, chunkVeggie] : vegetationMap) {
 		if ((libv::vec3f(chunkVeggie.pos, 0.f) - eye).length() < 10.f) {
 			const auto& mesh = chunkVeggie.mesh;
 			auto uniforms = uniform_stream.block_unique(layout_matrices);

@@ -25,9 +25,10 @@
 int main(int argc, const char** argv) {
 	auto args = libv::arg::Parser("Surface", "Surface generation and visualization tool");
 
-	const auto arg_config = args.optional<std::string>
+	const auto arg_config = args.require<std::string>
 			("-c", "--config")
-			("config", "Path to the config file");
+			("config", "Path to the config file")
+			= "config/noise_config.lua";
 
 	const auto arg_verbose = args.flag
 			("-v", "--verbose")
@@ -55,7 +56,7 @@ int main(int argc, const char** argv) {
 			std::filesystem::current_path("../app/surface/"); // During development binary artifacts created under /bin
 
 		// Run the game
-		surface::SurfaceViewer surfaceViewer;
+		surface::SurfaceViewer surfaceViewer(std::move(arg_config.value()));
 		surfaceViewer.execute();
 
 	} catch (const std::exception& e) {

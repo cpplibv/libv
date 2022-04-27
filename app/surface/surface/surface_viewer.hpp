@@ -11,6 +11,8 @@
 // pro
 #include <surface/view/frame.hpp>
 
+#include <optional>
+
 
 namespace surface {
 
@@ -32,10 +34,11 @@ public:
 //	surface::CameraPlayer::screen_picker screen_picker;
 
 public:
-	SurfaceViewer();
+	explicit SurfaceViewer(const std::string& configPath);
+
 
 private:
-	void initUI();
+	void initUI(const std::string& configPath);
 
 public:
 	void execute();
