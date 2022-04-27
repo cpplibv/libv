@@ -6,16 +6,15 @@
 in vec3 fragmentPositionW;
 in vec4 fragmentColor;
 in vec3 fragmentNormal;
+in float fragmentFogFactor;
 
 out vec4 result;
 
 
-//void main() {
-//	result = fragmentColor;
-//}
+uniform vec3 fogColor = vec3(0.8, 0.9, 1);
+
 
 void main() {
-//	vec3 N = vec3(0, 0, 1);
 	vec3 N = normalize(fragmentNormal); // Normal vector
 	vec3 V = normalize(eye - fragmentPositionW); // View vector
 	vec3 L = vec3(0, 0, 1); // Light vector
@@ -31,6 +30,12 @@ void main() {
 
 //	result = vec4(base_color.rgb * attenuation, base_color.a);
 	result = vec4(fragmentColor.rgb * attenuation, fragmentColor.a);
+
+	// --- Fog ---
+
+	result.rgb = mix(result.rgb, fogColor.rgb, fragmentFogFactor);
+
+	// --- Debug ---
 
 //	result = vec4(abs(N), 1);
 //	result = vec4(N, 1);
