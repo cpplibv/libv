@@ -19,8 +19,7 @@
 #include <surface/surface/node.hpp>
 
 #include <libv/math/gradient.hpp>
-#include <libv/utility/random/xoroshiro128.hpp>
-#include <libv/utility/random/uniform_distribution.hpp>
+
 
 
 namespace surface {
@@ -91,7 +90,7 @@ public:
 	std::vector<VeggieType> veggies;
 
 public:
-	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution);
+	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution, Seed globalSeed);
 
 public:
 	/// @param uv The relative local (uv) coordinates (in region of 0..1) of the requested point
@@ -107,9 +106,6 @@ public:
 class ChunkGen {
 private:
 	libv::mt::thread_bulk threads{libv::mt::hardware_concurrency_or(4) - 2};
-	libv::xoroshiro128 rng{123};
-
-
 
 //	surface::Renderer renderer;
 //	sol::state lua;

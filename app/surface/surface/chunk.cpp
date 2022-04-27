@@ -1,5 +1,6 @@
 // Created by dbobula on 1/16/2022.
 
+// hpp
 #include <surface/surface/chunk.hpp>
 // libv
 #include <libv/math/fract.hpp>
@@ -10,6 +11,7 @@
 
 
 namespace surface {
+
 // -------------------------------------------------------------------------------------------------
 
 bool isPointInSWTriangle(libv::vec2f p) {
@@ -18,12 +20,12 @@ bool isPointInSWTriangle(libv::vec2f p) {
 
 // -------------------------------------------------------------------------------------------------
 
-Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t resolution) :
+Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t resolution, Seed globalSeed) :
 		index(index),
 		position(position),
 		size(size),
 		resolution(resolution),
-		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32u)),
+		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32u), globalSeed),
 		biomeMap(resolution, resolution),
 		height(resolution, resolution),
 		temperature(resolution, resolution),
@@ -214,7 +216,7 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 	const auto step = chunkSize / static_cast<float>(numQuad);
 //	const auto step = chunkSize / static_cast<float>(chunkResolution);
 
-	std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex));
+	std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex), config.globalSeed);
 
 	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
 		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);

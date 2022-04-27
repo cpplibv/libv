@@ -82,8 +82,6 @@ Mesh RendererDebug::build_mesh(const std::vector<Sphere>& veggies) {
 }
 
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	// !!! P3: Rebuild is too expensive on each frame
-
 	glr.program(shader.program());
 	for (const auto&[_, chunkVeggie] : vegetationMap) {
 		const auto& eye = glr.eye();

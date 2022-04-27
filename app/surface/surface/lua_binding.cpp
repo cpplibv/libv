@@ -80,7 +80,6 @@ template <typename T, typename ConvertFn>
 template <typename T>
 void setFractalConfig(T& node, const sol::object& object) {
 	const auto table = convertTable(object);
-	node.seed = table["seed"];
 	node.octaves = table["octaves"];
 	node.amplitude = table["amplitude"];
 	node.frequency = table["frequency"];
@@ -99,13 +98,20 @@ SurfaceLuaBinding::SurfaceLuaBinding() {
 	libv::lua::open_libraries(lua, libv::lua::lualib::vec);
 }
 
-std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& object, int depth) {
+Seed SurfaceLuaBinding::convertSeed(const sol::object& object, Seed seedOffset) {
+	if (object.get_type() != sol::type::number)
+		throw std::runtime_error(fmt::format("Seed has to be a number {}", libv::lua::lua_type_to_string(object.get_type())));
+
+	return object.as<Seed>() + seedOffset;
+}
+
+std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& object, Seed seedOffset) {
 	const auto table = convertTable(object);
 
 	std::vector<std::unique_ptr<Node>> children;
 	for (const auto&[key, value] : table) {
 		if (value.get_type() == sol::type::table)
-			children.emplace_back(convertNodeTree(value, depth + 1));
+			children.emplace_back(convertNodeTree(value, seedOffset));
 	}
 
 	auto solNodeType = table["nodeType"];
@@ -120,17 +126,17 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 
 	} else if (nodeType == "perlin") {
 		auto node = std::make_unique<NodePerlin>();
-		node->seed = table["seed"];
+		node->seed = convertSeed(table.get<sol::object>("seed"), seedOffset);
 		return node;
 
 	} else if (nodeType == "simplex") {
 		auto node = std::make_unique<NodeSimplex>();
-		node->seed = table["seed"];
+		node->seed = convertSeed(table.get<sol::object>("seed"), seedOffset);
 		return node;
 
 	} else if (nodeType == "cellular") {
 		auto node = std::make_unique<NodeCellular>();
-		node->seed = table["seed"];
+		node->seed = convertSeed(table.get<sol::object>("seed"), seedOffset);
 		node->distanceFn = table["distanceFn"];
 		node->returnType = table["returnType"];
 		node->jitter = table["jitter"];
@@ -138,6 +144,7 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 
 	} else if (nodeType == "simplexFractal") {
 		auto node = std::make_unique<NodeSimplexFractal>();
+		node->seed = convertSeed(table.get<sol::object>("seed"), seedOffset);
 		setFractalConfig(*node, table);
 		return node;
 
@@ -146,6 +153,7 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 			throw std::runtime_error("Warp can only be applied to size of one nodes");
 
 		auto node = std::make_unique<NodeWarp>(std::move(children[0]));
+		node->seed = convertSeed(table.get<sol::object>("seed"), seedOffset);
 		setFractalConfig(*node, table);
 		return node;
 
@@ -189,14 +197,14 @@ SurfaceObject SurfaceLuaBinding::convertSurfaceObject(const sol::object& object)
 	return result;
 }
 
-HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object) {
+HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOffset) {
 	const auto table = convertTable(object);
 
 	HeatMap result;
 	result.name = table["name"];
 	result.heightSensitivity = table["heightSensitivity"];
 	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
-	result.rootNode = convertNodeTree(table.get<sol::object>("nodes"));
+	result.rootNode = convertNodeTree(table.get<sol::object>("nodes"), seedOffset);
 
 	return result;
 }
@@ -245,6 +253,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	const auto table = convertTable(object);
 
 	auto result = std::make_shared<Config>();
+	result->globalSeed = table["seed"]; // Global seed is optional
 	result->visualization = table["visualization"];
 //	result->currentScene = table["currentScene"];
 	result->resolution = table["resolution"];
@@ -292,10 +301,10 @@ std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::str
 	sol::object luaConfig = env.get<sol::object>("config");
 	auto result = convertConfig(luaConfig);
 
-	result->height = convertHeatMap(env.get<sol::object>("height"));
-	result->temperature = convertHeatMap(env.get<sol::object>("temperature"));
-	result->humidity = convertHeatMap(env.get<sol::object>("humidity"));
-	result->fertility = convertHeatMap(env.get<sol::object>("fertility"));
+	result->height = convertHeatMap(env.get<sol::object>("height"), result->globalSeed);
+	result->temperature = convertHeatMap(env.get<sol::object>("temperature"), result->globalSeed);
+	result->humidity = convertHeatMap(env.get<sol::object>("humidity"), result->globalSeed);
+	result->fertility = convertHeatMap(env.get<sol::object>("fertility"), result->globalSeed);
 	result->biomes = convertBiomes(env.get<sol::object>("biomes"));
 //	extendBiomes(result.biomes);
 

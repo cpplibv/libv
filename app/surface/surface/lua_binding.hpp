@@ -21,6 +21,10 @@ class Node;
 class SurfaceObject;
 class VeggieType;
 
+using Seed = uint32_t;
+
+// -------------------------------------------------------------------------------------------------
+
 class SurfaceLuaBinding {
 private:
 	sol::state lua;
@@ -29,11 +33,11 @@ private:
 //	void setFractalConfig(const sol::table& luaConfig);
 
 private:
-	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, int depth = 0);
+	static Seed convertSeed(const sol::object& object, Seed seedOffset);
+	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, Seed seedOffset);
 	static SurfaceObject convertSurfaceObject(const sol::object& object);
 	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
-	static HeatMap convertHeatMap(const sol::object& object);
-//	std::vector<HeatMap> convertHeatMaps(const sol::object& object);
+	static HeatMap convertHeatMap(const sol::object& object, Seed seedOffset);
 	static Biome convertBiome(const sol::object& object);
 	static libv::flat_set<Biome> convertBiomes(const sol::object& object);
 	static VeggieType convertVeggieType(const sol::object& object);

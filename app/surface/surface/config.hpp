@@ -113,6 +113,8 @@ struct Biome {
 
 class Config {
 public:
+	Seed globalSeed;
+
 	Visualization visualization;
 //	std::string currentScene;
 	size_t resolution; /// Number of quads/pixels per side

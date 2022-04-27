@@ -4,6 +4,7 @@
 #include <surface/surface/surface.hpp>
 // libv
 #include <libv/utility/index_spiral.hpp>
+#include <libv/utility/timer.hpp>
 // pro
 #include <surface/log.hpp>
 
@@ -34,6 +35,8 @@ void SurfaceGen::buildChunks(const std::shared_ptr<const Config>& config_sp) {
 		const auto& config = *config_sp;
 
 		for (size_t i = 0; i < config.numChunks && !token.stop_requested(); ++i) {
+			libv::Timer timer;
+
 			const auto chunkIndex = libv::index_spiral(i);
 
 			std::shared_ptr<Chunk> chunk = chunkGen.generateChunk(config, chunkIndex);
@@ -41,6 +44,8 @@ void SurfaceGen::buildChunks(const std::shared_ptr<const Config>& config_sp) {
 
 			auto chunksLock = std::unique_lock(chunksGuard);
 			resultQueue->emplace(std::move(chunk));
+
+			log_surface.trace("TimerChunkGen{:>8}: {:8.4f} ms", chunkIndex, timer.timed_ms().count());
 		}
 	});
 }
