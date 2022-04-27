@@ -139,7 +139,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //		}
 	}
 
-	if (!surface->getChunks().empty()) {
+//	if (!surface->getChunks().empty()) {
 		if (surfaceDirty) {
 			//build mesh
 			currentScene->build(surface->getChunks());
@@ -152,7 +152,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		// render plant model/debug
 		if (enableVegetation)
 			currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
-	}
+//	}
 
 	if (currentHeatMap == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();
