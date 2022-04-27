@@ -11,7 +11,7 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "surface.vs", "surface.fs") {}
+		shader(rctx.loader.shader, "surface.vs", "surface.fs") {}
 
 void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Chunk>& chunk) {
 	auto& chunkRenderData = chunkMeshMap[chunk->index];

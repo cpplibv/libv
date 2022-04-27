@@ -11,7 +11,7 @@ in float fragmentFogFactor;
 out vec4 result;
 
 
-uniform vec3 fogColor = vec3(0.8, 0.9, 1);
+uniform vec3 fogColor = vec3(0.7, 0.8, 0.9);
 
 
 void main() {

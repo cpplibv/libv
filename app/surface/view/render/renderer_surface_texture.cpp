@@ -11,7 +11,7 @@ namespace surface {
 
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
+		shader(rctx.loader.shader, "surface_texture.vs", "surface_texture.fs") {
 	build_mesh();
 }
 

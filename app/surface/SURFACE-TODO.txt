@@ -3,14 +3,26 @@
 
 
 
+shader re-loading might deadlock sometimes
+
+skybox / background
+	libv.rev: builtin:cube (XYZ cube)
+	fog uniforms
+		fog option runtime on/off
+		fog color from config
+
+fog+
+	fog for veggies
+	fog uniforms
+		fog option runtime on/off
+		fog color from config
+
+lighting, sun
+	normal map edge pixel calculation
 
 
 Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
 
-skybox / background
-fog
-lighting, sun
-	normal map edge pixel calculation
 
 command line argument config selection
 improve config cycle:
@@ -19,15 +31,10 @@ improve config cycle:
 	watch directory
 	cycle based on filename on index
 
+
 texture view duplicate border pixels
 
 point xyz -> z (only)
-
-multi config
-	activate nova
-	config path
-	remember last
-	switching
 
 dtor crash from fsw
 

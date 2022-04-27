@@ -168,6 +168,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	if (enableVegetation)
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 
+	if (enableSkybox) {
+		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
+	}
+
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();
 		glr.state.polygonModeFill(); // In case we are wireframe mode, force poly fill for the grid

@@ -10,15 +10,15 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererDebug::RendererDebug(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
 }
-
 
 //void RendererDebug::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count) {
 //	const auto& sphere = Sphere(center, radius, color, ring_count, segment_count);
 //	vegetationMap.insert_or_assign(index, sphere);
 //	dirty = true;
 //}
+
 void RendererDebug::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
 	auto& chunkRenderData = vegetationMap[index];
 
@@ -41,6 +41,7 @@ void RendererDebug::addVeggies(int generation, const libv::vec2i& index, const l
 
 void RendererDebug::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	mesh.clear();
+
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();

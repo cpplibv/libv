@@ -5,28 +5,28 @@
 // fwd
 #include <surface/fwd.hpp>
 // libv
-#include <libv/ctrl/fwd.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/fwd.hpp>
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
-#include <libv/meta/reflection_access.hpp>
+//#include <libv/meta/reflection_access.hpp>
+#include <libv/rev/resource/resource_manager.hpp>
 #include <libv/rev/resource/shader.hpp>
-#include <libv/rev/resource/shader_loader.hpp>
+#include <libv/rev/settings.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
+//#include <libv/ui/component/canvas.hpp>
 // pro
-//#include <surface/sim/universe.hpp>
-#include <surface/view/camera.hpp>
-//#include <surface/view/render/model.hpp>
 #include <surface/view/render/shaders.hpp>
 
-#include <surface/surface/chunk.hpp>
+
 
 #include <libv/utility/hash.hpp>
-
+#include <surface/surface/chunk.hpp>
+#include <surface/view/camera.hpp>
+#include <surface/view/render/renderer_skybox.hpp>
 
 
 // =================================================================================================
@@ -38,18 +38,28 @@ inline int32_t global_test_mode = 0;
 // =================================================================================================
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
+
 using Mesh = libv::glr::Mesh;
 
 // -------------------------------------------------------------------------------------------------
 
 struct RendererResourceContext {
-	libv::rev::ShaderLoader shader_loader{"shader/"};
+	libv::rev::ResourceManager loader{[] {
+		libv::rev::Settings settings;
+		settings.texture.base_path = "../../res/texture/";
+		settings.shader.base_path = "shader/";
+		settings.model.base_path = "../../res/model/";
+		return settings;
+	}()};
+//	libv::rev::ShaderLoader shader_loader{"shader/"};
 //	libv::rev::ModelLoader model_loader{"model/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 	RendererResourceContext() {
 		// Include the res/shader/ folder from libv
-		shader_loader.add_include_directory("", "../../res/shader/");
+		loader.shader.add_include_directory("", "../../res/shader/");
 //		// Include the res/model/ folder from libv
 //		model_loader.add_include_directory("", "../../res/model/");
 	}
@@ -135,6 +145,7 @@ struct Renderer {
 	RendererEditorGrid editorGrid{resource_context};
 	RendererGizmo gizmo{resource_context};
 	RendererText text{resource_context};
+	RendererSkybox sky{resource_context};
 
 public:
 	explicit Renderer(libv::ui::UI& ui);

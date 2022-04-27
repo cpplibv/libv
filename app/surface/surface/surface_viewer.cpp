@@ -76,6 +76,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
 		enableGrid = !enableGrid;
 	});
+	controls.feature_action<void>("surface.toggle_skybox", [](const auto&) {
+		enableSkybox = !enableSkybox;
+	});
 
 	controls.feature_action<void>("surface.3d", [this](const auto&) {
 		log_surface.info("Changing scene to: 3D Surface");
@@ -162,6 +165,8 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.bind("surface.cycle_config", "C [press]");
 	controls.bind("surface.toggle_vegetation", "F4 [press]");
 	controls.bind("surface.toggle_grid", "F5 [press]");
+//	controls.bind("surface.toggle_fog", "F6 [press]");
+	controls.bind("surface.toggle_skybox", "F7 [press]");
 
 	controls.bind("surface.3d", "1 [press]");
 	controls.bind("surface.height_texture", "2 [press]");

@@ -26,7 +26,7 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -69,7 +69,7 @@ void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+		shader(rctx.loader.shader, "editor_grid_plane.vs", "editor_grid_plane.fs") {
 	auto position = mesh_grid.attribute(attribute_position);
 	auto index = mesh_grid.index();
 
@@ -102,7 +102,7 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 ////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
 ////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 ////		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
-//		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
+//		shader(rctx.loader.shader, "fleet.vs", "fleet.fs") {
 //
 ////	log_surface.fatal("RendererFleet...");
 ////
@@ -127,7 +127,7 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 // -------------------------------------------------------------------------------------------------
 
 RendererText::RendererText(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "font_2D.vs", "font_2D.fs") {
+		shader(rctx.loader.shader, "font_2D.vs", "font_2D.fs") {
 }
 
 void RendererText::add_text(
@@ -264,7 +264,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 Renderer::Renderer(libv::ui::UI& ui) {
-	resource_context.shader_loader.attach_libv_ui_hub(ui.event_hub());
+	resource_context.loader.shader.attach_libv_ui_hub(ui.event_hub());
 	text.font = ui.context().font("consola.ttf");
 }
 
@@ -272,7 +272,7 @@ void Renderer::prepare_for_render(libv::glr::Queue& glr) {
 	// shader_loader.update MUST run before any other render queue operation
 	// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
 	// | So this is a better place than before, still not the best, When UI gets rev updates in the future maybe there will be better solutions
-	resource_context.shader_loader.update(glr.out_of_order_gl());
+	resource_context.loader.update(glr.out_of_order_gl());
 }
 
 // -------------------------------------------------------------------------------------------------
