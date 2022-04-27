@@ -13,7 +13,6 @@
 #include <libv/ui/settings.hpp>
 // pro
 #include <surface/log.hpp>
-#include <surface/surface/surface_canvas.hpp>
 #include <surface/view/camera_control.hpp>
 #include <surface/view/overlay_shader_error.hpp>
 
@@ -37,8 +36,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 			settings.track_style_scripts = true;
 			return settings;
 		}()),
+		canvas("canvas", ui, controls, configPath),
 		mainLayers("layers"),
-		sceneTitle("sceneTitle") {
+		sceneTitle("sceneTitle"){
 
 //	frame.setSize(1024, 1024);
 //	frame.setAlwaysOnTop(true);
@@ -50,7 +50,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
 
-	controls.feature_action<void>("surface.refresh_surface", [](const auto&) {
+	controls.feature_action<void>("surface.refresh_surface", [this](const auto&) {
 		refresh = true;
 	});
 	controls.feature_action<void>("surface.toggle_wireframe", [](const auto&) {
@@ -69,9 +69,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 			break;
 		}
 	});
-	controls.feature_action<void>("surface.cycle_config", [](const auto&) {
-		configChanged = true;
+	controls.feature_action<void>("surface.cycle_config", [this](const auto&) {
 		refresh = true;
+		configName.text(canvas.object().cycleConfigs());
 	});
 	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
 		enableGrid = !enableGrid;
@@ -172,18 +172,18 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.bind("surface.biome_texture", "6 [press]");
 //	controls.bind("surface.distribution_texture", "7 [press]");
 
-	initUI(configPath);
+	initUI();
 
 	controls.attach(frame);
 	ui.attach(frame);
 	ui.add(mainLayers);
+
 }
 
-void SurfaceViewer::initUI(const std::string& configPath) {
-	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas("canvas", ui, controls, configPath);
+void SurfaceViewer::initUI() {
 	canvas.z_index_offset(-100);
 
-	canvas.event().focus.connect([this, canvas](const libv::ui::EventFocus& e) mutable {
+	canvas.event().focus.connect([this](const libv::ui::EventFocus& e) mutable {
 		canvas.object().cameraManager.enableControls(e.gain());
 	});
 
@@ -203,6 +203,13 @@ void SurfaceViewer::initUI(const std::string& configPath) {
 	sceneTitle.align_vertical(libv::ui::AlignVertical::top);
 	sceneTitle.margin(6);
 	mainLayers.add(sceneTitle);
+
+	configName.text(canvas.object().currentConfigPath);
+	configName.font_color(libv::vec4f(1, 1, 1, 1));
+	configName.align_horizontal(libv::ui::AlignHorizontal::right);
+	configName.align_vertical(libv::ui::AlignVertical::top);
+	configName.margin(6);
+	mainLayers.add(configName);
 
 	mainLayers.add(overlay_shader_error());
 }

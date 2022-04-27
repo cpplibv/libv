@@ -258,11 +258,11 @@ class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
 	CameraManager cameraManager;
 
+	std::string currentConfigPath;
 private:
 	surface::Renderer renderer;
 
 	SurfaceLuaBinding binding;
-	std::string currentConfigPath;
 //	std::string configPaths;
 	libv::fsw::Watcher fileWatcher;
 
@@ -273,6 +273,7 @@ private:
 
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);
+	std::string cycleConfigs();
 
 private:
 	[[nodiscard]] std::unique_ptr<Scene> createScene(SceneType scene);
@@ -280,7 +281,6 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
-	std::string cycleConfigs(const std::string& currentConfigPath_);
 //	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;

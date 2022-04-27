@@ -84,7 +84,7 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-std::string SurfaceCanvas::cycleConfigs(const std::string& currentConfigPath_) {
+std::string SurfaceCanvas::cycleConfigs() {
 	const auto filter_pattern = "**.lua";
 
 	bool next = false;
@@ -100,35 +100,30 @@ std::string SurfaceCanvas::cycleConfigs(const std::string& currentConfigPath_) {
 		if (not libv::match_wildcard_glob(filepath, filter_pattern))
 			continue;
 
-		log_surface.debug("filepath: {}", filepath);
-
 		if (first) {
 			first = false;
 			firstConfig = filepath;
 		}
 
-		if (next)
-			return filepath;
+		if (next){
+			currentConfigPath = filepath;
+			return currentConfigPath;
+		}
 
-		if (filepath == currentConfigPath_) {
+		if (filepath == currentConfigPath) {
 			next = true;
 		}
 	}
 
 	assert(not first && "Given directory is empty of lua config files");
-	return firstConfig;
+	currentConfigPath = firstConfig;
+	return currentConfigPath;
 }
 
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
 
 	cameraManager.update();
-
-	if (configChanged) {
-		configChanged = false;
-//		configCnt++;
-		currentConfigPath = cycleConfigs(currentConfigPath);
-	}
 
 	if (refresh) {
 		refresh = false;

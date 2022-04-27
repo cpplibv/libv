@@ -10,6 +10,7 @@
 #include <libv/ui/ui.hpp>
 // pro
 #include <surface/view/frame.hpp>
+#include <surface/surface/surface_canvas.hpp>
 
 #include <optional>
 
@@ -25,9 +26,11 @@ public:
 	surface::SurfaceFrame frame;
 	libv::ctrl::Controls controls;
 	libv::ui::UI ui;
+	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas;
 
 	libv::ui::PanelAnchor mainLayers;
 	libv::ui::Label sceneTitle;
+	libv::ui::Label configName;
 
 //	surface::Renderer renderer;
 //	surface::CameraPlayer camera;
@@ -38,7 +41,7 @@ public:
 
 
 private:
-	void initUI(const std::string& configPath);
+	void initUI();
 
 public:
 	void execute();
