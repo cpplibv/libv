@@ -23,7 +23,8 @@ private:
 
 
 public:
-	SurfaceGen(){}
+	SurfaceGen() {}
+
 //	void buildChunk(size_t index, const Config& config);
 	void buildChunks(const std::shared_ptr<const Config>& config);
 	std::shared_ptr<Chunk> tryPopReadyChunk();
@@ -31,6 +32,7 @@ public:
 
 class Surface {
 private:
+	int genCnt = 0;
 	std::vector<std::shared_ptr<Chunk>> chunks;
 //	std::mutex chunksGuard;
 //	std::shared_ptr<const Config> config = nullptr;
@@ -44,19 +46,25 @@ public:
 		return chunks;
 	}
 
-	inline void gen(std::shared_ptr<const Config>&& config) {
-	//void cancel
+	inline int gen(std::shared_ptr<const Config>&& config) {
+		//void cancel
+//		std::cout << "surface.gen() " << std::endl;
 		chunks.clear();
 		surfaceGen.buildChunks(std::move(config));
+		return ++genCnt;
 	}
 
-	bool update() {
+	inline bool update() {
 		bool changed = false;
-		while (auto chunk = surfaceGen.tryPopReadyChunk()){
+		while (auto chunk = surfaceGen.tryPopReadyChunk()) {
 			chunks.emplace_back(std::move(chunk));
 			changed = true;
 		}
 		return changed;
+	}
+
+	[[nodiscard]] inline int getGenCnt() {
+		return genCnt;
 	}
 };
 

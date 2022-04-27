@@ -17,8 +17,8 @@ namespace surface {
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_) :
 		cameraManager(controls),
-		renderer(ui),
-		currentConfigPath(std::move(configPath_)) {
+		currentConfigPath(std::move(configPath_)),
+		renderer(ui) {
 
 	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event&) {
 		changed = true;
@@ -105,7 +105,7 @@ std::string SurfaceCanvas::cycleConfigs() {
 			firstConfig = filepath;
 		}
 
-		if (next){
+		if (next) {
 			currentConfigPath = filepath;
 			return currentConfigPath;
 		}
@@ -150,18 +150,15 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	if (previousScene != currentScene) {
 		previousScene = currentScene;
 		activeScene = createScene(currentScene);
-//		if (surfaceDirty) {
 		//build mesh
-		activeScene->build(surface->getChunks());
-		activeScene->buildVeggie(surface->getChunks());
-//		}
+		activeScene->build(surface->getGenCnt(), surface->getChunks());
+		activeScene->buildVeggie(surface->getGenCnt(), surface->getChunks());
 	}
 
-//	if (!surface->getChunks().empty()) {
 	if (surfaceDirty) {
 		//build mesh
-		activeScene->build(surface->getChunks());
-		activeScene->buildVeggie(surface->getChunks());
+		activeScene->build(surface->getGenCnt(), surface->getChunks());
+		activeScene->buildVeggie(surface->getGenCnt(), surface->getChunks());
 	}
 
 	//render surface texture/_3d
@@ -170,7 +167,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	// render plant model/debug
 	if (enableVegetation)
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
-//	}
 
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();

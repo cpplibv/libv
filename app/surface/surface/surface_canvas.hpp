@@ -61,11 +61,11 @@ public:
 	explicit Scene(Renderer& renderer) : renderer(renderer), rendererVeggie(renderer.resource_context) {}
 
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
 //	virtual void clear() = 0;
 //	virtual void clear(size_t count) = 0;
-	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
+	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
 	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
@@ -81,10 +81,10 @@ struct SurfaceScene : Scene {
 	SurfaceScene(Renderer& renderer, RendererResourceContext& rctx) : Scene(renderer), rendererSurface(rctx) {
 	}
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 //		rendererSurface.clear();
 		for (const auto& chunk : chunks) {
-			rendererSurface.addChunk(chunk);
+			rendererSurface.addChunk(generation, chunk);
 		}
 	}
 
@@ -92,10 +92,10 @@ struct SurfaceScene : Scene {
 		rendererSurface.render(glr, uniform_stream);
 	}
 
-	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 //		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-			rendererVeggie.addVeggies(chunk->index, chunk->position, chunk->veggies, true);
+			rendererVeggie.addVeggies(generation, chunk->index, chunk->position, chunk->veggies, true);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -133,9 +133,9 @@ struct TextureScene : Scene {
 		rendererTexture.render(glr, uniform_stream);
 	}
 
-	virtual void buildVeggie(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 		for (const auto& chunk : chunks)
-			rendererVeggie.addVeggies(chunk->index, chunk->position, chunk->veggies, false);
+			rendererVeggie.addVeggies(generation, chunk->index, chunk->position, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -165,7 +165,8 @@ inline libv::vector_2D<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint
 struct HeightHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(getColors(chunk->height));
@@ -177,7 +178,8 @@ struct HeightHeatMap : TextureScene {
 struct BiomeHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->biomeMap);
@@ -189,7 +191,8 @@ struct BiomeHeatMap : TextureScene {
 struct TemperatureHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->temperature);
@@ -201,7 +204,8 @@ struct TemperatureHeatMap : TextureScene {
 struct HumidityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->humidity);
@@ -213,7 +217,8 @@ struct HumidityHeatMap : TextureScene {
 struct FertilityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
+		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
 			const auto heatMap = createTexture(chunk->fertility);

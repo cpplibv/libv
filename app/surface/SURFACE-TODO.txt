@@ -79,9 +79,41 @@ TODO revive texture
 
 
 
+ regenerate surface/chunk (to test the generation working)
+ do not clear old chunk data, let the regeneration clear chunks
+     config selection with cycle
+
+ vegi range limit (just first x chunk, just y height)
+ Config
+ 	unsubscribe or subscribe to folder
+ 	dynamic configPathList filling
+ 		std::file_system recursive, wild card matching
+    command line argument for config - libv::arg::Parser vagy kezzel
+    ui label
+
+
+
+
  =================================================================================================
 
- temp, humidity barmi lehessen
+dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
+
+Bug: texture nezetben veggie not working with zoom
+
+ config folder
+    remember last: profile file, json (libv::serial)
+
+
+ Veggi instantiation
+
+ Smooth cutoff/cutin Biome blending
+
+ horizontal expansion, missing nodes
+ create your own good looking surface config
+
+ LOD
+ priority based generation order and rendering
+ frustum culling
 
 
 

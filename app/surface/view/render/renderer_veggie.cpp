@@ -19,23 +19,28 @@ RendererDebug::RendererDebug(RendererResourceContext& rctx) :
 //	vegetationMap.insert_or_assign(index, sphere);
 //	dirty = true;
 //}
-void RendererDebug::addVeggies(const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
-	ChunkVegetation chunkVegetation;
-	chunkVegetation.pos = chunkPos;
+void RendererDebug::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
+	auto& chunkRenderData = vegetationMap[index];
 
+	if (chunkRenderData.generation == generation)
+		return;
+
+	chunkRenderData.pos = chunkPos;
+	chunkRenderData.generation = generation;
+
+	std::vector<Sphere> spheres;
+	spheres.reserve(veggies.size());
 	for (const auto& veggie : veggies) {
-		chunkVegetation.veggies.emplace_back(
+		spheres.emplace_back(
 				is3D ? veggie.pos : libv::vec3f{xy(veggie.pos), 0.f},
 				veggie.size, veggie.color, 6, 6);
 	}
 
-	chunkVegetation.mesh = build_mesh(chunkVegetation.veggies);
-
-	vegetationMap.insert_or_assign(index, chunkVegetation);
+	buildMesh(chunkRenderData.mesh, spheres);
 }
 
-Mesh RendererDebug::build_mesh(const std::vector<Sphere>& veggies) {
-	Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+void RendererDebug::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
+	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
@@ -78,7 +83,6 @@ Mesh RendererDebug::build_mesh(const std::vector<Sphere>& veggies) {
 			}
 		}
 	}
-	return mesh;
 }
 
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {

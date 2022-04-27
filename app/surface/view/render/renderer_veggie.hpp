@@ -33,8 +33,8 @@ struct RendererDebug {
 	};
 
 	struct ChunkVegetation {
+		int generation = -1;
 		libv::vec2f pos;
-		std::vector<Sphere> veggies;
 		Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	};
 
@@ -46,13 +46,13 @@ private:
 	ShaderTestMode shader;
 	bool dirty = true;
 
-	Mesh build_mesh(const std::vector<Sphere>& veggies);
+	void buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies);
 public:
 	explicit RendererDebug(RendererResourceContext& rctx);
 
 //	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
 
-	void addVeggies(const libv::vec2i& index, const libv::vec2f& chunkPos,
+	void addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos,
 			std::vector<VeggieType>& veggies, bool is3D);
 //	void clear_spheres();
 

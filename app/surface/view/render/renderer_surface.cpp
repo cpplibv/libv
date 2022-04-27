@@ -13,12 +13,18 @@ namespace surface {
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface.vs", "surface.fs") {}
 
-void RendererSurface::addChunk(const std::shared_ptr<surface::Chunk>& chunk) {
-	const auto& pair = chunkMeshMap.emplace(chunk->index, libv::glr::Mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw});
-	auto& mesh = pair.first->second;
-	if(!pair.second)
-		mesh.clear();
+void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Chunk>& chunk) {
+	auto& chunkRenderData = chunkMeshMap[chunk->index];
+	if (chunkRenderData.generation == generation)
+		return;
 
+	chunkRenderData.generation = generation;
+	buildMesh(chunkRenderData.mesh, chunk);
+}
+
+
+void RendererSurface::buildMesh(Mesh& mesh, const std::shared_ptr<surface::Chunk>& chunk) {
+	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -70,14 +76,14 @@ void RendererSurface::clear() {
 void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 
 	glr.program(shader.program());
-	for (const auto& [_, mesh] : chunkMeshMap) {
+	for (const auto&[_, chunkMesh] : chunkMeshMap) {
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = glr.mvp();
 		uniforms[layout_matrices.matM] = glr.model;
 		uniforms[layout_matrices.matP] = glr.projection;
 		uniforms[layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(uniforms));
-		glr.render(mesh);
+		glr.render(chunkMesh.mesh);
 	}
 }
 

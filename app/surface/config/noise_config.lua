@@ -157,7 +157,7 @@ config = {
 	visualization = Visualization.spheres,
 	resolution = 128,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
-	numChunks = 20,
+	numChunks = 400,
 
 	amplitude = 0.5,
 	--treeSize = 0.003,
