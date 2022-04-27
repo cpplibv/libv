@@ -124,7 +124,7 @@ public:
 	PlantDistribution plantDistribution;
 	int circleNumber;
 	float circleSize;
-	std::vector<SurfaceObject> objects;
+//	std::vector<SurfaceObject> objects;
 	libv::flat_set<Biome> biomes;
 //	libv::gradientf<libv::vec4f> colorGrad;
 //	std::unique_ptr<Node> rootNode;

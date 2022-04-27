@@ -23,20 +23,18 @@ lighting, sun
 
 Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
 
-
 command line argument config selection
 improve config cycle:
 	naming
 	fix mem leak (no unsubscribe)
 	watch directory
 	cycle based on filename on index
-
+	remember last
 
 texture view duplicate border pixels
 
 point xyz -> z (only)
 
-dtor crash from fsw
 
 mesh submesh update (for surface chunks)
 

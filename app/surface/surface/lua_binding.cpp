@@ -209,9 +209,9 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOf
 	return result;
 }
 
-std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::object& object) {
-	return convertArray<SurfaceObject>(object, convertSurfaceObject);
-}
+//std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::object& object) {
+//	return convertArray<SurfaceObject>(object, convertSurfaceObject);
+//}
 
 VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	const auto table = convertTable(object);
@@ -263,7 +263,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	result->plantDistribution = table["plantDistribution"];
 	result->circleNumber = table["circleNumber"];
 	result->circleSize = table["circleSize"];
-	result->objects = convertSurfaceObjects(table.get<sol::object>("objects"));
+//	result->objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;
 }
