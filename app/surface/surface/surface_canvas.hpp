@@ -32,8 +32,8 @@ enum class SceneType {
 //	distribution,
 };
 
-inline SceneType currentHeatMap = SceneType::_3d;
-inline SceneType previousHeatMap = currentHeatMap;
+inline SceneType currentScene = SceneType::_3d;
+inline SceneType previousScene = currentScene;
 
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
@@ -266,7 +266,7 @@ private:
 	libv::fsw::Watcher fileWatcher;
 
 private:
-	std::unique_ptr<Scene> currentScene;
+	std::unique_ptr<Scene> activeScene;
 	std::unique_ptr<Surface> surface;
 	bool surfaceDirty = false;
 

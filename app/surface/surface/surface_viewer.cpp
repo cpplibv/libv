@@ -80,42 +80,42 @@ SurfaceViewer::SurfaceViewer() :
 	controls.feature_action<void>("surface.3d", [this](const auto&) {
 		log_surface.info("Changing scene to: 3D Surface");
 		sceneTitle.text("3D Surface");
-		currentHeatMap = SceneType::_3d;
+		currentScene = SceneType::_3d;
 		currentCameraMode = CameraMode::_3d;
 	});
 	controls.feature_action<void>("surface.height_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Height");
 		sceneTitle.text("Texture: Height");
-		currentHeatMap = SceneType::height;
+		currentScene = SceneType::height;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.temperature_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Temperature");
 		sceneTitle.text("Texture: Temperature");
-		currentHeatMap = SceneType::temperature;
+		currentScene = SceneType::temperature;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.humidity_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Humidity");
 		sceneTitle.text("Texture: Humidity");
-		currentHeatMap = SceneType::humidity;
+		currentScene = SceneType::humidity;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.fertility_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Fertility");
 		sceneTitle.text("Texture: Fertility");
-		currentHeatMap = SceneType::fertility;
+		currentScene = SceneType::fertility;
 		currentCameraMode = CameraMode::_2d;
 	});
 	controls.feature_action<void>("surface.biome_texture", [this](const auto&) {
 		log_surface.info("Changing scene to: Texture Biome");
 		sceneTitle.text("Texture: Biome");
-		currentHeatMap = SceneType::biome;
+		currentScene = SceneType::biome;
 		currentCameraMode = CameraMode::_2d;
 	});
 //	controls.feature_action<void>("surface.distribution_texture", [](const auto&) {
 //		log_surface.info("Changing scene to: Texture distribution");
-//		currentHeatMap = SceneType::distribution;
+//		currentScene = SceneType::distribution;
 //		hasSceneChanged = true;
 //		currentCameraMode = CameraMode::_2d;
 //	});

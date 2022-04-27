@@ -1,21 +1,16 @@
 // Created by dbobula on 3/25/2022.
 
+// hpp
 #include <surface/surface/surface_canvas.hpp>
-
-// std
-#include <iostream>
-
-//libv
-//#include <libv/utility/timer.hpp>
-#include <libv/utility/index_spiral.hpp>
+// libv
 #include <libv/glr/queue.hpp>
-
-//space
+// pro
 #include <surface/log.hpp>
-#include <surface/surface/chunk.hpp>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls) :
 		cameraManager(controls),
@@ -28,7 +23,7 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls) :
 	setConfig();
 
 	surface = std::make_unique<Surface>();
-	currentScene = createScene(currentHeatMap);
+	activeScene = createScene(currentScene);
 }
 
 std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
@@ -109,7 +104,7 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	if (refresh) {
 		refresh = false;
-		currentScene = createScene(currentHeatMap);
+		activeScene = createScene(currentScene);
 		changed = true;
 	}
 
@@ -129,32 +124,32 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	setupRenderStates(glr);
 	const auto s_guard = glr.state.push_guard();
 
-	if (previousHeatMap != currentHeatMap) {
-		previousHeatMap = currentHeatMap;
-		currentScene = createScene(currentHeatMap);
+	if (previousScene != currentScene) {
+		previousScene = currentScene;
+		activeScene = createScene(currentScene);
 //		if (surfaceDirty) {
 		//build mesh
-		currentScene->build(surface->getChunks());
-		currentScene->buildVeggie(surface->getChunks());
+		activeScene->build(surface->getChunks());
+		activeScene->buildVeggie(surface->getChunks());
 //		}
 	}
 
 //	if (!surface->getChunks().empty()) {
 		if (surfaceDirty) {
 			//build mesh
-			currentScene->build(surface->getChunks());
-			currentScene->buildVeggie(surface->getChunks());
+			activeScene->build(surface->getChunks());
+			activeScene->buildVeggie(surface->getChunks());
 		}
 
 		//render surface texture/_3d
-		currentScene->render(glr, renderer.resource_context.uniform_stream);
+		activeScene->render(glr, renderer.resource_context.uniform_stream);
 
 		// render plant model/debug
 		if (enableVegetation)
-			currentScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
+			activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 //	}
 
-	if (currentHeatMap == SceneType::_3d && enableGrid) {
+	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();
 		glr.state.polygonModeFill(); // In case we are wireframe mode, force poly fill for the grid
 		glr.state.disableDepthMask();
@@ -163,6 +158,5 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 }
 
 // -------------------------------------------------------------------------------------------------
-
 
 } // namespace surface

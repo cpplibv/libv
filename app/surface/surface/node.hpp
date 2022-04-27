@@ -2,22 +2,29 @@
 
 #pragma once
 
-//#include <vector>
+// ext
+#include <boost/container/small_vector.hpp>
+// libv
+#include <libv/noise/noise.hpp>
+// std
 #include <memory>
 #include <cmath>
 
-#include <libv/noise/noise.hpp>
-
-#include <boost/container/small_vector.hpp>
-
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
+
 using Seed = uint32_t;
+
+// -------------------------------------------------------------------------------------------------
 
 struct Node {
 	virtual float evaluate(float x, float y) = 0;
 	virtual ~Node() = default;
 };
+
+// -------------------------------------------------------------------------------------------------
 
 struct NodeConstant : Node {
 	float value = 0.f;
@@ -171,6 +178,6 @@ struct NodePow : Node {
 //    }
 //};
 
-
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface

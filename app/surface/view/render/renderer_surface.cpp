@@ -1,14 +1,15 @@
 // Created by dbobula on 4/20/2022.
 
+// hpp
 #include <surface/view/render/renderer_surface.hpp>
-
-//libv
+// libv
 #include <libv/glr/queue.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
+
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface.vs", "surface.fs") {}
 
@@ -79,6 +80,7 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 		glr.render(mesh);
 	}
 }
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace surface

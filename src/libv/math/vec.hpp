@@ -876,6 +876,15 @@ template <std::size_t N, typename T>
 	return result;
 }
 
+/// Matches glsl fract: x - floor(x)
+template <std::size_t N, typename T>
+[[nodiscard]] constexpr inline vec_t<N, T> fract(const vec_t<N, T>& vec) noexcept {
+	vec_t<N, T> result;
+	for (std::size_t i = 0; i < N; ++i)
+		result.data()[i] = vec.data()[i] - std::floor(vec.data()[i]);
+	return result;
+}
+
 template <std::size_t N, typename T>
 [[nodiscard]] constexpr inline bool approx_eq(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs, T epsilon = T{0.00001}) noexcept {
 	bool result = true;

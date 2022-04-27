@@ -153,7 +153,7 @@ end
 --end
 
 config = {
-	--currentHeatMap = "temperature",
+	--currentScene = "temperature",
 	visualization = Visualization.spheres,
 	resolution = 128,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD

@@ -1,8 +1,11 @@
 // Created by dbobula on 4/19/2022.
 
+// hpp
 #include <surface/surface/surface.hpp>
-
+// libv
 #include <libv/utility/index_spiral.hpp>
+// pro
+#include <surface/log.hpp>
 
 
 namespace surface {
@@ -35,9 +38,6 @@ void SurfaceGen::buildChunks(const std::shared_ptr<const Config>& config_sp) {
 
 			std::shared_ptr<Chunk> chunk = chunkGen.generateChunk(config, chunkIndex);
 			chunkGen.placeVegetation(*chunk, config);
-			// more log needed
-//		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
-//		std::cout << std::endl;
 
 			auto chunksLock = std::unique_lock(chunksGuard);
 			resultQueue->emplace(std::move(chunk));

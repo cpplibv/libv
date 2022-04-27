@@ -1,12 +1,14 @@
 #version 330 core
 
+#include <block/matrices.glsl>
+
+
 in vec3 fragmentPositionW;
 in vec4 fragmentColor;
 in vec3 fragmentNormal;
 
 out vec4 result;
 
-#include <block/matrices.glsl>
 
 //void main() {
 //	result = fragmentColor;

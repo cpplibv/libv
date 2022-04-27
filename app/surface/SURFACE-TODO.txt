@@ -5,18 +5,57 @@
 
 
 
+Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
+
+skybox / background
+fog
+lighting, sun
+	normal map edge pixel calculation
+
+command line argument config selection
+improve config cycle:
+	naming
+	fix mem leak (no unsubscribe)
+	watch directory
+	cycle based on filename on index
+
+texture view duplicate border pixels
+
+point xyz -> z (only)
+
+multi config
+	activate nova
+	config path
+	remember last
+	switching
+
+dtor crash from fsw
+
+mesh submesh update (for surface chunks)
 
 
+=================================================================================================
 
 
+regenerate surface/chunk (to test the generation working)
+do not clear old chunk data, let the regeneration clear chunks
 
+config folder
+	config selection with cycle
+	command line argument for config
 
+vegi range limit
 
+Veggi instantiation
 
+Smooth cutoff/cutin Biome blending
 
+horizontal expansion, missing nodes
+create your own good looking surface config
 
-
-
+LOD
+priority based generation order and rendering
+frustum culling
 
 
 

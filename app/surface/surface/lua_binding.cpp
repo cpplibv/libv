@@ -1,16 +1,21 @@
 // Created by dbobula on 2/20/2022.
 
-//libv
-#include <libv/lua/sol_type_to_string.hpp>
-#include <libv/lua/convert_color.hpp>
-//space
+// hpp
 #include <surface/surface/lua_binding.hpp>
-//pro
-#include <iostream>
+// ext
 #include <fmt/format.h>
+// libv
+#include <libv/lua/convert_color.hpp>
+#include <libv/lua/sol_type_to_string.hpp>
+#include <libv/math/gradient.hpp>
+// pro
+#include <surface/surface/config.hpp>
+#include <surface/surface/node.hpp>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] sol::table convertTable(const sol::object& object) {
 	if (object.get_type() != sol::type::table)
@@ -37,25 +42,6 @@ template <typename T, typename ConvertFn>
 		result.emplace_back(convert(value));
 	}
 	return result;
-}
-
-//template <typename T, size_t N>
-//[[nodiscard]] libv::vec_t<N, T> convertVec(const sol::object& object) {
-//	std::cout << "convertVec" << std::endl;
-//	const auto result = convertArray<T>(object, [](auto value){return value;});
-//	auto asd = libv::vec_t<N, T>();
-//}
-
-template <typename T, size_t N>
-[[nodiscard]] libv::vec_t<N, T> convertVec(const sol::object& object) {
-	std::cout << "convertVec" << std::endl;
-	const auto result = convertArray<T>(object, [](auto value) { return value; });
-	return [&result] <size_t... I>(std::index_sequence<I...>) {
-		return libv::vec_t<N, T>(result[I]...);
-	}(std::make_index_sequence<N>());
-
-//	const auto table = convertTable(object);
-//	return libv::vec_t<2, T>(table[1], table[2]);
 }
 
 template <typename T, typename ConvertFn>
@@ -115,15 +101,11 @@ SurfaceLuaBinding::SurfaceLuaBinding() {
 
 std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& object, int depth) {
 	const auto table = convertTable(object);
+
 	std::vector<std::unique_ptr<Node>> children;
 	for (const auto&[key, value] : table) {
-//		std::cout << std::string(depth, '\t');
-		if (value.get_type() == sol::type::table) {
-//			std::cout << key.as<std::string_view>() << ":" << std::endl;
+		if (value.get_type() == sol::type::table)
 			children.emplace_back(convertNodeTree(value, depth + 1));
-		} else {
-//			std::cout << key.as<std::string_view>() << " = " << value.as<std::string_view>() << std::endl;
-		}
 	}
 
 	auto solNodeType = table["nodeType"];
@@ -135,14 +117,17 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 		auto node = std::make_unique<NodeConstant>();
 		node->value = table["value"];
 		return node;
+
 	} else if (nodeType == "perlin") {
 		auto node = std::make_unique<NodePerlin>();
 		node->seed = table["seed"];
 		return node;
+
 	} else if (nodeType == "simplex") {
 		auto node = std::make_unique<NodeSimplex>();
 		node->seed = table["seed"];
 		return node;
+
 	} else if (nodeType == "cellular") {
 		auto node = std::make_unique<NodeCellular>();
 		node->seed = table["seed"];
@@ -150,10 +135,12 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 		node->returnType = table["returnType"];
 		node->jitter = table["jitter"];
 		return node;
+
 	} else if (nodeType == "simplexFractal") {
 		auto node = std::make_unique<NodeSimplexFractal>();
 		setFractalConfig(*node, table);
 		return node;
+
 	} else if (nodeType == "warp") {
 		if (children.size() != 1)
 			throw std::runtime_error("Warp can only be applied to size of one nodes");
@@ -190,7 +177,6 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 	} else
 		throw std::runtime_error("Unknown node type: " + table.as<std::string>());
 }
-
 
 SurfaceObject SurfaceLuaBinding::convertSurfaceObject(const sol::object& object) {
 	const auto table = convertTable(object);
@@ -260,7 +246,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 
 	auto result = std::make_shared<Config>();
 	result->visualization = table["visualization"];
-//	result->currentHeatMap = table["currentHeatMap"];
+//	result->currentScene = table["currentScene"];
 	result->resolution = table["resolution"];
 	result->numChunks = table["numChunks"];
 	result->numVeggie = table["numVeggie"];
@@ -306,19 +292,6 @@ std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::str
 	sol::object luaConfig = env.get<sol::object>("config");
 	auto result = convertConfig(luaConfig);
 
-	//set rootNode
-//	{
-//		sol::object luaNodes = env["nodes"];
-//		auto nodes = convertNodeTree(luaNodes);
-//		result.rootNode = std::move(nodes);
-//	}
-
-//	//set heatMaps
-//	{
-//		sol::object luaHeatMaps = env["heatMaps"];
-//		auto nodes = convertHeatMaps(luaHeatMaps);
-//		result.heatMaps = std::move(nodes);
-//	}
 	result->height = convertHeatMap(env.get<sol::object>("height"));
 	result->temperature = convertHeatMap(env.get<sol::object>("temperature"));
 	result->humidity = convertHeatMap(env.get<sol::object>("humidity"));
@@ -328,6 +301,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::str
 
 	return result;
 }
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace surface

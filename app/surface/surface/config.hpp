@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include <surface/surface/node.hpp>
-//#include <surface/surface/biome.hpp>
-
-#include <libv/noise/noise.hpp>
+// libv
+#include <libv/container/flat_set.hpp>
 #include <libv/math/gradient.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/container/flat_set.hpp>
-#include <surface/log.hpp>
+// pro
+#include <surface/surface/node.hpp>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
 
 enum class Visualization {
 	model,
@@ -81,7 +81,6 @@ struct VeggieType {
 	libv::vec3f pos;
 	libv::vec4f color;
 
-
 //	Range<float> fertility;
 //	std::string path;
 //	Range<float> height;
@@ -89,7 +88,6 @@ struct VeggieType {
 //	Range<float> hue;
 //	Range<float> saturation;
 //	Range<float> value;
-
 };
 
 struct Biome {
@@ -99,10 +97,6 @@ struct Biome {
 	float dominance = 1.f;
 	libv::gradientf<libv::vec4f> colorGrad;
 	std::vector<VeggieType> vegetation;
-
-	~Biome() {
-		log_surface.error("Biome dtor");
-	}
 
 	friend inline bool operator<(const Biome& lhs, const Biome& rhs) noexcept {
 		return lhs.name < rhs.name;
@@ -115,14 +109,12 @@ struct Biome {
 	friend inline bool operator<(const std::string& lhs, const Biome& rhs) noexcept {
 		return lhs < rhs.name;
 	}
-
 };
-
 
 class Config {
 public:
 	Visualization visualization;
-//	std::string currentHeatMap;
+//	std::string currentScene;
 	size_t resolution; /// Number of quads/pixels per side
 	size_t numChunks; /// Number of quads/pixels per side
 	size_t numVeggie;
@@ -138,7 +130,6 @@ public:
 	HeatMap temperature;
 	HeatMap humidity;
 	HeatMap fertility;
-
 
 //	std::unique_ptr<Node> heightRootNode;
 //	std::unique_ptr<Node> temperatureOffsetRootNode;
@@ -159,11 +150,8 @@ public:
 //	libv::CellularDistanceFunction distanceFn = libv::CellularDistanceFunction::euclidean;
 //	libv::CellularReturnType returnType = libv::CellularReturnType::cellValue;
 //	float jitter = 1.0f;
-
-	~Config() {
-		log_surface.error("Config dtor");
-	}
-
 };
-} // namespace surface
 
+// -------------------------------------------------------------------------------------------------
+
+} // namespace surface

@@ -1,25 +1,19 @@
 // Created by dbobula on 1/16/2022.
 
 #include <surface/surface/chunk.hpp>
-
-//ext
-#include <fmt/format.h>
-//libv
-#include <libv/noise/noise.hpp>
+// libv
 #include <libv/math/fract.hpp>
-// std
-#include <functional>
-#include <iostream>
-#include <memory>
-//space
+#include <libv/utility/random/uniform_distribution.hpp>
+#include <libv/utility/random/xoroshiro128.hpp>
+// pro
 #include <surface/surface/biome.hpp>
 
 
 namespace surface {
 // -------------------------------------------------------------------------------------------------
 
-bool isPointInTriangle(libv::vec2f p, float step) {
-	return libv::fract(p.x / step) + libv::fract(p.y / step) < 1;
+bool isPointInSWTriangle(libv::vec2f p) {
+	return p.x + p.y < 1;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -50,11 +44,11 @@ float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	// (0,0)
 
 	const auto numQuad = resolution - 1;
-	const auto step = 1.f / static_cast<float>(numQuad);
+	const auto step = static_cast<float>(numQuad);
 
-	const auto leftX = static_cast<int>(uv.x / step);
+	const auto leftX = static_cast<int>(uv.x * step);
 	const auto rightX = leftX + 1;
-	const auto downY = static_cast<int>(uv.y / step);
+	const auto downY = static_cast<int>(uv.y * step);
 	const auto upY = downY + 1;
 
 	const auto NW = height(leftX, upY).pos;
@@ -62,15 +56,15 @@ float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	const auto SW = height(leftX, downY).pos;
 	const auto SE = height(rightX, downY).pos;
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
-	const auto isPointInNWSWSE = isPointInTriangle(uv, step);
+	const auto quadU = libv::fract(uv.x * step);
+	const auto quadV = libv::fract(uv.y * step);
 
-	auto u = libv::fract(uv.x / step);
-	auto v = libv::fract(uv.y / step);
+	const auto isPointInNWSWSE = isPointInSWTriangle({quadU, quadV});
 
 	if (isPointInNWSWSE)
-		return (1 - u - v) * SW.z + u * SE.z + v * NW.z;
+		return (1 - quadU - quadV) * SW.z + quadU * SE.z + quadV * NW.z;
 	else
-		return (-1 + u + v) * NE.z + (1 - u) * NW.z + (1 - v) * SE.z;
+		return (-1 + quadU + quadV) * NE.z + (1 - quadU) * NW.z + (1 - quadV) * SE.z;
 }
 
 libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {

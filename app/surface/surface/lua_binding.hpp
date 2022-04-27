@@ -2,16 +2,24 @@
 
 #pragma once
 
-//ext
+// ext
 #include <sol/sol.hpp>
-
-#include <surface/surface/config.hpp>
-#include <surface/surface/node.hpp>
-
+// libv
 #include <libv/container/flat_set.hpp>
+// std
+#include <memory>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
+
+class Biome;
+class Config;
+class HeatMap;
+class Node;
+class SurfaceObject;
+class VeggieType;
 
 class SurfaceLuaBinding {
 private:
@@ -19,6 +27,7 @@ private:
 //	Config config;
 
 //	void setFractalConfig(const sol::table& luaConfig);
+
 private:
 	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, int depth = 0);
 	static SurfaceObject convertSurfaceObject(const sol::object& object);
@@ -38,5 +47,6 @@ public:
 //	NodeTree getNodeTreeFromLuaScript(std::string_view script);
 };
 
-} // namespace surface
+// -------------------------------------------------------------------------------------------------
 
+} // namespace surface
