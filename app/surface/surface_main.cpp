@@ -7,6 +7,9 @@
 #include <surface/log.hpp>
 #include <surface/surface/surface_viewer.hpp>
 
+//libv
+#include <libv/arg/arg.hpp>
+
 #include <iostream>
 
 //#include <libv/color/space.hpp>
@@ -20,8 +23,23 @@
 // -------------------------------------------------------------------------------------------------
 
 int main(int argc, const char** argv) {
-	(void) argc;
-	(void) argv;
+	auto args = libv::arg::Parser("Surface", "Surface generation and visualization tool");
+
+	const auto arg_config = args.optional<std::string>
+			("-c", "--config")
+			("config", "Path to the config file");
+
+	const auto arg_verbose = args.flag
+			("-v", "--verbose")
+			("verbose", "Enables verbose mode");
+
+	args.positional(arg_config);
+
+	if (!args.standard_validate(argc, argv, std::cerr, 100))
+		return EXIT_FAILURE;
+
+	if (arg_verbose.value())
+		std::cout << args.report(100);
 
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
