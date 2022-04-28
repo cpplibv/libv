@@ -22,7 +22,6 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-
 ///** @note Vertex Arrays cannot be shared between multiple openGL contexts */
 class AccessVertexArray {
 private:

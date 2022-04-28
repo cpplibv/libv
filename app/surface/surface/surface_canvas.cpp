@@ -31,17 +31,17 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, s
 std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
 	switch (scene) {
 	case SceneType::_3d:
-		return std::make_unique<SurfaceScene>(renderer, renderer.resource_context);
+		return std::make_unique<SurfaceScene>(renderer);
 	case SceneType::height:
-		return std::make_unique<HeightHeatMap>(renderer, renderer.resource_context);
+		return std::make_unique<HeightHeatMap>(renderer);
 	case SceneType::temperature:
-		return std::make_unique<TemperatureHeatMap>(renderer, renderer.resource_context);
+		return std::make_unique<TemperatureHeatMap>(renderer);
 	case SceneType::humidity:
-		return std::make_unique<HumidityHeatMap>(renderer, renderer.resource_context);
+		return std::make_unique<HumidityHeatMap>(renderer);
 	case SceneType::fertility:
-		return std::make_unique<FertilityHeatMap>(renderer, renderer.resource_context);
+		return std::make_unique<FertilityHeatMap>(renderer);
 	case SceneType::biome:
-		return std::make_unique<BiomeHeatMap>(renderer, renderer.resource_context);
+		return std::make_unique<BiomeHeatMap>(renderer);
 	}
 
 	assert(false && "Invalid SceneType enum value");
@@ -127,7 +127,11 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	if (refresh) {
 		refresh = false;
+		renderer.veggie.clear();
+		renderer.surface.clear();
+
 		activeScene = createScene(currentScene);
+
 		changed = true;
 	}
 
@@ -137,8 +141,19 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 		auto script = libv::read_file_str_or_throw(currentConfigPath);
 		auto conf = binding.getConfigFromLuaScript(script);
 
+		renderer.sky.fogIntensity = conf->fogIntensity;
+		renderer.sky.fogColor = conf->fogColor;
+		renderer.veggie.fogIntensity = conf->fogIntensity;
+		renderer.veggie.fogColor = conf->fogColor;
+		renderer.surface.fogIntensity = conf->fogIntensity;
+		renderer.surface.fogColor = conf->fogColor;
+
 		surface->gen(std::move(conf));
 	}
+
+	renderer.sky.fogEnabled = enableFog;
+	renderer.veggie.fogEnabled = enableFog;
+	renderer.surface.fogEnabled = enableFog;
 
 	surfaceDirty = surface->update();
 }
@@ -168,9 +183,8 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	if (enableVegetation)
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream);
 
-	if (enableSkybox) {
+	if (enableSkybox)
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
-	}
 
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();

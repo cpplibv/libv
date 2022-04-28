@@ -5,10 +5,12 @@
 #include <libv/glr/queue.hpp>
 #include <libv/math/vec.hpp>
 
+#include <surface/view/render/renderer.hpp>
+
 
 namespace surface {
-// -------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
 		shader(rctx.loader.shader, "surface_texture.vs", "surface_texture.fs") {
@@ -66,6 +68,7 @@ void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuf
 	}
 
 }
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace surface

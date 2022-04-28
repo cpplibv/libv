@@ -124,6 +124,10 @@ public:
 	PlantDistribution plantDistribution;
 	int circleNumber;
 	float circleSize;
+
+	float fogIntensity;
+	libv::vec4f fogColor;
+
 //	std::vector<SurfaceObject> objects;
 	libv::flat_set<Biome> biomes;
 //	libv::gradientf<libv::vec4f> colorGrad;

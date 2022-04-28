@@ -3,25 +3,34 @@
 
 
 
-shader re-loading might deadlock sometimes
 
-skybox / background
-	libv.rev: builtin:cube (XYZ cube)
-	fog uniforms
-		fog option runtime on/off
-		fog color from config
+// !!! FOG OPTION VARIABLE
 
-fog+
-	fog for veggies
-	fog uniforms
-		fog option runtime on/off
-		fog color from config
+Stability:
+	!!! shader re-loading might deadlock sometimes
 
-lighting, sun
-	normal map edge pixel calculation
+Visuals:
+	skybox / background
+		libv.rev: builtin:cube (XYZ cube)
+		fog uniforms
+			fog option runtime on/off
+			fog color/intensity from config
+		skybox texture from config
 
+	fog+
+		fog for veggies
+		fog uniforms
+			fog option runtime on/off
+			fog color/intensity from config
 
-Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
+	lighting
+		sun
+
+	issues
+		normal map edge pixel calculation
+		texture view duplicate border pixels
+		texture view sometimes can flicker a row on chunk borders
+			most likely half pixel issue
 
 command line argument config selection
 improve config cycle:
@@ -31,16 +40,18 @@ improve config cycle:
 	cycle based on filename on index
 	remember last
 
-texture view duplicate border pixels
 
 point xyz -> z (only)
-
 
 mesh submesh update (for surface chunks)
 
 
+
 =================================================================================================
 
+
+
+Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
 
 regenerate surface/chunk (to test the generation working)
 do not clear old chunk data, let the regeneration clear chunks

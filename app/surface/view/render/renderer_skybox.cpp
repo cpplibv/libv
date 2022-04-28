@@ -34,6 +34,10 @@ void RendererSkybox::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.state.depthFunctionLEqual();
 	glr.program(shader.program());
 
+	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
+//	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
+	glr.uniform(shader.uniform().fogColor, fogColor);
+
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 //	uniforms[layout_matrices.matMVP] = glr.mvp();
 	uniforms[layout_matrices.matMVP] = glr.projection * libv::mat4f(libv::mat3f(glr.view));

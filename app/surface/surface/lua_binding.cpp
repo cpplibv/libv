@@ -263,6 +263,10 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	result->plantDistribution = table["plantDistribution"];
 	result->circleNumber = table["circleNumber"];
 	result->circleSize = table["circleSize"];
+
+	result->fogIntensity = table["fogIntensity"].get_or(0.05f);
+	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));
+	result->fogColor = fogColorOpt ? *fogColorOpt : libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};
 //	result->objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;

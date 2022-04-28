@@ -27,6 +27,9 @@
 #include <surface/surface/chunk.hpp>
 #include <surface/view/camera.hpp>
 #include <surface/view/render/renderer_skybox.hpp>
+#include <surface/view/render/renderer_surface.hpp>
+#include <surface/view/render/renderer_surface_texture.hpp>
+#include <surface/view/render/renderer_veggie.hpp>
 
 
 // =================================================================================================
@@ -62,16 +65,6 @@ struct RendererResourceContext {
 		loader.shader.add_include_directory("", "../../res/shader/");
 //		// Include the res/model/ folder from libv
 //		model_loader.add_include_directory("", "../../res/model/");
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-struct VecHash {
-	auto operator()(libv::vec2i vec) const {
-		return libv::hash_combine(
-				libv::hash_int(static_cast<uint32_t>(vec.x)),
-				libv::hash_int(static_cast<uint32_t>(vec.y)));
 	}
 };
 
@@ -146,6 +139,9 @@ struct Renderer {
 	RendererGizmo gizmo{resource_context};
 	RendererText text{resource_context};
 	RendererSkybox sky{resource_context};
+	RendererVeggie veggie{resource_context};
+	RendererSurface surface{resource_context};
+	RendererSurfaceTexture surfaceTexture{resource_context};
 
 public:
 	explicit Renderer(libv::ui::UI& ui);

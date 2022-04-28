@@ -26,6 +26,7 @@ public:
 	surface::SurfaceFrame frame;
 	libv::ctrl::Controls controls;
 	libv::ui::UI ui;
+
 	libv::ui::CanvasAdaptorT<SurfaceCanvas> canvas;
 
 	libv::ui::PanelAnchor mainLayers;

@@ -4,22 +4,24 @@
 
 #include <libv/glr/queue.hpp>
 
+#include <surface/view/render/renderer.hpp>
+
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-RendererDebug::RendererDebug(RendererResourceContext& rctx) :
+RendererVeggie::RendererVeggie(RendererResourceContext& rctx) :
 		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
 }
 
-//void RendererDebug::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count) {
+//void RendererVeggie::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count) {
 //	const auto& sphere = Sphere(center, radius, color, ring_count, segment_count);
 //	vegetationMap.insert_or_assign(index, sphere);
 //	dirty = true;
 //}
 
-void RendererDebug::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
+void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
 	auto& chunkRenderData = vegetationMap[index];
 
 	if (chunkRenderData.generation == generation)
@@ -39,7 +41,7 @@ void RendererDebug::addVeggies(int generation, const libv::vec2i& index, const l
 	buildMesh(chunkRenderData.mesh, spheres);
 }
 
-void RendererDebug::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
+void RendererVeggie::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	mesh.clear();
 
 	auto position = mesh.attribute(attribute_position);
@@ -86,8 +88,12 @@ void RendererDebug::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	}
 }
 
-void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	glr.program(shader.program());
+
+	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
+	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
+	glr.uniform(shader.uniform().fogColor, fogColor);
 
 	const auto& eye = glr.eye();
 	for (const auto&[_, chunkVeggie] : vegetationMap) {
@@ -101,14 +107,12 @@ void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 			glr.uniform(std::move(uniforms));
 			glr.render(mesh);
 		}
-
 	}
 }
 
-//void RendererDebug::clear_spheres() {
-//	spheres.clear();
-//	dirty = true;
-//}
+void RendererVeggie::clear() {
+	vegetationMap.clear();
+}
 
 // -------------------------------------------------------------------------------------------------
 

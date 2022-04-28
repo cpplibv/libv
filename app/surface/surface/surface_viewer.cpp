@@ -76,6 +76,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
 		enableGrid = !enableGrid;
 	});
+	controls.feature_action<void>("surface.toggle_fog", [](const auto&) {
+		enableFog = !enableFog;
+	});
 	controls.feature_action<void>("surface.toggle_skybox", [](const auto&) {
 		enableSkybox = !enableSkybox;
 	});
@@ -162,11 +165,12 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.bind("surface.show_controls", "F1");
 	controls.bind("surface.toggle_wireframe", "F2 [press]");
 	controls.bind("surface.cycle_camera", "F3 [press]");
-	controls.bind("surface.cycle_config", "C [press]");
 	controls.bind("surface.toggle_vegetation", "F4 [press]");
 	controls.bind("surface.toggle_grid", "F5 [press]");
-//	controls.bind("surface.toggle_fog", "F6 [press]");
+	controls.bind("surface.toggle_fog", "F6 [press]");
 	controls.bind("surface.toggle_skybox", "F7 [press]");
+
+	controls.bind("surface.cycle_config", "C [press]");
 
 	controls.bind("surface.3d", "1 [press]");
 	controls.bind("surface.height_texture", "2 [press]");
@@ -211,7 +215,7 @@ void SurfaceViewer::initUI() {
 
 	configName.text(canvas.object().currentConfigPath);
 	configName.font_color(libv::vec4f(1, 1, 1, 1));
-	configName.align_horizontal(libv::ui::AlignHorizontal::right);
+	configName.align_horizontal(libv::ui::AlignHorizontal::left);
 	configName.align_vertical(libv::ui::AlignVertical::top);
 	configName.margin(6);
 	mainLayers.add(configName);

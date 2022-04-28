@@ -4,6 +4,8 @@
 #include <surface/view/render/renderer_surface.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+// pro
+#include <surface/view/render/renderer.hpp>
 
 
 namespace surface {
@@ -22,9 +24,9 @@ void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Ch
 	buildMesh(chunkRenderData.mesh, chunk);
 }
 
-
-void RendererSurface::buildMesh(Mesh& mesh, const std::shared_ptr<surface::Chunk>& chunk) {
+void RendererSurface::buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<surface::Chunk>& chunk) {
 	mesh.clear();
+
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -74,8 +76,12 @@ void RendererSurface::clear() {
 }
 
 void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-
 	glr.program(shader.program());
+
+	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
+	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
+	glr.uniform(shader.uniform().fogColor, fogColor);
+
 	for (const auto&[_, chunkMesh] : chunkMeshMap) {
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = glr.mvp();

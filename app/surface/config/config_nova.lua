@@ -123,6 +123,9 @@ config = {
 	numVeggie = 100,
 	--numVeggie = 500,
 	--numVeggie = 1000,
+
+	fogIntensity = 0.05,
+	fogColor = "rgb(0.7, 0.8, 0.9)";
 }
 
 biomes = {
