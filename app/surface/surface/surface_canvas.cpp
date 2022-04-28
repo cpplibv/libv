@@ -22,7 +22,7 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, s
 
 	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event& event) {
 		auto lock = std::unique_lock(mutex);
-		if (event.path.generic_string() == currentConfigPath_)
+		if (event.path.generic_string() == currentConfigPath_ )
 			changed = true;
 	});
 
@@ -39,7 +39,7 @@ std::string SurfaceCanvas::cycleConfig() {
 	bool first = true;
 	std::string firstConfig;
 	const auto dir = "config/";
-	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+	for (const auto& entry : std::filesystem::directory_iterator(dir)) {
 		if (not entry.is_regular_file())
 			continue;
 

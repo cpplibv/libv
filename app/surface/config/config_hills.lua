@@ -5,7 +5,7 @@ require("config/common/nodes")
 -- -------------------------------------------------------------------------------------------------
 
 config = {
-	seed = 0,
+	seed = 12,
 	resolution = 64,
 	--numChunks = 9,
 	--numChunks = 81,
@@ -14,8 +14,8 @@ config = {
 	--numVeggie = 500,
 	--numVeggie = 1000,
 
-	fogIntensity = 0.05,
-	fogColor = "rgb(0.7, 0.8, 0.9)";
+	fogIntensity = 0.01,
+	fogColor = "#58a3fe";
 }
 
 biomes = {
@@ -45,36 +45,88 @@ biomes = {
 	--},
 	{
 		name = "grassland2",
-		coord = vec2f(0.2, 0.8),
+		coord = vec2f(0.8, 0.8),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(121, 70%, 80%)" },
-			{ 1, "hsv(140, 90%, 70%)" }
+			{ 1, "#939f0b" }
 		},
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(150, 65%, 70%)",
+				color = "#69750c",
 				size = 0.05,
 				probability = 0.2,
 			},
 			{
 				name = "bush",
-				color = "hsv(145, 70%, 60%)",
+				color = "#69740c",
 				size = 0.022,
 				probability = 0.6,
 			},
 		}
 	},
 	{
-		name = "desert",
-		coord = vec2f(0.8, 0.2),
+		name = "green",
+		coord = vec2f(0.5, 0.9),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "hsv(34, 54%, 92%)" }
+			{ 1, "#415d08" }
+		},
+		vegetation = {
+			--{
+			--	name = "tree",
+			--	color = "hsv(60, 80%, 100%)",
+			--	size = 0.05,
+			--	probability = 0.2,
+			--	--fertilityRange = vec2f{0.6, 1.0},
+			--	--color = "hsv(120, 60%, 100%)",
+			--},
+			{
+				name = "rock",
+				color = "hsv(69, 10%, 60%)",
+				size = 0.022,
+				probability = 0.2,
+			}
+		}
+	},
+	{
+		name = "black",
+		coord = vec2f(0.2, 0.9),
+		dominance = 1.0,
+		cutOff = vec2f(0.1, 0.4),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "#1d2320" }
+		},
+		vegetation = {
+			--{
+			--	name = "tree",
+			--	color = "hsv(60, 80%, 100%)",
+			--	size = 0.05,
+			--	probability = 0.2,
+			--	--fertilityRange = vec2f{0.6, 1.0},
+			--	--color = "hsv(120, 60%, 100%)",
+			--},
+			{
+				name = "rock",
+				color = "hsv(69, 10%, 60%)",
+				size = 0.022,
+				probability = 0.2,
+			}
+		}
+	},
+	{
+		name = "red",
+		coord = vec2f(0.6, 0.0),
+		dominance = 1,
+		cutOff = vec2f(0.1, 0.4),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "#553522" }
 		},
 		vegetation = {
 			--{
@@ -127,8 +179,8 @@ height = {
 					--value = 0.5,
 					seed = 423,
 					octaves = 6,
-					amplitude = 3.5,
-					frequency = 0.5,
+					amplitude = 4.5,
+					frequency = 0.2,
 					lacunarity = 2.0,
 					persistence = 0.25,
 					--simplex{
@@ -138,7 +190,7 @@ height = {
 						seed = 600733745,
 						octaves = 5,
 						amplitude = 0.5,
-						frequency = 0.05,
+						frequency = 0.08,
 						lacunarity = 2.0,
 						persistence = 0.5,
 					},
@@ -221,7 +273,7 @@ temperature = {
 	},
 	nodes = add {
 		simplexFractal {
-			seed = 1,
+			seed = 476,
 			octaves = 6,
 			amplitude = 0.5,
 			frequency = 0.5,

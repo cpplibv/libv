@@ -42,8 +42,6 @@ inline bool enableSkybox = true;
 
 inline bool refresh = true;
 inline bool configChanged = false;
-//inline size_t configCnt = 0;
-//inline std::string currentConfigPath = "config/noise_config.lua";
 
 inline std::atomic<bool> changed = true;
 

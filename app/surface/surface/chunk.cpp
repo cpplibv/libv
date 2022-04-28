@@ -259,7 +259,7 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 //				throw std::runtime_error(fmt::format("Biome not found: {}", std::to_underlying(biome)));
 			auto picker = BiomePicker();
 			auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-//			const auto& biome = mix.primary();
+			const auto& biome = mix.primary();
 //			const auto& biome = mix.random(rng);
 //			auto weight = mix.primaryWeight();
 //			const auto forest = categorizeForest(wet);
@@ -269,7 +269,7 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
 			chunk->biomeMap(xi, yi) = mix.blendedColor(1.0f);
-//			chunk->biomeMap(xi, yi) = biome.colorGrad.sample(0.7f);
+//			chunk->biomeMap(xi, yi) = biome.colorGrad.sample(0.9f);
 
 //			chunk->biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
 //			chunk->surface(xi, yi) = SurfacePoint{chunk->height(xi, yi).pos + libv::vec3f{chunkPosition, 0},

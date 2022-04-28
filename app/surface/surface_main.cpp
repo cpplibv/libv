@@ -28,7 +28,7 @@ int main(int argc, const char** argv) {
 	const auto arg_config = args.require<std::string>
 			("-c", "--config")
 			("config", "Path to the config file")
-			= "config/noise_config.lua";
+			= "config/config_tundra.lua";
 
 	const auto arg_verbose = args.flag
 			("-v", "--verbose")

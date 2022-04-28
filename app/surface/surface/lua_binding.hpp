@@ -36,7 +36,7 @@ private:
 	static Seed convertSeed(const sol::object& object, Seed seedOffset);
 	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, Seed seedOffset);
 	static SurfaceObject convertSurfaceObject(const sol::object& object);
-	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
+//	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
 	static HeatMap convertHeatMap(const sol::object& object, Seed seedOffset);
 	static Biome convertBiome(const sol::object& object);
 	static libv::flat_set<Biome> convertBiomes(const sol::object& object);

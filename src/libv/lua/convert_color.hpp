@@ -2,15 +2,16 @@
 
 #pragma once
 
+// libv
 #include <libv/lua/lua.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/ui/property/color.hpp>
 #include <libv/parse/color.hpp>
-
 
 
 namespace libv {
 namespace lua {
+
+// -------------------------------------------------------------------------------------------------
 
 inline std::optional<libv::vec4f> convert_color(const sol::object& object) {
 
@@ -72,6 +73,8 @@ inline std::optional<libv::vec4f> convert_color(const sol::object& object) {
 		return std::nullopt;
 	}
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace lua
 } // namespace libv

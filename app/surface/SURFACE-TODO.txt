@@ -4,24 +4,13 @@
 
 
 
-// !!! FOG OPTION VARIABLE
-
 Stability:
 	!!! shader re-loading might deadlock sometimes
 
 Visuals:
 	skybox / background
 		libv.rev: builtin:cube (XYZ cube)
-		fog uniforms
-			fog option runtime on/off
-			fog color/intensity from config
 		skybox texture from config
-
-	fog+
-		fog for veggies
-		fog uniforms
-			fog option runtime on/off
-			fog color/intensity from config
 
 	lighting
 		sun
@@ -32,14 +21,8 @@ Visuals:
 		texture view sometimes can flicker a row on chunk borders
 			most likely half pixel issue
 
-command line argument config selection
-improve config cycle:
-	naming
-	fix mem leak (no unsubscribe)
-	watch directory
-	cycle based on filename on index
-	remember last
 
+remember last config
 
 point xyz -> z (only)
 
@@ -108,29 +91,31 @@ TODO revive texture
     ui label
 
 
+dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
 
 
  =================================================================================================
 
-dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
 
-Bug: texture nezetben veggie not working with zoom
-
- config folder
-    remember last: profile file, json (libv::serial)
-
-
- Veggi instantiation
-
- Smooth cutoff/cutin Biome blending
 
  horizontal expansion, missing nodes
+ 	coordinate (vec2 scale) dot product
+ 	smooth step
+ 	remap
+ 	if
+ 	curve/envelop, tangens
+ Smooth cutoff/cutin Biome blending
  create your own good looking surface config
+ 	warp + cellular = cserepes talaj
+
+ Veggi instantiation
 
  LOD
  priority based generation order and rendering
  frustum culling
 
+ config
+    remember last: profile file, json (libv::serial)
 
 
 
