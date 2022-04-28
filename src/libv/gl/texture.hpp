@@ -263,8 +263,13 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
 		libv::vec2i result;
-		glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_WIDTH, &result.x);
-		glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_HEIGHT, &result.y);
+		if (object.target == libv::gl::TextureTarget::CubeMap) {
+			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, level, GL_TEXTURE_WIDTH, &result.x);
+			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, level, GL_TEXTURE_HEIGHT, &result.y);
+		} else {
+			glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_WIDTH, &result.x);
+			glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_HEIGHT, &result.y);
+		}
 		checkGL();
 		return result;
 	}
@@ -273,9 +278,15 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
 		libv::vec3i result;
-		glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_WIDTH, &result.x);
-		glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_HEIGHT, &result.y);
-		glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_DEPTH, &result.z);
+		if (object.target == libv::gl::TextureTarget::CubeMapArray) {
+			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, level, GL_TEXTURE_WIDTH, &result.x);
+			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, level, GL_TEXTURE_HEIGHT, &result.y);
+			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, level, GL_TEXTURE_DEPTH, &result.z);
+		} else {
+			glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_WIDTH, &result.x);
+			glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_HEIGHT, &result.y);
+			glGetTexLevelParameteriv(to_value(object.target), level, GL_TEXTURE_DEPTH, &result.z);
+		}
 		checkGL();
 		return result;
 	}
