@@ -40,9 +40,8 @@ public:
 public:
 	explicit SurfaceViewer(const std::string& configPath);
 
-
 private:
-	void initUI();
+	void initUI(const std::string& configPath);
 
 public:
 	void execute();

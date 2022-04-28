@@ -17,15 +17,55 @@ namespace surface {
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_) :
 		cameraManager(controls),
-		currentConfigPath(std::move(configPath_)),
+		currentConfigPath_(std::move(configPath_)),
 		renderer(ui) {
 
-	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event&) {
-		changed = true;
+	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event& event) {
+		auto lock = std::unique_lock(mutex);
+		if (event.path.generic_string() == currentConfigPath_)
+			changed = true;
 	});
 
 	surface = std::make_unique<Surface>();
 	activeScene = createScene(currentScene);
+}
+
+std::string SurfaceCanvas::cycleConfig() {
+	auto lock = std::unique_lock(mutex);
+
+	const auto filter_pattern = "**.lua";
+
+	bool next = false;
+	bool first = true;
+	std::string firstConfig;
+	const auto dir = "config/";
+	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+		if (not entry.is_regular_file())
+			continue;
+
+		auto filepath = entry.path().generic_string();
+
+		if (not libv::match_wildcard_glob(filepath, filter_pattern))
+			continue;
+
+		if (first) {
+			first = false;
+			firstConfig = filepath;
+		}
+
+		if (next) {
+			currentConfigPath_ = filepath;
+			return currentConfigPath_;
+		}
+
+		if (filepath == currentConfigPath_) {
+			next = true;
+		}
+	}
+
+	assert(not first && "Given directory is empty of lua config files");
+	currentConfigPath_ = firstConfig;
+	return currentConfigPath_;
 }
 
 std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
@@ -84,42 +124,6 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-std::string SurfaceCanvas::cycleConfigs() {
-	const auto filter_pattern = "**.lua";
-
-	bool next = false;
-	bool first = true;
-	std::string firstConfig;
-	const auto dir = "config/";
-	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
-		if (not entry.is_regular_file())
-			continue;
-
-		auto filepath = entry.path().generic_string();
-
-		if (not libv::match_wildcard_glob(filepath, filter_pattern))
-			continue;
-
-		if (first) {
-			first = false;
-			firstConfig = filepath;
-		}
-
-		if (next) {
-			currentConfigPath = filepath;
-			return currentConfigPath;
-		}
-
-		if (filepath == currentConfigPath) {
-			next = true;
-		}
-	}
-
-	assert(not first && "Given directory is empty of lua config files");
-	currentConfigPath = firstConfig;
-	return currentConfigPath;
-}
-
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
 
@@ -137,8 +141,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	if (changed) {
 		changed = false;
-
-		auto script = libv::read_file_str_or_throw(currentConfigPath);
+		auto lock = std::unique_lock(mutex); // To guard the currentConfigPath read
+		auto script = libv::read_file_str_or_throw(currentConfigPath_);
 		auto conf = binding.getConfigFromLuaScript(script);
 
 		renderer.sky.fogIntensity = conf->fogIntensity;

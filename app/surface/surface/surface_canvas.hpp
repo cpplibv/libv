@@ -6,6 +6,8 @@
 #include <libv/fsw/watcher.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/ui/component/canvas.hpp>
+// std
+#include <mutex>
 // pro
 #include <surface/surface/lua_binding.hpp>
 #include <surface/surface/surface.hpp>
@@ -255,7 +257,10 @@ class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
 	CameraManager cameraManager;
 
-	std::string currentConfigPath;
+private:
+	std::mutex mutex;
+	std::string currentConfigPath_;
+
 private:
 	surface::Renderer renderer;
 
@@ -270,7 +275,7 @@ private:
 
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);
-	std::string cycleConfigs();
+	std::string cycleConfig();
 
 private:
 	[[nodiscard]] std::unique_ptr<Scene> createScene(SceneType scene);

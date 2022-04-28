@@ -71,7 +71,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	});
 	controls.feature_action<void>("surface.cycle_config", [this](const auto&) {
 		refresh = true;
-		configName.text(canvas.object().cycleConfigs());
+		configName.text(canvas.object().cycleConfig());
 	});
 	controls.feature_action<void>("surface.toggle_grid", [](const auto&) {
 		enableGrid = !enableGrid;
@@ -181,7 +181,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.bind("surface.biome_texture", "6 [press]");
 //	controls.bind("surface.distribution_texture", "7 [press]");
 
-	initUI();
+	initUI(configPath);
 
 	controls.attach(frame);
 	ui.attach(frame);
@@ -189,7 +189,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 
 }
 
-void SurfaceViewer::initUI() {
+void SurfaceViewer::initUI(const std::string& configPath) {
 	canvas.z_index_offset(-100);
 
 	canvas.event().focus.connect([this](const libv::ui::EventFocus& e) mutable {
@@ -213,7 +213,7 @@ void SurfaceViewer::initUI() {
 	sceneTitle.margin(6);
 	mainLayers.add(sceneTitle);
 
-	configName.text(canvas.object().currentConfigPath);
+	configName.text(configPath);
 	configName.font_color(libv::vec4f(1, 1, 1, 1));
 	configName.align_horizontal(libv::ui::AlignHorizontal::left);
 	configName.align_vertical(libv::ui::AlignVertical::top);
