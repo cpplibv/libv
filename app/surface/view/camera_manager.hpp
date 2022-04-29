@@ -31,7 +31,7 @@ class CameraManager {
 
 public:
 	explicit inline CameraManager(libv::ctrl::Controls& controls) :
-		controls(controls) {
+			controls(controls) {
 
 		camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 	}
@@ -117,7 +117,7 @@ public:
 		return libv::mat4f::identity();
 	}
 
-	float getHeight(){
+	float getHeight() {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.position().z;
@@ -129,13 +129,15 @@ public:
 		return 0.f;
 	}
 
-	Frustum getCameraFrustum(libv::vec2f canvasSize){
+	Frustum getCameraFrustum(libv::vec2f canvasSize) {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.frustum(canvasSize);
 		case CameraMode::_3d:
 			return camera3D.frustum(canvasSize);
 		}
+		assert(false && "Invalid CameraMode enum value");
+		return Frustum();
 	}
 };
 

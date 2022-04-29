@@ -100,6 +100,7 @@ nodes
 
  create your own good looking surface config
  	warp + cellular = cserepes talaj
+ frustum culling
  =================================================================================================
 
 
@@ -114,7 +115,6 @@ nodes
 
  LOD
  priority based generation order and rendering
- frustum culling
 
  config
     remember last: profile file, json (libv::serial)

@@ -125,20 +125,16 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 }
 
 void SurfaceCanvas::updateVisibleChunks() {
-//	renderer.debug.clear_debug_shapes();
 	visibleChunks.clear();
 	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
-//	renderer.debug.add_debug_frustum(frustum.corners(), libv::vec4f{0.8f, 0, 1, 1}, libv::vec4f{0.2f, 0.3f, 1, 0.1f});
 	for (const auto& chunk : surface->getChunks()) {
 		//Red check: throw away
 		//Green check: generate and render
 		const auto pos = libv::vec3f(chunk->position, 0.f);
 		if (frustum.sphereInFrustum(pos, chunk->size.length() / 2.f) != Frustum::Position::OUTSIDE) {
 			visibleChunks.emplace_back(chunk->index);
-//			renderer.debug.add_debug_sphere(pos, 0.2f, libv::vec4f{0, 1, 0.3, 1});
 		}
 		//Yellow check: lowprio generate, build but not render
-
 	}
 }
 
@@ -146,7 +142,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
 
 	cameraManager.update();
-	updateVisibleChunks();
+	if (!freeze)
+		updateVisibleChunks();
 
 
 	if (refresh) {
@@ -188,6 +185,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	setupRenderStates(glr);
 	const auto s_guard = glr.state.push_guard();
 
+
 	if (previousScene != currentScene) {
 		previousScene = currentScene;
 		activeScene = createScene(currentScene);
@@ -218,7 +216,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		glr.state.disableDepthMask();
 		renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
 	}
-//	renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------

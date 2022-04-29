@@ -40,10 +40,9 @@ inline bool enableGrid = true;
 inline bool enableFog = true;
 inline bool enableSkybox = true;
 
-inline bool refresh = true;
-inline bool configChanged = false;
-
+inline bool refresh = false;
 inline std::atomic<bool> changed = true;
+inline bool freeze = false;
 
 
 
