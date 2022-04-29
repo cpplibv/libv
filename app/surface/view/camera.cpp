@@ -108,11 +108,37 @@ void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept {
 		return;
 	}
 
-	const auto [length, dir] = (target - eye).length_and_dir();
+	const auto[length, dir] = (target - eye).length_and_dir();
 	roll_ = 0;
 	pitch_ = std::asin(dir.z);
 	yaw_ = -std::atan2(dir.y, dir.x); // Yaw is CW but atan2 is CCW
 	orbit_distance_ = length;
+}
+
+Frustum BaseCameraOrbit::frustum(vec2 canvas_size) const noexcept {
+	const auto width = canvas_size.x;
+	const auto height = canvas_size.y;
+
+	const auto world_far_height_half = (std::tan(fov_y_ / 2.f) * far_);
+	const auto world_near_height_half = (std::tan(fov_y_ / 2.f) * near_);
+
+	const auto aspect_ratio = width / height;
+	const auto world_far_width = world_far_height_half * aspect_ratio;
+	const auto world_near_width = world_near_height_half * aspect_ratio;
+
+	const auto eye_ = eye();
+	const auto nbl = eye_ + near_ * forward() + world_near_height_half * -up() + world_near_width * -right();
+	const auto nbr = eye_ + near_ * forward() + world_near_height_half * -up() + world_near_width * right();
+	const auto ntr = eye_ + near_ * forward() + world_near_height_half * up() + world_near_width * right();
+	const auto ntl = eye_ + near_ * forward() + world_near_height_half * up() + world_near_width * -right();
+
+	const auto fbl = eye_ + far_ * forward() + world_far_height_half * -up() + world_far_width * -right();
+	const auto fbr = eye_ + far_ * forward() + world_far_height_half * -up() + world_far_width * right();
+	const auto ftr = eye_ + far_ * forward() + world_far_height_half * up() + world_far_width * right();
+	const auto ftl = eye_ + far_ * forward() + world_far_height_half * up() + world_far_width * -right();
+
+
+	return Frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
 }
 
 // =================================================================================================

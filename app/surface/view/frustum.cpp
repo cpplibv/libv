@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/frustum.cpp
+// Project: libv, File: app/surface/view/frustum.cpp
 
 // hpp
 #include <surface/view/frustum.hpp>
@@ -67,6 +67,29 @@ Frustum::Position Frustum::pointInFrustum(libv::vec3f point) const noexcept {
 	return Position::INSIDE;
 }
 
+bool Frustum::isPointInFrustum(libv::vec3f point) const noexcept {
+	const auto left_dist = planes[left].distance(point);
+	if (left_dist < 0)
+		return false;
+	const auto right_dist = planes[right].distance(point);
+	if (right_dist < 0)
+		return false;
+	const auto up_dist = planes[up].distance(point);
+	if (up_dist < 0)
+		return false;
+	const auto down_dist = planes[down].distance(point);
+	if (down_dist < 0)
+		return false;
+	const auto near_dist = planes[near].distance(point);
+	if (near_dist < 0)
+		return false;
+	const auto far_dist = planes[far].distance(point);
+	if (far_dist < 0)
+		return false;
+
+	return true;
+}
+
 //Frustum::Frustum(libv::vec3f eye, libv::vec3f fbl_, libv::vec3f fbr_, libv::vec3f ftr_, libv::vec3f ftl_, float near_) noexcept {
 //	planes[left] = Plane(eye, fbr_, fbl_);
 //	planes[right] = Plane(eye, ftl_, ftr_);
@@ -115,6 +138,10 @@ Frustum::Frustum(libv::vec3f nbl_, libv::vec3f nbr_, libv::vec3f ntr_, libv::vec
 	corners_[ftr] = ftr_;
 	corners_[ftl] = ftl_;
 //	);
+}
+
+std::array<libv::vec3f, 8> Frustum::corners() const noexcept {
+	return corners_;
 }
 
 //int Frustum::sphereInFrustum(libv::vec3f p, float radius) const noexcept {

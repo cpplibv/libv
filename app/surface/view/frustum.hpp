@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/frustum.hpp
+// Project: libv, File: app/surface/view/frustum.hpp
 
 #pragma once
 
@@ -94,9 +94,10 @@ public:
 //	Frustum(libv::vec3f eye, libv::quat dir, libv::vec2f fov, float near, float far) noexcept;
 
 public:
-	Position pointInFrustum(libv::vec3f point) const noexcept;
-	Position sphereInFrustum(libv::vec3f point, float radius) const noexcept;
-	std::array<libv::vec3f, 8> corners();
+	[[nodiscard]] Position pointInFrustum(libv::vec3f point) const noexcept;
+	[[nodiscard]] bool isPointInFrustum(libv::vec3f point) const noexcept;
+	[[nodiscard]] Position sphereInFrustum(libv::vec3f point, float radius) const noexcept;
+	[[nodiscard]] std::array<libv::vec3f, 8> corners() const noexcept;
 //	int sphereInFrustum(libv::vec3f point, float radius) const noexcept;
 };
 

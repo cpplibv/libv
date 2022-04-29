@@ -34,7 +34,7 @@ public:
 
 class Surface {
 private:
-	int genCnt = 0;
+	int generation = 0;
 	std::vector<std::shared_ptr<Chunk>> chunks;
 //	std::mutex chunksGuard;
 //	std::shared_ptr<const Config> config = nullptr;
@@ -53,7 +53,7 @@ public:
 //		std::cout << "surface.gen() " << std::endl;
 		chunks.clear();
 		surfaceGen.buildChunks(std::move(config));
-		return ++genCnt;
+		return ++generation;
 	}
 
 	inline bool update() {
@@ -65,8 +65,8 @@ public:
 		return changed;
 	}
 
-	[[nodiscard]] inline int getGenCnt() {
-		return genCnt;
+	[[nodiscard]] inline int getGeneration() {
+		return generation;
 	}
 };
 

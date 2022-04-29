@@ -93,20 +93,22 @@ TODO revive texture
 
 dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
 
+nodes
+ 	coordinate (vec2 scale) dot product
+ 	smooth step, sin
+ 	remap
 
+ create your own good looking surface config
+ 	warp + cellular = cserepes talaj
  =================================================================================================
 
 
 
  horizontal expansion, missing nodes
- 	coordinate (vec2 scale) dot product
- 	smooth step
- 	remap
  	if
  	curve/envelop, tangens
+
  Smooth cutoff/cutin Biome blending
- create your own good looking surface config
- 	warp + cellular = cserepes talaj
 
  Veggi instantiation
 

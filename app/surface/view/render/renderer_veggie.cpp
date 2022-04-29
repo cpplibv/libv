@@ -88,7 +88,7 @@ void RendererVeggie::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	}
 }
 
-void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
@@ -96,9 +96,14 @@ void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(shader.uniform().fogColor, fogColor);
 
 	const auto& eye = glr.eye();
-	for (const auto&[_, chunkVeggie] : vegetationMap) {
-		if ((libv::vec3f(chunkVeggie.pos, 0.f) - eye).length() < 10.f) {
-			const auto& mesh = chunkVeggie.mesh;
+	for (const auto& index : visibleChunks) {
+		const auto& it = vegetationMap.find(index);
+		if(it == vegetationMap.end())
+			//visible chunk not ready to be rendered
+			continue;
+
+		if ((libv::vec3f(it->second.pos, 0.f) - eye).length() < 10.f) {
+			const auto& mesh = it->second.mesh;
 			auto uniforms = uniform_stream.block_unique(layout_matrices);
 			uniforms[layout_matrices.matMVP] = glr.mvp();
 			uniforms[layout_matrices.matM] = glr.model;

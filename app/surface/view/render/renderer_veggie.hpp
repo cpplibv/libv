@@ -81,7 +81,7 @@ public:
 
 	void clear();
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks);
 };
 
 

@@ -60,14 +60,14 @@ public:
 	explicit Scene(Renderer& renderer) : renderer(renderer) {}
 
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) = 0;
 //	virtual void clear() = 0;
 //	virtual void clear(size_t count) = 0;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
-	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-		renderer.veggie.render(glr, uniform_stream);
+	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) {
+		renderer.veggie.render(glr, uniform_stream, visibleChunks);
 	}
 
 	virtual ~Scene() = default;
@@ -83,8 +83,8 @@ struct SurfaceScene : Scene {
 		}
 	}
 
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-		renderer.surface.render(glr, uniform_stream);
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) override {
+		renderer.surface.render(glr, uniform_stream, visibleChunks);
 	}
 
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
@@ -94,7 +94,7 @@ struct SurfaceScene : Scene {
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-//		rendererVeggie.render(glr, uniform_stream);
+//		rendererVeggie.render(glr, uniform_stream, visibleChunks);
 //	}
 };
 
@@ -121,7 +121,8 @@ inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heat
 struct TextureScene : Scene {
 	using Scene::Scene;
 
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) override {
+		(void) visibleChunks;
 		renderer.surfaceTexture.render(glr, uniform_stream);
 	}
 
@@ -269,6 +270,8 @@ private:
 private:
 	std::unique_ptr<Scene> activeScene;
 	std::unique_ptr<Surface> surface;
+	std::vector<libv::vec2i> visibleChunks;
+//	std::vector<Surface> surface;
 	bool surfaceDirty = false;
 
 public:
@@ -281,6 +284,7 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
+	void updateVisibleChunks();
 //	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;

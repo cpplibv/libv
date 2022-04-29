@@ -10,6 +10,8 @@
 // std
 #include <chrono>
 #include <cmath>
+//surface
+#include <surface/view/frustum.hpp>
 
 
 namespace surface {
@@ -79,7 +81,7 @@ private:
 
 	float_type near_ = 0.1f;
 	float_type far_ = 100.f;
-	float_type fov_y_ = libv::deg_to_rad(75.0f);
+	float_type fov_y_ = libv::deg_to_rad(75.0f); //height
 
 public:
 	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
@@ -97,6 +99,7 @@ public:
 	[[nodiscard]] vec3 up() const noexcept;
 
 	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
+	[[nodiscard]] Frustum frustum(vec2 canvas_size) const noexcept;
 
 public:
 	void look_at(vec3 eye, vec3 target) noexcept;
@@ -290,6 +293,12 @@ public:
 	}
 	constexpr inline void position(vec3 value) noexcept {
 		position_ = value;
+	}
+
+	inline Frustum frustum(vec2 canvasSize) {
+		//TODO
+		(void) canvasSize;
+		return Frustum();
 	}
 //	[[nodiscard]] constexpr inline float_type near() const noexcept {
 //		return near_;

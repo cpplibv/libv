@@ -75,21 +75,26 @@ void RendererSurface::clear() {
 	chunkMeshMap.clear();
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
 
-	for (const auto&[_, chunkMesh] : chunkMeshMap) {
+	for (const auto& index : visibleChunks) {
+		const auto& it = chunkMeshMap.find(index);
+		if (it == chunkMeshMap.end())
+			//visible chunk not ready to be rendered
+			continue;
+
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = glr.mvp();
 		uniforms[layout_matrices.matM] = glr.model;
 		uniforms[layout_matrices.matP] = glr.projection;
 		uniforms[layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(uniforms));
-		glr.render(chunkMesh.mesh);
+		glr.render(it->second.mesh);
 	}
 }
 
