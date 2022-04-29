@@ -2,18 +2,65 @@
 
 
 
+=== Stack =======================================================================================
+
+
+Sprites:
+	fog
+
+	gs: UB on atan2 if x == 0
+
+	sprite.fs
+		dither: sprite random + sprite pos based viewport position, so, combine this two
+
+	Sprite
+		There is a startup crash, but could not identify it so far
+			| Manual stress tested came back negative
+			| MAYBE its just the shader load/reload deadlock
+
+		Render:
+			proper angle calculation
+				(also there is an error with direct down looking, atan/asin fails)
+				(there is also one with 30° and left column 2-5 when the eye crosses one dim above it)
+
+			dither blend between images
+				no linear blend, but switch pixels one-by-one based on white noise
+				! IF alpha not zero in any of them matches, then linear blend
+				maybe exclusive threshold in the middle
+					60% direct
+					20-20% blend with neighbour
+						1 fetch
+						2 fetch (row or column change)
+						4 fetch (row and column change)
+
+		BAKE:
+			use real model AABB
+			on the sprite atlas edge, there is a smudge
+				? drop one half pixel from the UV
+
+			originally baked normal map should be cleared with 0.5, 0.5, 0.5 first
+				fix upsampling normals, renomalize them
+			OR use a signed internal format for normals?
+
+
+vec2f lua convert function is buggy
+remember last config
+
 
 
 Stability:
-	!!! shader re-loading might deadlock sometimes
+	!!! during regeneration and exit (esc) deadlock-y
 
 Visuals:
 	skybox / background
 		libv.rev: builtin:cube (XYZ cube)
 		skybox texture from config
+		find a couple of good skybox
 
 	lighting
 		sun
+			switching
+			config sun properties
 
 	issues
 		normal map edge pixel calculation
@@ -21,48 +68,25 @@ Visuals:
 		texture view sometimes can flicker a row on chunk borders
 			most likely half pixel issue
 
-
-remember last config
+	debug views
+		normal, height
+		textures on 3D: temperature, humidity etc
 
 point xyz -> z (only)
 
-mesh submesh update (for surface chunks)
+
+libv.glr: mesh submesh update (for surface chunks)
+
+
+Big things left
+	Sprites
+	Water
+	Textures
+	LOD
 
 
 
-=================================================================================================
-
-
-
-Vegi renderer vegetationMap, incorrect caching, looks more upload than needed?
-
-regenerate surface/chunk (to test the generation working)
-do not clear old chunk data, let the regeneration clear chunks
-
-config folder
-	config selection with cycle
-	command line argument for config
-
-vegi range limit
-
-Veggi instantiation
-
-Smooth cutoff/cutin Biome blending
-
-horizontal expansion, missing nodes
-create your own good looking surface config
-
-LOD
-priority based generation order and rendering
-frustum culling
-
-
-
-
-
-
-
-===================================================================================================
+=== DONE ========================================================================================
 
 
 
@@ -90,6 +114,10 @@ TODO revive texture
     command line argument for config - libv::arg::Parser vagy kezzel
     ui label
 
+
+
+
+=== Queue ========================================================================================
 
 dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
 

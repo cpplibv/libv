@@ -27,6 +27,7 @@
 #include <surface/surface/chunk.hpp>
 #include <surface/view/camera.hpp>
 #include <surface/view/render/renderer_skybox.hpp>
+#include <surface/view/render/renderer_sprite.hpp>
 #include <surface/view/render/renderer_surface.hpp>
 #include <surface/view/render/renderer_surface_texture.hpp>
 #include <surface/view/render/renderer_veggie.hpp>
@@ -258,6 +259,7 @@ struct Renderer {
 	RendererVeggie veggie{resource_context};
 	RendererSurface surface{resource_context};
 	RendererSurfaceTexture surfaceTexture{resource_context};
+	RendererSprite sprite{resource_context.loader};
 
 public:
 	explicit Renderer(libv::ui::UI& ui);

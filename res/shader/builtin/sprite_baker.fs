@@ -10,14 +10,19 @@ in vec3 fragmentNormalW;
 //in vec3 fragmentBitangentW;
 in vec2 fragmentTexture0;
 
+
 //out vec4 result;
 layout(location = 0) out vec4 resultColor;
 layout(location = 1) out vec4 resultNormal;
 //layout(location = 2) out float resultDepth;
 
+
+
 uniform sampler2D texture0;
 
 // -------------------------------------------------------------------------------------------------
+
+
 
 void main() {
 	vec3 N = normalize(fragmentNormalW);
@@ -41,5 +46,6 @@ void main() {
 //	resultNormal = N;
 
 	resultColor = color;
+//	resultColor = vec4(1, 1, 1, 1);
 	resultNormal = vec4(N * 0.5 + 0.5, 1);
 }

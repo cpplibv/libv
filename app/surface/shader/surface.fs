@@ -17,7 +17,8 @@ uniform vec4 fogColor = vec4(0.7, 0.8, 0.9, 1.0);
 void main() {
 	vec3 N = normalize(fragmentNormal); // Normal vector
 	vec3 V = normalize(eye - fragmentPositionW); // View vector
-	vec3 L = vec3(0, 0, 1); // Light vector
+//	vec3 L = vec3(0, 0, 1); // Light vector
+	vec3 L = normalize(vec3(0.6, 0.8, 1)); // Light vector
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
@@ -26,7 +27,7 @@ void main() {
 
 	float attenuation =
 			strength_diffuse +
-			strength_specular * 0.2;
+			strength_specular * 0.05;
 
 //	result = vec4(base_color.rgb * attenuation, base_color.a);
 	result = vec4(fragmentColor.rgb * attenuation, fragmentColor.a);

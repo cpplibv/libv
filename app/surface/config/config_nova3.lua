@@ -15,7 +15,7 @@ config = {
 	--numVeggie = 1000,
 
 	fogIntensity = 0.05,
-	fogColor = "rgb(0.7, 0.8, 0.9)";
+	fogColor = "rgb(0.7, 0.9, 0.8)";
 }
 
 biomes = {
@@ -45,7 +45,7 @@ biomes = {
 	--},
 	{
 		name = "grassland2",
-		coord = vec2f(0.2, 0.6),
+		coord = vec2f(0.2, 0.8),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
@@ -69,7 +69,7 @@ biomes = {
 	},
 	{
 		name = "desert",
-		coord = vec2f(0.8, 0.6),
+		coord = vec2f(0.8, 0.2),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
@@ -118,44 +118,64 @@ height = {
 		--[1.0] = "green",
 		--[2.0] = "grey",
 	},
-	nodes =
-		pow {
-			exponent = 2.0,
-			--exponent = 1.0,
+	nodes = pow {
+		exponent = 1,
+
+		mix {
 			add {
-				warp {
-					--value = 0.5,
-					seed = 423,
-					octaves = 6,
-					amplitude = 3.5,
-					frequency = 0.5,
+				simplexFractal {
+					seed = 600733745,
+					octaves = 5,
+					amplitude = 0.5,
+					frequency = 0.1,
 					lacunarity = 2.0,
-					persistence = 0.25,
-					--simplex{
-					--	seed = 126
-					--}
+					persistence = 0.5,
+				},
+				constant {
+					value = 0.5,
+				},
+			},
+			clamp {
+				simplexFractal {
+					seed = 602364345,
+					octaves = 7,
+					amplitude = 1.0,
+					frequency = 0.08,
+					lacunarity = 1.5,
+					persistence = 0.5,
+				},
+				add {
 					simplexFractal {
-						seed = 600733745,
-						octaves = 5,
-						amplitude = 0.5,
-						frequency = 0.05,
-						lacunarity = 2.0,
+						seed = 6023643445,
+						octaves = 7,
+						amplitude = 1.0,
+						frequency = 0.17,
+						lacunarity = 1.5,
 						persistence = 0.5,
 					},
+					constant {
+						value = 0,
+					},
 				},
-				--simplexFractal {
-				--	seed = 2,
-				--	octaves = 10,
-				--	amplitude = 0.4,
-				--	frequency = 0.2,
-				--	lacunarity = 2.0,
-				--	persistence = 0.5,
-				--},
+				constant {
+					value = 3.5,
+				},
+			},
+			add {
+				simplexFractal {
+					seed = 5323,
+					octaves = 5,
+					amplitude = 0.5,
+					frequency = 0.2,
+					lacunarity = 2.0,
+					persistence = 0.5,
+				},
 				constant {
 					value = 0.5,
 				},
 			},
 		},
+	},
 
 	--nodes = pow {
 	--	exponent = 2.0,
@@ -214,7 +234,7 @@ height = {
 
 temperature = {
 	name = "temperature",
-	heightSensitivity = 0.5, --//200m-kent 1 fok
+	heightSensitivity = 5, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
@@ -223,13 +243,13 @@ temperature = {
 		simplexFractal {
 			seed = 1,
 			octaves = 6,
-			amplitude = 0.1,
+			amplitude = 0.5,
 			frequency = 0.5,
 			lacunarity = 2.0,
 			persistence = 0.5,
 		},
 		constant {
-			value = 0.6
+			value = 0.5
 		}
 	}
 }

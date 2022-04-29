@@ -21,9 +21,11 @@ end
 config = {
 	seed = 123,
 	resolution = 128,
+	numChunks = 1,
 	--numChunks = 9,
 	--numChunks = 81,
-	numChunks = 81,
+	--numChunks = 81,
+	--numChunks = 169,
 	numVeggie = 200,
 	--numVeggie = 500,
 	--numVeggie = 1000,
@@ -64,7 +66,6 @@ biomes = {
 			},
 		}
 	},
-
 	{
 		name = "grassland",
 		coord = vec2f(0.6, 0.0),

@@ -11,8 +11,33 @@ uniform bool isColor; // Upsampling happens on: True = colors, False = normals
 
 // -------------------------------------------------------------------------------------------------
 
-void main() {
+vec3 find_any_color_near(vec2 uv, vec2 pixelSize, float startDistance) {
+	for (float ring = startDistance; ring < startDistance + 32; ring += 1.0) {
+		for (float i = -ring * 0.5; i < ring * 0.5; i++) {
+			vec4 sample_;
 
+			sample_ = texture(texture0, uv + vec2(i, ring) * pixelSize).rgba;
+			if (sample_.a > 0.9)
+				return sample_.rgb;
+
+			sample_ = texture(texture0, uv + vec2(i, -ring) * pixelSize).rgba;
+			if (sample_.a > 0.9)
+				return sample_.rgb;
+
+			sample_ = texture(texture0, uv + vec2(ring, i) * pixelSize).rgba;
+			if (sample_.a > 0.9)
+				return sample_.rgb;
+
+			sample_ = texture(texture0, uv + vec2(-ring, i) * pixelSize).rgba;
+			if (sample_.a > 0.9)
+				return sample_.rgb;
+		}
+	}
+
+	return vec3(0.5, 0.5, 0.5);
+}
+
+void main() {
 	// |---|---|---|---|
 	//   ^   ^   ^   ^
 	//         v
@@ -20,35 +45,40 @@ void main() {
 	// 4 -> -3/8, -1/8, 1/8, 3/8
 	// N -> -0.5 + (1 + 2K) / 2N : K={0..N}
 
-	ivec2 size = textureSize(texture0, 0);
-	vec2 input_pixel_size = 1.0 / size;
+	vec2 inputPixelSize = 1.0 / textureSize(texture0, 0);
 
 	int samples = ssaaSamples;
 
-	vec4 color;
+	vec4 color = vec4(0, 0, 0, 0);
+	int sample_used = 0;
+
 	for (int y = 0; y < samples; y++) {
 		for (int x = 0; x < samples; x++) {
 			vec2 offset = -0.5 + (1.0 + 2.0 * vec2(x, y)) / (2.0 * samples);
-			vec4 sample_ = texture(texture0, fragmentTexture0 + input_pixel_size * offset).rgba;
+			vec4 sample_ = texture(texture0, fragmentTexture0 + inputPixelSize * offset).rgba;
 
-			if (isColor)
-				color += sample_;
-			else // isNormal
-				color += (sample_ * 2.0 - 1.0) * 0.5 + 0.5;
+			if (sample_.a > color.a) {
+				color = sample_;
+				sample_used = 1;
+			} else if (sample_.a > color.a * 0.9) {
+				color.rgb += sample_.rgb;
+				++sample_used;
+			}
 		}
 	}
 
-	if (isColor) {
-		// For RGB only AVG the "exciting opacity fragments"
-		// color /= samples * samples;
-		color.rgb /= color.a;
-		color.a /= samples * samples;
-		color = clamp(color, 0, 1);
+	if (color.a < 0.05 || sample_used == 0) {
+		// find closest anything
+		color.rgb = find_any_color_near(fragmentTexture0, inputPixelSize, samples / 2.0);
+		color.a = 0;
+
 	} else {
-		color /= samples * samples;
-//		color = clamp(color, 0, 1);
-		color.rgb =	normalize(color.rgb * 2.0 - 1.0) * 0.5 + 0.5;
-//		color.rgb =	normalize(color);
+		color.rgb /= sample_used;
+		color.a = min(color.a, 1);
+	}
+
+	if (isColor) {
+	} else { // isNormal
 		color.a = 1;
 	}
 

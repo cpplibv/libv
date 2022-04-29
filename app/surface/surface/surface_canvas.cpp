@@ -20,10 +20,15 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, s
 		currentConfigPath_(std::move(configPath_)),
 		renderer(ui) {
 
-	fileWatcher.subscribe_directory("config", [this](const libv::fsw::Event& event) {
+	fileWatcher.subscribe_directory("config/", [this](const libv::fsw::Event& event) {
 		auto lock = std::unique_lock(mutex);
 		if (event.path.generic_string() == currentConfigPath_)
 			changed = true;
+	});
+
+	fileWatcher.subscribe_directory("../../res/shader/", [this](const libv::fsw::Event& event) {
+		if (event.path.filename().generic_string().starts_with("sprite_"))
+			forceRebake = true;
 	});
 
 	surface = std::make_unique<Surface>();
@@ -181,7 +186,6 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	surfaceDirty = surface->update();
 }
 
-
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	setupRenderStates(glr);
 	const auto s_guard = glr.state.push_guard();
@@ -199,20 +203,47 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 //	}
 
 	if (surfaceDirty) {
+		if (!std::exchange(initializedSprites, true)) {
+			renderer.sprite.registerSprite("tree_01.vm4", 1.f / 66.85f);
+			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 0.5f / 66.85f);
+			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
+
+			for (int x = 0; x < 10; ++x) {
+				for (int y = 0; y < 10; ++y) {
+					const auto xf = static_cast<float>(x);
+					const auto yf = static_cast<float>(y);
+					renderer.sprite.add(x % 2 == 0, {xf, yf, 0.f});
+				}
+			}
+		}
+
 		//build mesh
 		activeScene->build(surface->getGeneration(), surface->getChunks());
 		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
-	}
+
+	} else if (forceRebake.exchange(false))
+		renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
 
 	//render surface texture/_3d
 	activeScene->render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 
-	// render plant model/debug
-	if (enableVegetation)
-		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
-
 	if (currentScene == SceneType::_3d && enableSkybox)
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
+
+	// render plant model/debug
+	if (enableVegetation) {
+		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
+		renderer.sprite.render(glr, renderer.resource_context.uniform_stream);
+	}
+
+	{
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(-1.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(1.f / 66.85f);
+			tree_01.render(glr, renderer.resource_context.uniform_stream);
+		}
+	}
 
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();

@@ -15,7 +15,7 @@ config = {
 	--numVeggie = 1000,
 
 	fogIntensity = 0.05,
-	fogColor = "rgb(0.7, 0.8, 0.9)";
+	fogColor = "rgb(0.7, 0.9, 0.8)";
 }
 
 biomes = {
@@ -45,7 +45,7 @@ biomes = {
 	--},
 	{
 		name = "grassland2",
-		coord = vec2f(0.2, 0.6),
+		coord = vec2f(0.2, 0.8),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
@@ -69,7 +69,7 @@ biomes = {
 	},
 	{
 		name = "desert",
-		coord = vec2f(0.8, 0.6),
+		coord = vec2f(0.8, 0.2),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
@@ -95,6 +95,80 @@ biomes = {
 	},
 }
 
+-- =================================================================================================
+
+base = function(seed)
+	return add{
+		constant {
+			value = 1,
+		},
+		simplexFractal {
+			seed = seed,
+			octaves = 2,
+			amplitude = 1,
+			frequency = 0.05,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		},
+	}
+end
+
+mountainRange = pow {
+	exponent = 2.0,
+
+	min {
+		base(222),
+		min {
+			base(333),
+			min {
+				base(555),
+				base(666),
+			},
+		},
+	},
+}
+
+baseMicro = function(seed)
+	return add{
+		constant {
+			value = 0.5,
+		},
+		simplexFractal {
+			seed = seed,
+			octaves = 1,
+			amplitude = 0.5,
+			frequency = 0.2,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		},
+	}
+end
+
+microRange = mul {
+	constant {
+		value = -0.5,
+	},
+	pow {
+		exponent = 0.2,
+
+		min {
+			baseMicro(2222),
+			min {
+				--baseMicro(3333),
+				--min {
+					baseMicro(4444),
+					min {
+						baseMicro(5555),
+						baseMicro(6666),
+					},
+				--},
+			},
+		},
+	},
+}
+
+-- =================================================================================================
+
 height = {
 	name = "height",
 	heightSensitivity = 0.0,
@@ -119,102 +193,63 @@ height = {
 		--[2.0] = "grey",
 	},
 	nodes =
-		pow {
-			exponent = 2.0,
-			--exponent = 1.0,
-			add {
-				warp {
-					--value = 0.5,
-					seed = 423,
-					octaves = 6,
-					amplitude = 3.5,
-					frequency = 0.5,
-					lacunarity = 2.0,
-					persistence = 0.25,
-					--simplex{
-					--	seed = 126
-					--}
-					simplexFractal {
-						seed = 600733745,
-						octaves = 5,
-						amplitude = 0.5,
-						frequency = 0.05,
-						lacunarity = 2.0,
-						persistence = 0.5,
-					},
-				},
-				--simplexFractal {
-				--	seed = 2,
-				--	octaves = 10,
-				--	amplitude = 0.4,
-				--	frequency = 0.2,
-				--	lacunarity = 2.0,
-				--	persistence = 0.5,
-				--},
-				constant {
-					value = 0.5,
-				},
-			},
-		},
-
+		add {
+			mountainRange,
+			microRange,
+		}
 	--nodes = pow {
 	--	exponent = 2.0,
-	--	--	}
-	--	--}
-	--	add {
-	--		--perlin{},
-	--		warp {
-	--			--value = 0.5,
-	--			seed = 423,
+	--
+	--	min {
+	--		simplexFractal {
+	--			seed = 33543745,
 	--			octaves = 5,
-	--			amplitude = 0.05,
-	--			frequency = 0.25,
+	--			amplitude = 0.5,
+	--			frequency = 0.1,
 	--			lacunarity = 2.0,
 	--			persistence = 0.5,
-	--			--simplex{
-	--			--	seed = 126
-	--			--}
-	--			simplexFractal {
-	--				seed = 810,
-	--				octaves = 6,
-	--				amplitude = 0.4,
-	--				frequency = 0.5,
-	--				lacunarity = 2.0,
-	--				persistence = 0.5,
+	--		},
+	--		mix {
+	--			constant {
+	--				value = 0,
+	--			},
+	--			add {
+	--				simplexFractal {
+	--					seed = 600733745,
+	--					octaves = 5,
+	--					amplitude = 0.5,
+	--					frequency = 0.1,
+	--					lacunarity = 2.0,
+	--					persistence = 0.5,
+	--				},
+	--				constant {
+	--					value = 0.5,
+	--				},
+	--			},
+	--			--},
+	--			saturate {
+	--				add {
+	--					simplexFractal {
+	--						seed = 602364345,
+	--						octaves = 5,
+	--						amplitude = 1.0,
+	--						frequency = 0.10,
+	--						lacunarity = 1.5,
+	--						persistence = 0.5,
+	--					},
+	--					constant {
+	--						value = 0.5,
+	--					},
+	--				},
 	--			},
 	--		},
-	--		simplexFractal {
-	--			seed = 1,
-	--			octaves = 6,
-	--			amplitude = 0.4,
-	--			frequency = 0.2,
-	--			lacunarity = 2.0,
-	--			persistence = 0.5,
-	--		},
-	--		--simplexFractal {
-	--		--	seed = 1000,
-	--		--	octaves = 6,
-	--		--	amplitude = 0.6,
-	--		--	frequency = 0.2,
-	--		--	lacunarity = 2.0,
-	--		--	persistence = 0.5,
-	--		--},
-	--		constant {
-	--			value = 0.2
-	--		},
-	--		--cellular {
-	--		--	distanceFn = DistFun.manhattan,
-	--		--	returnType = ReturnType.distance2Div,
-	--		--	jitter = 1,
-	--		--},
-	--
-	--	}
-	--}
+	--	},
+	--},
 }
 
 temperature = {
 	name = "temperature",
-	heightSensitivity = 0.5, --//200m-kent 1 fok
+	heightSensitivity = 5, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
@@ -223,13 +258,13 @@ temperature = {
 		simplexFractal {
 			seed = 1,
 			octaves = 6,
-			amplitude = 0.1,
+			amplitude = 0.5,
 			frequency = 0.5,
 			lacunarity = 2.0,
 			persistence = 0.5,
 		},
 		constant {
-			value = 0.6
+			value = 0.5
 		}
 	}
 }

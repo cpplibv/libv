@@ -1,8 +1,8 @@
 #version 330 core
 
 #include <builtin/sprite.glsl>
-//#include <command_arrow.glsl>
-//#include <lib/linearize_depth.glsl>
+#include <builtin/sprite_definition.glsl>
+#include <rev_sandbox/block/matrices.glsl>
 
 
 layout (points) in;
@@ -12,8 +12,13 @@ in GeometryData vs_out[1];
 
 out FragmentData fs_in;
 
-uniform vec2 render_resolution; // Program block
+//uniform vec2 render_resolution; // Program block
 
+
+// -------------------------------------------------------------------------------------------------
+
+const float pi = 3.14159265359;
+const float tau = 2 * pi;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -28,51 +33,76 @@ void main() {
 
 	// -------------------------------------------------------------------------------------------------
 
-	vec4 origin = gl_in[0].gl_Position;
-//	origin /= origin.w;
-	float size = 0.7;
+	SpriteDefinition def = spriteDefinitions[vs_out[0].type];
+//	def.tile_num_x
+//	def.tile_num_y
+//	def.model_offset
+//	def.model_scale
+//	def.angle_x_min
+//	def.angle_x_max
+//	def.angle_y_min
+//	def.angle_y_max
 
-//	fs_in.eyeDir = vs_out[0].eyeDir;
-	vec2 var = normalize(vs_out[0].eyeDir.xy);
-//	float horizontal = mod((atan(var.y, var.x) + 3.14) / 3.14 / 2.0, 1.0 / 16.0);
-	float angleXY = atan(var.y, var.x) + 3.14;
-	float angleZ = asin(vs_out[0].eyeDir.z);
+	// -------------------------------------------------------------------------------------------------
 
-	float horizontal = angleXY / 3.14 / 2.0;
-	horizontal *= 16.0;
-	horizontal = 1 - trunc(horizontal);
-	float vertical = angleZ / 3.14 * 2.0;
-	vertical *= 8.0;
-	vertical = trunc(vertical);
-//	vertical=0;
+	//	vec4 origin = gl_in[0].gl_Position;
+	//	origin /= origin.w;
 
-	fs_in.tile_index = vec2(horizontal, vertical);
-//	fs_in.dither0 = rand(horizontal, vertical);
-	fs_in.dither0 = fract(angleZ / 3.14 * 2.0 * 8.0);
-	fs_in.dither1 = fract(angleXY / 3.14 / 2.0 * 16.0);
+	//	vec2 pixel_size = 2.0 / render_resolution;
+	//	vec2 pixel_size = vec2(0.09, 0.16);
+
+	// gl_PrimitiveIDIn
+
+	// -------------------------------------------------------------------------------------------------
+
+	vec2 dirXY = normalize(-vs_out[0].eyeDir.xy);
+	float dirZ = vs_out[0].eyeDir.z;
+
+	vec3 normal = vs_out[0].normalW;
+
+	float horizontal = def.tile_num_x + -(atan(dirXY.y, dirXY.x) / tau + 0.5) * def.tile_num_x;
+	float horizontal_tile = round(horizontal);
+
+	float vertical = max(0, (asin(dirZ) / (pi / 2.0)) * (def.tile_num_y - 1.0));
+	float vertical_tile = round(vertical);
+
+	// Sprite space
+	vec3 center = vs_out[0].positionW.xyz;
+	vec3 forward = normalize(center - eye);
+	vec3 right = normalize(cross(forward, vec3(0, 0, 1)));
+	vec3 up = cross(right, forward);
+
+	center += def.model_offset;
+
+	// -------------------------------------------------------------------------------------------------
+
+	fs_in.tile_index = vec2(horizontal_tile, vertical_tile);
+//	fs_in.dither0 = fract(angleZ / 3.14 * 2.0 * 8.0);
+//	fs_in.dither1 = fract(angleXY / 3.14 / 2.0 * 16.0);
+	fs_in.type = vs_out[0].type;
 
 	// v1
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 0);
-	gl_Position = origin + vec4(+size, -size, 0, 0);
+	gl_Position = matMVP * vec4(center + right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v2
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 1);
-	gl_Position = origin + vec4(+size, +size, 0, 0);
+	gl_Position = matMVP * vec4(center + right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v0
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 0);
-	gl_Position = origin + vec4(-size, -size, 0, 0);
+	gl_Position = matMVP * vec4(center - right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v3
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 1);
-	gl_Position = origin + vec4(-size, +size, 0, 0);
+	gl_Position = matMVP * vec4(center - right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	EndPrimitive();
@@ -92,8 +122,6 @@ void main() {
 //	vec4 dir_SP = target_SP - source_SP;
 //	float dir_pixel_length = length(dir_SP.xy / pixel_size);
 //	dir_SP /= dir_pixel_length;
-//
-//	// TODO P1: Vertexes yeeted behind the camera normal plane causes incorrect uvs
 //
 //	// If only one endpoint is behind the camera the negative w coord would flip the direction
 //	if (target_P.w * source_P.w < 0)

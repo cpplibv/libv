@@ -120,12 +120,10 @@ const auto layout_definitions = libv::glr::layout_std140<UniformLayoutSpriteDefi
 struct UniformsSprite {
 	libv::glr::Uniform_texture textureColor;
 	libv::glr::Uniform_texture textureNormal;
-//	libv::glr::Uniform_int32 ssaaSamples;
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(textureColor, "textureColor", libv::rev::textureChannel_diffuse);
 		access(textureNormal, "textureNormal", libv::rev::textureChannel_normal);
-//		access(ssaaSamples, "ssaaSamples");
 	}
 
 	template <typename Access> void access_blocks(Access& access) {

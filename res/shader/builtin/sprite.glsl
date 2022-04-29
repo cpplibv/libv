@@ -1,17 +1,16 @@
 #pragma once
 
 
-//const float body_width = 7;
-//const float head_width = 16;
-//const float head_height = 28;
-//const float body_width = 15;
-//const float head_width = 50;
-//const float head_height = 50;
-
-
 struct GeometryData {
 	vec3 positionW;
+	vec3 normalW;
 	vec3 eyeDir;
+
+	vec3 right;
+	vec3 up;
+
+	int type;
+
 //	vec4 color;
 //	float segmentPosition;
 //	float segmentSize;
@@ -26,6 +25,9 @@ struct FragmentData {
 	vec2 tile_index;
 	float dither0;
 	float dither1;
+
+	float type;
+
 //	vec3 eyeDir;
 //	vec2 part_uv;
 //	float head;

@@ -913,7 +913,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET surface
 	SOURCE app/surface/*.cpp
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_color
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_color libv_arg
 	LINK   libv_vm4
 	LINK   libv_sys
 	LINK   libv_utility libv_math libv_noise

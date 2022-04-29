@@ -118,6 +118,12 @@ struct NodeWarp : BaseFractalNode {
 		libv::warpWithIndependentFractal(seed, x, y, amplitude, frequency, octaves, lacunarity, persistence);
 		return input->evaluate(x, y);
 	}
+
+//	virtual void glsl(std::string_view inputVar) override {
+//		auto resultName = nextVar();
+//		outln("vec2 {} = warpWithIndependentFractal({});", resultName, inputVar);
+//		input->glsl(resultName);
+//	}
 };
 
 struct NodeCoordinate : Node {
@@ -126,6 +132,10 @@ struct NodeCoordinate : Node {
 	virtual float evaluate(float x, float y) override {
 		return weights.x * x + weights.y * y;
 	}
+
+//	virtual void glsl(std::string_view inputVar) override {
+//		out("vec2({}.x * {}, {}.y * {})", inputVar, weights.x, inputVar, weights.y);
+//	}
 };
 
 struct NodePlus : Node {

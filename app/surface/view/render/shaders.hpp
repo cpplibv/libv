@@ -23,6 +23,8 @@ constexpr auto attribute_bondWeight = libv::glr::Attribute<5, libv::vec4f>{};
 constexpr auto attribute_tangent    = libv::glr::Attribute<6, libv::vec3f>{};
 constexpr auto attribute_bitangent  = libv::glr::Attribute<7, libv::vec3f>{};
 constexpr auto attribute_texture0   = libv::glr::Attribute<8, libv::vec2f>{};
+
+constexpr auto attribute_type       = libv::glr::Attribute<13, int32_t>{};
 constexpr auto attribute_custom1    = libv::glr::Attribute<14, libv::vec4f>{};
 constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};
 
@@ -70,11 +72,12 @@ struct UniformLayoutMatrices {
 //	LIBV_REFLECTION_ACCESS(frame_random_ivec4);
 //};
 
-const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
-//const auto uniformBlock_model = libv::glr::UniformBlockBinding{1, "Model"};
-//const auto uniformBlock_pass = libv::glr::UniformBlockBinding{?, "Pass"};
-const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
-//const auto layout_pass = libv::glr::layout_std140<UniformLayoutPass>(uniformBlock_pass);
+inline const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
+inline const auto uniformBlock_definitions = libv::glr::UniformBlockBinding{1, "SpriteDefinitions"};
+//inline const auto uniformBlock_model = libv::glr::UniformBlockBinding{?, "Model"};
+//inline const auto uniformBlock_pass = libv::glr::UniformBlockBinding{?, "Pass"};
+inline const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
+//inline const auto layout_pass = libv::glr::layout_std140<UniformLayoutPass>(uniformBlock_pass);
 
 // -------------------------------------------------------------------------------------------------
 

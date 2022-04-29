@@ -156,6 +156,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 			label.font_color({1, 1, 1, 1});
 			//label.style("overlay.controls-help.lbl");
 			label.text(std::move(text));
+			label.background(libv::ui::Background::color({0, 0, 0, 0.5f}));
 
 			mainLayers.add(label);
 		} else {
@@ -208,7 +209,7 @@ void SurfaceViewer::initUI(const std::string& configPath) {
 
 	libv::ui::Label label("version_lbl");
 	label.text("v1.0");
-	label.font_color(libv::vec4f(0.8f, 0.8f, 0.8f, 0.6f));
+	label.font_color(libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
 	label.align_horizontal(libv::ui::AlignHorizontal::right);
 	label.align_vertical(libv::ui::AlignVertical::bottom);
 	label.margin(8, 0);

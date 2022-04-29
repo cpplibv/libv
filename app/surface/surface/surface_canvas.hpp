@@ -16,6 +16,10 @@
 #include <surface/view/render/renderer.hpp>
 
 
+#include <libv/rev/model.hpp>
+#include <libv/rev/resource_manager.hpp>
+
+
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
@@ -46,7 +50,7 @@ inline std::atomic<bool> changed = true;
 inline bool freeze = false;
 inline bool blendBiomes = true;
 
-
+inline std::atomic<bool> forceRebake = false;
 
 
 // -------------------------------------------------------------------------------------------------
@@ -278,6 +282,9 @@ private:
 	Frustum cameraFrustum;
 //	std::vector<Surface> surface;
 	bool surfaceDirty = false;
+	bool initializedSprites = false;
+
+	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
 
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);
