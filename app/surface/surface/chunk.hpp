@@ -87,7 +87,7 @@ public:
 	libv::vector_2D<float> fertility;
 	libv::vector_2D<float> temp_humidity_distribution;
 //	std::vector<SurfaceObjectStorage> featureList;
-	std::vector<VeggieType> veggies;
+	std::vector<Veggie> veggies;
 
 public:
 	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution, Seed globalSeed);

@@ -101,24 +101,24 @@ nodes
  create your own good looking surface config
  	warp + cellular = cserepes talaj
  frustum culling
+ toggle freeze
  =================================================================================================
 
 
+Veggi instantiation
 
- horizontal expansion, missing nodes
- 	if
- 	curve/envelop, tangens
+horizontal expansion
 
- Smooth cutoff/cutin Biome blending
+Smooth cutoff/cutin Biome blending
 
- Veggi instantiation
+LOD
+priority based generation order and rendering
 
- LOD
- priority based generation order and rendering
+config
+	remember last: profile file, json (libv::serial)
 
- config
-    remember last: profile file, json (libv::serial)
-
+additional nodes
+	curve/envelop, tangens
 
 
 

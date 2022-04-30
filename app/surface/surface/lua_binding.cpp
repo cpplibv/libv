@@ -325,17 +325,37 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOf
 //	return convertArray<SurfaceObject>(object, convertSurfaceObject);
 //}
 
+template <typename T>
+Range<T> convertRange(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	Range<T> result;
+	result.min = table["min"];
+	result.max = table["max"];
+	return result;
+}
+
+template <typename T>
+Shift<T> convertShift(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	Shift<T> result;
+	result.offset = table["offset"];
+	result.radius = table["radius"];
+	return result;
+}
+
 VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	const auto table = convertTable(object);
 
 	VeggieType result;
 	result.name = table["name"];
-	result.size = table["size"];
-	result.color = convertColor(table.get<sol::object>("color"));
 	result.probability = table["probability"] != sol::type::number ? 1.f : table["probability"];
-//	std::cout << "result.name: " << result.name << std::endl;
-//	std::cout << "result.name: " << result.size << std::endl;
-//	std::cout << "result.name: " << result.color << std::endl;
+	result.path = table["path"];
+	result.scale = convertRange<float>(table["scale"]);
+	result.hue = convertShift<float>(table["hue"]);
+	result.saturation = convertShift<float>(table["saturation"]);
+	result.value = convertShift<float>(table["value"]);
 	return result;
 }
 

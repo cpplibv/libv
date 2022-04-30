@@ -167,3 +167,39 @@ smoothstep = function(args)
 end
 
 -- -------------------------------------------------------------------------------------------------
+
+range = function(min, max)
+	return {
+		min = min,
+		max = max
+	}
+end
+
+shift = function(offset, radius)
+	return {
+		offset = offset,
+		radius = radius
+	}
+end
+
+full_hue = function()
+	return {
+		offset = 180,
+		radius = 180
+	}
+end
+
+
+full_saturation = function()
+	return {
+		offset = 0.5,
+		radius = 0.5
+	}
+end
+
+full_value = function()
+	return {
+		offset = 0.5,
+		radius = 0.5
+	}
+end

@@ -178,7 +178,6 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 
 	controls.bind("surface.3d", "1 [press]");
 	controls.bind("surface.height_texture", "2 [press]");
-//	controls.bind("surface.normal_texture", "?? [press]");
 	controls.bind("surface.temperature_texture", "3 [press]");
 	controls.bind("surface.humidity_texture", "4 [press]");
 	controls.bind("surface.fertility_texture", "5 [press]");

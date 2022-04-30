@@ -21,7 +21,7 @@ RendererVeggie::RendererVeggie(RendererResourceContext& rctx) :
 //	dirty = true;
 //}
 
-void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<VeggieType>& veggies, bool is3D) {
+void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<Veggie>& veggies, bool is3D) {
 	auto& chunkRenderData = vegetationMap[index];
 
 	if (chunkRenderData.generation == generation)
@@ -35,7 +35,7 @@ void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const 
 	for (const auto& veggie : veggies) {
 		spheres.emplace_back(
 				is3D ? veggie.pos : libv::vec3f{xy(veggie.pos), 0.f},
-				veggie.size, veggie.color, 6, 6);
+				veggie.scale, libv::vec4f{veggie.hsv_color_shift, 1.0f}, 6, 6);
 	}
 
 	buildMesh(chunkRenderData.mesh, spheres);

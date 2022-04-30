@@ -74,20 +74,25 @@ struct Range {
 	T max;
 };
 
+template <typename T>
+struct Shift{
+	T offset;
+	T radius;
+};
+
 struct VeggieType {
 	std::string name;
 	float probability = 1.0f;
-	float size = 1.0f;
-	libv::vec3f pos;
-	libv::vec4f color;
+//	float size = 1.0f;
 
 //	Range<float> fertility;
-//	std::string path;
-//	Range<float> height;
-//	//hsv diff color: saturation, value mehet, hue 20-30 fok vec3f(hue, saturation, value)
-//	Range<float> hue;
-//	Range<float> saturation;
-//	Range<float> value;
+	std::string path;
+	Range<float> scale;
+
+/// hsv diff color: saturation, value mehet, hue 20-30 fok vec3f(hue, saturation, value)
+	Shift<float> hue;
+	Shift<float> saturation;
+	Shift<float> value;
 };
 
 struct Biome {

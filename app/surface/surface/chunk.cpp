@@ -161,11 +161,11 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //		const auto& biome = *config.biomes.begin();
 //		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
 
-		if (auto veggieType = mix.getRandomVeggieType(biome, rngLocal)) { //TODO: This should be veggie
-			veggieType->pos = point; //TODO: TAKE THIS OUT
+		if (auto veggie = mix.getRandomVeggie(biome, rngLocal)) {
+			veggie->pos = point;
 
 			auto lock = std::unique_lock(chunk_m);
-			chunk.veggies.emplace_back(std::move(veggieType.value()));
+			chunk.veggies.emplace_back(std::move(veggie.value()));
 		}
 	});
 }

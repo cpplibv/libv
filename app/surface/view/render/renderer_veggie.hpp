@@ -10,6 +10,7 @@
 //#include <surface/view/render/renderer.hpp>
 #include <surface/view/vec_hash.hpp>
 #include <surface/view/render/shaders.hpp>
+#include <surface/surface/biome.hpp>
 
 
 namespace surface {
@@ -77,7 +78,7 @@ public:
 //	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
 
 	void addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos,
-			std::vector<VeggieType>& veggies, bool is3D);
+			std::vector<Veggie>& veggies, bool is3D);
 
 	void clear();
 

@@ -11,6 +11,11 @@
 namespace surface {
 // -------------------------------------------------------------------------------------------------
 
+Veggie::Veggie(VeggieId id, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type) :
+		id(id), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift), type(type) {}
+
+// -------------------------------------------------------------------------------------------------
+
 BiomeMix::BiomeMix() {};
 
 void BiomeMix::normalize() {
@@ -115,6 +120,31 @@ std::optional<VeggieType> BiomeMix::getRandomVeggieType(const Biome& biome, libv
 	}
 	return std::nullopt;
 //		throw std::runtime_error("BiomeMix.getRandomVeggieType() has reached end unexpectedly");
+}
+
+std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng) {
+	if (auto veggieType = getRandomVeggieType(biome, rng)) {
+
+		auto rotationScale = libv::make_uniform_distribution_inclusive(0.f, 360.f);
+		auto rotation = std::fmod(rotationScale(rng), 360.f);
+
+		auto scaleRange = libv::make_uniform_distribution_inclusive(veggieType->scale.min, veggieType->scale.max);
+		auto scale = scaleRange(rng);
+
+		auto hueShift = libv::make_uniform_distribution_inclusive(veggieType->hue.offset - veggieType->hue.radius, veggieType->hue.offset + veggieType->hue.radius);
+		auto hue = std::fmod(hueShift(rng), 360.f);
+
+		auto saturationShift = libv::make_uniform_distribution_inclusive(veggieType->saturation.offset - veggieType->saturation.radius, veggieType->saturation.offset + veggieType->saturation.radius);
+		auto saturation = std::clamp(saturationShift(rng), 0.f, 1.f);
+
+		auto valueShift = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
+		auto value = std::clamp(valueShift(rng), 0.f, 1.f);
+
+
+		return Veggie(globalId, rotation, scale, libv::vec3f{hue, saturation, value}, *veggieType);
+	}
+
+	return std::nullopt;
 }
 
 

@@ -31,18 +31,25 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
-				color = "#c37224",
-				size = 0.025,
 				probability = 0.2,
+				path = "resource/tundra_tree.xyz",
+				scale = range(0.025, 0.05),
+				hue = shift(0, 30), --0-360
+				saturation = shift(0.7, 0.2), --0-1
+				value = shift(0.7, 0.2), --0-1
 			},
 			{
 				name = "bush",
-				color = "#80302a",
-				size = 0.022,
 				probability = 0.2,
-			}
+				path = "resource/tundra_bush.xyz",
+				scale = range(0.015, 0.025),
+				hue = shift(0, 30), --0-360
+				saturation = full_saturation(), --0-1
+				value = full_value(), --0-1
+			},
 		}
 	},
+
 	{
 		name = "grassland",
 		coord = vec2f(0.7, 0.5),
@@ -55,70 +62,76 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
-				color = "#3b3e14",
-				size = 0.05,
 				probability = 0.2,
+				path = "resource/tundra_tree.xyz",
+				scale = range(0.025, 0.05),
+				hue = shift(53, 30), --0-360
+				saturation = full_saturation(), --0-1
+				value = full_value(), --0-1
 			},
 			{
 				name = "bush",
-				color = "#756f23",
-				size = 0.022,
-				probability = 0.6,
+				probability = 0.2,
+				path = "resource/tundra_bush.xyz",
+				scale = range(0.015, 0.025),
+				hue = shift(53, 30), --0-360
+				saturation = full_saturation(), --0-1
+				value = full_value(), --0-1
 			},
 		}
 	},
-	{
-		name = "rocks",
-		coord = vec2f(0.3, 0.3),
-		dominance = 1.0,
-		cutOff = vec2f(0.1, 0.4),
-		colorGrad = {
-			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "#737e9b" }
-		},
-		vegetation = {
-			--{
-			--	name = "tree",
-			--	color = "hsv(60, 80%, 100%)",
-			--	size = 0.05,
-			--	probability = 0.2,
-			--	--fertilityRange = vec2f{0.6, 1.0},
-			--	--color = "hsv(120, 60%, 100%)",
-			--},
-			{
-				name = "rock",
-				color = "#4b5e70",
-				size = 0.022,
-				probability = 0.2,
-			}
-		}
-	},
-	{
-		name = "alps",
-		coord = vec2f(0.1, 0.1),
-		dominance = 1.0,
-		cutOff = vec2f(0.1, 0.4),
-		colorGrad = {
-			{ 0, "#f0f3f7" },
-			{ 1, "#f0f3f7" }
-		},
-		vegetation = {
-			--{
-			--	name = "tree",
-			--	color = "hsv(60, 80%, 100%)",
-			--	size = 0.05,
-			--	probability = 0.2,
-			--	--fertilityRange = vec2f{0.6, 1.0},
-			--	--color = "hsv(120, 60%, 100%)",
-			--},
-			{
-				name = "rock",
-				color = "#b4c3de",
-				size = 0.022,
-				probability = 0.2,
-			}
-		}
-	},
+	--{
+	--	name = "rocks",
+	--	coord = vec2f(0.3, 0.3),
+	--	dominance = 1.0,
+	--	cutOff = vec2f(0.1, 0.4),
+	--	colorGrad = {
+	--		{ 0, "hsv(36, 35%, 98%)" },
+	--		{ 1, "#737e9b" }
+	--	},
+	--	vegetation = {
+	--		--{
+	--		--	name = "tree",
+	--		--	color = "hsv(60, 80%, 100%)",
+	--		--	size = 0.05,
+	--		--	probability = 0.2,
+	--		--	--fertilityRange = vec2f{0.6, 1.0},
+	--		--	--color = "hsv(120, 60%, 100%)",
+	--		--},
+	--		{
+	--			name = "rock",
+	--			color = "#4b5e70",
+	--			size = 0.022,
+	--			probability = 0.2,
+	--		}
+	--	}
+	--},
+	--{
+	--	name = "alps",
+	--	coord = vec2f(0.1, 0.1),
+	--	dominance = 1.0,
+	--	cutOff = vec2f(0.1, 0.4),
+	--	colorGrad = {
+	--		{ 0, "#f0f3f7" },
+	--		{ 1, "#f0f3f7" }
+	--	},
+	--	vegetation = {
+	--		--{
+	--		--	name = "tree",
+	--		--	color = "hsv(60, 80%, 100%)",
+	--		--	size = 0.05,
+	--		--	probability = 0.2,
+	--		--	--fertilityRange = vec2f{0.6, 1.0},
+	--		--	--color = "hsv(120, 60%, 100%)",
+	--		--},
+	--		{
+	--			name = "rock",
+	--			color = "#b4c3de",
+	--			size = 0.022,
+	--			probability = 0.2,
+	--		}
+	--	}
+	--},
 }
 
 height = {

@@ -39,110 +39,37 @@ enum class VeggieClass {
 
 };
 
+//struct Entry {
+//	libv::vec3f position;
+//	libv::vec3f normal;
+//	float rotation;
+//	float height or scale;
+//	libv::vec3f hsv_color_shift;
+//	int id;
+//};
 
 using VeggieId = int32_t;
+inline VeggieId globalId = 0;
 
 class Veggie {
 public:
-	//id
 	VeggieId id;
+
+	//id
 	libv::vec3f pos;
 	//vec3 normal vector (up) / kvaternio
 	libv::vec3f normal;
 	float rotation;
-	float height;
-	libv::vec3f hsvDiff;
+	float scale;
+	//clamp during randomization, except hue <- modf
+	libv::vec3f hsv_color_shift;
 
 	VeggieType type;
-	//size
-	//colorDiff
-};
-
-//class WeightedEntry {
-//public:
-//	Biome biome;
-//	float weight;
-//
-//public:
-//	WeightedEntry(Biome biome, float weight) : biome(std::move(biome)), weight(weight) {};
-//};
-//template<class T>
-//float optionalToString(T* obj)
-//{
-//	constexpr bool has_toString = requires(const T& t) {
-//		t.weight;
-//	};
-//
-//	if constexpr (has_toString)
-//		return obj->toString();
-//	else
-//		return 1.0f;
-//}
-
-
-template <typename T>
-//template <typename T>
-requires requires(const T entry){ entry.weight; }
-//concept ccSnapshotArchive = requires(const T entry) {
-//	{ entry.weight } -> std::same_as<float>;
-//	{ car.isShared() } -> std::same_as<bool>;
-//};
-class WeightedContainer {
-public:
-	std::vector<T> entries;
-
-private:
-	void normalize() {
-		float sum = 0.f;
-		for (const auto& entry : entries) {
-			sum += entry.weight;
-		}
-
-		assert(sum != 0.f);
-
-		for (auto& entry : entries) {
-			entry.weight /= sum;
-		}
-	}
 
 public:
-	WeightedContainer() {
-		entries.reserve(5);
-	}
-
-	explicit WeightedContainer(std::vector<T> entries_) :
-		entries(std::move(entries_)) {
-		normalize();
-	}
-
-//	explicit WeightedContainer(const std::vector<T>& entries) : entries(entries) {}
-
-	void insert(const T& entry) {
-		entries.emplace_back(entry);
-		normalize();
-	}
-
-	void erase(const T& entry) {
-		const auto it = std::find(entries.begin(), entries.end(), entry);
-		if (it == entries.end())
-			assert(false);
-
-		entries.erase(it);
-		normalize();
-	}
-
-	void eraseAll(const std::vector<T>& entries_) {
-		for (const auto& entry : entries_) {
-			const auto it = std::find(entries.begin(), entries.end(), entry);
-			if (it == entries.end())
-				assert(false);
-
-			entries.erase(it);
-		}
-		normalize();
-	}
-//	void addAll()
+	Veggie(VeggieId id, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type);
 };
+
 
 struct WeightedEntry {
 	const Biome* biome = nullptr;
