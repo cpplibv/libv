@@ -177,14 +177,12 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	renderer.surface.fogEnabled = enableFog;
 
 	surfaceDirty = surface->update();
-
 }
 
 
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	setupRenderStates(glr);
 	const auto s_guard = glr.state.push_guard();
-
 
 	if (previousScene != currentScene) {
 		previousScene = currentScene;
@@ -193,6 +191,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		activeScene->build(surface->getGeneration(), surface->getChunks());
 		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
 	}
+//	if (previousScene != currentScene) {
+//		previousScene = currentScene;
+//		activeScene = createScene(currentScene);
+//	}
 
 	if (surfaceDirty) {
 		//build mesh
@@ -200,7 +202,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
 	}
 
-//	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
 	//render surface texture/_3d
 	activeScene->render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 
@@ -208,7 +209,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	if (enableVegetation)
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 
-	if (enableSkybox)
+	if (currentScene == SceneType::_3d && enableSkybox)
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
 
 	if (currentScene == SceneType::_3d && enableGrid) {

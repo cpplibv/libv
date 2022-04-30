@@ -5,6 +5,7 @@
 // libv
 #include <libv/fsw/watcher.hpp>
 #include <libv/glr/texture.hpp>
+#include <libv/glr/queue.hpp>
 #include <libv/ui/component/canvas.hpp>
 // std
 #include <mutex>
@@ -122,6 +123,9 @@ struct TextureScene : Scene {
 
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override {
 		(void) frustum;
+		auto s_guard = glr.state.push_guard();
+		glr.state.disableDepthMask();
+		glr.state.disableDepthTest();
 		renderer.surfaceTexture.render(glr, uniform_stream);
 	}
 

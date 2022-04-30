@@ -63,6 +63,7 @@ struct RendererVeggie {
 		libv::vec2f chunkSize;
 		libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	};
+	bool is3D = true;
 
 private:
 	std::unordered_map<libv::vec2i, ChunkVegetation, VecHash> vegetationMap;
@@ -81,7 +82,7 @@ public:
 //	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
 
 	void addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, const libv::vec2f& chunkSize,
-			std::vector<Veggie>& veggies, bool is3D);
+			std::vector<Veggie>& veggies, bool is3D_);
 
 	void clear();
 

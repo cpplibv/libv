@@ -58,9 +58,6 @@ biomes = {
 		colorGrad = {
 			{ 0, "hsv(121, 70%, 80%)" },
 			{ 1, "hsv(300, 70%, 80%)" }
-
-
-
 		},
 		vegetation = {
 			{
