@@ -21,6 +21,9 @@ void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Ch
 		return;
 
 	chunkRenderData.generation = generation;
+	chunkRenderData.pos = libv::vec3f{chunk->position, 0.f};
+	chunkRenderData.size = chunk->size;
+	chunkRenderData.generation = generation;
 	buildMesh(chunkRenderData.mesh, chunk);
 }
 
@@ -75,26 +78,23 @@ void RendererSurface::clear() {
 	chunkMeshMap.clear();
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
 
-	for (const auto& index : visibleChunks) {
-		const auto& it = chunkMeshMap.find(index);
-		if (it == chunkMeshMap.end())
-			//visible chunk not ready to be rendered
-			continue;
-
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
-		glr.uniform(std::move(uniforms));
-		glr.render(it->second.mesh);
+	for (const auto &[_, chunkMesh] : chunkMeshMap) {
+		if (frustum.sphereInFrustum(chunkMesh.pos, chunkMesh.size.length() / 2.f) != Frustum::Position::OUTSIDE) {
+			auto uniforms = uniform_stream.block_unique(layout_matrices);
+			uniforms[layout_matrices.matMVP] = glr.mvp();
+			uniforms[layout_matrices.matM] = glr.model;
+			uniforms[layout_matrices.matP] = glr.projection;
+			uniforms[layout_matrices.eye] = glr.eye();
+			glr.uniform(std::move(uniforms));
+			glr.render(chunkMesh.mesh);
+		}
 	}
 }
 

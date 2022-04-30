@@ -21,13 +21,14 @@ RendererVeggie::RendererVeggie(RendererResourceContext& rctx) :
 //	dirty = true;
 //}
 
-void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, std::vector<Veggie>& veggies, bool is3D) {
+void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, const libv::vec2f& chunkSize, std::vector<Veggie>& veggies, bool is3D) {
 	auto& chunkRenderData = vegetationMap[index];
 
 	if (chunkRenderData.generation == generation)
 		return;
 
-	chunkRenderData.pos = chunkPos;
+	chunkRenderData.chunkPos = libv::vec3f{chunkPos, 0.f};
+	chunkRenderData.chunkSize = chunkSize;
 	chunkRenderData.generation = generation;
 
 	std::vector<Sphere> spheres;
@@ -88,7 +89,7 @@ void RendererVeggie::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	}
 }
 
-void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks) {
+void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
@@ -96,21 +97,19 @@ void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(shader.uniform().fogColor, fogColor);
 
 	const auto& eye = glr.eye();
-	for (const auto& index : visibleChunks) {
-		const auto& it = vegetationMap.find(index);
-		if(it == vegetationMap.end())
-			//visible chunk not ready to be rendered
-			continue;
+	for (const auto &[_, veggie] : vegetationMap) {
 
-		if ((libv::vec3f(it->second.pos, 0.f) - eye).length() < 10.f) {
-			const auto& mesh = it->second.mesh;
-			auto uniforms = uniform_stream.block_unique(layout_matrices);
-			uniforms[layout_matrices.matMVP] = glr.mvp();
-			uniforms[layout_matrices.matM] = glr.model;
-			uniforms[layout_matrices.matP] = glr.projection;
-			uniforms[layout_matrices.eye] = glr.eye();
-			glr.uniform(std::move(uniforms));
-			glr.render(mesh);
+		if (frustum.sphereInFrustum(veggie.chunkPos, veggie.chunkSize.length() / 2.f) != Frustum::Position::OUTSIDE) {
+			if ((veggie.chunkPos - eye).length() < 10.f) {
+				const auto& mesh = veggie.mesh;
+				auto uniforms = uniform_stream.block_unique(layout_matrices);
+				uniforms[layout_matrices.matMVP] = glr.mvp();
+				uniforms[layout_matrices.matM] = glr.model;
+				uniforms[layout_matrices.matP] = glr.projection;
+				uniforms[layout_matrices.eye] = glr.eye();
+				glr.uniform(std::move(uniforms));
+				glr.render(mesh);
+			}
 		}
 	}
 }

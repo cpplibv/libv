@@ -124,27 +124,27 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearDepth();
 }
 
-void SurfaceCanvas::updateVisibleChunks() {
-	visibleChunks.clear();
-	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
-	for (const auto& chunk : surface->getChunks()) {
-		//Red check: throw away
-		//Green check: generate and render
-		const auto pos = libv::vec3f(chunk->position, 0.f);
-		if (frustum.sphereInFrustum(pos, chunk->size.length() / 2.f) != Frustum::Position::OUTSIDE) {
-			visibleChunks.emplace_back(chunk->index);
-		}
-		//Yellow check: lowprio generate, build but not render
-	}
-}
+//void SurfaceCanvas::updateVisibleChunks() {
+//	visibleChunks.clear();
+//	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
+//	for (const auto& chunk : surface->getChunks()) {
+//		//Red check: throw away
+//		//Green check: generate and render
+//		const auto pos = libv::vec3f(chunk->position, 0.f);
+//		if (frustum.sphereInFrustum(pos, chunk->size.length() / 2.f) != Frustum::Position::OUTSIDE) {
+//			visibleChunks.emplace_back(chunk->index);
+//		}
+//		//Yellow check: lowprio generate, build but not render
+//	}
+//}
 
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
 
 	cameraManager.update();
-	if (!freeze)
-		updateVisibleChunks();
 
+	if (!freeze)
+		cameraFrustum = cameraManager.getCameraFrustum(canvas_size);
 
 	if (refresh) {
 		refresh = false;
@@ -200,12 +200,13 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
 	}
 
+//	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
 	//render surface texture/_3d
-	activeScene->render(glr, renderer.resource_context.uniform_stream, visibleChunks);
+	activeScene->render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 
 	// render plant model/debug
 	if (enableVegetation)
-		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, visibleChunks);
+		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 
 	if (enableSkybox)
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);

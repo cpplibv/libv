@@ -11,6 +11,7 @@
 #include <surface/view/vec_hash.hpp>
 #include <surface/view/render/shaders.hpp>
 #include <surface/surface/biome.hpp>
+#include <surface/view/frustum.hpp>
 
 
 namespace surface {
@@ -57,7 +58,9 @@ struct RendererVeggie {
 
 	struct ChunkVegetation {
 		int generation = -1;
-		libv::vec2f pos;
+//		libv::vec2f pos;
+		libv::vec3f chunkPos;
+		libv::vec2f chunkSize;
 		libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	};
 
@@ -77,12 +80,12 @@ public:
 
 //	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10);
 
-	void addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos,
+	void addVeggies(int generation, const libv::vec2i& index, const libv::vec2f& chunkPos, const libv::vec2f& chunkSize,
 			std::vector<Veggie>& veggies, bool is3D);
 
 	void clear();
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
 };
 
 

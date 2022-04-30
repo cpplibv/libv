@@ -57,7 +57,10 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(121, 70%, 80%)" },
-			{ 1, "#8e842f" }
+			{ 1, "hsv(300, 70%, 80%)" }
+
+
+
 		},
 		vegetation = {
 			{

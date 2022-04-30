@@ -15,6 +15,7 @@
 #include <surface/surface/chunk.hpp>
 #include <surface/view/render/shaders.hpp>
 #include <surface/view/vec_hash.hpp>
+#include <surface/view/frustum.hpp>
 
 
 namespace surface {
@@ -52,6 +53,8 @@ struct RendererSurface {
 private:
 	struct ChunkMesh {
 		int generation = -1;
+		libv::vec3f pos;
+		libv::vec2f size;
 		libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 	};
 
@@ -76,7 +79,7 @@ public:
 //	void addFirstChunk(const surface::Chunk& chunk);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Chunk& chunk);
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const std::vector<libv::vec2i>& visibleChunks);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
 
 private:
 	void buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<surface::Chunk>& chunk);
