@@ -53,7 +53,9 @@ public:
 
 	void remove(T* resource) {
 		// O( N^2 )
-		libv::erase_stable(storage, resource, [](const libv::intrusive2_ptr<T>& ptr){ return ptr.get(); });
+		libv::erase_stable(storage, resource, [](const libv::intrusive2_ptr<T>& ptr) {
+			return ptr.get();
+		});
 	}
 };
 

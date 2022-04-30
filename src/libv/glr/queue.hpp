@@ -8,6 +8,7 @@
 #include <libv/gl/matrix_stack.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/guard.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -69,6 +70,7 @@ public:
 	void setClearColor(const libv::vec4f rgba);
 
 	void clearColor();
+	void clearColorDepth();
 	void clearDepth();
 
 public:

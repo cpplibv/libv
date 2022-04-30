@@ -1200,7 +1200,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_rev_res
 	SOURCE sandbox/libv_rev_res_main.cpp
-	LINK   libv_log libv_rev ext_glfw
+	LINK   libv_log libv_rev ext_glfw libv_img
 )
 
 wish_create_executable(

@@ -32,7 +32,7 @@ Model::~Model() {
 	// For the sake of forward declared vector
 }
 
-void Model::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void Model::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const {
 	self->render(glr, uniform_stream);
 }
 

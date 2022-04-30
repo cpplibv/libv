@@ -192,6 +192,8 @@ void InternalTextureLoader::process_res(InternalTexture_ptr&& res, libv::gl::Ima
 	// TODO P2: filtering, anisotropic filtering, mipmap, usage
 	res->texture.set(libv::gl::MagFilter::Linear);
 	res->texture.set(libv::gl::MinFilter::LinearMipmapLinear);
+//	res->texture.set(libv::gl::MagFilter::Nearest);
+//	res->texture.set(libv::gl::MinFilter::Nearest);
 	res->texture.generate_mipmaps();
 }
 

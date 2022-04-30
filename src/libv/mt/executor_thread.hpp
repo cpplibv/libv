@@ -102,7 +102,7 @@ private:
 	}
 
 public:
-	ExecutorThread(const std::string& name = "UNNAMED") :
+	explicit ExecutorThread(const std::string& name = "UNNAMED") :
 		thread(&ExecutorThread::run, this),
 		name(name) { }
 

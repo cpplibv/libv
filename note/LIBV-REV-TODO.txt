@@ -25,6 +25,7 @@ libv.rev: Resources: Models, Materials and Textures
 libv.rev: Move files: internal_ to internal/internal_
 libv.rev: Move files: glsl_ to glsl/glsl_
 libv.rev: Move files: *shader* to resource/*shader*
+libv.utility: xoroshiro128 shall handle {0,0} as low quality input
 
 
 
@@ -55,16 +56,43 @@ libv.rev: Move files: *shader* to resource/*shader*
 --- STACK ------------------------------------------------------------------------------------------
 
 
+sprite.fs
+	dither: sprite random + sprite pos based viewport position, so, combine this two
 
+Sprite
+	There is a startup crash, but could not identify it so far
+		| Manual stress tested came back negative
 
+	Render:
+		Camera: I kinda need a camera to deal with this
 
+		proper angle calculation
+			(also there is an error with direct down looking, atan/asin fails)
+			(there is also one with 30° and left column 2-5 when the eye crosses one dim above it)
 
-libv.utility: xoroshiro128 shall handle {0,0} as low quality input
+		dither blend between images
+			no linear blend, but switch pixels one-by-one based on white noise
+			! IF alpha not zero in any of them matches, then linear blend
+			maybe exclusive threshold in the middle
+				60% direct
+				20-20% blend with neighbour
+					1 fetch
+					2 fetch (row or column change)
+					4 fetch (row and column change)
 
+	BAKE:
+		need a live edit preview for sprite baking
+			listen to shader reload events, request a rebake
 
+		on the sprite atlas edge, there is a smudge
+			? drop one half pixel from the UV
 
+		in color map, there is still a lot of black bleeding in on the edges
+		the color alpha is still weak
 
-
+		originally baked normal map should be cleared with 0.5, 0.5, 0.5 first
+			fix upsampling normals, renomalize them
+		OR use a signed internal format for normals?
 
 
 libv.rev.res: Events

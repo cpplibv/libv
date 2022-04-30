@@ -37,16 +37,19 @@
 #include <libv/rev/texture.hpp>
 //#include <libv/rev/resource/texture_loader.hpp>
 
-
-
-
-
+#include <libv/rev/resource/attribute.hpp>
 #include <libv/rev/resource/material_scanner.hpp>
 #include <libv/rev/materials/material_sprite_baker.hpp>
 #include <libv/vm4/load.hpp>
 
+#include <libv/img/save.hpp>
+#include <libv/utility/write_file.hpp>
+
+#include <libv/utility/min_max.hpp>
+
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
+#include <libv/gl/framebuffer.hpp>
 //#include <libv/glr/attribute.hpp>
 //#include <libv/glr/font.hpp>
 //#include <libv/glr/procedural/cube.hpp>
@@ -56,138 +59,508 @@
 //#include <libv/glr/uniform.hpp>
 //#include <libv/glr/uniform_block_binding.hpp>
 
+#include <libv/rev/materials/block_matrices.hpp>
+
+#include <libv/glr/layout_to_string.hpp>
+
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr uint32_t WINDOW_WIDTH = 1280;
-constexpr uint32_t WINDOW_HEIGHT = 800;
-
-constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
-constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
-constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
-
-const auto uniformBlock_matrices   = libv::glr::UniformBlockBinding{0, "Matrices"};
-
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+//constexpr uint32_t WINDOW_WIDTH = 1280;
+//constexpr uint32_t WINDOW_HEIGHT = 800;
+constexpr uint32_t WINDOW_WIDTH = 1024;
+constexpr uint32_t WINDOW_HEIGHT = 1024;
 
 // -------------------------------------------------------------------------------------------------
 
-struct UniformLayoutMatrices {
-	libv::glr::Uniform_mat4f matMVP;
-//	libv::glr::Uniform_mat4f matP;
-	libv::glr::Uniform_mat4f matM;
-//	libv::glr::Uniform_vec3f color;
+struct UniformLayoutSpriteDefinition {
+	static inline auto name() { return "SpriteDefinition"; }
 
-	LIBV_REFLECTION_ACCESS(matMVP);
-//	LIBV_REFLECTION_ACCESS(matP);
-	LIBV_REFLECTION_ACCESS(matM);
-//	LIBV_REFLECTION_ACCESS(color);
+	// Ordering matters: Block is packed to 48 Byte
+
+	libv::glr::Uniform_vec2i tile_size;
+	libv::glr::Uniform_int32 tile_num_x;
+	libv::glr::Uniform_int32 tile_num_y;
+
+	libv::glr::Uniform_vec3f model_offset;
+	libv::glr::Uniform_float model_scale;
+
+	libv::glr::Uniform_float angle_x_min;
+	libv::glr::Uniform_float angle_x_max;
+	libv::glr::Uniform_float angle_y_min;
+	libv::glr::Uniform_float angle_y_max;
+
+	LIBV_REFLECTION_ACCESS(tile_size);
+	LIBV_REFLECTION_ACCESS(tile_num_x);
+	LIBV_REFLECTION_ACCESS(tile_num_y);
+
+	LIBV_REFLECTION_ACCESS(model_offset);
+	LIBV_REFLECTION_ACCESS(model_scale);
+
+	LIBV_REFLECTION_ACCESS(angle_x_min);
+	LIBV_REFLECTION_ACCESS(angle_x_max);
+	LIBV_REFLECTION_ACCESS(angle_y_min);
+	LIBV_REFLECTION_ACCESS(angle_y_max);
 };
-const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
+
+struct UniformLayoutSpriteDefinitions {
+	// With 48 byte as SpriteDefinition size the maximum sprite definition count is: 65536 / 48 = 1365
+	// std::array<UniformLayoutSpriteDefinition, 65536 / 48> spriteDefinitions;
+	std::array<UniformLayoutSpriteDefinition, 64> spriteDefinitions;
+
+	LIBV_REFLECTION_ACCESS(spriteDefinitions);
+};
+
+const auto uniformBlock_definitions = libv::glr::UniformBlockBinding{1, "SpriteDefinitions"};
+
+const auto layout_definitions = libv::glr::layout_std140<UniformLayoutSpriteDefinitions>(uniformBlock_definitions);
 
 // -------------------------------------------------------------------------------------------------
 
-struct UniformsSphere {
-//	libv::glr::Uniform_mat4f matMVP;
-//	libv::glr::Uniform_mat4f matM;
-//	libv::glr::Uniform_vec3f color;
-	libv::glr::Uniform_texture texture0;
+struct UniformsSprite {
+	libv::glr::Uniform_texture textureColor;
+	libv::glr::Uniform_texture textureNormal;
+//	libv::glr::Uniform_int32 ssaaSamples;
 
 	template <typename Access> void access_uniforms(Access& access) {
-//		access(matMVP, "matMVP");
-//		access(render_resolution, "render_resolution");
-//		access(time, "time", 0.f);
-		access(texture0, "texture0", textureChannel_diffuse);
+		access(textureColor, "textureColor", libv::rev::textureChannel_diffuse);
+		access(textureNormal, "textureNormal", libv::rev::textureChannel_normal);
+//		access(ssaaSamples, "ssaaSamples");
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
+		access(uniformBlock_definitions);
+	}
+};
+
+using ShaderSprite = libv::rev::Shader<UniformsSprite>;
+
+// -------------------------------------------------------------------------------------------------
+
+struct SpriteDefinition {
+	libv::vec2i tile_size = {64, 64};
+
+	float model_scale = 1.f; // Billboard size
+	libv::vec3f model_offset = {0.f, 0.f, 0.f}; // Billboard offset compared to origin
+
+	int tile_num_x = 16;
+	int tile_num_y = 8;
+	float angle_x_min = 0.f;
+	float angle_x_max = libv::tau * (static_cast<float>(tile_num_y) - 1) / static_cast<float>(tile_num_y);
+	float angle_y_min = 0.f;
+	float angle_y_max = libv::pi / 2.f;
+};
+
+struct Sprite {
+	SpriteDefinition definition;
+	libv::glr::Texture2D::R8_G8_B8_A8 texture_color;
+	libv::glr::Texture2D::R8_G8_B8 texture_normal;
+};
+
+class RendererSprite {
+private:
+	struct Entry {
+		libv::vec3f position;
+		//libv::vec3f normal;
+		//float rotation;
+		//float height or scale;
+		//libv::vec3f hsv_color_shift;
+		//int id;
+	};
+
+public:
+	ShaderSprite shader;
+	std::shared_ptr<Sprite> sprite;
+	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::UniformBlockSharedView_std140 spriteDefinitionsBlock;
+
+private:
+	std::vector<Entry> entries;
+	bool dirty = false;
+	bool active = false;
+
+public:
+	explicit RendererSprite(libv::rev::ResourceManager& loader) :
+		shader(loader.shader, "builtin/sprite.vs", "builtin/sprite.gs", "builtin/sprite.fs") {}
+
+public:
+	void add(libv::vec3f position) {
+		entries.emplace_back(position);
+		dirty = true;
+	}
+
+private:
+	void updateMesh(libv::glr::UniformBuffer& uniform_stream) {
+		dirty = false;
+		active = !entries.empty();
+
+		mesh.clear();
+
+		if (!active)
+			return;
+
+//		std::cout << libv::glr::layout_to_string<UniformLayoutSpriteDefinitions>("SpriteDefinitions") << std::endl;
+//		std::cout << libv::glr::layout_std140_size<UniformLayoutSpriteDefinitions>() << std::endl;
+
+		// --- Mesh
+
+		auto position = mesh.attribute(libv::rev::attribute_position);
+//		auto normal = mesh.attribute(libv::rev::attribute_normal);
+
+		auto index = mesh.index();
+
+		position.reserve(entries.size());
+		for (const auto& vertex : entries)
+			position(vertex.position);
+
+//		normal.reserve(entries.size());
+//		for (const auto& vertex : entries)
+//			normal(vertex.normal);
+
+//		auto position = mesh.attribute();
+
+		for (uint32_t i = 0; i < entries.size(); ++i)
+			index(i);
+
+		// --- Uniform Sprite Definitions
+
+		spriteDefinitionsBlock = uniform_stream.block_shared(layout_definitions);
+		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[1].model_scale] = 2.0f;
+//		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+//		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+//		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+//		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+//		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[0].model_scale] = 1.0f;
+//		...
+	}
+
+public:
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+		if (dirty)
+			updateMesh(uniform_stream);
+
+		if (!active)
+			return;
+
+		glr.program(shader.program());
+
+		auto block_matrices = uniform_stream.block_shared(libv::rev::layout_matrices);
+		block_matrices[libv::rev::layout_matrices.matMVP] = glr.mvp();
+		block_matrices[libv::rev::layout_matrices.matM] = glr.model;
+		block_matrices[libv::rev::layout_matrices.matP] = glr.projection;
+		block_matrices[libv::rev::layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(block_matrices));
+		glr.uniform(spriteDefinitionsBlock);
+		glr.texture(sprite->texture_color, libv::rev::textureChannel_diffuse);
+		glr.texture(sprite->texture_normal, libv::rev::textureChannel_normal);
+		glr.render(mesh);
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-//struct SpriteAtlas {
-//	libv::glr::Texture2D::R8_G8_B8_A8 color;
-//	libv::glr::Texture2D::R8_G8_B8 normal;
-//	libv::glr::Texture2D::D24 depth;
-//};
+struct UniformsSpriteBakerDownsample {
+	libv::glr::Uniform_texture texture0;
+	libv::glr::Uniform_int32 ssaaSamples;
+	libv::glr::Uniform_bool isColor;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(texture0, "texture0", libv::rev::textureChannel_diffuse);
+		access(ssaaSamples, "ssaaSamples");
+		access(isColor, "isColor");
+	}
+
+	template <typename Access> void access_blocks(Access& access) {
+		access(libv::rev::uniformBlock_matrices);
+	}
+};
+
+using ShaderSpriteBakerDownsample = libv::rev::Shader<UniformsSpriteBakerDownsample>;
+
+// -------------------------------------------------------------------------------------------------
+
+struct SpriteAtlasBaker {
+	libv::vec2i atlasSize;
+	int32_t ssaaSamples;
+
+	libv::vec2i bakeSize;
+	libv::rev::ResourceManager& loader;
+
+	libv::glr::Framebuffer bakeMSFBO;
+	libv::glr::Texture2DMultisample::R8_G8_B8_A8 bakeMSColor;
+	libv::glr::Texture2DMultisample::R8_G8_B8 bakeMSNormal;
+	libv::glr::Texture2DMultisample::D16 bakeMSDepth;
+
+	libv::glr::Framebuffer bakeSSFBO;
+	libv::glr::Texture2D::R8_G8_B8_A8 bakeSSColor;
+	libv::glr::Texture2D::R8_G8_B8 bakeSSNormal;
+	libv::glr::Texture2D::D16 bakeSSDepth;
+
+	libv::glr::Framebuffer resultFBOColor;
+
+	libv::glr::Framebuffer resultFBONormal;
+
+	ShaderSpriteBakerDownsample shaderSpriteBakerDownsample;
+
+//	SpriteAtlas result{atlasSize};
+//	libv::glr::Framebuffer result_fbo;
+
+	explicit SpriteAtlasBaker(libv::rev::ResourceManager& loader, libv::vec2i atlasSize, int msaaSamples = 16, int ssaaSamples = 16) :
+		atlasSize(atlasSize),
+		ssaaSamples(static_cast<int32_t>(std::sqrt(ssaaSamples))),
+		bakeSize(atlasSize * this->ssaaSamples),
+		loader(loader),
+		shaderSpriteBakerDownsample(loader.shader, "rev_sandbox/full_screen.vs", "builtin/sprite_baker_downsample.fs") {
+
+		assert(ssaaSamples == 1 || ssaaSamples == 4 || ssaaSamples == 9 || ssaaSamples == 16);
+
+		bakeMSColor.storage_ms(bakeSize, msaaSamples, false);
+		bakeMSNormal.storage_ms(bakeSize, msaaSamples, false);
+		bakeMSDepth.storage_ms(bakeSize, msaaSamples, false);
+
+		bakeMSFBO.attach2D(libv::gl::Attachment::Color0, bakeMSColor);
+		bakeMSFBO.attach2D(libv::gl::Attachment::Color1, bakeMSNormal);
+		bakeMSFBO.attach2D(libv::gl::Attachment::Depth, bakeMSDepth);
+
+		bakeSSColor.storage(1, bakeSize);
+		bakeSSNormal.storage(1, bakeSize);
+		bakeSSDepth.storage(1, bakeSize);
+
+		bakeSSFBO.attach2D(libv::gl::Attachment::Color0, bakeSSColor);
+		bakeSSFBO.attach2D(libv::gl::Attachment::Color1, bakeSSNormal);
+		bakeSSFBO.attach2D(libv::gl::Attachment::Depth, bakeSSDepth);
+	}
+
+	SpriteDefinition renderAtlas(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::rev::Model& model) {
+		const auto AABB_max = libv::vec3f{178.889f, 184.191f, 382.196f} * 0.175f;
+		const auto AABB_min = libv::vec3f{-184.492f, -170.332f, 0.f} * 0.175f;
+		// load vm4
+//		libv::rev::Model model(vm4, materialLoader, libv::rev::SpriteBaker::create);
+
+		SpriteDefinition def;
+//		def.tile_size.x = 10;
+//		def.tile_size.x = 64;
+//		def.tile_size.x = 256;
+//		def.tile_size.y = 256;
+
+		// Tree
+		auto AABB_extent = libv::max(libv::abs(AABB_max), libv::abs(AABB_min)) * 2.0f;
+		// Z empty space is adjusted with offset
+		AABB_extent.z = std::abs(AABB_max.z - AABB_min.z);
+
+		const auto bake_tile_size = def.tile_size * ssaaSamples;
+		const auto bake_tile_sizef = bake_tile_size.cast<float>();
+
+		// NOTE: This scale will cause some clipping in rotated views, but its good enough for now
+		def.model_scale = libv::min(
+				static_cast<float>(bake_tile_size.x) / AABB_extent.x,
+				static_cast<float>(bake_tile_size.x) / AABB_extent.y,
+				static_cast<float>(bake_tile_size.x) / AABB_extent.z,
+				static_cast<float>(bake_tile_size.y) / AABB_extent.x,
+				static_cast<float>(bake_tile_size.y) / AABB_extent.y,
+				static_cast<float>(bake_tile_size.y) / AABB_extent.z
+		);
+		def.model_offset = libv::vec3f{0, 0, (AABB_max.z + AABB_min.z) * -0.5f};
+
+		const auto angle_x_range = def.angle_x_max - def.angle_x_min;
+		const auto angle_y_range = def.angle_y_max - def.angle_y_min;
+		const auto angle_x_step = angle_x_range / static_cast<float>(def.tile_num_x - 1);
+		const auto angle_y_step = angle_y_range / static_cast<float>(def.tile_num_y - 1);
+
+		const auto guard_vp = glr.viewport_guard();
+
+		const auto guard_p = glr.projection.push_guard();
+		const auto guard_v = glr.view.push_guard();
+		const auto guard_m = glr.model.push_guard();
+
+		glr.projection = libv::mat4f::ortho(
+				-0.5f * bake_tile_sizef.x,
+				+0.5f * bake_tile_sizef.x,
+				-0.5f * bake_tile_sizef.y,
+				+0.5f * bake_tile_sizef.y,
+//				-1000.0f,
+//				+1000.0f);
+//				-2.0f * def.model_scale,
+//				+2.0f * def.model_scale);
+				-1.0f * bake_tile_sizef.y,
+				+1.0f * bake_tile_sizef.y);
+
+		glr.view = libv::mat4f::lookAt(libv::vec3f(1, 0, 0), libv::vec3f::zero(), libv::vec3f(0, 0, 1));
+
+		glr.model.scale(def.model_scale);
+		glr.model.translate(def.model_offset);
+
+		for (int y = 0; y < def.tile_num_y; ++y) {
+			const auto yf = static_cast<float>(y);
+
+			for (int x = 0; x < def.tile_num_x; ++x) {
+				const auto xf = static_cast<float>(x);
+
+				const auto guard_v2 = glr.view.push_guard();
+				glr.view.rotate(libv::radian(yf * angle_y_step), 0, 1, 0);
+				glr.view.rotate(libv::radian(xf * angle_x_step), 0, 0, 1);
+
+				glr.viewport(libv::vec2i{x, y} * bake_tile_size, bake_tile_size);
+
+//				renderSprite(glr);
+				model.render(glr, uniform_stream);
+			}
+		}
+
+		return def;
+	}
+
+	std::shared_ptr<Sprite> bake(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, std::string_view modelName) {
+		// --- Fetch model ---
+
+		auto model = loader.model.load(modelName, libv::rev::MaterialSpriteBaker::create, 100);
+		loader.update(glr.out_of_order_gl()); // Force model loading
+
+		// --- Setup ---
+
+		auto guard_m = glr.model.push_guard();
+		auto guard_s = glr.state.push_guard();
+
+		glr.state.enableBlend();
+		glr.state.blendSrc_SourceAlpha();
+		glr.state.blendDst_One_Minus_SourceAlpha();
+
+		glr.state.disableCullFace(); // To handle two-sided tree models
+		glr.state.frontFaceCCW();
+
+		glr.state.enableDepthTest();
+		glr.state.depthFunctionLess();
+
+		glr.framebuffer_draw(bakeMSFBO);
+//		glr.setClearColor(1, 1, 1, 1);
+		glr.setClearColor(0, 0, 0, 0);
+		glr.clearColor();
+		glr.clearDepth();
+
+		// --- Render ---
+
+		auto def = renderAtlas(glr, uniform_stream, model);
+
+		// --- Resolve ---
+
+		glr.blit(bakeMSFBO, bakeSSFBO,
+				libv::gl::Attachment::Color0, {0, 0}, bakeSize,
+				libv::gl::Attachment::Color0, {0, 0}, bakeSize,
+				libv::gl::BufferBit::ColorDepth, libv::gl::MagFilter::Nearest);
+
+		glr.blit(bakeMSFBO, bakeSSFBO,
+				libv::gl::Attachment::Color1, {0, 0}, bakeSize,
+				libv::gl::Attachment::Color1, {0, 0}, bakeSize,
+				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+
+		// --- Debug display ---
+
+//		// Blit to default just to debug
+//		glr.blit_to_default(result_fbo,
+//				libv::gl::Attachment::Color0, {0, 0}, bakeSize or atlasSize,
+//				{0, 0}, bakeSize or atlasSize,
+//				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+
+		// --- Upsample ---
+
+//		libv::glr::Texture2DArray::R8_G8_B8_A8 resultColor;
+		libv::glr::Texture2D::R8_G8_B8_A8 resultColor;
+		resultColor.storage(1, atlasSize);
+		resultColor.set(libv::gl::MagFilter::Linear);
+		resultColor.set(libv::gl::MinFilter::Linear);
+		resultFBOColor.attach2D(libv::gl::Attachment::Color0, resultColor);
+//		resultFBOColor.attach3D(libv::gl::Attachment::Color0, resultColor, 0, ID);
+
+//		libv::glr::Texture2DArray::R8_G8_B8 resultNormal;
+		libv::glr::Texture2D::R8_G8_B8 resultNormal;
+		resultNormal.storage(1, atlasSize);
+		resultNormal.set(libv::gl::MagFilter::Linear);
+		resultNormal.set(libv::gl::MinFilter::Linear);
+//		resultNormal.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+		resultFBONormal.attach2D(libv::gl::Attachment::Color0, resultNormal);
+//		resultFBONormal.attach2D(libv::gl::Attachment::Color0, resultNormal, 0, ID);
+
+		glr.setClearColor(0, 0, 0, 0);
+		glr.state.disableDepthTest();
+		glr.state.disableDepthMask();
+
+		{
+			glr.framebuffer_draw(resultFBOColor);
+			glr.program(shaderSpriteBakerDownsample.program());
+			glr.texture(bakeSSColor, libv::rev::textureChannel_diffuse);
+			glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
+			glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, true);
+			glr.render_full_screen();
+		} {
+			glr.framebuffer_draw(resultFBONormal);
+			glr.program(shaderSpriteBakerDownsample.program());
+			glr.texture(bakeSSNormal, libv::rev::textureChannel_diffuse);
+			glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
+			glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, false);
+			glr.render_full_screen();
+		}
+
+		resultColor.generate_mipmaps();
+		resultNormal.generate_mipmaps();
+
+		glr.framebuffer_default();
+
+		// --- Retrieve Textures ---
+
+//		glr.callback([size = atlasSize, result = result](libv::gl::GL& gl) {
+//		glr.callback([size = bakeSize, result = result](libv::gl::GL& gl) {
+//			const auto flipY = []<typename C>(C& data, size_t sizeX) {
+//				using value_type = typename C::value_type;
+//				const auto numRow = data.size() / sizeX;
+//				auto tmpRow = std::make_unique_for_overwrite<value_type[]>(sizeX);
 //
-//struct SpriteDefinition {
-//	// definition:
-//	libv::vec2i tile_size = {64, 64};
+//				for (size_t i = 0; i < numRow / 2; ++i) {
+//					void* const tmp = tmpRow.get();
+//					void* const front = data.data() + i * sizeX;
+//					void* const back = data.data() + (numRow - 1 - i) * sizeX;
 //
-//	// import only:
-//	float model_scale = 1.f;
-//	// import and maybe definition:
-//	libv::vec3f model_offset = {0.f, 0.f, 0.f};
+//					std::memcpy(tmp, front, sizeX * sizeof(value_type));
+//					std::memcpy(front, back, sizeX * sizeof(value_type));
+//					std::memcpy(back, tmp, sizeX * sizeof(value_type));
+//				}
+//			};
 //
-//	// definition:
-//	int tile_num_x = 16;
-//	int tile_num_y = 8;
-//	float angle_x_min = 0.f;
-//	float angle_x_max = libv::tau * (static_cast<float>(tile_num_y) - 1) / static_cast<float>(tile_num_y);
-//	float angle_y_min = 0.f;
-//	float angle_y_max = libv::pi / 2.f;
-//};
-//
-//struct SpriteAtlasBaker {
-//	libv::glr::Framebuffer fbo;
-//	libv::glr::Texture2DMultisample::R8_G8_B8_A8 color;
-//	libv::glr::Texture2DMultisample::R8_G8_B8 normal;
-//	libv::glr::Texture2DMultisample::D24 depth;
-//
-////	libv::rev::RenderTarget render_target;
-//
-////	SpriteAtlasBaker(libv::vec2i atlas_size, int msaa_samples, int super_sample_resolution) {
-//	explicit SpriteAtlasBaker(libv::vec2i atlas_size, int msaa_samples = 16) {
-//		color.storage_ms(atlas_size, msaa_samples, false);
-//		normal.storage_ms(atlas_size, msaa_samples, false);
-//		depth.storage_ms(atlas_size, msaa_samples, false);
-//
-//		fbo.attach2D(libv::gl::Attachment::Color0, color);
-//		fbo.attach2D(libv::gl::Attachment::Color1, normal);
-//		fbo.attach2D(libv::gl::Attachment::Depth, depth);
-////		render_target.attach(color, libv::glr::attachment0);
-////		render_target.attach(normal, libv::glr::attachment1);
-////		render_target.attach(depth, libv::glr::attachment2);
-//	}
-//
-//	void render(libv::glr::Queue& glr) {
-//
-//	}
-//
-//	SpriteAtlas bake(libv::glr::Queue& glr) {
-//		SpriteAtlas result;
-//
-////		libv::glr::Framebuffer fbo;
-////		fbo.attach2D(libv::gl::Attachment::Color0, result.color);
-////		fbo.attach2D(libv::gl::Attachment::Color1, result.normal);
-////		fbo.attach2D(libv::gl::Attachment::Depth, result.depth);
-//
-//		glr.blit(render_target.framebuffer(), fbo, {0, 0}, render_target.size(), {0, 0}, dst_size, libv::gl::BufferBit::ColorDepth, libv::gl::MagFilter::Linear);
-//
-////		libv::rev::RenderTarget result_target(atlas_size, msaa_samples);
-////		result_target.attach(result.color, libv::glr::attachment0);
-////		result_target.attach(result.normal, libv::glr::attachment1);
-////		result_target.attach(result.depth, libv::glr::attachment2);
-////
-////		glr.blit(render_target.framebuffer(), result_target.framebuffer());
-//
-//		return result;
-//	}
-//};
+//			{
+//				std::vector<libv::vec4uc> data;
+//				data.resize(size.x * size.y);
+//				gl.readTextureImage(result.color.out_of_order_gl(), 0, libv::gl::ReadFormat::RGBA, libv::gl::DataType::U8, data.data());
+//				flipY(data, size.x);
+//				auto imgData = libv::img::save_png(data.data(), size.x, size.y);
+//				libv::write_file_or_throw("test_color.png", imgData.span());
+//			} {
+//				std::vector<libv::vec3uc> data;
+//				data.resize(size.x * size.y);
+//				gl.readTextureImage(result.normal.out_of_order_gl(), 0, libv::gl::ReadFormat::RGB, libv::gl::DataType::U8, data.data());
+//				flipY(data, size.x);
+//				auto imgData = libv::img::save_png(data.data(), size.x, size.y);
+//				libv::write_file_or_throw("test_normal.png", imgData.span());
+//			} {
+//				std::vector<uint16_t> data;
+//				data.resize(size.x * size.y);
+//				gl.readTextureImage(result.depth.out_of_order_gl(), 0, libv::gl::ReadFormat::DEPTH, libv::gl::DataType::U16, data.data());
+//				libv::write_file_or_throw("test_depth.raw", std::as_bytes(std::span(data)));
+//			}
+//		});
+
+		return std::make_shared<Sprite>(def, resultColor, resultNormal);
+	}
+};
+
+// =================================================================================================
 
 struct Sandbox {
-	int debug_view_bloom_step = 0;
 	std::chrono::duration<float> running_time{0};
 
 	libv::vec2i window_size = {WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	libv::glr::Remote remote; // Remote has to be the first data member to clean up gl resources
-
-	libv::glr::Mesh mesh_sphere{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh_color_bar{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
@@ -198,72 +571,23 @@ struct Sandbox {
 		settings.model.base_path = "../res/model/";
 		return settings;
 	}()};
-	libv::rev::Texture texture0 = loader.texture.load("hexagon_metal_0001_diffuse.dds");
-//	libv::rev::Texture texture0 = loader.texture.load("builtin:white");
-	libv::rev::Texture texture0b = loader.texture.load("hexagon_metal_0001_diffuse.dds");
-	libv::rev::Texture texture1 = loader.texture.load("hexagon_metal_0001_normal.dds");
-	libv::rev::Texture texture2 = loader.texture.load("hexagon_metal_0001_emission.dds");
-	libv::rev::Texture texture3 = loader.texture.load("not_found.dds");
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/Tree_med.fixed.game.vm4")), loader.material.load};
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/Tree_med.fixed.game.vm4")), [this](const auto& m) {
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/test_node_02_med.game.vm4")), [this](const auto& m) {
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/test_node_med.game.vm4")), [this](const auto& m) {
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/test_shadow_curves_02_med.game.vm4")), [this](const auto& m) {
-//	libv::rev::Model model0{libv::vm4::load_or_throw(libv::read_file_or_throw("../res/model/tree_01.vm4")), [this](const auto& m) {
-//		libv::rev::MaterialScanner ms(loader.shader, loader.texture, m);
-//		return libv::rev::MaterialSpriteBaker::create(ms);
-//	}};
 
-	libv::rev::Model model0 = loader.model.load("tree_01.vm4", libv::rev::MaterialSpriteBaker::create);
-//	libv::rev::Model model0 = loader.model.load("tree_01.vm4");
-//	libv::rev::Model model0 = loader.model.fallback();
+	libv::rev::Model keep_alive = loader.model.load("tree_01.vm4", libv::rev::MaterialSpriteBaker::create, 100);
 
-//	libv::rev::Shader<UniformsSphere> shader_sphere{loader.shader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere.fs"};
-	libv::rev::Shader<UniformsSphere> shader_sphere{loader.shader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere_tex.fs"};
-	libv::rev::Shader<UniformsSphere> shader_color_bar{loader.shader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
+	bool created = false;
 
-	libv::rev::RenderTarget render_target{window_size, 4};
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorBufferTexture, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_AdditionalColorBufferTexture, 0);
-		//uint32_t drawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-		//glDrawBuffers(2, (GLenum*)drawBuffers);
+	// -------------------------------------------------------------------------------------------------
 
-	libv::rev::PostProcessing post_processing{loader.shader, window_size};
+	RendererSprite sprites{loader};
+
+	// -------------------------------------------------------------------------------------------------
 
 	Sandbox() {
-		{
-			mesh_sphere.clear();
-
-			auto position = mesh_sphere.attribute(attribute_position);
-			auto texture0 = mesh_sphere.attribute(attribute_texture0);
-			auto index = mesh_sphere.index();
-
-			libv::glr::generateSpherifiedCube(64, position, libv::glr::ignore, texture0, index);
-		}
-		{
-			mesh_color_bar.clear();
-
-			auto position = mesh_color_bar.attribute(attribute_position);
-			auto texture0 = mesh_color_bar.attribute(attribute_texture0);
-			auto index = mesh_color_bar.index();
-
-			position(-1, -1, 0);
-			position(+1, -1, 0);
-			position(+1, +1, 0);
-			position(-1, +1, 0);
-
-			texture0(0, 0);
-			texture0(1, 0);
-			texture0(1, 1);
-			texture0(0, 1);
-
-			index.quad(0, 1, 2, 3);
-		}
-
 		remote.create();
 		remote.enableDebug();
 
 		log_sandbox.debug("{:46} [{:>10} ]", "CurrentAvailableVideoMemory",        remote.gl().getCurrentAvailableVideoMemory());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxColorAttachments",                remote.gl().getMaxColorAttachments());
 		log_sandbox.debug("{:46} [{:>10} ]", "MaxSamples",                         remote.gl().getMaxSamples());
 		log_sandbox.debug("{:46} [{:>10} ]", "MaxSamplesInteger",                  remote.gl().getMaxSamplesInteger());
 		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnits",               remote.gl().getMaxTextureImageUnits());
@@ -290,35 +614,31 @@ struct Sandbox {
 		window_size.x = width;
 		window_size.y = height;
 
-		render_target.size(window_size);
-		post_processing.size(window_size);
+//		render_target.size(window_size);
+//		post_processing.size(window_size);
 
 		std::cout << "Resolution: " << width << "x" << height << std::endl;
 	}
 
 	void onKey(int key, int scancode, int action, int mods) {
+		(void) key;
 		(void) scancode;
 		(void) mods;
 
 		if (action != GLFW_PRESS)
 			return;
 
-		if (key == GLFW_KEY_GRAVE_ACCENT) {
-			render_target.sampleCount(0); std::cout << "MSAA: Disabled" << std::endl;
-		} else if (key == GLFW_KEY_1) {
-			render_target.sampleCount(2); std::cout << "MSAA: 2" << std::endl;
-		} else if (key == GLFW_KEY_2) {
-			render_target.sampleCount(4); std::cout << "MSAA: 4" << std::endl;
-		} else if (key == GLFW_KEY_3) {
-			render_target.sampleCount(8); std::cout << "MSAA: 8" << std::endl;
-		} else if (key == GLFW_KEY_4) {
-			render_target.sampleCount(16); std::cout << "MSAA: 16" << std::endl;
-
-		} else if (key == GLFW_KEY_Q) {
-			--debug_view_bloom_step; std::cout << "debug_view_bloom_step: " << debug_view_bloom_step << std::endl;
-		} else if (key == GLFW_KEY_W) {
-			++debug_view_bloom_step; std::cout << "debug_view_bloom_step: " << debug_view_bloom_step << std::endl;
-		}
+//		if (key == GLFW_KEY_GRAVE_ACCENT) {
+//			render_target.sampleCount(0); std::cout << "MSAA: Disabled" << std::endl;
+//		} else if (key == GLFW_KEY_1) {
+//			render_target.sampleCount(2); std::cout << "MSAA: 2" << std::endl;
+//		} else if (key == GLFW_KEY_2) {
+//			render_target.sampleCount(4); std::cout << "MSAA: 4" << std::endl;
+//		} else if (key == GLFW_KEY_3) {
+//			render_target.sampleCount(8); std::cout << "MSAA: 8" << std::endl;
+//		} else if (key == GLFW_KEY_4) {
+//			render_target.sampleCount(16); std::cout << "MSAA: 16" << std::endl;
+//		}
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -328,12 +648,38 @@ struct Sandbox {
 	}
 
 	void render() {
+		if (!std::exchange(created, true)) {
+			auto queue = remote.queue();
+
+			create_remote(queue);
+
+			remote.queue(std::move(queue));
+			remote.execute();
+		}
+
 		auto queue = remote.queue();
 
 		render_remote(queue);
 
 		remote.queue(std::move(queue));
 		remote.execute();
+	}
+
+	void create_remote(libv::glr::Queue& glr) {
+		SpriteAtlasBaker baker{loader, libv::vec2i{1024, 1024}, 16, 16};
+
+		auto atlas = baker.bake(glr, uniform_stream, "tree_01.vm4");
+//		auto atlas2 = baker.bake(glr, uniform_stream, "tree_02.vm4");
+//		auto atlas3 = baker.bake(glr, uniform_stream, "tree_03.vm4", -pi, pi, 0, pi/2, 16, 8, 64, 64);
+
+		sprites.sprite = atlas;
+		for (int x = -10; x < 10; ++x) {
+			for (int y = -10; y < 10; ++y) {
+				const auto xf = static_cast<float>(x);
+				const auto yf = static_cast<float>(y);
+				sprites.add({xf, yf, 0});
+			}
+		}
 	}
 
 	void render_remote(libv::glr::Queue& glr) {
@@ -348,8 +694,8 @@ struct Sandbox {
 		glr.state.blendSrc_SourceAlpha();
 		glr.state.blendDst_One_Minus_SourceAlpha();
 
-//		glr.state.enableCullFace();
-		glr.state.disableCullFace();
+		glr.state.enableCullFace();
+//		glr.state.disableCullFace();
 		glr.state.frontFaceCCW();
 		glr.state.cullBackFace();
 
@@ -357,10 +703,13 @@ struct Sandbox {
 //		glr.state.polygonModeLine();
 
 		glr.state.enableDepthTest();
+		glr.state.enableDepthMask();
 		glr.state.depthFunctionLess();
 
 		glr.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
 //		glr.setClearColor(1.f, 1.f, 1.f, 1.0f);
+
+		glr.clearColorDepth();
 
 		static constexpr libv::mat4f base_camera_orientation = libv::mat4f(
 				 0,  0, -1,  0, // Map Z- to X+
@@ -369,90 +718,29 @@ struct Sandbox {
 				 0,  0,  0,  1  //
 		);
 
-//		glr.projection = libv::mat4f::perspective(libv::deg_to_rad(60.f), window_size.x / window_size.y, 0.1f, 10000.f);
-//		glr.view = libv::mat4f::lookAt({60, 60, 40}, {0, 0, 0}, {0, 0, 1});
+		glr.projection = libv::mat4f::perspective(libv::deg_to_rad(60.f), static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.1f, 10000.f);
+//		glr.view = libv::mat4f::lookAt({6, 6, 4}, {0, 0, 0}, {0, 0, 1});
+//		glr.view = libv::mat4f::lookAt({6, 6, std::abs(std::fmod(running_time.count() / 3.f, 1.0f)) * 20.f}, {0, 0, 0}, {0, 0, 1});
 
-		glr.projection = libv::mat4f::ortho(0, static_cast<float>(window_size.x), 0, static_cast<float>(window_size.y), -1000, +1000);
-		glr.view = base_camera_orientation;
-		glr.view.rotate(libv::degrees(35.f), 0, -1, 0);
-		glr.view.translate(0, static_cast<float>(window_size.x) * -0.5f, 0);
-//		glr.view.translate(0, 0, static_cast<float>(window_size.y) * 0.5f);
-
-		glr.view.rotate(libv::degrees(running_time.count() * 5.f), 0, 0, 1);
+//		glr.projection = libv::mat4f::ortho(-10, 10, -10, 10, -1000, +1000);
+//		glr.view = base_camera_orientation;
 		glr.model = libv::mat4f::identity();
 
-		// --- Render the Sphere ---
+//		glr.view.rotate(libv::degrees(running_time.count() * 5.f), 0, 0, 1);
 
-		glr.framebuffer_draw(render_target.framebuffer());
-//		glr.framebuffer_draw_default();
-		glr.viewport({0, 0}, render_target.size());
-		glr.clearColor();
-		glr.clearDepth();
+		glr.view = base_camera_orientation;
+//		glr.view.rotate(libv::degrees(running_time.count() * 5.f), -0.7, -0.7, 0);
+		glr.view.translate(10, 0, 0);
 
-		{
-			const auto guard_m2 = glr.model.push_guard();
-//			glr.model.translate(static_cast<float>(window_size.x) * 0.5f, static_cast<float>(window_size.y) * 0.5f, 0);
-//			glr.model.translate(0, static_cast<float>(window_size.x) * 0.5f, 0);
-//			glr.model.scale(30.5f);
-			glr.model.scale(17.5f);
-//			glr.model.scale(12.5f);
+//		glr.view.rotate(libv::degrees(std::fmod(running_time.count() * 5.f, 170.f)), 0, -1, 0);
+//		glr.view.rotate(libv::degrees(30.f), 0, 0, 1);
 
-//			glr.model.scale(0.175f);
+		glr.view.rotate(libv::degrees(30.f), 0, -1, 0);
+		glr.view.rotate(libv::degrees(std::fmod(running_time.count() * 5.f, 170.f)), 0, 0, 1);
 
-			model0.render(glr, uniform_stream);
+		// --- Render ---
 
-//			auto uniforms = uniform_stream.block_unique(layout_matrices);
-//			uniforms[layout_matrices.matMVP] = glr.mvp();
-//			uniforms[layout_matrices.matM] = glr.model;
-//
-//			glr.program(shader_sphere.program());
-//			glr.texture(texture0.texture(), textureChannel_diffuse);
-//			glr.uniform(std::move(uniforms));
-//			glr.render(mesh_sphere);
-		}
-
-		glr.view = libv::mat4f::identity();
-		const auto mini_count = 16;
-		const auto mini_countf = static_cast<float>(mini_count);
-		for (int i = 0 ; i < mini_count; ++i) {
-			const auto fi = static_cast<float>(i);
-			const auto guard_m2 = glr.model.push_guard();
-			glr.model.translate(static_cast<float>(window_size.x) * 0.9f + std::sin(running_time.count()) * 50.f, (0.5f + fi) / mini_countf * static_cast<float>(window_size.y), 0);
-			glr.model.scale(15.f);
-			glr.model.rotate(libv::radian(libv::pi * fi / mini_countf), 0, 1, 0); // Using pi and not tau as only half rotation is enough, sphere is symmetric
-
-			auto uniforms = uniform_stream.block_unique(layout_matrices);
-			uniforms[layout_matrices.matMVP] = glr.mvp();
-			uniforms[layout_matrices.matM] = glr.model;
-
-			glr.program(shader_sphere.program());
-			glr.texture(texture0.texture(), textureChannel_diffuse);
-			glr.uniform(std::move(uniforms));
-			glr.render(mesh_sphere);
-		}
-//		{
-//			// Color-Space Test Bar
-//			const auto guard_m2 = glr.model.push_guard();
-//			const auto window_size_f = window_size.cast<float>();
-//			glr.model.translate(window_size_f.x * 0.5f, window_size_f.y * 0.5f, 500);
-//			glr.model.scale(window_size_f.x * 0.5f, window_size_f.y * 0.5f, 0);
-//
-//			glr.model.translate(0, -0.90f, 0);
-//			glr.model.scale(1, 0.10f, 1);
-//
-//			auto uniforms = uniform_stream.block_unique(layout_matrices);
-//			uniforms[layout_matrices.matMVP] = glr.mvp();
-//			uniforms[layout_matrices.matM] = glr.model;
-//
-//			glr.program(shader_color_bar.program());
-//			glr.uniform(std::move(uniforms));
-//			glr.render(mesh_color_bar);
-//		}
-
-		// --- Post Processing ---
-
-		const auto& main_texture = render_target.resolve(glr);
-		post_processing.pass(glr, main_texture);
+		sprites.render(glr, uniform_stream);
 	}
 };
 
@@ -460,5 +748,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.rev", WINDOW_HEIGHT, WINDOW_WIDTH, 0, 0);
+	return run_sandbox<Sandbox>("Sandbox libv.rev", WINDOW_HEIGHT, WINDOW_WIDTH, 4, 32);
 }

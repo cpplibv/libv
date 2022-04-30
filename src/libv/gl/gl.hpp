@@ -536,7 +536,7 @@ private:
 		glewExperimental = true;
 
 		if (GLenum err = glewInit() != GLEW_OK) {
-			log_gl.error("Failed to initialize glew: {}", glewGetErrorString(err));
+			log_gl.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", glewGetErrorString(err));
 			return;
 		}
 

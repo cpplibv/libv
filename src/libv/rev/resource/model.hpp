@@ -34,7 +34,7 @@ public:
 	~Model();
 
 public:
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const;
 };
 
 // -------------------------------------------------------------------------------------------------

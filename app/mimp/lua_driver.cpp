@@ -112,6 +112,16 @@ struct LuaContext {
 				}
 			}
 		});
+
+		api_table.set_function("print_model", [this]() {
+			if (dirtyBounds) {
+				libv::vm4::recalculateBounding(model);
+				dirtyBounds = false;
+			}
+
+			libv::vm4::log_vm4.fatal("AABB_max: {}", model.AABB_max);
+			libv::vm4::log_vm4.fatal("AABB_min: {}", model.AABB_min);
+		});
 	}
 
 	void run(std::string_view script) {

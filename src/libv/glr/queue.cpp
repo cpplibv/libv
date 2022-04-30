@@ -147,6 +147,10 @@ struct QueueTaskClear {
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
 		// TODO P5: Color mask in not auto enabled, Stencil mask need verification
 		(void) remote;
+
+//		AttorneyRemoteFramebuffer::use_draw_buffer(*framebuffer_dst, gl, *attachment_dst);
+//		AttorneyRemoteFramebuffer::reset_draw_buffer(*framebuffer_dst, gl, *attachment_dst);
+
 		if ((buffers & libv::gl::BufferBit::DepthStencil) == libv::gl::BufferBit::DepthStencil) {
 			auto cap_d = gl.capability.depthTest.enable_guard();
 			auto cap_s = gl.capability.stencilTest.enable_guard();
@@ -425,6 +429,16 @@ void Queue::clearColor() {
 	}
 }
 
+void Queue::clearColorDepth() {
+	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
+		task->buffers = task->buffers | libv::gl::BufferBit::Color | libv::gl::BufferBit::Depth;
+	} else {
+		sequencePoint();
+		self->add<QueueTaskClear>(libv::gl::BufferBit::Color | libv::gl::BufferBit::Depth);
+		sequencePoint();
+	}
+}
+
 void Queue::clearDepth() {
 	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
 		task->buffers = task->buffers | libv::gl::BufferBit::Depth;
@@ -440,7 +454,15 @@ void Queue::clearDepth() {
 void Queue::viewport(libv::vec2i position, libv::vec2i size) {
 	self->current_viewport_position = position;
 	self->current_viewport_size = size;
-	self->add<QueueTaskViewport>(position, size);
+
+	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskViewport>(&self->tasks.back())) {
+		task->size = size;
+		task->position = position;
+	} else {
+		sequencePoint();
+		self->add<QueueTaskViewport>(position, size);
+		sequencePoint();
+	}
 }
 
 libv::vec2i Queue::viewport_position() const {

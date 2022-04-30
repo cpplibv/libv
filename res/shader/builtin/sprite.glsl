@@ -1,0 +1,41 @@
+#pragma once
+
+
+//const float body_width = 7;
+//const float head_width = 16;
+//const float head_height = 28;
+//const float body_width = 15;
+//const float head_width = 50;
+//const float head_height = 50;
+
+
+struct GeometryData {
+	vec3 positionW;
+	vec3 eyeDir;
+//	vec4 color;
+//	float segmentPosition;
+//	float segmentSize;
+//	float chainPosition;
+//	float chainSize;
+//	float animationOffset;
+};
+
+struct FragmentData {
+	vec4 color;
+	vec2 uv;
+	vec2 tile_index;
+	float dither0;
+	float dither1;
+//	vec3 eyeDir;
+//	vec2 part_uv;
+//	float head;
+//	float segmentPosition;
+//	float segmentSize;
+//	float chainPosition;
+//	float chainSize;
+//	float animationOffset;
+};
+
+float rand(vec2 co) {
+	return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}

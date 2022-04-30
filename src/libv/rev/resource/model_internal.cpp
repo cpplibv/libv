@@ -23,7 +23,7 @@ void InternalModel::ref_count_one() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void InternalModel::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+void InternalModel::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const {
 	for (const auto& node : nodes) {
 		const auto guard = glr.model.push_guard();
 		glr.model *= node.transformation;

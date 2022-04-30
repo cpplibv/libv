@@ -74,7 +74,7 @@ private:
 	void ref_count_one() noexcept;
 
 public:
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const;
 
 public:
 	void load_mesh(const libv::vm4::Model& vm4);

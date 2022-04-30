@@ -21,3 +21,4 @@ model.add_bool("leaves", "twosided", true);
 --model.print_materials()
 --model.print_textures()
 ----model.print_nodes()
+-- model.print_model();
