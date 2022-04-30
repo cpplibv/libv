@@ -692,6 +692,9 @@ template <typename T>
 //			return to_value(AttributeType::INT);
 	// Bool cannot be just mapped for int, what about the sizes?
 
+	if constexpr (std::is_same_v<T, uint32_t>)
+		return AttributeType::UINT;
+
 	if constexpr (std::is_same_v<T, int32_t>)
 		return AttributeType::INT;
 

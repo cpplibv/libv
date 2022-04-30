@@ -376,7 +376,7 @@ public:
 	template <typename T>
 	[[nodiscard]] MeshAttribute<typename T::value_type> attribute(T) {
 		using attribute_type = typename T::value_type;
-		using underlying_type = typename attribute_type::value_type;
+		using underlying_type = typename T::underlying_type;
 
 		remote->dirty = true;
 		auto it = libv::linear_find_iterator(remote->attributes, T::channel, &RemoteMeshAttribute::channel);
@@ -392,7 +392,7 @@ public:
 		remote->attributes.emplace_back(
 				T::channel,
 				libv::gl::toAttributeType<underlying_type>(),
-				attribute_type::dim);
+				T::dim);
 
 		return MeshAttribute<attribute_type>{remote->attributes, remote->attributes.size() - 1};
 	}
