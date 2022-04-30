@@ -9,6 +9,7 @@
 #include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <memory>
+#include <utility>
 #include <vector>
 // pro
 #include <libv/gl/uniform_buffer_object.hpp>
@@ -79,7 +80,12 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+class UniformBlockSharedView_std140;
+class UniformBlockUniqueView_std140;
+
 class UniformBlockUniqueView_std140 {
+	friend UniformBlockSharedView_std140;
+
 private:
 	template <typename T>
 	struct Proxy {
@@ -99,15 +105,15 @@ public:
 	UniformBlockUniqueView_std140(
 			UniformBlockBindingLocation binding,
 			UniformDataBlock block,
-			const std::shared_ptr<RemoteUniformBuffer>& remote) :
+			std::shared_ptr<RemoteUniformBuffer>  remote) :
 		binding(binding),
 		block(block),
-		remote(remote) { }
+		remote(std::move(remote)) { }
 
 	UniformBlockUniqueView_std140(const UniformBlockUniqueView_std140&) = delete;
 	UniformBlockUniqueView_std140& operator=(const UniformBlockUniqueView_std140&) = delete;
 
-	UniformBlockUniqueView_std140(UniformBlockUniqueView_std140&& orig) :
+	UniformBlockUniqueView_std140(UniformBlockUniqueView_std140&& orig)  noexcept :
 		binding(orig.binding),
 		block(orig.block),
 		remote(std::move(orig.remote)) {
@@ -124,7 +130,7 @@ public:
 
 public:
 	template <typename T>
-	Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) {
+	[[nodiscard]] inline Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) noexcept {
 		remote->dirty = true;
 		const auto ptr = make_observer_ref(remote->data.data() + block.offset + location.location);
 		return Proxy<T>{ptr};
@@ -136,6 +142,46 @@ public:
 	}
 };
 
+class UniformBlockSharedView_std140 {
+private:
+	// Derefer the problem to a simple unique block shared via a shared_ptr
+	std::shared_ptr<UniformBlockUniqueView_std140> unique_block = nullptr;
+
+public:
+	UniformBlockSharedView_std140() = default;
+
+	UniformBlockSharedView_std140(
+			UniformBlockBindingLocation binding,
+			UniformDataBlock block,
+			std::shared_ptr<RemoteUniformBuffer> remote) :
+		unique_block(std::make_shared<UniformBlockUniqueView_std140>(binding, block, std::move(remote))) { }
+
+	inline UniformBlockSharedView_std140(const UniformBlockSharedView_std140&) noexcept = default;
+	inline UniformBlockSharedView_std140& operator=(const UniformBlockSharedView_std140&) & noexcept = default;
+	inline UniformBlockSharedView_std140(UniformBlockSharedView_std140&&) noexcept = default;
+	inline UniformBlockSharedView_std140& operator=(UniformBlockSharedView_std140&&) & noexcept = default;
+
+public:
+	[[nodiscard]] inline const std::shared_ptr<RemoteUniformBuffer>& remote() const noexcept {
+		return unique_block->remote;
+	}
+
+	[[nodiscard]] inline const UniformBlockBindingLocation& binding() const noexcept {
+		return unique_block->binding;
+	}
+
+	[[nodiscard]] inline const UniformDataBlock& block() const noexcept {
+		return unique_block->block;
+	}
+
+	template <typename T>
+	[[nodiscard]] inline UniformBlockUniqueView_std140::Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) noexcept {
+		return (*unique_block)[location];
+	}
+
+	~UniformBlockSharedView_std140() = default;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 class UniformBuffer {
@@ -145,7 +191,7 @@ private:
 	std::shared_ptr<RemoteUniformBuffer> remote;
 
 public:
-	UniformBuffer(libv::gl::BufferUsage usage) :
+	explicit UniformBuffer(libv::gl::BufferUsage usage) :
 		remote(std::make_shared<RemoteUniformBuffer>(usage)) { }
 	UniformBuffer(const UniformBuffer& orig) = default;
 	UniformBuffer(UniformBuffer&& orig) = default;
@@ -155,6 +201,12 @@ public:
 	[[nodiscard]] UniformBlockUniqueView_std140 block_unique(const UniformBlockLayout<T>& layout) {
 		remote->dirty = true;
 		return UniformBlockUniqueView_std140{layout.binding, remote->allocate(layout.size), remote};
+	}
+
+	template <typename T>
+	[[nodiscard]] UniformBlockSharedView_std140 block_shared(const UniformBlockLayout<T>& layout) {
+		remote->dirty = true;
+		return UniformBlockSharedView_std140{layout.binding, remote->allocate(layout.size), remote};
 	}
 
 	void reserve(std::size_t byte_size) {
@@ -184,10 +236,10 @@ public:
 	UniformBlockStreamView_std140(
 			UniformBlockBindingLocation binding,
 			UniformDataBlock block,
-			const std::shared_ptr<RemoteUniformBuffer>& remote) :
+			std::shared_ptr<RemoteUniformBuffer>  remote) :
 		binding(binding),
 		block(block),
-		remote(remote) { }
+		remote(std::move(remote)) { }
 
 	UniformBlockStreamView_std140(const UniformBlockStreamView_std140& other) = default;
 	UniformBlockStreamView_std140(UniformBlockStreamView_std140&& other) = default;
@@ -216,7 +268,7 @@ private:
 	std::shared_ptr<RemoteUniformBuffer> remote;
 
 public:
-	UniformBufferStream(libv::gl::BufferUsage usage = libv::gl::BufferUsage::StreamDraw) :
+	explicit UniformBufferStream(libv::gl::BufferUsage usage = libv::gl::BufferUsage::StreamDraw) :
 		remote(std::make_shared<RemoteUniformBuffer>(usage)) { }
 
 	UniformBufferStream(const UniformBufferStream& orig) = default;
@@ -227,10 +279,6 @@ public:
 	[[nodiscard]] UniformBlockStreamView_std140 block_stream(const UniformBlockLayout<T>& layout) {
 		remote->dirty = true;
 		return UniformBlockStreamView_std140{layout.binding, remote->allocate(layout.size), remote};
-	}
-
-	const auto& tmp() {
-		return remote->data;
 	}
 
 	void clear() {

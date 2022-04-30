@@ -193,12 +193,21 @@ struct QueueTaskClearColor {
 	}
 };
 
-struct QueueTaskUniformBlock {
+struct QueueTaskUniformBlockUnique {
 	SequenceNumber sequenceNumber;
 	UniformBlockUniqueView_std140 view;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
 		view.remote->bind(gl, remote, view.binding, view.block);
+	}
+};
+
+struct QueueTaskUniformBlockShared {
+	SequenceNumber sequenceNumber;
+	UniformBlockSharedView_std140 view;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		view.remote()->bind(gl, remote, view.binding(), view.block());
 	}
 };
 
@@ -340,7 +349,7 @@ public:
 	std::vector<std::variant<
 			QueueTaskCallback,
 			QueueTaskClear, QueueTaskClearColor, QueueTaskViewport,
-			QueueTaskMesh, QueueTaskMeshVII, QueueTaskMeshFullScreen, QueueTaskUniformBlock, QueueTaskUniformBlockStream, QueueTaskTexture,
+			QueueTaskMesh, QueueTaskMeshVII, QueueTaskMeshFullScreen, QueueTaskUniformBlockUnique, QueueTaskUniformBlockShared, QueueTaskUniformBlockStream, QueueTaskTexture,
 			QueueTaskFramebuffer, QueueTaskBlit
 	>> tasks;
 
@@ -665,11 +674,15 @@ void Queue::uniform(const Uniform_t<libv::mat4x4d> uniform, const libv::mat4x4d&
 // -------------------------------------------------------------------------------------------------
 
 void Queue::uniform(UniformBlockUniqueView_std140&& view) {
-	self->add<QueueTaskUniformBlock>(std::move(view));
+	self->add<QueueTaskUniformBlockUnique>(std::move(view));
+}
+
+void Queue::uniform(UniformBlockSharedView_std140 view) {
+	self->add<QueueTaskUniformBlockShared>(std::move(view));
 }
 
 void Queue::uniform(UniformBlockStreamView_std140 view) {
-	self->add<QueueTaskUniformBlockStream>(view);
+	self->add<QueueTaskUniformBlockStream>(std::move(view));
 }
 
 void Queue::texture(Texture texture, const libv::gl::TextureChannel channel) {

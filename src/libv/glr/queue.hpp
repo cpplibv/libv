@@ -27,8 +27,9 @@ class Mesh;
 class Program;
 class Remote;
 class Texture;
-class UniformBlockStreamView_std140;
 class UniformBlockUniqueView_std140;
+class UniformBlockSharedView_std140;
+class UniformBlockStreamView_std140;
 
 struct Queue {
 public:
@@ -160,8 +161,9 @@ public:
 	void uniform(const Uniform_t<libv::mat3x4d> uniform, const libv::mat3x4d& value);
 	void uniform(const Uniform_t<libv::mat4x4d> uniform, const libv::mat4x4d& value);
 
-	void uniform(UniformBlockStreamView_std140 view);
 	void uniform(UniformBlockUniqueView_std140&& view);
+	void uniform(UniformBlockSharedView_std140 view);
+	void uniform(UniformBlockStreamView_std140 view);
 	void texture(Texture texture, const libv::gl::TextureChannel channel);
 //	void pop_program(Program program) {}
 //	void push_program() {}
