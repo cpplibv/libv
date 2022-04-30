@@ -40,6 +40,7 @@ public:
 	void attach(libv::gl::Attachment attachment, Renderbuffer renderbuffer) noexcept;
 	void attach1D(libv::gl::Attachment attachment, Texture texture, int32_t level = 0) noexcept;
 	void attach2D(libv::gl::Attachment attachment, Texture texture, int32_t level = 0) noexcept;
+	void attach2D(libv::gl::Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept;
 	void attach2D(libv::gl::Attachment attachment, Texture texture, libv::gl::CubeSide side, int32_t level = 0) noexcept;
 	void attach3D(libv::gl::Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept;
 

@@ -41,6 +41,13 @@ struct RemoteFramebuffer {
 		int32_t level;
 	};
 
+	struct Attachment2DLayer {
+		libv::gl::Attachment attachment;
+		Texture texture;
+		int32_t level;
+		int32_t layer;
+	};
+
 	struct Attachment2DCube {
 		libv::gl::Attachment attachment;
 		Texture texture;
@@ -55,7 +62,7 @@ struct RemoteFramebuffer {
 		int32_t layer;
 	};
 
-	using Attachment = std::variant<AttachmentR, Attachment1D, Attachment2D, Attachment2DCube, Attachment3D>;
+	using Attachment = std::variant<AttachmentR, Attachment1D, Attachment2D, Attachment2DLayer, Attachment2DCube, Attachment3D>;
 
 public:
 	libv::gl::Framebuffer object;
@@ -123,6 +130,13 @@ void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 				gl(object).attach_draw2D(a.attachment, AttorneyRemoteTexture::sync_no_bind(a.texture, gl, remote_), a.level);
 			else
 				gl(object).attach_read2D(a.attachment, AttorneyRemoteTexture::sync_no_bind(a.texture, gl, remote_), a.level);
+		}
+
+		if constexpr (libv::similar_v<decltype(a), Attachment2DLayer>) {
+			if constexpr (Both || Draw)
+				gl(object).attach_draw2D(a.attachment, AttorneyRemoteTexture::sync_no_bind(a.texture, gl, remote_), a.level, a.layer);
+			else
+				gl(object).attach_read2D(a.attachment, AttorneyRemoteTexture::sync_no_bind(a.texture, gl, remote_), a.level, a.layer);
 		}
 
 		if constexpr (libv::similar_v<decltype(a), Attachment2DCube>) {
@@ -221,6 +235,11 @@ void Framebuffer::attach2D(libv::gl::Attachment attachment, Texture texture, int
 
 void Framebuffer::attach2D(libv::gl::Attachment attachment, Texture texture, libv::gl::CubeSide side, int32_t level) noexcept {
 	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2DCube>, attachment, std::move(texture), side, level);
+	remote->dirty = true;
+}
+
+void Framebuffer::attach2D(libv::gl::Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+	remote->pendingAttachments.emplace_back(std::in_place_type<RemoteFramebuffer::Attachment2DLayer>, attachment, std::move(texture), level, layer);
 	remote->dirty = true;
 }
 

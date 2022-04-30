@@ -111,6 +111,14 @@ private:
 		checkGL();
 	}
 
+	inline void _texture2DLayer(GLenum mode, Attachment attachment, int32_t texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture != 0);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		glFramebufferTextureLayer(mode, libv::to_value(attachment), texture, level, layer);
+		checkGL();
+	}
+
 	inline void _texture3D(GLenum mode, Attachment attachment, GLenum target, int32_t texture, int32_t level, int32_t layer) noexcept {
 		LIBV_GL_DEBUG_ASSERT(texture != 0);
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
@@ -175,6 +183,16 @@ public:
 		LIBV_GL_DEBUG_ASSERT(!oneOf(texture.target, TextureTarget::Rectangle, TextureTarget::_2DMultisample) || level == 0);
 
 		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
+	}
+
+	inline void attach_draw2D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_2DArray);
+		_texture2DLayer(GL_DRAW_FRAMEBUFFER, attachment, texture.id, level, layer);
+	}
+
+	inline void attach_read2D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_2DArray);
+		_texture2DLayer(GL_READ_FRAMEBUFFER, attachment, texture.id, level, layer);
 	}
 
 	inline void attach_draw2D(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0) noexcept {
