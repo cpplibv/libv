@@ -48,15 +48,15 @@ struct ToStringLayouter {
 	std::string_view type_string(libv::meta::identity_t<float>) { return "float"; }
 	std::string_view type_string(libv::meta::identity_t<double>) { return "double"; }
 
-	std::string_view type_string(libv::meta::identity_t<libv::vec2b>) { return "vec2b"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec3b>) { return "vec3b"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec4b>) { return "vec4b"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec2i>) { return "vec2i"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec3i>) { return "vec3i"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec4i>) { return "vec4i"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec2ui>) { return "vec2u"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec3ui>) { return "vec3u"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec4ui>) { return "vec4u"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec2b>) { return "bvec2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec3b>) { return "bvec3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec4b>) { return "bvec4"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec2i>) { return "ivec2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec3i>) { return "ivec3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec4i>) { return "ivec4"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec2ui>) { return "uvec2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec3ui>) { return "uvec3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec4ui>) { return "uvec4"; }
 	std::string_view type_string(libv::meta::identity_t<libv::vec2l>) { return "i64vec2"; }
 	std::string_view type_string(libv::meta::identity_t<libv::vec3l>) { return "i64vec3"; }
 	std::string_view type_string(libv::meta::identity_t<libv::vec4l>) { return "i64vec4"; }
@@ -66,28 +66,28 @@ struct ToStringLayouter {
 	std::string_view type_string(libv::meta::identity_t<libv::vec2f>) { return "vec2"; }
 	std::string_view type_string(libv::meta::identity_t<libv::vec3f>) { return "vec3"; }
 	std::string_view type_string(libv::meta::identity_t<libv::vec4f>) { return "vec4"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec2d>) { return "vec2d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec3d>) { return "vec3d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::vec4d>) { return "vec4d"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec2d>) { return "dvec2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec3d>) { return "dvec3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::vec4d>) { return "dvec4"; }
 
 	std::string_view type_string(libv::meta::identity_t<libv::mat2f>) { return "mat2"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat3f>) { return "mat3"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat4f>) { return "mat4"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat2d>) { return "mat2d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat3d>) { return "mat3d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat4d>) { return "mat4d"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat2d>) { return "dmat2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat3d>) { return "dmat3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat4d>) { return "dmat4"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat2x3f>) { return "mat2x3"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat2x4f>) { return "mat2x4"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat3x2f>) { return "mat3x2"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat3x4f>) { return "mat3x4"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat4x2f>) { return "mat4x2"; }
 	std::string_view type_string(libv::meta::identity_t<libv::mat4x3f>) { return "mat4x3"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat2x3d>) { return "mat2x3d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat2x4d>) { return "mat2x4d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat3x2d>) { return "mat3x2d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat3x4d>) { return "mat3x4d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat4x2d>) { return "mat4x2d"; }
-	std::string_view type_string(libv::meta::identity_t<libv::mat4x3d>) { return "mat4x3d"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat2x3d>) { return "dmat2x3"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat2x4d>) { return "dmat2x4"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat3x2d>) { return "dmat3x2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat3x4d>) { return "dmat3x4"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat4x2d>) { return "dmat4x2"; }
+	std::string_view type_string(libv::meta::identity_t<libv::mat4x3d>) { return "dmat4x3"; }
 
 	template <typename T>
 	void print_members() {

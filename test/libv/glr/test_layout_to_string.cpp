@@ -163,11 +163,11 @@ TEST_CASE("Layout to string UniformsComplex", "[libv.glr.to_string]") {
 	const auto expected =
 R"(struct UniformsComplexNestedA {
 	int _00_int32_;
-	vec2b _01_vec2f_;
+	bvec2 _01_vec2f_;
 };
 
 struct UniformsComplexNestedB {
-	vec3u _00_vec3ui;
+	uvec3 _00_vec3ui;
 	vec2 _01_vec2f_;
 	float _02_2float[2];
 	vec2 _03_vec2f_;
