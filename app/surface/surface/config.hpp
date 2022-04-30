@@ -80,6 +80,12 @@ struct Shift{
 	T radius;
 };
 
+template <typename T>
+struct Limit {
+	T soft;
+	T hard;
+};
+
 struct VeggieType {
 	std::string name;
 	float probability = 1.0f;
@@ -98,7 +104,9 @@ struct VeggieType {
 struct Biome {
 	std::string name;
 	libv::vec2f coord;
-	libv::vec2f cutOff;
+	Limit<float> takeover; //take over, monopol, seize, exclude
+	Limit<float> handover; //
+//	libv::vec2f cutOff;
 	float dominance = 1.f;
 	libv::gradientf<libv::vec4f> colorGrad;
 	std::vector<VeggieType> vegetation;
@@ -120,8 +128,9 @@ class Config {
 public:
 	Seed globalSeed;
 
+	bool blendBiomes = true;
+
 	Visualization visualization;
-//	std::string currentScene;
 	size_t resolution; /// Number of quads/pixels per side
 	size_t numChunks; /// Number of quads/pixels per side
 	size_t numVeggie;

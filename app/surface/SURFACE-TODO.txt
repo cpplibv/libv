@@ -102,14 +102,14 @@ nodes
  	warp + cellular = cserepes talaj
  frustum culling
  toggle freeze
+Veggi instantiation
+Smooth cutoff/cutin Biome blending
  =================================================================================================
 
 
-Veggi instantiation
 
 horizontal expansion
 
-Smooth cutoff/cutin Biome blending
 
 LOD
 priority based generation order and rendering

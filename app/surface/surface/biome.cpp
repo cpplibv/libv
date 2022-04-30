@@ -2,10 +2,14 @@
 
 #include <surface/surface/biome.hpp>
 
+//std
 #include <utility>
 #include <algorithm>
-
+#include <ranges>
+//libv
 #include <libv/algo/erase_if_stable.hpp>
+//surface
+#include <surface/log.hpp>
 
 
 namespace surface {
@@ -16,59 +20,63 @@ Veggie::Veggie(VeggieId id, float rotation, float scale, const libv::vec3f& hsvC
 
 // -------------------------------------------------------------------------------------------------
 
-BiomeMix::BiomeMix() {};
-
-void BiomeMix::normalize() {
+float BiomeMix::normalize() {
 	float sum = 0.f;
 	for (const auto& entry : entries) {
 		sum += entry.weight;
 	}
 
-	assert(sum != 0.f);
+
+	if (sum == 0.f) {
+		log_surface.fatal("Sum != 0.f");
+		return 0.f;
+	}
+//	assert(sum != 0.f);
+//	if (sum == 0) {
+//		entries[0].weight = 1.f;
+//		return;
+//	}
 
 	for (auto& entry : entries) {
 		entry.weight /= sum;
 	}
+
+	return sum;
 }
 
 
-void BiomeMix::blendForVeggies() {
-	//cut-off
-	//TODO: This breaks the blending
-	bool winner = false;
-	WeightedEntry winnerEntry;
+void BiomeMix::applyTakeover() {
 	for (auto& entry : entries) {
-//		if (entry.biome == nullptr)
-//			continue;
-		assert(entry.biome != nullptr);
-
-		if (entry.weight > entry.biome->cutOff.y) {
-			winnerEntry = entry;
-			winner = true;
-			break;
+		const auto takeover = entry.biome->takeover;
+//		auto treshold1 = 0.5f;
+		if (entry.weight > takeover.soft) {
+			auto diff = libv::smoothstep(entry.weight, takeover.soft, takeover.hard) / (1 - entry.weight);
+			entry.weight += diff;
+//			for (auto& item : entries) {
+//
+//			}
 		}
 	}
-	if (winner) {
-		entries.clear();
-		winnerEntry.weight = 1.0f;
-		entries.emplace_back(winnerEntry);
-	} else {
-		size_t i = 0;
-		libv::erase_if_stable(entries, [&i, this](const auto& x) {
-			assert(x.biome != nullptr);
-			const auto result = x.weight < x.biome->cutOff.x && i + 2 < entries.size();
-			if (result)
-				++i;
-			return result;
-		});
-		normalize();
-	}
-}
+	auto sum = normalize();
 
-//void BiomeMix::blendForTiles() {
-//	const auto& smallest = entries[entries.size() - 1];
-//	container.erase(smallest);
-//}
+	for (auto& entry : entries | std::views::reverse) {
+		const auto handover = entry.biome->handover;
+		if (entry.weight < handover.soft) {
+			const auto diff = libv::smoothstep(entry.weight, handover.hard, handover.soft);
+			const auto sumDiff = entry.weight - entry.weight * diff;
+			if (sum - sumDiff > 0.f) {
+				entry.weight *= diff;
+				sum -= sumDiff;
+			}
+			else {
+				auto little = 0.001f;
+				entry.weight = little;
+				sum -= entry.weight - little;
+			}
+		}
+	}
+	normalize();
+}
 
 const Biome& BiomeMix::primary() noexcept {
 
@@ -104,22 +112,15 @@ libv::vec4f BiomeMix::blendedColor(float fertility) noexcept {
 
 
 std::optional<VeggieType> BiomeMix::getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng) {
-//		float sum = 0.f;
-//		for (const auto & veggieType : biome.vegetation) {
-//			sum += veggieType.probability;
-//		}
 	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
 	auto number = ratio(rng);
-//		VeggieType result;
 	for (const auto& veggieType : biome.vegetation) {
 		if (number < veggieType.probability) {
-//				result = veggieType;
 			return veggieType;
 		}
 		number -= veggieType.probability;
 	}
 	return std::nullopt;
-//		throw std::runtime_error("BiomeMix.getRandomVeggieType() has reached end unexpectedly");
 }
 
 std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng) {
@@ -132,7 +133,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 		auto scale = scaleRange(rng);
 
 		auto hueShift = libv::make_uniform_distribution_inclusive(veggieType->hue.offset - veggieType->hue.radius, veggieType->hue.offset + veggieType->hue.radius);
-		auto hue = std::fmod(hueShift(rng), 360.f);
+		auto hue = std::fmod(hueShift(rng), 360.f) / 360.f;
 
 		auto saturationShift = libv::make_uniform_distribution_inclusive(veggieType->saturation.offset - veggieType->saturation.radius, veggieType->saturation.offset + veggieType->saturation.radius);
 		auto saturation = std::clamp(saturationShift(rng), 0.f, 1.f);
@@ -190,7 +191,7 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 		const auto& entry = WeightedEntry(candidate.biome, weight);
 		entries.emplace_back(entry);
 	}
-	return BiomeMix(entries);
+	return BiomeMix(std::move(entries));
 }
 
 } // namespace surface

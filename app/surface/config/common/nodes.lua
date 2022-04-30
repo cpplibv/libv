@@ -182,13 +182,19 @@ shift = function(offset, radius)
 	}
 end
 
+limit = function(soft, hard)
+	return {
+		soft = soft,
+		hard = hard
+	}
+end
+
 full_hue = function()
 	return {
 		offset = 180,
 		radius = 180
 	}
 end
-
 
 full_saturation = function()
 	return {

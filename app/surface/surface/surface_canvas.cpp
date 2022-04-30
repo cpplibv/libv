@@ -162,6 +162,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 		auto script = libv::read_file_str_or_throw(currentConfigPath_);
 		auto conf = binding.getConfigFromLuaScript(script);
 
+		conf->blendBiomes = blendBiomes;
+
 		renderer.sky.fogIntensity = conf->fogIntensity;
 		renderer.sky.fogColor = conf->fogColor;
 		renderer.veggie.fogIntensity = conf->fogIntensity;

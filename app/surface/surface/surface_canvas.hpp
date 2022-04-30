@@ -44,6 +44,7 @@ inline bool enableSkybox = true;
 inline bool refresh = false;
 inline std::atomic<bool> changed = true;
 inline bool freeze = false;
+inline bool blendBiomes = true;
 
 
 
@@ -288,7 +289,7 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
-	void updateVisibleChunks();
+//	void updateVisibleChunks();
 //	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;

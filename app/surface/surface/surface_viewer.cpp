@@ -50,11 +50,15 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 //		CanvasControl::register_controls(controls);
 //		CanvasControl::bind_default_controls(controls);
 
-	controls.feature_action<void>("surface.refresh_surface", [this](const auto&) {
+	controls.feature_action<void>("surface.refresh_surface", [](const auto&) {
 		refresh = true;
 	});
-	controls.feature_action<void>("surface.toggle_freeze", [this](const auto&) {
+	controls.feature_action<void>("surface.toggle_freeze", [](const auto&) {
 		freeze = !freeze;
+	});
+	controls.feature_action<void>("surface.toggle_biome_blending", [](const auto&) {
+		blendBiomes = !blendBiomes;
+		changed = true;
 	});
 	controls.feature_action<void>("surface.toggle_wireframe", [](const auto&) {
 		enableWireframe = !enableWireframe;
@@ -173,6 +177,7 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 	controls.bind("surface.toggle_fog", "F6 [press]");
 	controls.bind("surface.toggle_skybox", "F7 [press]");
 	controls.bind("surface.toggle_freeze", "F8 [press]");
+	controls.bind("surface.toggle_biome_blending", "F9 [press]");
 
 	controls.bind("surface.cycle_config", "C [press]");
 

@@ -345,6 +345,16 @@ Shift<T> convertShift(const sol::object& object) {
 	return result;
 }
 
+template <typename T>
+Limit<T> convertLimit(const sol::object& object) {
+	const auto table = convertTable(object);
+
+	Limit<T> result;
+	result.soft = table["soft"];
+	result.hard = table["hard"];
+	return result;
+}
+
 VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	const auto table = convertTable(object);
 
@@ -352,10 +362,11 @@ VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	result.name = table["name"];
 	result.probability = table["probability"] != sol::type::number ? 1.f : table["probability"];
 	result.path = table["path"];
-	result.scale = convertRange<float>(table["scale"]);
-	result.hue = convertShift<float>(table["hue"]);
-	result.saturation = convertShift<float>(table["saturation"]);
-	result.value = convertShift<float>(table["value"]);
+	result.scale = table["scale"] == sol::type::nil ? Range<float>{0.01f, 0.02f} : convertRange<float>(table["scale"]);
+	//TODO: default value
+	result.hue = table["hue"] == sol::type::nil ? Shift<float>{0.f, 1.f} : convertShift<float>(table["hue"]);
+	result.saturation = table["saturation"] == sol::type::nil ? Shift<float>{1.0f, 0.1f} : convertShift<float>(table["saturation"]);
+	result.value = table["value"] == sol::type::nil ? Shift<float>{1.0f, 0.1f} : convertShift<float>(table["value"]);
 	return result;
 }
 
@@ -369,7 +380,9 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	Biome result;
 	result.name = table["name"];
 	result.coord = table["coord"];
-	result.cutOff = table["cutOff"];
+	result.handover = table["handover"] == sol::type::nil ? Limit<float>{0.35f, 0.25f} : convertLimit<float>(table["handover"]);
+	result.takeover = table["takeover"] == sol::type::nil ? Limit<float>{0.45f, 0.6f} : convertLimit<float>(table["takeover"]);
+//	result.cutOff = table["cutOff"];
 	result.dominance = table["dominance"] != sol::type::number ? 1.f : table["dominance"];
 	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
 	result.vegetation = convertVeggieTypes(table.get<sol::object>("vegetation"));
@@ -386,15 +399,15 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 
 	auto result = std::make_shared<Config>();
 	result->globalSeed = table["seed"]; // Global seed is optional
-	result->visualization = table["visualization"];
+//	result->visualization = table["visualization"];
 //	result->currentScene = table["currentScene"];
 	result->resolution = table["resolution"];
 	result->numChunks = table["numChunks"];
 	result->numVeggie = table["numVeggie"];
 	result->amplitude = table["amplitude"];
-	result->plantDistribution = table["plantDistribution"];
-	result->circleNumber = table["circleNumber"];
-	result->circleSize = table["circleSize"];
+//	result->plantDistribution = table["plantDistribution"];
+//	result->circleNumber = table["circleNumber"];
+//	result->circleSize = table["circleSize"];
 
 	result->fogIntensity = table["fogIntensity"].get_or(0.05f);
 	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));

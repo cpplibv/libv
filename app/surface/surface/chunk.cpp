@@ -155,11 +155,8 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
 		auto picker = BiomePicker();
 		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-		mix.blendForVeggies();
-		const auto& biome = mix.random(rngLocal);
-//		const auto& biome = mix.primary();
-//		const auto& biome = *config.biomes.begin();
-//		auto veggieType = std::optional<VeggieType>{biome.vegetation[0]};
+
+		const auto& biome = config.blendBiomes ? mix.random(rngLocal) : mix.primary();
 
 		if (auto veggie = mix.getRandomVeggie(biome, rngLocal)) {
 			veggie->pos = point;
@@ -209,7 +206,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //}
 
 std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
-	const auto chunkSize = libv::vec2f{2, 2};
+	const auto chunkSize = libv::vec2f{4, 4};
 	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;
@@ -259,7 +256,6 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 //				throw std::runtime_error(fmt::format("Biome not found: {}", std::to_underlying(biome)));
 			auto picker = BiomePicker();
 			auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-			const auto& biome = mix.primary();
 //			const auto& biome = mix.random(rng);
 //			auto weight = mix.primaryWeight();
 //			const auto forest = categorizeForest(wet);
@@ -268,8 +264,12 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 //							0.33f, getMin(0.33f, wet),
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
-			chunk->biomeMap(xi, yi) = mix.blendedColor(1.0f);
-//			chunk->biomeMap(xi, yi) = biome.colorGrad.sample(0.9f);
+			if (config.blendBiomes) {
+				chunk->biomeMap(xi, yi) = mix.blendedColor(1.0f);
+			} else {
+				const auto& biome = mix.primary();
+				chunk->biomeMap(xi, yi) = biome.colorGrad.sample(1.0f);
+			}
 
 //			chunk->biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
 //			chunk->surface(xi, yi) = SurfacePoint{chunk->height(xi, yi).pos + libv::vec3f{chunkPosition, 0},

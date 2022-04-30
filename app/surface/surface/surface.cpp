@@ -13,18 +13,6 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-//void SurfaceGen::buildChunk(size_t index, const Config& config) {
-//	const auto chunkIndex = libv::index_spiral(index).cast<int32_t>();
-//	std::unique_ptr<Chunk> chunk = chunkGen.generateChunk(config, chunkIndex);
-//	chunkGen.placeVegetation(chunk, config);
-//	// more log needed
-////		fmt::print("TimerChunkGen: {:8.4f} ms", timerChunkGen.timed_ms().count());
-////		std::cout << std::endl;
-//
-//	auto chunksLock = std::unique_lock(chunksGuard);
-//	readyChunks.emplace_back(std::move(chunk));
-//}
-
 void SurfaceGen::buildChunks(const std::shared_ptr<const Config>& config_sp) {
 	stopSource.request_stop();
 	stopSource = std::stop_source{};

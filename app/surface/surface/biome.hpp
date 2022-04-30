@@ -92,31 +92,22 @@ private:
 //	WeightedContainer<WeightedEntry> container;
 	std::vector<WeightedEntry> entries;
 
-private:
-	void normalize();
-
 public:
-	BiomeMix();
-
-	BiomeMix(std::vector<WeightedEntry> entries) : entries(std::move(entries)) {
+	explicit BiomeMix(std::vector<WeightedEntry>&& entries) : entries(std::move(entries)) {
 		normalize();
+		applyTakeover();
 	}
 
-	void blendForVeggies();
-//	void blendForTiles();
-//	void normalize();
-//	void replaceWithNullEntry(WeightedEntry& entry);
-//	void replaceOthersWithNullEntries(WeightedEntry& entry);
-//	[[nodiscard]] WeightedEntry& operator[](size_t index) {
-//		return container.entries[index];
-//	}
-
+public:
 	[[nodiscard]] const Biome& primary() noexcept;
 	[[nodiscard]] const Biome& random(libv::xoroshiro128& rng);
 	[[nodiscard]] libv::vec4f blendedColor(float fertility) noexcept;
-
-	[[nodiscard]] std::optional<VeggieType> getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng);
 	[[nodiscard]] std::optional<Veggie> getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng);
+
+private:
+	float normalize();
+	void applyTakeover();
+	[[nodiscard]] std::optional<VeggieType> getRandomVeggieType(const Biome& biome, libv::xoroshiro128& rng);
 
 };
 
@@ -127,8 +118,9 @@ private:
 		float weight;
 //		float distance_sq;
 		libv::vec2f point; // Hacky
-		CandidateBiome() {}
 
+	public:
+		CandidateBiome() {}
 		CandidateBiome(const Biome* biome, float weight, libv::vec2f point) :
 				biome(biome), weight(weight), point(point) {}
 
@@ -139,13 +131,11 @@ private:
 	};
 
 public:
-//	libv::flat_set<Biome> biomes;
 //	std::array<CandidateBiome, 4> output;
-//	libv::xoroshiro128 rng{123};
 
 public:
 	explicit BiomePicker();
-	Biome* emptyBiome();
+//	Biome* emptyBiome();
 
 	[[nodiscard]] BiomeMix mix(const libv::flat_set<Biome>& biomes, const libv::vec2f point);
 //	[[nodiscard]] BiomeMix veggieMix(const libv::flat_set<Biome>& biomes, const libv::vec2f point);

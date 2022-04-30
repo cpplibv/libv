@@ -4,13 +4,27 @@ require("config/common/nodes")
 
 -- -------------------------------------------------------------------------------------------------
 
+local global_handover = function()
+	return {
+		soft = 0.4,
+		hard = 0.1
+	}
+end
+
+local global_takeover = function()
+	return {
+		soft = 0.6,
+		hard = 0.8
+	}
+end
+
 config = {
 	seed = 123,
-	resolution = 64,
+	resolution = 128,
 	--numChunks = 9,
 	--numChunks = 81,
-	numChunks = 169,
-	numVeggie = 100,
+	numChunks = 81,
+	numVeggie = 200,
 	--numVeggie = 500,
 	--numVeggie = 1000,
 
@@ -21,9 +35,10 @@ config = {
 biomes = {
 	{
 		name = "red",
-		coord = vec2f(0.8, 0.7),
+		coord = vec2f(0.8, 0.0),
 		dominance = 1.0,
-		cutOff = vec2f(0.1, 0.4),
+		handover = global_handover(),
+		takeover = global_takeover(),
 		colorGrad = {
 			{ 0, "hsv(210, 10%, 98%)" },
 			{ 1, "#80302a" }
@@ -35,8 +50,8 @@ biomes = {
 				path = "resource/tundra_tree.xyz",
 				scale = range(0.025, 0.05),
 				hue = shift(0, 30), --0-360
-				saturation = shift(0.7, 0.2), --0-1
-				value = shift(0.7, 0.2), --0-1
+				saturation = shift(0.8, 0.1), --0-1
+				value = shift(0.8, 0.1), --0-1
 			},
 			{
 				name = "bush",
@@ -44,20 +59,21 @@ biomes = {
 				path = "resource/tundra_bush.xyz",
 				scale = range(0.015, 0.025),
 				hue = shift(0, 30), --0-360
-				saturation = full_saturation(), --0-1
-				value = full_value(), --0-1
+				saturation = shift(0.8,0.1), --0-1
+				value = shift(0.8,0.1), --0-1
 			},
 		}
 	},
 
 	{
 		name = "grassland",
-		coord = vec2f(0.7, 0.5),
+		coord = vec2f(0.6, 0.0),
 		dominance = 1.0,
-		cutOff = vec2f(0.1, 0.4),
+		handover = global_handover(),
+		takeover = global_takeover(),
 		colorGrad = {
 			{ 0, "hsv(121, 70%, 80%)" },
-			{ 1, "hsv(300, 70%, 80%)" }
+			{ 1, "hsv(121, 70%, 45%)" }
 		},
 		vegetation = {
 			{
@@ -65,73 +81,81 @@ biomes = {
 				probability = 0.2,
 				path = "resource/tundra_tree.xyz",
 				scale = range(0.025, 0.05),
-				hue = shift(53, 30), --0-360
-				saturation = full_saturation(), --0-1
-				value = full_value(), --0-1
+				hue = shift(100, 10), --0-360
+				saturation = shift(0.7,0.1), --0-1
+				value = shift(0.6,0.1), --0-1
 			},
 			{
 				name = "bush",
 				probability = 0.2,
 				path = "resource/tundra_bush.xyz",
 				scale = range(0.015, 0.025),
-				hue = shift(53, 30), --0-360
-				saturation = full_saturation(), --0-1
-				value = full_value(), --0-1
+				hue = shift(110, 30), --0-360
+				saturation = shift(0.75,0.1), --0-1
+				value = shift(0.75,0.1), --0-1
 			},
 		}
 	},
-	--{
-	--	name = "rocks",
-	--	coord = vec2f(0.3, 0.3),
-	--	dominance = 1.0,
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "hsv(36, 35%, 98%)" },
-	--		{ 1, "#737e9b" }
-	--	},
-	--	vegetation = {
-	--		--{
-	--		--	name = "tree",
-	--		--	color = "hsv(60, 80%, 100%)",
-	--		--	size = 0.05,
-	--		--	probability = 0.2,
-	--		--	--fertilityRange = vec2f{0.6, 1.0},
-	--		--	--color = "hsv(120, 60%, 100%)",
-	--		--},
-	--		{
-	--			name = "rock",
-	--			color = "#4b5e70",
-	--			size = 0.022,
-	--			probability = 0.2,
-	--		}
-	--	}
-	--},
-	--{
-	--	name = "alps",
-	--	coord = vec2f(0.1, 0.1),
-	--	dominance = 1.0,
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "#f0f3f7" },
-	--		{ 1, "#f0f3f7" }
-	--	},
-	--	vegetation = {
-	--		--{
-	--		--	name = "tree",
-	--		--	color = "hsv(60, 80%, 100%)",
-	--		--	size = 0.05,
-	--		--	probability = 0.2,
-	--		--	--fertilityRange = vec2f{0.6, 1.0},
-	--		--	--color = "hsv(120, 60%, 100%)",
-	--		--},
-	--		{
-	--			name = "rock",
-	--			color = "#b4c3de",
-	--			size = 0.022,
-	--			probability = 0.2,
-	--		}
-	--	}
-	--},
+	{
+		name = "rocks",
+		coord = vec2f(1.0, 0.0),
+		dominance = 1.0,
+		handover = global_handover(),
+		takeover = global_takeover(),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "hsv(240, 70%, 60%)" }
+		},
+		vegetation = {
+			--{
+			--	name = "tree",
+			--	color = "hsv(60, 80%, 100%)",
+			--	size = 0.05,
+			--	probability = 0.2,
+			--	--fertilityRange = vec2f{0.6, 1.0},
+			--	--color = "hsv(120, 60%, 100%)",
+			--},
+			{
+				name = "rock",
+				probability = 0.8,
+				path = "resource/tundra_rock.xyz",
+				scale = range(0.015, 0.025),
+				hue = shift(240, 10), --0-360
+				saturation = shift(0.5,0.1), --0-1
+				value = shift(0.9,0.1), --0-1
+			}
+		}
+	},
+	{
+		name = "alps",
+		coord = vec2f(0.4, 0.0),
+		dominance = 1.0,
+		handover = global_handover(),
+		takeover = global_takeover(),
+		colorGrad = {
+			{ 0, "#f0f3f7" },
+			{ 1, "hsv(40, 0%, 90%)" }
+		},
+		vegetation = {
+			--{
+			--	name = "tree",
+			--	color = "hsv(60, 80%, 100%)",
+			--	size = 0.05,
+			--	probability = 0.2,
+			--	--fertilityRange = vec2f{0.6, 1.0},
+			--	--color = "hsv(120, 60%, 100%)",
+			--},
+			{
+				name = "rock",
+				probability = 0.8,
+				path = "resource/tundra_rock.xyz",
+				scale = range(0.015, 0.025),
+				hue = shift(300, 10), --0-360
+				saturation = shift(0.1,0.1), --0-1
+				value = shift(0.4,0.1), --0-1
+			}
+		}
+	},
 }
 
 height = {
@@ -238,7 +262,7 @@ height = {
 
 temperature = {
 	name = "temperature",
-	heightSensitivity = 3, --//200m-kent 1 fok
+	heightSensitivity = 0.4, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
@@ -249,13 +273,13 @@ temperature = {
 			simplexFractal {
 				seed = 1,
 				octaves = 6,
-				amplitude = 0.1,
-				frequency = 0.5,
+				amplitude = 0.2,
+				frequency = 0.2,
 				lacunarity = 2.0,
 				persistence = 0.5,
 			},
 			constant {
-				value = 0.9
+				value = 0.7
 			}
 		}
 	}
@@ -270,15 +294,15 @@ humidity = {
 	},
 	nodes = --add {
 	add {
-		simplexFractal {
-			seed = 103421,
-
-			octaves = 6,
-			amplitude = 0.1,
-			frequency = 0.5,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
+		--simplexFractal {
+		--	seed = 103421,
+		--
+		--	octaves = 6,
+		--	amplitude = 0.2,
+		--	frequency = 0.5,
+		--	lacunarity = 2.0,
+		--	persistence = 0.5,
+		--},
 		--cellular {
 		--	seed = 123,
 		--	distanceFn = DistFun.euclidean,
@@ -288,7 +312,7 @@ humidity = {
 		--	jitter = 1,
 		--},
 		constant {
-			value = 0.2
+			value = 0.0
 		},
 	}
 }
