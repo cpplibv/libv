@@ -6,6 +6,8 @@
 #include <libv/fsw/watcher.hpp>
 // ext
 #include <efsw/efsw.hpp>
+// libv
+#include <libv/mt/worker_thread.hpp>
 // std
 //#include <filesystem>
 #include <functional>
@@ -58,6 +60,8 @@ public:
 	std::unordered_map<std::string, DirectoryCluster> directories;
 
 	std::optional<efsw::FileWatcher> efsw_watcher;
+
+	libv::mt::worker_thread handle_dispatch_thread{"fsw/dispatch"};
 
 private:
 	/// @param watchid The watch id for the directory

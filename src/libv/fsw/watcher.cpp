@@ -356,7 +356,15 @@ void ImplWatcher::handleFileAction(efsw::WatchID id, const std::string& dir, con
 	normal_old_path = std::filesystem::absolute(normal_old_path, ignore_ec);
 	normal_old_path.make_preferred();
 
-	_handle_file_action(*this, normal_action, normal_path, normal_old_path);
+	// NOTE: A dispatcher thread has to be used as EFSW holds an internal mutex during this callback
+	//			which could cause any EFSW call from any other source to deadlock (real scenario)
+	handle_dispatch_thread.execute_async([
+			this,
+			normal_action,
+			normal_path = std::move(normal_path),
+			normal_old_path = std::move(normal_old_path)] {
+		_handle_file_action(*this, normal_action, normal_path, normal_old_path);
+	});
 }
 
 Watcher::Watcher() :
@@ -378,8 +386,10 @@ Watcher::~Watcher() {
 		self->directories.clear();
 	}
 
-	// Force EFSW to clean itself up and clear any ongoing callback (handleFileAction) to finish
+	// Force EFSW to clean itself up and hand over any ongoing callback (handleFileAction) to the dispatch thread
 	self->efsw_watcher.reset();
+
+	// handle_dispatch_thread destructor will make sure everything is dispatched
 }
 
 Watcher::token_type Watcher::subscribe_file(std::filesystem::path path, callback_type callback) {

@@ -1094,7 +1094,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_fsw
 	SOURCE sandbox/libv_fsw_main.cpp
-	LINK   libv_fsw Threads::Threads
+	LINK   libv_fsw libv_mt Threads::Threads
 )
 
 wish_create_executable(
