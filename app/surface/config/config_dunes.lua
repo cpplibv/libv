@@ -10,6 +10,7 @@ config = {
 	--numChunks = 9,
 	--numChunks = 81,
 	numChunks = 169,
+	--numChunks = 369,
 	numVeggie = 100,
 	--numVeggie = 500,
 	--numVeggie = 1000,
@@ -89,7 +90,7 @@ biomes = {
 				name = "rock",
 				color = "hsv(69, 10%, 60%)",
 				size = 0.022,
-				probability = 0.2,
+				probability = 0.002,
 			}
 		}
 	},

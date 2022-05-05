@@ -143,6 +143,7 @@ public:
 	void bakeSprites(libv::rev::ResourceManager& loader, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 
 public:
+	void clear();
 	void add(int32_t type, libv::vec3f position);
 
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);

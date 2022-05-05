@@ -111,6 +111,10 @@ void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::
 	}
 }
 
+void RendererSprite::clear() {
+	entries.clear();
+}
+
 void RendererSprite::add(int32_t type, libv::vec3f position) {
 	entries.emplace_back(type, position);
 	dirty = true;

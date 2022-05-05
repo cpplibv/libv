@@ -95,7 +95,11 @@ struct SurfaceScene : Scene {
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 //		rendererVeggie.clear_spheres();
 		for (const auto& chunk : chunks)
-			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, true);
+			for (const auto& veggie : chunk->veggies) {
+				renderer.sprite.add(0, veggie.pos);
+//				renderer.sprite.add(0, libv::vec3f(chunk->position, 0) + veggie.pos);
+//			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, true);
+			}
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
@@ -110,7 +114,6 @@ inline libv::glr::Texture createTexture(const libv::vector_2D<float>& heatmap) {
 	texturef.set(libv::gl::MinFilter::Nearest);
 	texturef.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
 	return texturef;
-
 }
 
 inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heatmap) {
@@ -120,7 +123,6 @@ inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heat
 	texturef.set(libv::gl::MinFilter::Nearest);
 	texturef.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
 	return texturef;
-
 }
 
 struct TextureScene : Scene {
@@ -136,7 +138,12 @@ struct TextureScene : Scene {
 
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 		for (const auto& chunk : chunks)
-			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, false);
+			for (const auto& veggie : chunk->veggies) {
+				renderer.sprite.add(0, veggie.pos);
+//				renderer.sprite.add(0, libv::vec3f(chunk->position, 0) + veggie.pos);
+//				spheres.emplace_back(veggie.pos, veggie.scale, libv::vec4f{libv::color::hsv_to_rgb(veggie.hsv_color_shift), 1.f}, 6, 6);
+			}
+//			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {

@@ -7,6 +7,14 @@
 
 Sprites:
 	fog
+	normals
+	lighting
+
+	normal normal for lighting
+	model "normal" / up vector
+	surface normals for additional fake lighting based on the hills
+
+	cleanup shaders, there is a lot of space conversioness
 
 	gs: UB on atan2 if x == 0
 

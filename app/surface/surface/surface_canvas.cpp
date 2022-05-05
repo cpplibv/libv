@@ -169,19 +169,24 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 		conf->blendBiomes = blendBiomes;
 
+		renderer.sprite.clear();
+
 		renderer.sky.fogIntensity = conf->fogIntensity;
 		renderer.sky.fogColor = conf->fogColor;
-		renderer.veggie.fogIntensity = conf->fogIntensity;
-		renderer.veggie.fogColor = conf->fogColor;
+//		renderer.sprite.fogIntensity = conf->fogIntensity;
+//		renderer.sprite.fogColor = conf->fogColor;
 		renderer.surface.fogIntensity = conf->fogIntensity;
 		renderer.surface.fogColor = conf->fogColor;
+		renderer.veggie.fogIntensity = conf->fogIntensity;
+		renderer.veggie.fogColor = conf->fogColor;
 
 		surface->gen(std::move(conf));
 	}
 
 	renderer.sky.fogEnabled = enableFog;
-	renderer.veggie.fogEnabled = enableFog;
+//	renderer.sprite.fogEnabled = enableFog;
 	renderer.surface.fogEnabled = enableFog;
+	renderer.veggie.fogEnabled = enableFog;
 
 	surfaceDirty = surface->update();
 }
@@ -204,17 +209,18 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			renderer.sprite.registerSprite("tree_01.vm4", 1.f / 66.85f);
+			renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
 			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 0.5f / 66.85f);
 			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
 
-			for (int x = 0; x < 10; ++x) {
-				for (int y = 0; y < 10; ++y) {
-					const auto xf = static_cast<float>(x);
-					const auto yf = static_cast<float>(y);
-					renderer.sprite.add(x % 2 == 0, {xf, yf, 0.f});
-				}
-			}
+//			for (int x = 0; x < 10; ++x) {
+//				for (int y = 0; y < 10; ++y) {
+//					const auto xf = static_cast<float>(x);
+//					const auto yf = static_cast<float>(y);
+//					renderer.sprite.add(x % 2 == 0, {xf, yf, 0.f});
+////					renderer.sprite.add(0, {xf, yf, 0.f}, hsv_shift, normal, rotation);
+//				}
+//			}
 		}
 
 		//build mesh
