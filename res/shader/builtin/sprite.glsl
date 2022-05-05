@@ -10,6 +10,7 @@ struct GeometryData {
 	vec3 up;
 
 	int type;
+	float fogFactor;
 
 //	vec4 color;
 //	float segmentPosition;
@@ -28,6 +29,7 @@ struct FragmentData {
 	float dither1;
 
 	float type;
+	float fogFactor;
 
 //	vec3 eyeDir;
 //	vec2 part_uv;

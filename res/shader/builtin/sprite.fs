@@ -9,8 +9,11 @@ in FragmentData fs_in;
 
 out vec4 result;
 
+
 uniform sampler2DArray textureColor;
 uniform sampler2DArray textureNormal;
+
+uniform vec4 fogColor = vec4(0.7, 0.8, 0.9, 1.0);
 
 
 // -------------------------------------------------------------------------------------------------
@@ -92,7 +95,7 @@ void main() {
 
 	// --- Fog ---
 
-//	result.rgb = mix(result.rgb, fogColor.rgb, fragmentFogFactor);
+	color.rgb = mix(color.rgb, fogColor.rgb, fs_in.fogFactor);
 
 	// --- Result / Debug
 

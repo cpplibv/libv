@@ -173,8 +173,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 		renderer.sky.fogIntensity = conf->fogIntensity;
 		renderer.sky.fogColor = conf->fogColor;
-//		renderer.sprite.fogIntensity = conf->fogIntensity;
-//		renderer.sprite.fogColor = conf->fogColor;
+		renderer.sprite.fogIntensity = conf->fogIntensity;
+		renderer.sprite.fogColor = conf->fogColor;
 		renderer.surface.fogIntensity = conf->fogIntensity;
 		renderer.surface.fogColor = conf->fogColor;
 		renderer.veggie.fogIntensity = conf->fogIntensity;
@@ -184,7 +184,7 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	}
 
 	renderer.sky.fogEnabled = enableFog;
-//	renderer.sprite.fogEnabled = enableFog;
+	renderer.sprite.fogEnabled = enableFog;
 	renderer.surface.fogEnabled = enableFog;
 	renderer.veggie.fogEnabled = enableFog;
 

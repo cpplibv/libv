@@ -80,6 +80,7 @@ void main() {
 //	fs_in.dither0 = fract(angleZ / 3.14 * 2.0 * 8.0);
 //	fs_in.dither1 = fract(angleXY / 3.14 / 2.0 * 16.0);
 	fs_in.type = vs_out[0].type;
+	fs_in.fogFactor = vs_out[0].fogFactor;
 
 	// v1
 	fs_in.color = vec4(1, 0, 0, 1);

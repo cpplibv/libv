@@ -127,7 +127,9 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 		return;
 
 	glr.program(shader.program());
-
+	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
+	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
+	glr.uniform(shader.uniform().fogColor, fogColor);
 	auto block_matrices = uniform_stream.block_shared(layout_matrices);
 	block_matrices[layout_matrices.matMVP] = glr.mvp();
 	block_matrices[layout_matrices.matM] = glr.model;

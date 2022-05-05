@@ -63,9 +63,17 @@ struct UniformsSprite {
 	libv::glr::Uniform_texture textureColor;
 	libv::glr::Uniform_texture textureNormal;
 
+	libv::glr::Uniform_bool fogEnabled;
+	libv::glr::Uniform_float fogIntensity;
+	libv::glr::Uniform_vec4f fogColor;
+
 	template <typename Access> void access_uniforms(Access& access) {
 		access(textureColor, "textureColor", textureChannel_diffuse);
 		access(textureNormal, "textureNormal", textureChannel_normal);
+
+		access(fogEnabled, "fogEnabled", true);
+		access(fogIntensity, "fogIntensity", 0.05f);
+		access(fogColor, "fogColor", libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f});
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -96,9 +104,7 @@ struct SpriteDefinition {
 struct SpriteAtlas {
 	std::vector<SpriteDefinition> definitions;
 	libv::glr::Texture2DArray::R8_G8_B8_A8 textureColor;
-//	libv::glr::Texture2DArray::R8_G8_B8 textureNormal;
 	libv::glr::Texture2DArray::R8_G8_B8 textureNormal;
-//	libv::glr::Texture2DArray::RGB16F textureNormal;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -132,6 +138,11 @@ private:
 	std::vector<Entry> entries;
 	bool dirty = false;
 	bool active = false;
+
+public:
+	bool fogEnabled = true;
+	float fogIntensity = 0.05f;
+	libv::vec4f fogColor = libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};
 
 public:
 	explicit RendererSprite(libv::rev::ResourceManager& loader);
