@@ -37,6 +37,7 @@ public:
 	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteTextures(1, &object.id);
+		gl.cleanupDestroyedTextureID(object.target, object.id);
 		object.id = 0;
 		checkGL();
 	}

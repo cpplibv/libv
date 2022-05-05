@@ -836,6 +836,8 @@ public:
 
 	inline Texture boundTexture(TextureTarget target) noexcept;
 
+	inline void cleanupDestroyedTextureID(TextureTarget target, uint32_t id) noexcept;
+
 public:
 	inline void useProgram(const Program& program) noexcept;
 	inline Program boundProgram() noexcept;
@@ -1012,6 +1014,14 @@ inline Texture GL::boundTexture(TextureTarget target) noexcept {
 	std::size_t targetID = convertToTargetIndex(target);
 
 	return Texture{textureBindings[targetID][libv::to_value(currentActiveTexture)], target};
+}
+
+inline void GL::cleanupDestroyedTextureID(TextureTarget target, uint32_t id) noexcept {
+	std::size_t targetID = convertToTargetIndex(target);
+
+	for (auto& activeID : textureBindings[targetID])
+		if (activeID == id)
+			activeID = 0;
 }
 
 // -------------------------------------------------------------------------------------------------
