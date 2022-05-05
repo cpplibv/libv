@@ -18,14 +18,14 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsSpriteBakerDownsample {
-	libv::glr::Uniform_texture texture0;
+	libv::glr::Uniform_texture textureColor;
+	libv::glr::Uniform_texture textureNormal;
 	libv::glr::Uniform_int32 ssaaSamples;
-	libv::glr::Uniform_bool isColor;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", textureChannel_diffuse);
+		access(textureColor, "textureColor", textureChannel_diffuse);
+		access(textureNormal, "textureNormal", textureChannel_normal);
 		access(ssaaSamples, "ssaaSamples");
-		access(isColor, "isColor");
 	}
 
 	template <typename Access> void access_blocks(Access& access) {

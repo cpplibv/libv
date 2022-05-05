@@ -149,10 +149,8 @@ void BakerSpriteAtlas::bake(SpriteAtlas& atlas, uint32_t index,
 	glr.state.depthFunctionLess();
 
 	glr.framebuffer_draw(bakeMSFBO);
-//		glr.setClearColor(1, 1, 1, 1);
-	glr.setClearColor(0, 0, 0, 0);
-	glr.clearColor();
-	glr.clearDepth();
+	glr.setClearColor(0.5f, 0.5f, 0.5f, 0);
+	glr.clearColorDepth();
 
 	// --- Render ---
 
@@ -181,33 +179,22 @@ void BakerSpriteAtlas::bake(SpriteAtlas& atlas, uint32_t index,
 	// --- Upsample ---
 
 	// GLR doesn't support temporal flux on resources, so 2 temporary framebuffer has to be created for each sprite atlas
-	libv::glr::Framebuffer resultFBOColor;
-	libv::glr::Framebuffer resultFBONormal;
+	libv::glr::Framebuffer resultFBO;
 
-	resultFBOColor.attach2D(libv::gl::Attachment::Color0, atlas.textureColor, 0, index);
-	resultFBONormal.attach2D(libv::gl::Attachment::Color0, atlas.textureNormal, 0, index);
+	resultFBO.attach2D(libv::gl::Attachment::Color0, atlas.textureColor, 0, index);
+	resultFBO.attach2D(libv::gl::Attachment::Color1, atlas.textureNormal, 0, index);
 
-	glr.setClearColor(0, 0, 0, 0);
+	glr.framebuffer_draw(resultFBO);
+	// No need to clear, depth test or blend: full screen quad will override everything
 	glr.state.disableDepthTest();
 	glr.state.disableDepthMask();
 	glr.state.disableBlend();
-//	glr.state.blendSrc_One();
-//	glr.state.blendDst_Zero();
 
 	{
-		glr.framebuffer_draw(resultFBOColor);
 		glr.program(shaderSpriteBakerDownsample.program());
-		glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, true);
 		glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
 		glr.texture(bakeSSColor, textureChannel_diffuse);
-		glr.render_full_screen();
-	}
-	{
-		glr.framebuffer_draw(resultFBONormal);
-		glr.program(shaderSpriteBakerDownsample.program());
-		glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, false);
-		glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
-		glr.texture(bakeSSNormal, textureChannel_diffuse);
+		glr.texture(bakeSSNormal, textureChannel_normal);
 		glr.render_full_screen();
 	}
 

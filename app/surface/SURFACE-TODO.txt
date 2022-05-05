@@ -22,10 +22,6 @@ Sprites:
 		dither: sprite random + sprite pos based viewport position, so, combine this two
 
 	Sprite
-		There is a startup crash, but could not identify it so far
-			| Manual stress tested came back negative
-			| MAYBE its just the shader load/reload deadlock
-
 		Render:
 			proper angle calculation
 				(also there is an error with direct down looking, atan/asin fails)
@@ -45,10 +41,6 @@ Sprites:
 			use real model AABB
 			on the sprite atlas edge, there is a smudge
 				? drop one half pixel from the UV
-
-			originally baked normal map should be cleared with 0.5, 0.5, 0.5 first
-				fix upsampling normals, renomalize them
-			OR use a signed internal format for normals?
 
 
 vec2f lua convert function is buggy

@@ -48,4 +48,6 @@ void main() {
 	resultColor = color;
 //	resultColor = vec4(1, 1, 1, 1);
 	resultNormal = vec4(N * 0.5 + 0.5, 1);
+//	resultNormal = vec4(N, 1);
+//	resultNormal = vec4(.5, .5, 1, 1);
 }

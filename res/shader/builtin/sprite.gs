@@ -84,24 +84,28 @@ void main() {
 	// v1
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 0);
+	fs_in.positionW = (matM * vec4(center + right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1)).xyz;
 	gl_Position = matMVP * vec4(center + right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v2
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 1);
+	fs_in.positionW = (matM * vec4(center + right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1)).xyz;
 	gl_Position = matMVP * vec4(center + right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v0
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 0);
+	fs_in.positionW = (matM * vec4(center - right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1)).xyz;
 	gl_Position = matMVP * vec4(center - right * 0.5 * def.model_scale - up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 
 	// v3
 	fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 1);
+	fs_in.positionW = (matM * vec4(center - right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1)).xyz;
 	gl_Position = matMVP * vec4(center - right * 0.5 * def.model_scale + up * 0.5 * def.model_scale, 1);
 	EmitVertex();
 

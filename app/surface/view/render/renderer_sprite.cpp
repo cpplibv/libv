@@ -60,14 +60,14 @@ void RendererSprite::updateMesh() {
 		index(i);
 }
 
-void RendererSprite::clearSprites() {
-	spriteTypes.clear();
-}
-
 int32_t RendererSprite::registerSprite(std::string modelPath, float sizeMultiplier) {
-	spriteTypes.emplace_back(modelPath, sizeMultiplier);
+	spriteTypes.emplace_back(std::move(modelPath), sizeMultiplier);
 
 	return static_cast<int32_t>(spriteTypes.size()) - 1;
+}
+
+void RendererSprite::clearSprites() {
+	spriteTypes.clear();
 }
 
 void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
@@ -94,7 +94,6 @@ void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::
 
 	spriteDefinitionsBlock = uniform_stream.block_shared(layout_definitions);
 	for (uint32_t i = 0; i < spriteTypes.size(); ++i) {
-//		spriteTypes[i].sizeMultiplier;
 		const auto& def = spriteAtlas->definitions[i];
 
 		spriteDefinitionsBlock[layout_definitions.spriteDefinitions[i].tile_size] = def.tile_size;

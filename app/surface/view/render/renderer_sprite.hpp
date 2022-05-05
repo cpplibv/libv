@@ -96,7 +96,9 @@ struct SpriteDefinition {
 struct SpriteAtlas {
 	std::vector<SpriteDefinition> definitions;
 	libv::glr::Texture2DArray::R8_G8_B8_A8 textureColor;
+//	libv::glr::Texture2DArray::R8_G8_B8 textureNormal;
 	libv::glr::Texture2DArray::R8_G8_B8 textureNormal;
+//	libv::glr::Texture2DArray::RGB16F textureNormal;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -138,8 +140,8 @@ private:
 	void updateMesh();
 
 public:
-	void clearSprites();
 	int32_t registerSprite(std::string modelPath, float sizeMultiplier);
+	void clearSprites();
 	void bakeSprites(libv::rev::ResourceManager& loader, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 
 public:

@@ -20,6 +20,7 @@ struct GeometryData {
 };
 
 struct FragmentData {
+	vec3 positionW;
 	vec4 color;
 	vec2 uv;
 	vec2 tile_index;
