@@ -93,9 +93,9 @@ public:
 
 	/// Returns a quaternion such that: quat * start = dest
 	/// Based on: http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
-	[[nodiscard]] static constexpr inline quat_t from_non_unit_vectors(vec3_t<T> u, vec3_t<T> v) noexcept {
-		vec3_t<T> w = cross(u, v);
-		quat_t q = quat_t(dot(u, v), w.x, w.y, w.z);
+	[[nodiscard]] static constexpr inline quat_t from_non_unit_vectors(vec3_t<T> start, vec3_t<T> dest) noexcept {
+		vec3_t<T> w = cross(start, dest);
+		quat_t q = quat_t(dot(start, dest), w.x, w.y, w.z);
 		q.w += q.length();
 		return q.normalize();
 	}
