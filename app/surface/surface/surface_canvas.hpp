@@ -41,7 +41,7 @@ inline SceneType previousScene = currentScene;
 
 inline bool enableWireframe = false;
 inline bool enableVegetation = true;
-inline bool enableGrid = true;
+inline bool enableGrid = false;
 inline bool enableFog = true;
 inline bool enableSkybox = true;
 
@@ -93,12 +93,12 @@ struct SurfaceScene : Scene {
 	}
 
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-//		rendererVeggie.clear_spheres();
+		int type = 0;
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies) {
-				renderer.sprite.add(0, veggie.pos);
-//				renderer.sprite.add(0, libv::vec3f(chunk->position, 0) + veggie.pos);
-//			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, true);
+				type = (type + 1) % 5;
+//				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
 			}
 	}
 
@@ -112,6 +112,7 @@ inline libv::glr::Texture createTexture(const libv::vector_2D<float>& heatmap) {
 	texturef.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
 	texturef.set(libv::gl::MagFilter::Nearest);
 	texturef.set(libv::gl::MinFilter::Nearest);
+	texturef.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
 	texturef.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
 	return texturef;
 }
@@ -139,11 +140,8 @@ struct TextureScene : Scene {
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies) {
-				renderer.sprite.add(0, veggie.pos);
-//				renderer.sprite.add(0, libv::vec3f(chunk->position, 0) + veggie.pos);
-//				spheres.emplace_back(veggie.pos, veggie.scale, libv::vec4f{libv::color::hsv_to_rgb(veggie.hsv_color_shift), 1.f}, 6, 6);
+				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
 			}
-//			renderer.veggie.addVeggies(generation, chunk->index, chunk->position, chunk->size, chunk->veggies, false);
 	}
 
 //	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {

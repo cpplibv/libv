@@ -1,15 +1,15 @@
 #version 330 core
 
+#include <block/matrices.glsl>
 #include <builtin/sprite.glsl>
 #include <lib/fog.glsl>
-#include <rev_sandbox/block/matrices.glsl>
 
 
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
-//layout(location = 11) in vec3 vertexHSVColorShift;
-//layout(location = 12) in vec2 vertexRotationHeight;
+layout(location = 2) in vec4 vertexHSVColorShift;
 layout(location = 13) in int vertexType;
+layout(location = 15) in vec2 vertexRotationScale;
 
 out GeometryData vs_out;
 
@@ -28,7 +28,10 @@ void main() {
 //	vs_out.positionW = vertexPosition; // Used?
 	vs_out.type = vertexType;
 
-	vs_out.normalW = normalize((matM * vec4(0, 0, 1, 1)).xyz);
+	vs_out.normalUp = vertexNormal;
+	vs_out.rotation = vertexRotationScale.x;
+	vs_out.scale = vertexRotationScale.y;
+	vs_out.hsvColorShift = vertexHSVColorShift;
 
 	// --- Fog ---
 

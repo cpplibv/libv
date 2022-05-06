@@ -55,6 +55,9 @@ InternalModel::InternalModel(const libv::vm4::Model& model, const MaterialLoader
 }
 
 void InternalModel::load_mesh(const libv::vm4::Model& vm4) {
+	AABB_max = vm4.AABB_max;
+	AABB_min = vm4.AABB_min;
+
 	glrMesh = libv::glr::Mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	auto position = glrMesh.attribute(attribute_position);

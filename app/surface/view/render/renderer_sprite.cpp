@@ -36,25 +36,33 @@ void RendererSprite::updateMesh() {
 
 	// --- Mesh
 
-	auto position = mesh.attribute(attribute_position);
 	auto type = mesh.attribute(attribute_type);
-//		auto normal = mesh.attribute(attribute_normal);
+	auto position = mesh.attribute(attribute_position);
+	auto normal = mesh.attribute(attribute_normal);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto rotation_scale = mesh.attribute(attribute_custom0_f2);
 
 	auto index = mesh.index();
-
-	position.reserve(entries.size());
-	for (const auto& vertex : entries)
-		position(vertex.position);
 
 	type.reserve(entries.size());
 	for (const auto& vertex : entries)
 		type(vertex.type);
 
-//		normal.reserve(entries.size());
-//		for (const auto& vertex : entries)
-//			normal(vertex.normal);
+	position.reserve(entries.size());
+	for (const auto& vertex : entries)
+		position(vertex.position);
 
-//		auto position = mesh.attribute();
+	normal.reserve(entries.size());
+	for (const auto& vertex : entries)
+		normal(vertex.normal);
+
+	rotation_scale.reserve(entries.size());
+	for (const auto& vertex : entries)
+		rotation_scale(vertex.rotation, vertex.scale);
+
+	color0.reserve(entries.size());
+	for (const auto& vertex : entries)
+		color0(libv::vec4f(vertex.hsv_color_shift, 1.f));
 
 	for (uint32_t i = 0; i < entries.size(); ++i)
 		index(i);
@@ -114,8 +122,8 @@ void RendererSprite::clear() {
 	entries.clear();
 }
 
-void RendererSprite::add(int32_t type, libv::vec3f position) {
-	entries.emplace_back(type, position);
+void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_color_shift) {
+	entries.emplace_back(type, position, normal, rotation, scale, hsv_color_shift);
 	dirty = true;
 }
 

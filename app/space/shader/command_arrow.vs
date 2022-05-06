@@ -1,7 +1,7 @@
 #version 330 core
 
-#include <command_arrow.glsl>
 #include <block/matrices.glsl>
+#include <command_arrow.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 2) in vec4 vertexColor;

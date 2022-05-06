@@ -3,6 +3,8 @@
 #include <block/matrices.glsl>
 #include <builtin/sprite.glsl>
 #include <builtin/sprite_definition.glsl>
+#include <lib/color.glsl>
+#include <lib/quat.glsl>
 
 
 in FragmentData fs_in;
@@ -68,11 +70,16 @@ void main() {
 	vec4 color = texture(textureColor, vec3(tile_origin + uv * tile_size, fs_in.type)).rgba;
 //	vec3 normal = normalize(texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f);
 	vec3 normal = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f;
+	normal = qrotate(fs_in.rotationQuat, normal);
 
 	if (color.a < 0.49)
 		discard;
 
 	color.a = 1;
+
+	// --- HSV Color Shift ---
+
+	color.rgb = hsv_to_rgb(normalize_hsv(rgb_to_hsv(color.rgb) + fs_in.hsvColorShift.rgb));
 
 	// --- Fake lighting ---
 

@@ -362,11 +362,11 @@ VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	result.name = table["name"];
 	result.probability = table["probability"] != sol::type::number ? 1.f : table["probability"];
 	result.path = table["path"];
-	result.scale = table["scale"] == sol::type::nil ? Range<float>{0.01f, 0.02f} : convertRange<float>(table.get<sol::object>("scale"));
+	result.scale = table["scale"] == sol::type::nil ? Range<float>{0.5f, 2.0f} : convertRange<float>(table.get<sol::object>("scale"));
 	//TODO: default value
 	result.hue = table["hue"] == sol::type::nil ? Shift<float>{0.f, 1.f} : convertShift<float>(table.get<sol::object>("hue"));
-	result.saturation = table["saturation"] == sol::type::nil ? Shift<float>{1.0f, 0.1f} : convertShift<float>(table.get<sol::object>("saturation"));
-	result.value = table["value"] == sol::type::nil ? Shift<float>{1.0f, 0.1f} : convertShift<float>(table.get<sol::object>("value"));
+	result.saturation = table["saturation"] == sol::type::nil ? Shift<float>{0.0f, 0.1f} : convertShift<float>(table.get<sol::object>("saturation"));
+	result.value = table["value"] == sol::type::nil ? Shift<float>{0.0f, 0.1f} : convertShift<float>(table.get<sol::object>("value"));
 	return result;
 }
 

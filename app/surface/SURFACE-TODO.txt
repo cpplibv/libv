@@ -5,16 +5,14 @@
 === Stack =======================================================================================
 
 
-Sprites:
-	fog
-	normals
-	lighting
 
-	normal normal for lighting
-	model "normal" / up vector
+scene change does not clear sprites just adds a new batch
+
+
+Sprites:
 	surface normals for additional fake lighting based on the hills
 
-	cleanup shaders, there is a lot of space conversioness
+	cleanup shaders, there is a lot of space conversioness in vs->gs
 
 	gs: UB on atan2 if x == 0
 

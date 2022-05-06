@@ -114,10 +114,10 @@ private:
 	struct Entry {
 		int32_t type;
 		libv::vec3f position;
-		//libv::vec3f normal;
-		//float rotation;
-		//float height or scale;
-		//libv::vec3f hsv_color_shift;
+		libv::vec3f normal;
+		float rotation;
+		float scale;
+		libv::vec3f hsv_color_shift;
 	};
 
 	struct SpriteType {
@@ -157,7 +157,7 @@ public:
 
 public:
 	void clear();
-	void add(int32_t type, libv::vec3f position);
+	void add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_color_shift);
 
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };

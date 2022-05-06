@@ -49,7 +49,7 @@ enum class VeggieClass {
 //};
 
 using VeggieId = int32_t;
-inline VeggieId globalId = 0;
+//inline VeggieId globalId = 0;
 
 class Veggie {
 public:
@@ -57,9 +57,9 @@ public:
 
 	//id
 	libv::vec3f pos;
-	//vec3 normal vector (up) / kvaternio
-	libv::vec3f normal;
+	libv::vec3f normal; // = {0, 0, 1};
 	float rotation;
+	// Normal + rotation = quaternion?
 	float scale;
 	//clamp during randomization, except hue <- modf
 	libv::vec3f hsv_color_shift;
@@ -67,7 +67,7 @@ public:
 	VeggieType type;
 
 public:
-	Veggie(VeggieId id, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type);
+	Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type);
 };
 
 

@@ -23,10 +23,10 @@ vec4 qmul(const vec4 lhs, const float rhs) {
 
 vec4 qmul(const vec4 lhs, const vec4 rhs) {
 	return vec4(
-		lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, // X
-		lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, // Y
-		lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, // Z
-		lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z  // W
+			lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, // X
+			lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, // Y
+			lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, // Z
+			lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z  // W
 	);
 }
 
@@ -52,10 +52,10 @@ float qdot(const vec4 lhs, const vec4 rhs) {
 
 vec4 qcross(const vec4 lhs, const vec4 rhs) {
 	return vec4(
-		lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, // X
-		lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, // Y
-		lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, // Z
-		lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z  // W
+			lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, // X
+			lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, // Y
+			lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, // Z
+			lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z  // W
 	);
 }
 
@@ -107,13 +107,15 @@ vec4 qfromNonUnitVectors(const vec3 start, const vec3 dest) {
 	return qnormalize(q);
 }
 
+/// A given angle of rotation about a given axis
+/// @param axis - unit vector
+vec4 qAngleAxis(float angle, vec3 axis) {
+	float sn = sin(angle * 0.5);
+	float cs = cos(angle * 0.5);
+	return vec4(axis * sn, cs);
+}
+
 // -------------------------------------------------------------------------------------------------
 
-// A given angle of rotation about a given axis
-//vec4 rotate_angle_axis(float angle, vec3 axis) {
-//	float sn = sin(angle * 0.5);
-//	float cs = cos(angle * 0.5);
-//	return vec4(axis * sn, cs);
-//}
 //vec4 qlookat(vec3 forward, vec3 up);
 //vec4 qslerp(vec4 a, vec4 b, float t);

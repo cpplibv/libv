@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/glr/fwd.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/vm4/fwd.hpp>
 // pro
@@ -35,6 +36,13 @@ public:
 
 public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const;
+
+public:
+	[[nodiscard]] bool isLoaded() const noexcept;
+	/// Requires loaded state
+	[[nodiscard]] libv::vec3f AABB_max() const noexcept;
+	/// Requires loaded state
+	[[nodiscard]] libv::vec3f AABB_min() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

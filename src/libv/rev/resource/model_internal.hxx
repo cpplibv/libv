@@ -47,6 +47,10 @@ public:
 	std::weak_ptr<InternalModelLoader> loader_;
 
 public:
+	libv::vec3f AABB_max;
+	libv::vec3f AABB_min;
+
+public:
 	inline InternalModel(
 			std::weak_ptr<InternalModelLoader> loader,
 			std::string name,

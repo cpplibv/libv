@@ -4,6 +4,17 @@ require("config/common/nodes")
 
 -- -------------------------------------------------------------------------------------------------
 
+local global_handover = {
+	soft = 0.2,
+	hard = 0.1
+}
+
+local global_takeover = {
+	soft = 0.35,
+	hard = 0.6
+}
+
+
 config = {
 	seed = 0,
 	resolution = 64,
@@ -11,11 +22,11 @@ config = {
 	--numChunks = 81,
 	numChunks = 169,
 	--numChunks = 369,
-	numVeggie = 100,
+	numVeggie = 150,
 	--numVeggie = 500,
 	--numVeggie = 1000,
 
-	fogIntensity = 0.05,
+	fogIntensity = 0.03,
 	fogColor = "rgb(0.7, 0.9, 0.8)";
 }
 
@@ -48,23 +59,38 @@ biomes = {
 		name = "grassland2",
 		coord = vec2f(0.2, 0.8),
 		dominance = 1.0,
+		--handover = global_handover,
+		--takeover = global_takeover,
+
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
-			{ 0, "hsv(121, 70%, 80%)" },
-			{ 1, "hsv(140, 90%, 70%)" }
+			{ 0, "hsv(100, 40%, 80%)" },
+			{ 1, "hsv(120, 50%, 45%)" }
 		},
 		vegetation = {
+			--{
+			--	name = "tree",
+			--	color = "hsv(150, 65%, 70%)",
+			--	size = 0.05,
+			--	probability = 0.2,
+			--},
 			{
-				name = "tree",
-				color = "hsv(150, 65%, 70%)",
-				size = 0.05,
-				probability = 0.2,
+				name = "bush",
+				color = "hsv(145, 70%, 60%)",
+				scale = range(2.0, 4.0),
+				hue = shift(-60.0, 10.0),
+				saturation = shift(0.2, 0.1),
+				value = shift(0.1, 0.1),
+				probability = 0.03,
 			},
 			{
 				name = "bush",
 				color = "hsv(145, 70%, 60%)",
-				size = 0.022,
-				probability = 0.6,
+				scale = range(2.0, 4.0),
+				hue = shift(20.0, 10.0),
+				saturation = shift(-0.1, 0.2),
+				value = shift(0.1, 0.1),
+				probability = 1.0,
 			},
 		}
 	},
@@ -72,6 +98,9 @@ biomes = {
 		name = "desert",
 		coord = vec2f(0.8, 0.2),
 		dominance = 1.0,
+		--handover = global_handover,
+		--takeover = global_takeover,
+
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
@@ -250,7 +279,7 @@ height = {
 
 temperature = {
 	name = "temperature",
-	heightSensitivity = 5, --//200m-kent 1 fok
+	heightSensitivity = 2, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
@@ -259,7 +288,7 @@ temperature = {
 		simplexFractal {
 			seed = 1,
 			octaves = 6,
-			amplitude = 0.5,
+			amplitude = 0.3,
 			frequency = 0.5,
 			lacunarity = 2.0,
 			persistence = 0.5,
@@ -279,15 +308,15 @@ humidity = {
 	},
 	nodes = --add {
 	add {
-		simplexFractal {
-			seed = 103421,
-
-			octaves = 6,
-			amplitude = 0.5,
-			frequency = 0.5,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
+		--simplexFractal {
+		--	seed = 103421,
+		--
+		--	octaves = 6,
+		--	amplitude = 0.5,
+		--	frequency = 0.5,
+		--	lacunarity = 2.0,
+		--	persistence = 0.5,
+		--},
 		--cellular {
 		--	seed = 123,
 		--	distanceFn = DistFun.euclidean,
@@ -297,7 +326,7 @@ humidity = {
 		--	jitter = 1,
 		--},
 		constant {
-			value = 0.5
+			value = 0.7
 		},
 	}
 }

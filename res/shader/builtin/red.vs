@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <rev_sandbox/block/matrices.glsl>
+#include <block/matrices.glsl>
 
 
 layout(location = 0) in vec3 vertexPosition;

@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <rev_sandbox/block/matrices.glsl>
+#include <block/matrices.glsl>
 
 
 in vec3 fragmentPositionW;

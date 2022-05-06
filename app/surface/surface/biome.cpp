@@ -1,22 +1,24 @@
 // Created by dbobula on 4/4/2022.
 
+// hpp
 #include <surface/surface/biome.hpp>
-
-//std
-#include <utility>
+// std
 #include <algorithm>
 #include <ranges>
-//libv
+#include <utility>
+// libv
 #include <libv/algo/erase_if_stable.hpp>
-//surface
+#include <libv/math/constants.hpp>
+// pro
 #include <surface/log.hpp>
 
 
 namespace surface {
+
 // -------------------------------------------------------------------------------------------------
 
-Veggie::Veggie(VeggieId id, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type) :
-		id(id), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift), type(type) {}
+Veggie::Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type) :
+		id(id), normal(normal), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift), type(type) {}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -28,7 +30,7 @@ float BiomeMix::normalize() {
 
 
 	if (sum == 0.f) {
-		log_surface.fatal("Sum != 0.f");
+		log_surface.fatal("Sum == 0.f");
 		return 0.f;
 	}
 //	assert(sum != 0.f);
@@ -126,23 +128,33 @@ std::optional<VeggieType> BiomeMix::getRandomVeggieType(const Biome& biome, libv
 std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xoroshiro128& rng) {
 	if (auto veggieType = getRandomVeggieType(biome, rng)) {
 
-		auto rotationScale = libv::make_uniform_distribution_inclusive(0.f, 360.f);
-		auto rotation = std::fmod(rotationScale(rng), 360.f);
+		auto normalRDist = libv::make_uniform_distribution_exclusive(0.f, libv::tau);
+//		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f);
+		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f / 6.f);
+		const auto r = normalRDist(rng);
+		const auto u = normalUDist(rng);
+		const auto normal = libv::vec3f(
+				std::sin(u) * std::cos(r),
+				std::sin(u) * std::sin(r),
+				std::cos(u)
+		);
 
-		auto scaleRange = libv::make_uniform_distribution_inclusive(veggieType->scale.min, veggieType->scale.max);
-		auto scale = scaleRange(rng);
+		auto rotationDist = libv::make_uniform_distribution_exclusive(0.f, libv::tau);
+		const auto rotation = rotationDist(rng);
 
-		auto hueShift = libv::make_uniform_distribution_inclusive(veggieType->hue.offset - veggieType->hue.radius, veggieType->hue.offset + veggieType->hue.radius);
-		auto hue = std::fmod(hueShift(rng), 360.f) / 360.f;
+		auto scaleDist = libv::make_uniform_distribution_inclusive(veggieType->scale.min, veggieType->scale.max);
+		const auto scale = scaleDist(rng);
 
-		auto saturationShift = libv::make_uniform_distribution_inclusive(veggieType->saturation.offset - veggieType->saturation.radius, veggieType->saturation.offset + veggieType->saturation.radius);
-		auto saturation = std::clamp(saturationShift(rng), 0.f, 1.f);
+		auto hueDist = libv::make_uniform_distribution_inclusive(veggieType->hue.offset - veggieType->hue.radius, veggieType->hue.offset + veggieType->hue.radius);
+		const auto hue = std::fmod(hueDist(rng), 360.f) / 360.f;
 
-		auto valueShift = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
-		auto value = std::clamp(valueShift(rng), 0.f, 1.f);
+		auto saturationDist = libv::make_uniform_distribution_inclusive(veggieType->saturation.offset - veggieType->saturation.radius, veggieType->saturation.offset + veggieType->saturation.radius);
+		const auto saturation = std::clamp(saturationDist(rng), 0.f, 1.f);
 
+		auto valueDist = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
+		const auto value = std::clamp(valueDist(rng), 0.f, 1.f);
 
-		return Veggie(globalId, rotation, scale, libv::vec3f{hue, saturation, value}, *veggieType);
+		return Veggie(0, normal, rotation, scale, libv::vec3f{hue, saturation, value}, *veggieType);
 	}
 
 	return std::nullopt;

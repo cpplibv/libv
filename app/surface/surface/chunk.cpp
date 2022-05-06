@@ -133,7 +133,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 
 	std::mutex chunk_m;
 	std::mutex rng_m;
-	chunk.veggies.reserve(config.numVeggie / 5); // TODO P3: Should check if reserving for 20% isn't memory wasteful
+	chunk.veggies.reserve(config.numVeggie / 5); // TODO P3: Should check if reserving for 20% isn't memory wasteful | reserve more maybe even 100%, shrink to fit when done = 2 allocation, but never more, and 0 memory waste
 
 	// NOTE: This parallelism doesn't yield too much gain, but still better than single thread
 	// The entire generation of 81 chunk with 100 veggie per chunk in milliseconds:

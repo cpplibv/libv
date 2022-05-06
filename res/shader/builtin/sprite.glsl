@@ -3,42 +3,31 @@
 
 struct GeometryData {
 	vec3 positionW;
-	vec3 normalW;
+//	vec3 normalW;
 	vec3 eyeDir;
 
-	vec3 right;
-	vec3 up;
+	vec3 normalUp;
+	float rotation;
+	float scale;
+
+	vec4 hsvColorShift;
 
 	int type;
 	float fogFactor;
-
-//	vec4 color;
-//	float segmentPosition;
-//	float segmentSize;
-//	float chainPosition;
-//	float chainSize;
-//	float animationOffset;
 };
 
 struct FragmentData {
 	vec3 positionW;
-	vec4 color;
+	vec4 rotationQuat;
 	vec2 uv;
 	vec2 tile_index;
-	float dither0;
-	float dither1;
+//	float dither0;
+//	float dither1;
+
+	vec4 hsvColorShift;
 
 	float type;
 	float fogFactor;
-
-//	vec3 eyeDir;
-//	vec2 part_uv;
-//	float head;
-//	float segmentPosition;
-//	float segmentSize;
-//	float chainPosition;
-//	float chainSize;
-//	float animationOffset;
 };
 
 float rand(vec2 co) {

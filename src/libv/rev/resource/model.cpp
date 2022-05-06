@@ -36,6 +36,22 @@ void Model::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stre
 	self->render(glr, uniform_stream);
 }
 
+//bool Model::isLoaded() const noexcept {
+//	return ?;
+//}
+
+libv::vec3f Model::AABB_max() const noexcept {
+//	assert(isLoaded());
+
+	return self->AABB_max;
+}
+
+libv::vec3f Model::AABB_min() const noexcept {
+//	assert(isLoaded());
+
+	return self->AABB_min;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace rev

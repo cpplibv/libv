@@ -44,14 +44,9 @@ BakerSpriteAtlas::BakerSpriteAtlas(libv::rev::ResourceManager& loader, libv::vec
 }
 
 void BakerSpriteAtlas::renderAtlas(SpriteDefinition& def, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::rev::Model& model, float sizeMultiplier) {
-	const auto AABB_max = libv::vec3f{178.889f, 184.191f, 382.196f} * 0.175f;
-	const auto AABB_min = libv::vec3f{-184.492f, -170.332f, 0.f} * 0.175f;
-	// load vm4
-//		libv::rev::Model model(vm4, materialLoader, libv::rev::SpriteBaker::create);
-//		def.tile_size.x = 10;
-//		def.tile_size.x = 64;
-//		def.tile_size.x = 256;
-//		def.tile_size.y = 256;
+	// Model is forced to be loaded at this point, so accessing model data is allowed
+	const auto AABB_max = model.AABB_max();
+	const auto AABB_min = model.AABB_min();
 
 	// Tree
 	auto AABB_extent = libv::max(libv::abs(AABB_max), libv::abs(AABB_min)) * 2.0f;
@@ -74,11 +69,10 @@ void BakerSpriteAtlas::renderAtlas(SpriteDefinition& def, libv::glr::Queue& glr,
 
 	const auto angle_x_range = def.angle_x_max - def.angle_x_min;
 	const auto angle_y_range = def.angle_y_max - def.angle_y_min;
-	const auto angle_x_step = angle_x_range / static_cast<float>(def.tile_num_x);
-	const auto angle_y_step = angle_y_range / static_cast<float>(def.tile_num_y);
+	const auto angle_x_step = angle_x_range / static_cast<float>(def.tile_num_x - 1);
+	const auto angle_y_step = angle_y_range / static_cast<float>(def.tile_num_y - 1);
 
 	const auto guard_vp = glr.viewport_guard();
-
 	const auto guard_p = glr.projection.push_guard();
 	const auto guard_v = glr.view.push_guard();
 	const auto guard_m = glr.model.push_guard();
