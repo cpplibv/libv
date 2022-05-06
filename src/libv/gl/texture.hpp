@@ -354,7 +354,12 @@ public:
 		set(GL_TEXTURE_MIN_LOD, value);
 	}
 	inline void setSwizzle(Swizzle r, Swizzle g, Swizzle b, Swizzle a) noexcept {
-		set(GL_TEXTURE_SWIZZLE_RGBA, {to_value(r), to_value(g), to_value(b), to_value(a)});
+		set(GL_TEXTURE_SWIZZLE_RGBA, libv::vec4i{
+			static_cast<GLint>(to_value(r)),
+			static_cast<GLint>(to_value(g)),
+			static_cast<GLint>(to_value(b)),
+			static_cast<GLint>(to_value(a))
+		});
 	}
 	inline void setSwizzleR(Swizzle swizzle) noexcept {
 		set(GL_TEXTURE_SWIZZLE_R, swizzle);

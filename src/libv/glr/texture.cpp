@@ -34,6 +34,7 @@ struct RemoteTexture {
 	bool dirty_wrap1 = false;
 	bool dirty_wrap2 = false;
 	bool dirty_wrap3 = false;
+	bool dirty_swizzle = false;
 	bool dirty_mipmaps = false;
 
 	//int32_t ref_count = 0;
@@ -66,6 +67,10 @@ struct RemoteTexture {
 	libv::gl::Wrap warpS = libv::gl::Wrap::Repeat;
 	libv::gl::Wrap warpT = libv::gl::Wrap::Repeat;
 	libv::gl::Wrap warpR = libv::gl::Wrap::Repeat;
+	libv::gl::Swizzle swizzleR = libv::gl::Swizzle::Red;
+	libv::gl::Swizzle swizzleG = libv::gl::Swizzle::Green;
+	libv::gl::Swizzle swizzleB = libv::gl::Swizzle::Blue;
+	libv::gl::Swizzle swizzleA = libv::gl::Swizzle::Alpha;
 
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
@@ -193,6 +198,12 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		gl(head.texture).bind();
 		gl(head.texture).setWrap(warpS, warpT, warpR);
 		dirty_wrap3 = false;
+	}
+
+	if (dirty_swizzle) {
+		gl(head.texture).bind();
+		gl(head.texture).setSwizzle(swizzleR, swizzleG, swizzleB, swizzleA);
+		dirty_swizzle = false;
 	}
 
 	if (dirty_mipmaps) {
@@ -400,6 +411,15 @@ void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap war
 	remote->warpS = warpS;
 	remote->warpT = warpT;
 	remote->warpR = warpR;
+}
+
+void Texture::set(libv::gl::Swizzle r, libv::gl::Swizzle g, libv::gl::Swizzle b, libv::gl::Swizzle a) noexcept {
+	remote->head.dirty = true;
+	remote->dirty_swizzle = true;
+	remote->swizzleR = r;
+	remote->swizzleG = g;
+	remote->swizzleB = b;
+	remote->swizzleA = a;
 }
 
 void Texture::generate_mipmaps() noexcept {

@@ -92,6 +92,7 @@ public:
 	void set(libv::gl::Wrap warpS) noexcept;
 	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT) noexcept;
 	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap warpR) noexcept;
+	void set(libv::gl::Swizzle r, libv::gl::Swizzle g, libv::gl::Swizzle b, libv::gl::Swizzle a) noexcept;
 
 	void generate_mipmaps() noexcept;
 
