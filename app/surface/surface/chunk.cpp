@@ -206,7 +206,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //}
 
 std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
-	const auto chunkSize = libv::vec2f{4, 4};
+	const auto chunkSize = libv::vec2f{8, 8};
 	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;

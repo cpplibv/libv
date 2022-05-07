@@ -17,8 +17,8 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-Veggie::Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type) :
-		id(id), normal(normal), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift), type(type) {}
+Veggie::Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift) :
+		id(id), normal(normal), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift) {}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 		auto valueDist = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
 		const auto value = std::clamp(valueDist(rng), 0.f, 1.f);
 
-		return Veggie(0, normal, rotation, scale, libv::vec3f{hue, saturation, value}, *veggieType);
+		return Veggie(0, normal, rotation, scale, libv::vec3f{hue, saturation, value});
 	}
 
 	return std::nullopt;

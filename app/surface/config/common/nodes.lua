@@ -45,10 +45,17 @@ ReturnType = {
 -- -------------------------------------------------------------------------------------------------
 
 
-constant = function(args)
-	args = args or {}
-	args.nodeType = NodeType.constant
-	return args
+constant = function(args_or_number)
+	if type(args_or_number) == "number" then
+		return {
+			nodeType = NodeType.constant,
+			value = args_or_number,
+		}
+	else
+		local node = args_or_number or {}
+		node.nodeType = NodeType.constant
+		return node
+	end
 end
 
 value = function(args)

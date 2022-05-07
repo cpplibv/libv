@@ -10,7 +10,7 @@ config = {
 	numChunks = 169,
 	numVeggie = 100,
 
-	fogIntensity = 0.05,
+	fogIntensity = 0.035,
 	fogColor = "rgb(0.9, 0.8, 0.6)";
 }
 

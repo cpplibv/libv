@@ -64,10 +64,8 @@ public:
 	//clamp during randomization, except hue <- modf
 	libv::vec3f hsv_color_shift;
 
-	VeggieType type;
-
 public:
-	Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift, const VeggieType& type);
+	Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift);
 };
 
 

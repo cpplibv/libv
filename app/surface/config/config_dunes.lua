@@ -142,16 +142,19 @@ base = function(seed)
 	}
 end
 
-mountainRange = pow {
-	exponent = 2.0,
+mountainRange = mul {
+	constant(1.4),
+	pow {
+		exponent = 2.0,
 
-	min {
-		base(222),
 		min {
-			base(333),
+			base(222),
 			min {
-				base(555),
-				base(666),
+				base(333),
+				min {
+					base(555),
+					base(666),
+				},
 			},
 		},
 	},

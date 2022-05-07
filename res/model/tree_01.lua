@@ -3,8 +3,6 @@ model.scale(0.175)
 --model.scale_height_to(10)
 --model.rotate(0, 90, 90)
 
---model.property("sprite_offset", vec3f{})
-
 model.regex_replace_textures("Tree_med.fixed.game.fbm/bark_0021.jpg", "../../res/model/tree_01_bark.diffuse.jpg");
 model.regex_replace_textures("Tree_med.fixed.game.fbm/DB2X2_L01.png", "../../res/model/tree_01_leaves.diffuse.png");
 model.regex_replace_textures("Tree_med.fixed.game.fbm/DB2X2_L01_Spec.png", "../../res/model/tree_01_leaves.specular.png");

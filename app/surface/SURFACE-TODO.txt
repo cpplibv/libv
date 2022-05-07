@@ -58,7 +58,6 @@ Sprites:
 						4 fetch (row and column change)
 
 		BAKE:
-			use real model AABB
 			on the sprite atlas edge, there is a smudge
 				? drop one half pixel from the UV
 
@@ -76,6 +75,14 @@ Visuals:
 		libv.rev: builtin:cube (XYZ cube)
 		skybox texture from config
 		find a couple of good skybox
+
+	micro texture
+		per biome based texture
+			2 float
+				texture index
+				scale (repetation size)
+
+	veggi type
 
 	lighting
 		sun
@@ -99,9 +106,7 @@ libv.glr: mesh submesh update (for surface chunks)
 
 
 Big things left
-	Sprites
 	Water
-	Textures
 	LOD
 
 

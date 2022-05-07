@@ -96,9 +96,9 @@ struct SurfaceScene : Scene {
 		int type = 0;
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies) {
-				type = (type + 1) % 5;
-//				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
-				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+				type = (type + 1) % 2;
+				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+//				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
 			}
 	}
 

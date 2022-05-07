@@ -209,11 +209,12 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
-			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
-			renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
-			renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
-			renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
+			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
+			const auto stoneID = renderer.sprite.registerSprite("stone_01.vm4", 1.0f / 250.f);
+//			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
+//			renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
+//			renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
+//			renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
 			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
 
 //			for (int x = 0; x < 10; ++x) {
