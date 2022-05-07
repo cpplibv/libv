@@ -566,6 +566,8 @@ private:
 		capability.scissorTest.init();
 		capability.stencilTest.init();
 		capability.textureCubeMapSeamless.init();
+
+		capability.textureCubeMapSeamless.enable();
 	}
 
 public:

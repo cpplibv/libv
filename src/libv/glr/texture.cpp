@@ -64,9 +64,9 @@ struct RemoteTexture {
 	// Properties
 	libv::gl::MagFilter magFilter = libv::gl::MagFilter::Linear;
 	libv::gl::MinFilter minFilter = libv::gl::MinFilter::NearestMipmapLinear;
-	libv::gl::Wrap warpS = libv::gl::Wrap::Repeat;
-	libv::gl::Wrap warpT = libv::gl::Wrap::Repeat;
-	libv::gl::Wrap warpR = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap wrapS = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap wrapT = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap wrapR = libv::gl::Wrap::Repeat;
 	libv::gl::Swizzle swizzleR = libv::gl::Swizzle::Red;
 	libv::gl::Swizzle swizzleG = libv::gl::Swizzle::Green;
 	libv::gl::Swizzle swizzleB = libv::gl::Swizzle::Blue;
@@ -97,6 +97,18 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (dirty_load) {
 		head.texture = image->createTexture();
 		dirty_load = false;
+
+		if (head.texture.target == libv::gl::TextureTarget::CubeMap) {
+			// TODO P4: For cube maps we override the properties that makes sense for cube maps
+			wrapS = libv::gl::Wrap::ClampToEdge;
+			wrapT = libv::gl::Wrap::ClampToEdge;
+			wrapR = libv::gl::Wrap::ClampToEdge;
+			magFilter = libv::gl::MagFilter::Linear;
+			minFilter = libv::gl::MinFilter::Linear;
+			dirty_filter = true;
+			dirty_wrap2 = true;
+			dirty_mipmaps = false;
+		}
 	}
 
 	if (dirty_storage) {
@@ -184,19 +196,19 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 
 	if (dirty_wrap1) {
 		gl(head.texture).bind();
-		gl(head.texture).setWrap(warpS);
+		gl(head.texture).setWrap(wrapS);
 		dirty_wrap1 = false;
 	}
 
 	if (dirty_wrap2) {
 		gl(head.texture).bind();
-		gl(head.texture).setWrap(warpS, warpT);
+		gl(head.texture).setWrap(wrapS, wrapT);
 		dirty_wrap2 = false;
 	}
 
 	if (dirty_wrap3) {
 		gl(head.texture).bind();
-		gl(head.texture).setWrap(warpS, warpT, warpR);
+		gl(head.texture).setWrap(wrapS, wrapT, wrapR);
 		dirty_wrap3 = false;
 	}
 
@@ -392,25 +404,25 @@ void Texture::set(libv::gl::MinFilter filter) noexcept {
 	remote->minFilter = filter;
 }
 
-void Texture::set(libv::gl::Wrap warpS) noexcept {
+void Texture::set(libv::gl::Wrap wrapS) noexcept {
 	remote->head.dirty = true;
 	remote->dirty_wrap1 = true;
-	remote->warpS = warpS;
+	remote->wrapS = wrapS;
 }
 
-void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT) noexcept {
+void Texture::set(libv::gl::Wrap wrapS, libv::gl::Wrap wrapT) noexcept {
 	remote->head.dirty = true;
 	remote->dirty_wrap2 = true;
-	remote->warpS = warpS;
-	remote->warpT = warpT;
+	remote->wrapS = wrapS;
+	remote->wrapT = wrapT;
 }
 
-void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap warpR) noexcept {
+void Texture::set(libv::gl::Wrap wrapS, libv::gl::Wrap wrapT, libv::gl::Wrap wrapR) noexcept {
 	remote->head.dirty = true;
 	remote->dirty_wrap3 = true;
-	remote->warpS = warpS;
-	remote->warpT = warpT;
-	remote->warpR = warpR;
+	remote->wrapS = wrapS;
+	remote->wrapT = wrapT;
+	remote->wrapR = wrapR;
 }
 
 void Texture::set(libv::gl::Swizzle r, libv::gl::Swizzle g, libv::gl::Swizzle b, libv::gl::Swizzle a) noexcept {

@@ -190,11 +190,13 @@ void InternalTextureLoader::process_cpu(InternalTexture_ptr&& res, std::string&&
 void InternalTextureLoader::process_res(InternalTexture_ptr&& res, libv::gl::Image&& image) {
 	res->texture = libv::glr::Texture{std::move(image)};
 	// TODO P2: filtering, anisotropic filtering, mipmap, usage
+	// TODO P2: Cube maps should not generate mips and should set Wrap to ClampToEdge (this currently put into glr and overrides the following settings)
 	res->texture.set(libv::gl::MagFilter::Linear);
 	res->texture.set(libv::gl::MinFilter::LinearMipmapLinear);
 //	res->texture.set(libv::gl::MagFilter::Nearest);
 //	res->texture.set(libv::gl::MinFilter::Nearest);
 	res->texture.generate_mipmaps();
+
 }
 
 // -------------------------------------------------------------------------------------------------
