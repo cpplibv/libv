@@ -16,7 +16,7 @@ uniform vec4 fogColor = vec4(0.7, 0.8, 0.9, 1.0);
 
 
 void main() {
-	result = texture(textureSkybox, fragmentDirectionW).rgba;
+	result = texture(textureSkybox, fragmentDirectionW.xzy).rgba;
 //	result = vec4(1, 0, 0, 1);
 
 	// --- Fog ---

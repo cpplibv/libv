@@ -10,6 +10,7 @@
 //surface
 //#include <surface/view/render/shaders.hpp>
 #include <libv/glr/uniform_buffer.hpp>
+#include <libv/rev/texture.hpp>
 
 //#include <surface/view/render/renderer.hpp>
 #include <surface/surface/chunk.hpp>
@@ -27,14 +28,13 @@ class RendererResourceContext;
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsSurface {
-//	libv::glr::Uniform_texture texture_noise;
+	libv::glr::Uniform_texture textureBase;
 	libv::glr::Uniform_bool fogEnabled;
 	libv::glr::Uniform_float fogIntensity;
 	libv::glr::Uniform_vec4f fogColor;
 
 	template <typename Access> void access_uniforms(Access& access) {
-//		access(texture_noise, "texture_noise", textureChannel_diffuse);
-//		access(base_color, "base_color");
+		access(textureBase, "textureBase", textureChannel_diffuse);
 		access(fogEnabled, "fogEnabled", true);
 		access(fogIntensity, "fogIntensity", 0.05f);
 		access(fogColor, "fogColor", libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f});
@@ -59,13 +59,11 @@ private:
 	};
 
 private:
-//	Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 	std::unordered_map<libv::vec2i, ChunkMesh, VecHash> chunkMeshMap;
 	ShaderSurface shader;
-//	libv::glr::VertexIndex vi = 0;
-//	bool dirty = true;
 
-//	void build_mesh(const std::vector<surface::Chunk>& chunks);
+	libv::rev::Texture texture;
+
 public:
 	bool fogEnabled = true;
 	float fogIntensity = 0.05f;

@@ -14,7 +14,6 @@ local global_takeover = {
 	hard = 0.6
 }
 
-
 config = {
 	seed = 0,
 	resolution = 64,
@@ -27,7 +26,7 @@ config = {
 	--numVeggie = 1000,
 
 	fogIntensity = 0.03,
-	fogColor = "rgb(0.7, 0.9, 0.8)";
+	fogColor = "hsv(120, 5%, 95%)";
 }
 
 biomes = {

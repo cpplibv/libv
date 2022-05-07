@@ -9,6 +9,32 @@
 scene change does not clear sprites just adds a new batch
 
 
+sprite not smooth but discrete angle following
+\ sprite looks at eye, it should be just parallel with camera right, this would fix issues with orbit z hard clipping into each other and covering the other partially
+
+
+startup crash, source unknown
+		T 13 surface: TimerChunkGen    2 -4:   5.1110 ms, app/surface/surface/surface.cpp:36
+		T 13 surface: TimerChunkGen    3 -4:   4.5917 ms, app/surface/surface/surface.cpp:36
+		T 13 surface: TimerChunkGen    4 -4:   4.5092 ms, app/surface/surface/surface.cpp:36
+		T 2 libv.rev: Main loop resource update took: 21.859ms for 1 resource, src/libv/rev/resource/resource_manager_internal.hxx:60
+		I 2 libv.rev: Loading rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs v0, src/libv/rev/resource/shader_loader.cpp:132
+		T 2 libv.rev: Tracking file shader/rev_sandbox/full_screen.vs for rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs because of include rev_sandbox/full_screen.vs, src/libv/rev/resource/shader_loader.cpp:62
+		T 2 libv.rev: Tracking file ../../res/shader/rev_sandbox/full_screen.vs for rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs because of include rev_sandbox/full_screen.vs, src/libv/rev/resource/shader_loader.cpp:62
+		T 2 libv.rev: Tracking file shader/builtin/sprite_baker_downsample.fs for rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs because of include builtin/sprite_baker_downsample.fs, src/libv/rev/resource/shader_loader.cpp:62
+		T 2 libv.rev: Tracking file ../../res/shader/builtin/sprite_baker_downsample.fs for rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs because of include builtin/sprite_baker_downsample.fs, src/libv/rev/resource/shader_loader.cpp:62
+		I 2 libv.rev: Updating rev_sandbox/full_screen.vs|builtin/sprite_baker_downsample.fs v0, src/libv/rev/resource/shader_loader.cpp:233
+		T 2 libv.rev: Create new model: fighter_01_eltanin.0006_med.fixed.game.vm4 (MOV:100), src/libv/rev/resource/model_loader_internal.cpp:132
+		T 2 libv.rev: Main loop resource update took: 2.733ms for 1 resource, src/libv/rev/resource/resource_manager_internal.hxx:60
+		T 2 libv.rev: Create new model: projectile_missile_01_hellfire.0005_med.game.vm4 (MOV:100), src/libv/rev/resource/model_loader_internal.cpp:132
+		T 2 libv.rev: Main loop resource update took: 1.449ms for 1 resource, src/libv/rev/resource/resource_manager_internal.hxx:60
+		T 2 libv.rev: Create new model: tank_01_rocket_ring.0031_med.game.vm4 (MOV:100), src/libv/rev/resource/model_loader_internal.cpp:132
+		T 2 libv.rev: Main loop resource update took: 8.984ms for 1 resource, src/libv/rev/resource/resource_manager_internal.hxx:60
+		T 2 libv.rev: Create new model: building_delnan_16P_tex.0038_med.game.vm4 (MOV:100), src/libv/rev/resource/model_loader_internal.cpp:132
+		T 2 libv.rev: Main loop resource update took: 5.087ms for 1 resource, src/libv/rev/resource/resource_manager_internal.hxx:60
+		Process finished with exit code -1073740791 (0xC0000409)
+
+
 Sprites:
 	surface normals for additional fake lighting based on the hills
 
@@ -21,10 +47,6 @@ Sprites:
 
 	Sprite
 		Render:
-			proper angle calculation
-				(also there is an error with direct down looking, atan/asin fails)
-				(there is also one with 30° and left column 2-5 when the eye crosses one dim above it)
-
 			dither blend between images
 				no linear blend, but switch pixels one-by-one based on white noise
 				! IF alpha not zero in any of them matches, then linear blend

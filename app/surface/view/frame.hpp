@@ -16,12 +16,13 @@ namespace surface {
 
 struct SurfaceFrame : public libv::Frame {
 	SurfaceFrame() :
-		Frame("Surface", 1280, 800) {
+//		Frame("Surface", 1280, 800) {
+		Frame("Surface", 1680, 1050) {
 
 		setPosition(libv::Frame::FramePosition::center_current_monitor);
 		setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
-		setOpenGLSamples(libv::Frame::OpenGLSamples{0});
+		setOpenGLSamples(libv::Frame::OpenGLSamples{4});
 		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 		setIcon(icon_set_iris_cyan());
 

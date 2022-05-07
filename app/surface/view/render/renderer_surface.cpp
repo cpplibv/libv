@@ -13,7 +13,11 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "surface.vs", "surface.fs") {}
+		shader(rctx.loader.shader, "surface.vs", "surface.fs"),
+		texture(rctx.loader.texture.load("dirt.jpg")) {}
+//		texture(rctx.loader.texture.load("salt.jpg")) {}
+//		texture(rctx.loader.texture.load("grass.jpg")) {}
+//		texture(rctx.loader.texture.load("stone.jpg")) {}
 
 void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Chunk>& chunk) {
 	auto& chunkRenderData = chunkMeshMap[chunk->index];
@@ -84,6 +88,7 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
+	glr.texture(texture.texture(), textureChannel_diffuse);
 
 	for (const auto &[_, chunkMesh] : chunkMeshMap) {
 		if (frustum.sphereInFrustum(chunkMesh.pos, chunkMesh.size.length() / 2.f) != Frustum::Position::OUTSIDE) {
