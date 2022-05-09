@@ -241,7 +241,7 @@ public:
 					vertex.bitangent = libv::vec3f(mesh->mBitangents[j]);
 				}
 				if (mesh->HasTextureCoords(0))
-					vertex.texture0 = libv::vec::xy(mesh->mTextureCoords[0][j]);
+					vertex.texture0 = libv::vec::from_xy(mesh->mTextureCoords[0][j]);
 
 				if (mesh->HasBones()) {
 					//vertex.boneID = vec4i();
