@@ -21,10 +21,16 @@ uniform float fogIntensity = 0.05;
 // -------------------------------------------------------------------------------------------------
 
 void main() {
-	gl_Position = matMVP * vec4(vertexPosition, 1);
 	vec3 positionW = (matM * vec4(vertexPosition, 1)).xyz;
+
+	float dist_curve = length(eye.xy - positionW.xy);
+	float fake_sphere = -pow(dist_curve * 0.02, 2);
+
+	gl_Position = matMVP * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1);
+//	gl_Position = matMVP * vec4(vertexPosition, 1);
 	vs_out.eyeDir = normalize(eye - vertexPosition);
-	vs_out.positionW = (matM * vec4(vertexPosition, 1)).xyz; // Used?
+	vs_out.positionW = (matM * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1)).xyz;
+//	vs_out.positionW = (matM * vec4(vertexPosition, 1)).xyz; // Used?
 //	vs_out.positionW = vertexPosition; // Used?
 	vs_out.type = vertexType;
 

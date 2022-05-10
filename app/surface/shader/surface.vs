@@ -19,15 +19,19 @@ uniform float fogIntensity = 0.05;
 
 
 void main() {
-	gl_Position = matMVP * vec4(vertexPosition, 1);
 	fragmentPositionW = (matM * vec4(vertexPosition, 1)).xyz;
+
+	float dist = length(eye - fragmentPositionW);
+	float dist_curve = length(eye.xy - fragmentPositionW.xy);
+	float fake_sphere = -pow(dist_curve * 0.02, 2);
+
+	gl_Position = matMVP * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1);
 	fragmentNormal = mat3(matM) * vertexNormal;
 	fragmentColor = vertexColor;
 
 	// --- Fog ---
 
 	if (fogEnabled) {
-		float dist = length(eye - fragmentPositionW);
 //		float dist = gl_FragCoord.z / gl_FragCoord.w;
 
 //		float fogAmount = fogFactorLinear(dist, 1, 10);
