@@ -39,6 +39,7 @@ public:
 	ImportContext(Model& model, const aiScene* scene) : model(model), scene(scene) { }
 
 public:
+	static constexpr const char* default_libv_technique = "phong";
 	const char* to_libv_technique(int tech) {
 		switch (tech) {
 		case aiShadingMode_Flat: return "flat";
@@ -93,6 +94,9 @@ public:
 //				materials[i].properties.emplace("twosided", ai_int != 0);
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_SHADING_MODEL, ai_int))
 				materials[i].shader = to_libv_technique(ai_int);
+			else
+				materials[i].shader = default_libv_technique;
+
 			if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_BLEND_FUNC, ai_int))
 				materials[i].properties.emplace("blend_func", ai_int);
 
