@@ -90,17 +90,31 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 	glr.uniform(shader.uniform().fogColor, fogColor);
 	glr.texture(texture.texture(), textureChannel_diffuse);
 
-	for (const auto &[_, chunkMesh] : chunkMeshMap) {
+	std::erase_if(chunkMeshMap, [&](const auto& pair) {
+		const auto& [index, chunkMesh] = pair;
+
+//		const auto eye = glr.eye();
+//		const auto chunkPosition = libv::vec3f(index.template cast<float>() * 32.0f, 0);
+//		if (libv::length_sq(eye - chunkPosition) > 32.f * 32.f * 8.f * 8.f) // !!! Constants regarding size and chunk count
+//			return true;
+
+		const auto eye = glr.eye();
+		const auto chunkPosition = index.template cast<float>() * 32.0f;
+		if (libv::length_sq(xy(eye) - chunkPosition) > 32.f * 32.f * 8.f * 8.f) // !!! Constants regarding size and chunk count
+			return true;
+
 		if (frustum.sphereInFrustum(chunkMesh.pos, chunkMesh.size.length() / 2.f) != Frustum::Position::OUTSIDE) {
 			auto uniforms = uniform_stream.block_unique(layout_matrices);
 			uniforms[layout_matrices.matMVP] = glr.mvp();
 			uniforms[layout_matrices.matM] = glr.model;
 			uniforms[layout_matrices.matP] = glr.projection;
-			uniforms[layout_matrices.eye] = glr.eye();
+			uniforms[layout_matrices.eye] = eye;
 			glr.uniform(std::move(uniforms));
 			glr.render(chunkMesh.mesh);
 		}
-	}
+
+		return false;
+	});
 }
 
 // -------------------------------------------------------------------------------------------------

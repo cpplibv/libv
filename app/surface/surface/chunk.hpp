@@ -18,11 +18,12 @@
 #include <surface/surface/biome.hpp>
 #include <surface/surface/node.hpp>
 
-#include <libv/math/gradient.hpp>
-
+//#include <libv/math/gradient.hpp>
 
 
 namespace surface {
+
+// -------------------------------------------------------------------------------------------------
 
 struct SurfacePoint {
 	libv::vec3f pos;
@@ -68,7 +69,13 @@ class BiomeCell {
 	Biome config;
 };
 
-// no public by defualt unless dumb data (no invariant), add constructor
+enum class ChunkState {
+	pending,
+	ready,
+	active,
+	expired,
+};
+
 class Chunk {
 public:
 	libv::vec2i index;
@@ -76,6 +83,8 @@ public:
 	libv::vec2f size;
 	uint32_t resolution;
 	libv::xoroshiro128 rng;
+
+	ChunkState state = ChunkState::pending;
 
 public:
 //	libv::vector_2D<BiomeCell> biomeMap;
@@ -107,37 +116,18 @@ class ChunkGen {
 private:
 	libv::mt::thread_bulk threads{libv::mt::hardware_concurrency_or(4) - 2};
 
-//	surface::Renderer renderer;
-//	sol::state lua;
-//	Config config;
-
 public:
-//	gimme_surface();
-//	explicit ChunkGen(surface::Renderer& renderer);
 	ChunkGen();
 
-	[[nodiscard]] std::shared_ptr<Chunk> generateChunk(const Config& yi, const libv::vec2i chunkPosition);
-//	[[nodiscard]] libv::vector_2D<TexturePoint> generateTexturePoints();
-	void placeVegetation(Chunk& chunk, const Config& config);
-//		void placeVegetation(const Config& config);
+	void generateChunk(const Config& config, Chunk& chunk);
+//	libv::vector_2D<TexturePoint> generateTexturePoints();
+	void placeVegetation(const Config& config, Chunk& chunk);
 
 private:
-	void placeVegetationClustered(Chunk& chunk, const Config& config);
-	void placeVegetationRandom(Chunk& chunk, const Config& config);
+	void placeVegetationClustered(const Config& config, Chunk& chunk);
+	void placeVegetationRandom(const Config& config, Chunk& chunk);
 };
 
-
-//class Tile{
-//public:
-//	Biome biome_type;
-//
-//};
-//
-//class Biome{
-//	Vegetation vegetation;
-//	Weather weather_conditions;
-//
-//};
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface
-

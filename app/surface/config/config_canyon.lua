@@ -6,7 +6,7 @@ require("config/common/nodes")
 
 config = {
 	seed = 500,
-	resolution = 128,
+	resolution = 256,
 	numChunks = 169,
 	numVeggie = 100,
 

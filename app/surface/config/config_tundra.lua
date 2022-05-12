@@ -20,7 +20,7 @@ end
 
 config = {
 	seed = 123,
-	resolution = 128,
+	resolution = 256,
 	--numChunks = 1,
 	--numChunks = 9,
 	numChunks = 81,

@@ -295,7 +295,7 @@ public:
 		position_ = value;
 	}
 
-	inline Frustum frustum(vec2 canvasSize) {
+	inline Frustum frustum(vec2 canvasSize) const {
 		//TODO
 		(void) canvasSize;
 		return Frustum();

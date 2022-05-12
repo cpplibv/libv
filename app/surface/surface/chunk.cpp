@@ -93,9 +93,9 @@ libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
 
 ChunkGen::ChunkGen() {}
 
-void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
+void ChunkGen::placeVegetation(const Config& config, Chunk& chunk) {
 	if (config.plantDistribution == PlantDistribution::random) {
-		placeVegetationRandom(chunk, config);
+		placeVegetationRandom(config, chunk);
 	} else if (config.plantDistribution == PlantDistribution::clustered) {
 //		chunk.placeVegetationClustered(config);
 		throw std::runtime_error("Clustered plant distribution type not yet supported");
@@ -106,7 +106,7 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 //generalunk cluster centereket radiussal, aztan pedig ezekben a cluster korokben
 // generalunk random pontokat az interpolacioval
 //
-//void Chunk::placeVegetationClustered(Chunk& chunk, const Config& config) {
+//void Chunk::placeVegetationClustered(const Config& config, Chunk& chunk) {
 //	auto chunkSize = libv::make_uniform_distribution_exclusive(0, config.resolution - 1);
 //	auto ratio = libv::make_uniform_distribution_inclusive(0.f, 1.f);
 ////	float sum = 0.f;
@@ -129,7 +129,7 @@ void ChunkGen::placeVegetation(Chunk& chunk, const Config& config) {
 //	}
 //}
 
-void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
+void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 
 	std::mutex chunk_m;
 	std::mutex rng_m;
@@ -167,7 +167,7 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 	});
 }
 
-//void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
+//void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 //	const auto numQuad = config.resolution;
 //	auto ratio = libv::make_uniform_distribution_exclusive(0.f, 1.f);
 //
@@ -205,49 +205,47 @@ void ChunkGen::placeVegetationRandom(Chunk& chunk, const Config& config) {
 //	});
 //}
 
-std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv::vec2i chunkIndex) {
-	const auto chunkSize = libv::vec2f{8, 8};
-	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
+void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
+//	const auto chunkSize = libv::vec2f{8, 8};
+//	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
 	const auto numQuad = config.resolution;
 	const auto numVertex = numQuad + 1;
-	const auto step = chunkSize / static_cast<float>(numQuad);
+	const auto step = chunk.size / static_cast<float>(numQuad);
 //	const auto step = chunkSize / static_cast<float>(chunkResolution);
 
-	std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(chunkIndex, chunkPosition, chunkSize, static_cast<uint32_t>(numVertex), config.globalSeed);
-
-	const auto calc = [chunkPosition](const auto& node, const auto& colorGrad, const float x, const float y) {
-		const auto noise_value = node->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+	const auto calc = [&](const auto& node, const auto& colorGrad, const float x, const float y) {
+		const auto noise_value = node->evaluate(x + chunk.position.x, y + chunk.position.y);
 		const auto point = libv::vec3f{x, y, noise_value};
 		const auto color = colorGrad.sample(noise_value);
-		return SurfacePoint{point + libv::vec3f{chunkPosition, 0}, color};
+		return SurfacePoint{point + libv::vec3f{chunk.position, 0}, color};
 	};
 
-	chunk->temp_humidity_distribution.fill(0.f);
+	chunk.temp_humidity_distribution.fill(0.f);
 
 	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);
 
 		for (std::size_t xi = 0; xi < numVertex; ++xi) {
 			const auto xf = static_cast<float>(xi);
-			const auto x = xf * step.x - chunk->size.x * 0.5f;
-			const auto y = yf * step.y - chunk->size.y * 0.5f;
+			const auto x = xf * step.x - chunk.size.x * 0.5f;
+			const auto y = yf * step.y - chunk.size.y * 0.5f;
 
 			/// Calculate heatmaps' point
-			chunk->height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
-			chunk->temperature(xi, yi) = config.temperature.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
-			chunk->humidity(xi, yi) = config.humidity.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
+			chunk.temperature(xi, yi) = config.temperature.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
+			chunk.humidity(xi, yi) = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 
-			chunk->fertility(xi, yi) = config.fertility.rootNode->evaluate(x + chunkPosition.x, y + chunkPosition.y);
+			chunk.fertility(xi, yi) = config.fertility.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 
-//			chunk->temp_humidity_distribution(
-//					std::clamp(static_cast<size_t>(chunk->humidity(xi, yi).pos.z * 127.f), 0uz, chunk->temp_humidity_distribution.size_x() - 1),
-//					std::clamp(static_cast<size_t>(chunk->temperature(xi, yi).pos.z * 127.f), 0uz, chunk->temp_humidity_distribution.size_y() - 1)
+//			chunk.temp_humidity_distribution(
+//					std::clamp(static_cast<size_t>(chunk.humidity(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_x() - 1),
+//					std::clamp(static_cast<size_t>(chunk.temperature(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_y() - 1)
 //			) += 0.1f;
 
-			const auto height = chunk->height(xi, yi).pos.z;
-			const auto temp = chunk->temperature(xi, yi) - height * config.temperature.heightSensitivity;
-			const auto wet = chunk->humidity(xi, yi);
-			const auto fertilityOffset = chunk->fertility(xi, yi);
+			const auto height = chunk.height(xi, yi).pos.z;
+			const auto temp = chunk.temperature(xi, yi) - height * config.temperature.heightSensitivity;
+			const auto wet = chunk.humidity(xi, yi);
+			const auto fertilityOffset = chunk.fertility(xi, yi);
 
 			(void) fertilityOffset;
 //			const auto biome = categorizeZone(temp);
@@ -265,20 +263,19 @@ std::shared_ptr<Chunk> ChunkGen::generateChunk(const Config& config, const libv:
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
 			if (config.blendBiomes) {
-				chunk->biomeMap(xi, yi) = mix.blendedColor(1.0f);
+				chunk.biomeMap(xi, yi) = mix.blendedColor(1.0f);
 			} else {
 				const auto& biome = mix.primary();
-				chunk->biomeMap(xi, yi) = biome.colorGrad.sample(1.0f);
+				chunk.biomeMap(xi, yi) = biome.colorGrad.sample(1.0f);
 			}
 
-//			chunk->biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
-//			chunk->surface(xi, yi) = SurfacePoint{chunk->height(xi, yi).pos + libv::vec3f{chunkPosition, 0},
+//			chunk.biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
+//			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunk.position, 0},
 //					{1,0,0,1}};
 //			std::cout << " fertility: " << fertility<<std::endl;
 
 		}
 	});
-	return chunk;
 }
 
 // -------------------------------------------------------------------------------------------------

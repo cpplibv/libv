@@ -188,7 +188,7 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	renderer.surface.fogEnabled = enableFog;
 	renderer.veggie.fogEnabled = enableFog;
 
-	surfaceDirty = surface->update();
+	surfaceDirty = surface->update(cameraManager.position(), cameraManager.forward());
 }
 
 void SurfaceCanvas::render(libv::glr::Queue& glr) {

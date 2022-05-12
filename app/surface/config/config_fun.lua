@@ -5,7 +5,7 @@ require("config/common/nodes")
 -- -------------------------------------------------------------------------------------------------
 
 config = {
-	resolution = 128,
+	resolution = 256,
 	--biomeResolution = 16, --TODO: Use fix biome resolution for LOD
 	numChunks = 400,
 

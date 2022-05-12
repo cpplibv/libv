@@ -16,91 +16,20 @@ local global_takeover = {
 
 config = {
 	seed = 0,
-	resolution = 256,
+	resolution = 128,
 	--numChunks = 9,
 	numChunks = 81,
 	--numChunks = 169,
 	--numChunks = 441,
 	--numVeggie = 150,
 	--numVeggie = 500,
-	numVeggie = 1000,
+	numVeggie = 0,
 
 	fogIntensity = 0.02,
 	fogColor = "hsv(120, 5%, 95%)";
 }
 
 biomes = {
-	{
-		name = "snow",
-		coord = vec2f(-8, 0.2),
-		dominance = 1.0,
-		--handover = global_handover,
-		--takeover = global_takeover,
-
-		cutOff = vec2f(0.1, 0.4),
-		colorGrad = {
-			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "hsv(0, 0%, 100%)" }
-		},
-		vegetation = {
-			--{
-			--	name = "rock",
-			--	color = "hsv(69, 10%, 60%)",
-			--	size = 0.022,
-			--	probability = 0.002,
-			--}
-		}
-	},
-	{
-		name = "mountain",
-		coord = vec2f(-6, 0.2),
-		dominance = 1.0,
-		--handover = global_handover,
-		--takeover = global_takeover,
-
-		cutOff = vec2f(0.1, 0.4),
-		colorGrad = {
-			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "hsv(0, 0%, 50%)" }
-		},
-		vegetation = {
-			{
-				name = "tree",
-				scale = range(1.0, 2.0),
-				--hue = shift(20.0, 5.0),
-				--saturation = shift(0.0, 0.0),
-				--value = shift(0.0, 0.04),
-				hue = shift(0.0, 0.0),
-				saturation = shift(0.0, 0.0),
-				value = shift(0.0, 0.0),
-				probability = 0.01,
-			},
-		}
-	},
-	--{
-	--	name = "mountain",
-	--	coord = vec2f(0.2, 0.2),
-	--	dominance = 1.0,
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "hsv(210, 10%, 98%)" },
-	--		{ 1, "hsv(215, 14%, 92%)" }
-	--	},
-	--	vegetation = {
-	--	--	{
-	--	--		name = "tree",
-	--	--		color = "hsv(60, 80%, 100%)",
-	--	--		size = 0.025,
-	--	--		probability = 0.2,
-	--	--	},
-	--	--	{
-	--	--		name = "bush",
-	--	--		color = "hsv(69, 80%, 100%)",
-	--	--		size = 0.022,
-	--	--		probability = 0.2,
-	--	--	}
-	--	}
-	--},
 	{
 		name = "grassland",
 		coord = vec2f(0.2, 0.2),
@@ -174,92 +103,6 @@ biomes = {
 
 -- =================================================================================================
 
-base = function(seed)
-	return add{
-		constant {
-			value = 1,
-		},
-		simplexFractal {
-			seed = seed,
-			octaves = 2,
-			amplitude = 1,
-			frequency = 0.025,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
-	}
-end
-
-mountainRange = mul {
-	constant(1.4),
-	pow {
-		exponent = 1.5,
-
-		min {
-			base(222),
-			min {
-				base(333),
-				min {
-					base(555),
-					base(666),
-				},
-			},
-		},
-	},
-}
-
-baseMicro = function(seed)
-	return add{
-		constant {
-			value = 0.5,
-		},
-		simplexFractal {
-			seed = seed,
-			octaves = 1,
-			amplitude = 0.5,
-			frequency = 0.2,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
-	}
-end
-
-microRange = mul {
-	constant {
-		value = -0.5,
-	},
-	pow {
-		exponent = 0.2,
-
-		min {
-			baseMicro(2222),
-			min {
-				--baseMicro(3333),
-				--min {
-					baseMicro(4444),
-					min {
-						baseMicro(5555),
-						baseMicro(6666),
-					},
-				--},
-			},
-		},
-	},
-}
-
-bumps =
-	max {
-		constant(-0.2),
-		simplexFractal {
-			seed = 601,
-			octaves = 5,
-			amplitude = 0.8,
-			frequency = 0.02,
-			lacunarity = 2.0,
-			persistence = 0.55,
-		},
-	}
-
 -- =================================================================================================
 
 height = {
@@ -276,69 +119,24 @@ height = {
 		{ 0.5, "hsv(120, 100%, 60%)" },
 		{ 0.6, "hsv(120, 60%, 60%)" },
 		{ 1.0, "hsv(220, 5%, 95%)" },
-		--{key = -2.0 ,value =  "blue"},
-		--{key = 0.0 , value = "yellow"},
-		--{key = 1.0 , value = "green"},
-		--{key = 2.0 , value = "grey"},
-		--[-2.0] = "blue",
-		--[0.0] = "yellow",
-		--[1.0] = "green",
-		--[2.0] = "grey",
+	--	--{key = -2.0 ,value =  "blue"},
+	--	--{key = 0.0 , value = "yellow"},
+	--	--{key = 1.0 , value = "green"},
+	--	--{key = 2.0 , value = "grey"},
+	--	--[-2.0] = "blue",
+	--	--[0.0] = "yellow",
+	--	--[1.0] = "green",
+	--	--[2.0] = "grey",
 	},
 	nodes =
-		add {
-			mul { constant(2), mountainRange },
-			mul { constant(1), microRange },
-			mul { constant(2), bumps },
-		}
-	--nodes = pow {
-	--	exponent = 2.0,
-	--
-	--	min {
-	--		simplexFractal {
-	--			seed = 33543745,
-	--			octaves = 5,
-	--			amplitude = 0.5,
-	--			frequency = 0.1,
-	--			lacunarity = 2.0,
-	--			persistence = 0.5,
-	--		},
-	--		mix {
-	--			constant {
-	--				value = 0,
-	--			},
-	--			add {
-	--				simplexFractal {
-	--					seed = 600733745,
-	--					octaves = 5,
-	--					amplitude = 0.5,
-	--					frequency = 0.1,
-	--					lacunarity = 2.0,
-	--					persistence = 0.5,
-	--				},
-	--				constant {
-	--					value = 0.5,
-	--				},
-	--			},
-	--			--},
-	--			saturate {
-	--				add {
-	--					simplexFractal {
-	--						seed = 602364345,
-	--						octaves = 5,
-	--						amplitude = 1.0,
-	--						frequency = 0.10,
-	--						lacunarity = 1.5,
-	--						persistence = 0.5,
-	--					},
-	--					constant {
-	--						value = 0.5,
-	--					},
-	--				},
-	--			},
-	--		},
-	--	},
-	--},
+		simplexFractal {
+			seed = 42,
+			octaves = 2,
+			amplitude = 1,
+			frequency = 0.025,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		},
 }
 
 temperature = {
@@ -351,7 +149,7 @@ temperature = {
 	nodes = add {
 		simplexFractal {
 			seed = 1,
-			octaves = 6,
+			octaves = 60,
 			amplitude = 0.3,
 			frequency = 0.25,
 			lacunarity = 2.0,

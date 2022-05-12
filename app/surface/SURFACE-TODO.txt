@@ -5,10 +5,53 @@
 === Stack =======================================================================================
 
 
-restore after testing
-		//	int32_t tile_num_x = 32;
-		//  vegi pos + 0.25
-			vegi bake atlas res
+
+
+
+
+
+detect chunk in range
+	movement -> chunk change -> scan square
+
+detect chunk out of range
+	movement -> slide them off the window
+
+track in range chunks priority
+	ehhh
+
+generate in range chunk with highest priority
+	-> pop_front
+
+cancel out of range chunks
+	? weak_ptr
+
+access to a vector<Chunk> of active chunks
+	? unstable vector updated on both detect
+
+
+
+
+
+
+
+
+
+
+
+container
+	sliding table 2d
+
+queueExpired
+generations
+main chunk map
+
+vegi chunks
+camera movement
+priority sorting
+
+
+const auto distanceThresholdInit = 50.f;
+expire chunk should delete them from renderer
 
 
 

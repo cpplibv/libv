@@ -93,7 +93,7 @@ public:
 	}
 
 public:
-	libv::mat4f projection(libv::vec2f canvas_size) {
+	[[nodiscard]] libv::mat4f projection(libv::vec2f canvas_size) const noexcept {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.projection(canvas_size);
@@ -105,7 +105,7 @@ public:
 		return libv::mat4f::identity();
 	}
 
-	libv::mat4f view() {
+	[[nodiscard]] libv::mat4f view() const noexcept {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.view();
@@ -117,7 +117,7 @@ public:
 		return libv::mat4f::identity();
 	}
 
-	float getHeight() {
+	[[nodiscard]] float getHeight() const noexcept {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.position().z;
@@ -129,7 +129,7 @@ public:
 		return 0.f;
 	}
 
-	Frustum getCameraFrustum(libv::vec2f canvasSize) {
+	[[nodiscard]] Frustum getCameraFrustum(libv::vec2f canvasSize) const noexcept {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
 			return camera2D.frustum(canvasSize);
@@ -137,7 +137,29 @@ public:
 			return camera3D.frustum(canvasSize);
 		}
 		assert(false && "Invalid CameraMode enum value");
-		return Frustum();
+		return {};
+	}
+
+	[[nodiscard]] libv::vec3f position() const noexcept {
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			return camera2D.position();
+		case CameraMode::_3d:
+			return camera3D.eye();
+		}
+		assert(false && "Invalid CameraMode enum value");
+		return {0, 0, 0};
+	}
+
+	[[nodiscard]] libv::vec3f forward() const noexcept {
+		switch (currentCameraMode) {
+		case CameraMode::_2d:
+			return libv::vec3f{0, 0, -1};
+		case CameraMode::_3d:
+			return camera3D.forward();
+		}
+		assert(false && "Invalid CameraMode enum value");
+		return {1, 0, 0};
 	}
 };
 
