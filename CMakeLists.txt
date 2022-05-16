@@ -674,6 +674,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_container INTERFACE
+	LINK   libv_math
 )
 
 wish_create_library(
@@ -1294,6 +1295,12 @@ wish_create_executable(
 	TARGET test_libv_color
 	SOURCE test/libv/color/*.cpp
 	LINK   obj_test_runner libv_color libv_utility libv_math
+)
+
+wish_create_executable(
+	TARGET test_libv_container
+	SOURCE test/libv/container/*.cpp
+	LINK   obj_test_runner libv_container
 )
 
 wish_create_executable(
