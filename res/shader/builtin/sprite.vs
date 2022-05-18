@@ -3,6 +3,7 @@
 #include <block/matrices.glsl>
 #include <builtin/sprite.glsl>
 #include <lib/fog.glsl>
+#include <lib/constants.glsl> // !!!
 
 
 layout(location = 0) in vec3 vertexPosition;
@@ -26,7 +27,7 @@ void main() {
 	float dist_curve = length(eye.xy - positionW.xy);
 	float fake_sphere = -pow(dist_curve * 0.02, 2);
 
-	gl_Position = matMVP * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1);
+//	gl_Position = matMVP * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1);
 //	gl_Position = matMVP * vec4(vertexPosition, 1);
 	vs_out.eyeDir = normalize(eye - vertexPosition);
 	vs_out.positionW = (matM * vec4(vertexPosition + vec3(0, 0, fake_sphere), 1)).xyz;
@@ -36,6 +37,8 @@ void main() {
 
 	vs_out.normalUp = vertexNormal;
 	vs_out.rotation = vertexRotationScale.x;
+//	vs_out.normalUp = vec3(0, 0, 1); // !!!
+//	vs_out.rotation = pi *0; // !!!
 	vs_out.scale = vertexRotationScale.y;
 	vs_out.hsvColorShift = vertexHSVColorShift;
 

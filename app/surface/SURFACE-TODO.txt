@@ -5,10 +5,13 @@
 === Stack =======================================================================================
 
 
-write a glsl example script with warp, simplex fractal, coord, min
+restore after testing
+		//	int32_t tile_num_x = 32;
+		//  vegi pos + 0.25
+			vegi bake atlas res
 
-sprite bottom side make it darker
-sprite ambient lighting should not affect normals that point downward
+
+
 
 seed a non seeded noise : random x y offset and rotation
 
@@ -43,6 +46,9 @@ startup crash, source unknown
 
 Sprites:
 	surface normals for additional fake lighting based on the hills
+	sprite bottom side make it darker
+	sprite ambient lighting should not affect normals that point downward
+	sprite normals should be faked to be more on a sphere
 
 	cleanup shaders, there is a lot of space conversioness in vs->gs
 

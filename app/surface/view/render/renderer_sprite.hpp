@@ -88,12 +88,20 @@ using ShaderSprite = libv::rev::Shader<UniformsSprite>;
 
 struct SpriteDefinition {
 	libv::vec2i tile_size = {64, 64};
+//	libv::vec2i tile_size = {128, 128};
+//	libv::vec2i tile_size = {256, 256};
 
 	float model_scale = 1.f; // Billboard size
 	libv::vec3f model_offset = {0.f, 0.f, 0.f}; // Billboard offset compared to origin
 
 	int32_t tile_num_x = 32;
 	int32_t tile_num_y = 8;
+
+
+//	int32_t tile_num_x = 8;
+//	int32_t tile_num_y = 8;
+//	int32_t tile_num_x = 1;
+//	int32_t tile_num_y = 16;
 	float angle_x_min = 0.f;
 //	float angle_x_max = libv::tau * (static_cast<float>(tile_num_y) - 1) / static_cast<float>(tile_num_y);
 	float angle_x_max = libv::tau;

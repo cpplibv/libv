@@ -130,7 +130,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 
 		auto normalRDist = libv::make_uniform_distribution_exclusive(0.f, libv::tau);
 //		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f);
-		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f / 6.f);
+		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f / 9.f);
 		const auto r = normalRDist(rng);
 		const auto u = normalUDist(rng);
 		const auto normal = libv::vec3f(

@@ -69,11 +69,22 @@ void main() {
 	float dirZ = localEyeDir.z;
 
 	// Tile selection
+	//	 -pi .. pi
+	//	 0.5 .. 0.5
+	//	  0  ..  1
+	//	  0  .. tile_num_x
 	float horizontal = def.tile_num_x + -(atan(dirXY.y, dirXY.x) / tau + 0.5) * def.tile_num_x;
 	float horizontal_tile = round(horizontal);
+	float horizontal_diff = horizontal - horizontal_tile;
 
-	float vertical = max(0, (asin(dirZ) / (pi / 2.0)) * (def.tile_num_y - 1.0));
+	// -pi/2 .. pi/2
+	//	 -1  ..  1
+	//	max0 ..  1
+	//	  0  .. tile_num_y
+	//	-0.5 .. tile_num_y - 0.5
+	float vertical = max(0, (asin(dirZ) / (pi / 2.0))) * (def.tile_num_y) - 0.5;
 	float vertical_tile = round(vertical);
+	float vertical_diff = vertical - vertical_tile;
 
 	// Sprite space
 	vec3 center = vs_out[0].positionW.xyz;
@@ -85,12 +96,35 @@ void main() {
 
 	float spriteHalfSize = def.model_scale * vs_out[0].scale * 0.5;
 
+			//  -0.5 .. 0.5
+			//    0  ..  1
+			//    0  .. tau
+			//    0  .. tau/num
+	vec4 rotH = qAngleAxis(-horizontal_diff * tau / (def.tile_num_x), vec3(0, 0, 1));
+
+			//  -0.5 .. 0.5
+			//    0  ..  1
+			//    0  .. tau
+			//    0  .. tau/num
+//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), vec3(0, -1, 0));
+
+//	vec4 rotV = qAngleAxis((vertical_diff) * (pi / 2) / (def.tile_num_y - 1), vec3(0, -1, 0));
+//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), qrotate(rotH, vec3(0, -1, 0)));
+//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), qrotate(qinverse(rotH), vec3(0, -1, 0)));
+	vec4 rotV = qAngleAxis((vertical_diff) * (pi / 2) / (def.tile_num_y - 1),
+//			qrotate(qneg(rotH), vec3(0, -1, 0))
+			qrotate((qAngleAxis(-horizontal * tau / (def.tile_num_x), vec3(0, 0, 1))), vec3(0, -1, 0))
+	);
+
+	rotationQuat = qmul(rotationQuat, rotV);
+	rotationQuat = qmul(rotationQuat, rotH);
+
 	// -------------------------------------------------------------------------------------------------
 
 	fs_in.tile_index = vec2(horizontal_tile, vertical_tile);
-//	fs_in.dither0 = fract(angleZ / 3.14 * 2.0 * 8.0);
-//	fs_in.dither1 = fract(angleXY / 3.14 / 2.0 * 16.0);
+	fs_in.dither = vec2(horizontal_diff, vertical_diff);
 	fs_in.rotationQuat = rotationQuat;
+//	fs_in.rotationNormalQuat = rotationNormalQuat;
 	fs_in.hsvColorShift = vs_out[0].hsvColorShift;
 	fs_in.type = vs_out[0].type;
 	fs_in.fogFactor = vs_out[0].fogFactor;

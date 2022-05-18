@@ -11,6 +11,8 @@
 //#include <libv/glr/procedural/cube.hpp>
 
 //#include <surface/view/render/renderer.hpp>
+//// pro
+//#include <surface/log.hpp>
 
 
 namespace surface {
@@ -41,6 +43,8 @@ BakerSpriteAtlas::BakerSpriteAtlas(libv::rev::ResourceManager& loader, libv::vec
 	bakeSSFBO.attach2D(libv::gl::Attachment::Color0, bakeSSColor);
 	bakeSSFBO.attach2D(libv::gl::Attachment::Color1, bakeSSNormal);
 	bakeSSFBO.attach2D(libv::gl::Attachment::Depth, bakeSSDepth);
+
+//	log_surface.info("Bake Size {}", bakeSize);
 }
 
 void BakerSpriteAtlas::renderAtlas(SpriteDefinition& def, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::rev::Model& model, float sizeMultiplier) {
@@ -69,8 +73,8 @@ void BakerSpriteAtlas::renderAtlas(SpriteDefinition& def, libv::glr::Queue& glr,
 
 	const auto angle_x_range = def.angle_x_max - def.angle_x_min;
 	const auto angle_y_range = def.angle_y_max - def.angle_y_min;
-	const auto angle_x_step = angle_x_range / static_cast<float>(def.tile_num_x - 1);
-	const auto angle_y_step = angle_y_range / static_cast<float>(def.tile_num_y - 1);
+	const auto angle_x_step = angle_x_range / static_cast<float>(def.tile_num_x);
+	const auto angle_y_step = angle_y_range / static_cast<float>(std::max(def.tile_num_y - 1, 1));
 
 	const auto guard_vp = glr.viewport_guard();
 	const auto guard_p = glr.projection.push_guard();

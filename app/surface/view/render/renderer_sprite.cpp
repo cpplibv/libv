@@ -82,6 +82,12 @@ void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::
 	// --- Texture Bake
 
 	libv::vec2i atlasSize = {2048, 512};
+//	libv::vec2i atlasSize = {4096, 1024};
+//	libv::vec2i atlasSize = {256, 2048};
+//	libv::vec2i atlasSize = {256, 4096};
+//	libv::vec2i atlasSize = {512, 512};
+//	libv::vec2i atlasSize = {3 * 64, 512};
+//	libv::vec2i atlasSize = {8 * 64, 8 * 64};
 	BakerSpriteAtlas baker(loader, atlasSize, 1, 16);
 
 	spriteAtlas = std::make_shared<SpriteAtlas>();

@@ -564,4 +564,5 @@ Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGr
 CMake source generation step: https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
 Deterministic Lockstep: https://gafferongames.com/post/deterministic_lockstep/
 
+Improving vegetation vertex normals: https://www.artstation.com/artwork/w6nQ96
 

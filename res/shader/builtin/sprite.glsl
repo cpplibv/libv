@@ -19,10 +19,11 @@ struct GeometryData {
 struct FragmentData {
 	vec3 positionW;
 	vec4 rotationQuat;
+//	vec4 rotationNormalQuat;
+
 	vec2 uv;
 	vec2 tile_index;
-//	float dither0;
-//	float dither1;
+	vec2 dither; // [ -0.5 .. 0.5 ]
 
 	vec4 hsvColorShift;
 

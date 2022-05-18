@@ -16,20 +16,67 @@ local global_takeover = {
 
 config = {
 	seed = 0,
-	resolution = 64,
+	resolution = 128,
 	--numChunks = 9,
-	--numChunks = 81,
-	numChunks = 169,
-	--numChunks = 369,
-	numVeggie = 150,
+	numChunks = 81,
+	--numChunks = 169,
+	--numChunks = 441,
+	--numVeggie = 150,
 	--numVeggie = 500,
-	--numVeggie = 1000,
+	numVeggie = 1000,
 
-	fogIntensity = 0.03,
+	fogIntensity = 0.02,
 	fogColor = "hsv(120, 5%, 95%)";
 }
 
 biomes = {
+	{
+		name = "snow",
+		coord = vec2f(-8, 0.2),
+		dominance = 1.0,
+		--handover = global_handover,
+		--takeover = global_takeover,
+
+		cutOff = vec2f(0.1, 0.4),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "hsv(0, 0%, 100%)" }
+		},
+		vegetation = {
+			--{
+			--	name = "rock",
+			--	color = "hsv(69, 10%, 60%)",
+			--	size = 0.022,
+			--	probability = 0.002,
+			--}
+		}
+	},
+	{
+		name = "mountain",
+		coord = vec2f(-6, 0.2),
+		dominance = 1.0,
+		--handover = global_handover,
+		--takeover = global_takeover,
+
+		cutOff = vec2f(0.1, 0.4),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "hsv(0, 0%, 50%)" }
+		},
+		vegetation = {
+			{
+				name = "tree",
+				scale = range(1.0, 2.0),
+				--hue = shift(20.0, 5.0),
+				--saturation = shift(0.0, 0.0),
+				--value = shift(0.0, 0.04),
+				hue = shift(0.0, 0.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.0, 0.0),
+				probability = 0.01,
+			},
+		}
+	},
 	--{
 	--	name = "mountain",
 	--	coord = vec2f(0.2, 0.2),
@@ -55,8 +102,8 @@ biomes = {
 	--	}
 	--},
 	{
-		name = "grassland2",
-		coord = vec2f(0.2, 0.8),
+		name = "grassland",
+		coord = vec2f(0.2, 0.2),
 		dominance = 1.0,
 		--handover = global_handover,
 		--takeover = global_takeover,
@@ -64,7 +111,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(100, 40%, 80%)" },
-			{ 1, "hsv(120, 50%, 45%)" }
+			{ 1, "hsv(120, 30%, 80%)" }
 		},
 		vegetation = {
 			--{
@@ -75,7 +122,6 @@ biomes = {
 			--},
 			{
 				name = "bush",
-				color = "hsv(145, 70%, 60%)",
 				scale = range(2.0, 4.0),
 				hue = shift(-60.0, 10.0),
 				saturation = shift(0.2, 0.1),
@@ -83,19 +129,21 @@ biomes = {
 				probability = 0.03,
 			},
 			{
-				name = "bush",
-				color = "hsv(145, 70%, 60%)",
-				scale = range(2.0, 4.0),
-				hue = shift(20.0, 10.0),
-				saturation = shift(-0.1, 0.2),
-				value = shift(0.1, 0.1),
+				name = "tree",
+				scale = range(1.0, 3.0),
+				--hue = shift(20.0, 5.0),
+				--saturation = shift(0.0, 0.0),
+				--value = shift(0.0, 0.04),
+				hue = shift(0.0, 0.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.0, 0.0),
 				probability = 1.0,
 			},
 		}
 	},
 	{
 		name = "desert",
-		coord = vec2f(0.8, 0.2),
+		coord = vec2f(0.9, 0.2),
 		dominance = 1.0,
 		--handover = global_handover,
 		--takeover = global_takeover,
@@ -103,7 +151,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "hsv(34, 54%, 92%)" }
+			{ 1, "hsv(34, 14%, 100%)" }
 		},
 		vegetation = {
 			--{
@@ -135,7 +183,7 @@ base = function(seed)
 			seed = seed,
 			octaves = 2,
 			amplitude = 1,
-			frequency = 0.05,
+			frequency = 0.025,
 			lacunarity = 2.0,
 			persistence = 0.5,
 		},
@@ -145,7 +193,7 @@ end
 mountainRange = mul {
 	constant(1.4),
 	pow {
-		exponent = 2.0,
+		exponent = 1.5,
 
 		min {
 			base(222),
@@ -199,6 +247,19 @@ microRange = mul {
 	},
 }
 
+bumps =
+	max {
+		constant(-0.2),
+		simplexFractal {
+			seed = 601,
+			octaves = 5,
+			amplitude = 0.8,
+			frequency = 0.02,
+			lacunarity = 2.0,
+			persistence = 0.55,
+		},
+	}
+
 -- =================================================================================================
 
 height = {
@@ -226,8 +287,9 @@ height = {
 	},
 	nodes =
 		add {
-			mountainRange,
-			microRange,
+			mul { constant(2), mountainRange },
+			mul { constant(1), microRange },
+			mul { constant(2), bumps },
 		}
 	--nodes = pow {
 	--	exponent = 2.0,
@@ -291,12 +353,12 @@ temperature = {
 			seed = 1,
 			octaves = 6,
 			amplitude = 0.3,
-			frequency = 0.5,
+			frequency = 0.25,
 			lacunarity = 2.0,
 			persistence = 0.5,
 		},
 		constant {
-			value = 0.5
+			value = 0.1
 		}
 	}
 }

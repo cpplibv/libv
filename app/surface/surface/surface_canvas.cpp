@@ -209,8 +209,14 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
-			const auto stoneID = renderer.sprite.registerSprite("stone_01.vm4", 1.0f / 250.f);
+			const auto treeIDNormalized = renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
+//			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
+//			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
+//			const auto treeCactusAID = renderer.sprite.registerSprite("tree_cactus_a_03.vm4", 1.0f / 10.f);
+//			const auto treePalmID = renderer.sprite.registerSprite("tree_palm_02.vm4", 1.0f / 20.f);
+//			const auto stoneID = renderer.sprite.registerSprite("stone_01.vm4", 1.0f / 250.f);
+//			const auto treeCactusBID = renderer.sprite.registerSprite("tree_cactus_b_04.vm4", 1.0f / 7.f);
+//			const auto sphereID00 = renderer.sprite.registerSprite("test_sphere.vm4", 5.f / 100.f);
 //			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
 //			renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
 //			renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
@@ -252,6 +258,36 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 			glr.model.translate(-1.f, 1.0f * static_cast<float>(i), 0.f);
 			glr.model.scale(1.f / 66.85f);
 			tree_01.render(glr, renderer.resource_context.uniform_stream);
+		}
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(2.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(5.f * 5.f / 100.f);
+			tree_02.render(glr, renderer.resource_context.uniform_stream);
+		}
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(5.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(1.f / 66.85f);
+			tree_01_n.render(glr, renderer.resource_context.uniform_stream);
+		}
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(8.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(5.f * 1.0f / 250.f);
+			tree_03.render(glr, renderer.resource_context.uniform_stream);
+		}
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(11.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(5.f * 1.0f / 20.f);
+			tree_04.render(glr, renderer.resource_context.uniform_stream);
+		}
+		for (int i = 0; i < 10; ++i) {
+			auto m_guard = glr.model.push_guard();
+			glr.model.translate(14.f, 1.0f * static_cast<float>(i), 0.f);
+			glr.model.scale(5.f * 1.0f / 10.f);
+			tree_05.render(glr, renderer.resource_context.uniform_stream);
 		}
 	}
 

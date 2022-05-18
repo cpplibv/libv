@@ -96,9 +96,9 @@ struct SurfaceScene : Scene {
 		int type = 0;
 		for (const auto& chunk : chunks)
 			for (const auto& veggie : chunk->veggies) {
-				type = (type + 1) % 2;
-				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
-//				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+				type = (type + 1) % 5;
+//				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
 			}
 	}
 
@@ -290,6 +290,11 @@ private:
 	bool initializedSprites = false;
 
 	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
+	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized.vm4");
+	libv::rev::Model tree_02 = renderer.resource_context.loader.model.load("test_sphere.vm4");
+	libv::rev::Model tree_03 = renderer.resource_context.loader.model.load("stone_01.vm4");
+	libv::rev::Model tree_04 = renderer.resource_context.loader.model.load("tree_palm_02.vm4");
+	libv::rev::Model tree_05 = renderer.resource_context.loader.model.load("tree_cactus_a_03.vm4");
 
 public:
 	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);

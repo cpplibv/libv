@@ -21,7 +21,7 @@ void main() {
 	vec3 N = normalize(fragmentNormal); // Normal vector
 	vec3 V = normalize(eye - fragmentPositionW); // View vector
 //	vec3 L = vec3(0, 0, 1); // Light vector
-	vec3 L = normalize(vec3(0.6, 0.8, 1)); // Light vector
+	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
@@ -39,7 +39,10 @@ void main() {
 //	+ texture(textureBase, vec3(fract(fragmentPositionW.xy * 0.2), textureIndex.z).rgb * textureWeight.z;
 //	+ texture(textureBase, vec3(fract(fragmentPositionW.xy * 0.2), textureIndex.w).rgb * textureWeight.w;
 
-	vec3 texBase = texture(textureBase, fract(fragmentPositionW.xy * 0.2)).rgb;
+	vec3 texBase = texture(textureBase, fract(fragmentPositionW.xy * 0.45)).rgb;
+	vec3 texBaseLarge = texture(textureBase, fract(fragmentPositionW.xy * 0.01)).rgb;
+
+	texBase = mix(texBase, texBaseLarge, 0.2);
 //	texBase = hsv_to_rgb(rgb_to_hsv(texBase) * vec3(1, 0, 1));
 
 	result = vec4(texBase * fragmentColor.rgb * attenuation, fragmentColor.a);

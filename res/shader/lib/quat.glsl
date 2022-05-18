@@ -109,7 +109,7 @@ vec4 qfromNonUnitVectors(const vec3 start, const vec3 dest) {
 
 /// A given angle of rotation about a given axis
 /// @param axis - unit vector
-vec4 qAngleAxis(float angle, vec3 axis) {
+vec4 qAngleAxis(const float angle, const vec3 axis) {
 	float sn = sin(angle * 0.5);
 	float cs = cos(angle * 0.5);
 	return vec4(axis * sn, cs);

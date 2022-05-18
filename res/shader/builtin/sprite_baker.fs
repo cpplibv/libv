@@ -45,9 +45,20 @@ void main() {
 //	resultColor = color;
 //	resultNormal = N;
 
+//	vec3 V = normalize(eye - fragmentNormalW);
+
 	resultColor = color;
 //	resultColor = vec4(1, 1, 1, 1);
 	resultNormal = vec4(N * 0.5 + 0.5, 1);
+//	resultNormal = vec4(normalize(fragmentPositionW - vec3(0, 0, 1)), 1);
+//	resultNormal = vec4(normalize(fragmentPositionW - vec3(0, 0, 30)) * 0.5 + 0.5, 1);
+//	resultNormal = vec4(mix(N, V, 0.5) * 0.5 + 0.5, 1);
+//	resultNormal = vec4(V * 0.5 + 0.5, 1);
+//	resultNormal = vec4(-V, 1);
 //	resultNormal = vec4(N, 1);
 //	resultNormal = vec4(.5, .5, 1, 1);
+//	resultColor = vec4(step(0.9, N), 1);
+//	resultColor.rgb = resultNormal.rgb * 2 - 1;
+
+//	resultColor.rgb = N;
 }
