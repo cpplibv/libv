@@ -5,6 +5,12 @@
 === Stack =======================================================================================
 
 
+write a glsl example script with warp, simplex fractal, coord, min
+
+sprite bottom side make it darker
+sprite ambient lighting should not affect normals that point downward
+
+seed a non seeded noise : random x y offset and rotation
 
 scene change does not clear sprites just adds a new batch
 

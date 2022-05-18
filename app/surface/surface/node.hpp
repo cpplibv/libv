@@ -57,6 +57,13 @@ struct NodeSimplex : Node {
 
 	virtual float evaluate(float x, float y) override {
 		return libv::noise_simplex(seed, x, y);
+
+//		if (seed == 0)
+//		return libv::noise_simplex2S(seed, x, y);
+//		if (seed == 1)
+//		return libv::noise_simplex(seed, x, y);
+//		if (seed == 2)
+//		return libv::noise_simplex_glsl(x, y);
 	}
 };
 
@@ -106,6 +113,26 @@ struct NodeFractal : Node {
 				},
 				octaves, amplitude, frequency, lacunarity, persistence);
 	}
+
+//	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
+//		const auto resultID = glsl.nextVarID();
+//		const auto gainID = glsl.nextVarID();
+//		const auto iterCoordID = glsl.nextCoordID();
+//		glsl.outln("float v{} = 0;", resultID);
+//		glsl.outln("float v{} = {};", gainID, amplitude);
+//		glsl.outln("vec2 c{} = c{};", iterCoordID, coordinates);
+//		glsl.outln("for (int i = 0; i < {}; ++i) {{", octaves);
+//		{
+//			auto t = glsl.tab_guard();
+//			glsl.outln("c{} = ...;", iterCoordID, lacunarity);
+//			auto inputResultID = input->glsl(glsl, iterCoordID);
+//			glsl.outln("v{} = v{};", resultID, inputResultID);
+//			glsl.outln("v{} *= {};", gainID, persistence);
+//			...
+//		}
+//		glsl.outln("}}", resultID);
+//		return resultID;
+//	}
 };
 
 struct NodeWarp : BaseFractalNode {
@@ -115,14 +142,14 @@ struct NodeWarp : BaseFractalNode {
 	explicit NodeWarp(std::unique_ptr<Node> input) : input(std::move(input)) {}
 
 	virtual float evaluate(float x, float y) override {
-		libv::warpWithIndependentFractal(seed, x, y, amplitude, frequency, octaves, lacunarity, persistence);
-		return input->evaluate(x, y);
+		auto [wx, wy] = libv::warpFractalIndependent(seed, x, y, octaves, amplitude, frequency, lacunarity, persistence);
+		return input->evaluate(wx, wy);
 	}
 
-//	virtual void glsl(std::string_view inputVar) override {
-//		auto resultName = nextVar();
-//		outln("vec2 {} = warpWithIndependentFractal({});", resultName, inputVar);
-//		input->glsl(resultName);
+//	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
+//		const auto resultCoordID = glsl.nextCoordID();
+//		glsl.outln("vec2 c{} = warpFractalIndependent({});", resultCoordID, coordinates);
+//		return input->glsl(glsl, "c{}", resultCoordID);
 //	}
 };
 
@@ -133,8 +160,10 @@ struct NodeCoordinate : Node {
 		return weights.x * x + weights.y * y;
 	}
 
-//	virtual void glsl(std::string_view inputVar) override {
-//		out("vec2({}.x * {}, {}.y * {})", inputVar, weights.x, inputVar, weights.y);
+//	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
+//		const auto resultID = glsl.nextVarID();
+//		glsl.outln("float v{} = {}.x * {} + {}.y * {};", resultID, coordinates, weights.x, coordinates, weights.y);
+//		return resultID;
 //	}
 };
 
@@ -142,17 +171,16 @@ struct NodePlus : Node {
 	using container = boost::container::small_vector<std::unique_ptr<Node>, 4>;
 	container inputs;
 
-//	Node* input0;
-//	Node* input1;
-//
-//	virtual float evaluate(float x, float y) override {
-//		return
-//				input0->evaluate(x, y) +
-//						input1->evaluate(x, y);
-//	}
 	explicit NodePlus(container inputs) : inputs(std::move(inputs)) {}
 
 	virtual float evaluate(float x, float y) override;
+
+//	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
+//		const auto boost::container::small_vector<GLSLVarID, 4>;
+//		const auto resultID = glsl.nextVarID();
+//		glsl.outln("float v{} = {}.x * {} + {}.y * {};", resultID, coordinates, weights.x, coordinates, weights.y);
+//		return resultID;
+//	}
 };
 
 struct NodeMul : Node {
