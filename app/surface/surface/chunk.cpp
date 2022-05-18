@@ -26,8 +26,8 @@ Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t
 		size(size),
 		resolution(resolution),
 		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32u), globalSeed),
-		biomeMap(resolution, resolution),
 		height(resolution, resolution),
+		color(resolution, resolution),
 		temperature(resolution, resolution),
 		humidity(resolution, resolution),
 		fertility(resolution, resolution),
@@ -53,10 +53,10 @@ float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	const auto downY = static_cast<int>(uv.y * step);
 	const auto upY = downY + 1;
 
-	const auto NW = height(leftX, upY).pos;
-	const auto NE = height(rightX, upY).pos;
-	const auto SW = height(leftX, downY).pos;
-	const auto SE = height(rightX, downY).pos;
+	const auto NW = height(leftX, upY);
+	const auto NE = height(rightX, upY);
+	const auto SW = height(leftX, downY);
+	const auto SE = height(rightX, downY);
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
 	const auto quadU = libv::fract(uv.x * step);
 	const auto quadV = libv::fract(uv.y * step);
@@ -213,13 +213,6 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 	const auto step = chunk.size / static_cast<float>(numQuad);
 //	const auto step = chunkSize / static_cast<float>(chunkResolution);
 
-	const auto calc = [&](const auto& node, const auto& colorGrad, const float x, const float y) {
-		const auto noise_value = node->evaluate(x + chunk.position.x, y + chunk.position.y);
-		const auto point = libv::vec3f{x, y, noise_value};
-		const auto color = colorGrad.sample(noise_value);
-		return SurfacePoint{point + libv::vec3f{chunk.position, 0}, color};
-	};
-
 	chunk.temp_humidity_distribution.fill(0.f);
 
 	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
@@ -231,7 +224,12 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 			const auto y = yf * step.y - chunk.size.y * 0.5f;
 
 			/// Calculate heatmaps' point
-			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
+//			chunk.height(xi, yi) = calc(config.height.rootNode, config.height.colorGrad, x, y);
+//									libv::vec3f{chunk.position.x + x, chunk.position.y + y, noise_value}
+			chunk.height(xi, yi) = libv::vec3f{
+					chunk.position.x + x,
+					chunk.position.y + y,
+					config.height.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y)};
 			chunk.temperature(xi, yi) = config.temperature.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 			chunk.humidity(xi, yi) = config.humidity.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y);
 
@@ -242,7 +240,7 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 //					std::clamp(static_cast<size_t>(chunk.temperature(xi, yi).pos.z * 127.f), 0uz, chunk.temp_humidity_distribution.size_y() - 1)
 //			) += 0.1f;
 
-			const auto height = chunk.height(xi, yi).pos.z;
+			const auto height = chunk.height(xi, yi).z;
 			const auto temp = chunk.temperature(xi, yi) - height * config.temperature.heightSensitivity;
 			const auto wet = chunk.humidity(xi, yi);
 			const auto fertilityOffset = chunk.fertility(xi, yi);
@@ -263,13 +261,13 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 //							height, temp, wet, fertilityOffset, config.temperature.heightSensitivity);
 			//TODO: Dont calculate biomeMix for every vertex, just for n*n and then interpolate between them (like veggie points)
 			if (config.blendBiomes) {
-				chunk.biomeMap(xi, yi) = mix.blendedColor(1.0f);
+				chunk.color(xi, yi) = mix.blendedColor(1.0f);
 			} else {
 				const auto& biome = mix.primary();
-				chunk.biomeMap(xi, yi) = biome.colorGrad.sample(1.0f);
+				chunk.color(xi, yi) = biome.colorGrad.sample(1.0f);
 			}
 
-//			chunk.biomeMap(xi, yi) = libv::vec4f{weight, weight, weight, 1};
+//			chunk.color(xi, yi) = libv::vec4f{weight, weight, weight, 1};
 //			chunk.surface(xi, yi) = SurfacePoint{chunk.height(xi, yi).pos + libv::vec3f{chunk.position, 0},
 //					{1,0,0,1}};
 //			std::cout << " fertility: " << fertility<<std::endl;

@@ -25,12 +25,6 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-struct SurfacePoint {
-	libv::vec3f pos;
-//	float height;
-	libv::vec4f color;
-};
-
 //struct TexturePoint {
 //	libv::vec2f pos;
 //	libv::vec4f color;
@@ -69,12 +63,12 @@ class BiomeCell {
 	Biome config;
 };
 
-enum class ChunkState {
-	pending,
-	ready,
-	active,
-	expired,
-};
+//enum class ChunkState {
+//	pending,
+//	ready,
+//	active,
+//	expired,
+//};
 
 class Chunk {
 public:
@@ -84,14 +78,13 @@ public:
 	uint32_t resolution;
 	libv::xoroshiro128 rng;
 
-	ChunkState state = ChunkState::pending;
+//	ChunkState state = ChunkState::pending;
 
 public:
-//	libv::vector_2D<BiomeCell> biomeMap;
-	libv::vector_2D<libv::vec4f> biomeMap;
+	libv::vector_2D<libv::vec3f> height; // Could be a single float, XY could be derived from index in vertex shader
+	libv::vector_2D<libv::vec4f> color;
 
-	libv::vector_2D<SurfacePoint> height;
-	libv::vector_2D<float> temperature; // TODO P1: Only store a float, surface point is overkill
+	libv::vector_2D<float> temperature;
 	libv::vector_2D<float> humidity;
 	libv::vector_2D<float> fertility;
 	libv::vector_2D<float> temp_humidity_distribution;

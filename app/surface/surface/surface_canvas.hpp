@@ -108,22 +108,31 @@ struct SurfaceScene : Scene {
 };
 
 inline libv::glr::Texture createTexture(const libv::vector_2D<float>& heatmap) {
-	auto texturef = libv::glr::Texture2D::R32F();
-	texturef.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
-	texturef.set(libv::gl::MagFilter::Nearest);
-	texturef.set(libv::gl::MinFilter::Nearest);
-	texturef.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
-	texturef.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
-	return texturef;
+	auto texture = libv::glr::Texture2D::R32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
+}
+
+inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec3f>& heatmap) {
+	auto texture = libv::glr::Texture2D::RGB32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
 }
 
 inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heatmap) {
-	auto texturef = libv::glr::Texture2D::RGBA32F();
-	texturef.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
-	texturef.set(libv::gl::MagFilter::Nearest);
-	texturef.set(libv::gl::MinFilter::Nearest);
-	texturef.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
-	return texturef;
+	auto texture = libv::glr::Texture2D::RGBA32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
 }
 
 struct TextureScene : Scene {
@@ -159,14 +168,14 @@ struct TextureScene : Scene {
 //	return heatmap;
 //}
 
-inline libv::vector_2D<libv::vec4f> getColors(const libv::vector_2D<SurfacePoint>& points_) {
-	libv::vector_2D<libv::vec4f> heatmap{points_.size()};
-//	colors.reserve(points_.size_x() * points_.size_y());
-	for (size_t y = 0; y < points_.size_y(); ++y)
-		for (size_t x = 0; x < points_.size_x(); ++x)
-			heatmap(x, y) = points_(x, y).color;
-	return heatmap;
-}
+//inline libv::vector_2D<libv::vec4f> getColors(const libv::vector_2D<libv::vec3f>& points_) {
+//	libv::vector_2D<libv::vec4f> heatmap{points_.size()};
+////	colors.reserve(points_.size_x() * points_.size_y());
+//	for (size_t y = 0; y < points_.size_y(); ++y)
+//		for (size_t x = 0; x < points_.size_x(); ++x)
+//			heatmap(x, y) = points_(x, y).color;
+//	return heatmap;
+//}
 
 struct HeightHeatMap : TextureScene {
 	using TextureScene::TextureScene;
@@ -175,7 +184,7 @@ struct HeightHeatMap : TextureScene {
 		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(getColors(chunk->height));
+			const auto heatMap = createTexture(chunk->height);
 			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
@@ -188,7 +197,7 @@ struct BiomeHeatMap : TextureScene {
 		(void) generation;
 //		rendererTexture.clear();
 		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->biomeMap);
+			const auto heatMap = createTexture(chunk->color);
 			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
 		}
 	}
@@ -232,7 +241,6 @@ struct FertilityHeatMap : TextureScene {
 		}
 	}
 };
-
 
 //TODO: revive distribution texture
 //struct TemperatureHumidityDistributionHeatMap : TextureScene {

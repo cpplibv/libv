@@ -233,18 +233,6 @@ public:
 	}
 
 public:
-	[[nodiscard]] constexpr inline libv::vec2i size() const noexcept {
-		return size_;
-	}
-
-	[[nodiscard]] constexpr inline int32_t size_x() const noexcept {
-		return size_.x;
-	}
-
-	[[nodiscard]] constexpr inline int32_t size_y() const noexcept {
-		return size_.y;
-	}
-
 	[[nodiscard]] constexpr inline libv::vec2i offset() const noexcept {
 		return offset_;
 	}
@@ -257,7 +245,18 @@ public:
 		return offset_.y;
 	}
 
-public:
+	[[nodiscard]] constexpr inline libv::vec2i size() const noexcept {
+		return size_;
+	}
+
+	[[nodiscard]] constexpr inline int32_t size_x() const noexcept {
+		return size_.x;
+	}
+
+	[[nodiscard]] constexpr inline int32_t size_y() const noexcept {
+		return size_.y;
+	}
+
 	[[nodiscard]] constexpr inline T* data() noexcept {
 		return storage.get();
 	}
@@ -266,7 +265,6 @@ public:
 		return storage.get();
 	}
 
-public:
 	[[nodiscard]] constexpr inline std::span<T> unordered_span() noexcept {
 		return {storage.get(), static_cast<std::size_t>(size_.x * size_.y)};
 	}

@@ -6,6 +6,7 @@
 #include <libv/math/vec.hpp>
 // std
 #include <memory>
+#include <span>
 
 
 namespace libv {
@@ -77,13 +78,16 @@ public:
 		return size_.y;
 	}
 
-public:
 	[[nodiscard]] constexpr inline T* data() noexcept {
 		return storage.get();
 	}
 
 	[[nodiscard]] constexpr inline const T* data() const noexcept {
 		return storage.get();
+	}
+
+	[[nodiscard]] constexpr inline std::span<T> span() noexcept {
+		return {storage.get(), static_cast<std::size_t>(size_.x * size_.y)};
 	}
 };
 

@@ -46,22 +46,21 @@ void RendererSurface::buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<sur
 		if (y == 0 || y == chunk->height.size_y() - 1)
 			return libv::vec3f{0, 0, 1};
 
-		const auto pL = chunk->height(x - 1, y).pos;
-		const auto pR = chunk->height(x + 1, y).pos;
-		const auto pU = chunk->height(x, y + 1).pos;
-		const auto pD = chunk->height(x, y - 1).pos;
+		const auto pL = chunk->height(x - 1, y);
+		const auto pR = chunk->height(x + 1, y);
+		const auto pU = chunk->height(x, y + 1);
+		const auto pD = chunk->height(x, y - 1);
 
 		return normalize(libv::cross(pR - pL, pU - pD));
 	};
 
 	const auto rowSize = chunk->height.size_y();
-	for (uint32_t y = 0; y < rowSize; y++) {
-		for (uint32_t x = 0; x < chunk->height.size_x(); ++x) {
-			position(chunk->height(x, y).pos);
+	for (uint32_t y = 0; y < rowSize; y++)
+		for (uint32_t x = 0; x < chunk->height.size_x(); ++x)
 			normal(calculateNormal(x, y));
-			color0(chunk->biomeMap(x, y));
-		}
-	}
+
+	position.set_from_range(chunk->height.span());
+	color0.set_from_range(chunk->color.span());
 
 	for (size_t i = 0; i < rowSize - 1; ++i) {
 		index(vi);
