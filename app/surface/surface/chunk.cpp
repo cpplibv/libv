@@ -8,13 +8,15 @@
 #include <libv/utility/random/xoroshiro128.hpp>
 // pro
 #include <surface/surface/biome.hpp>
+#include <surface/surface/node.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-bool isPointInSWTriangle(libv::vec2f p) {
+/// @param p - point to test. Point has to be in the [0..1] unit square
+[[nodiscard]] constexpr inline bool isPointInSWTriangle(libv::vec2f p) noexcept {
 	return p.x + p.y < 1;
 }
 
@@ -30,8 +32,8 @@ Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t
 		color(resolution, resolution),
 		temperature(resolution, resolution),
 		humidity(resolution, resolution),
-		fertility(resolution, resolution),
-		temp_humidity_distribution(resolution, resolution) {
+		fertility(resolution, resolution) {
+//		temp_humidity_distribution(resolution, resolution) {
 }
 
 float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
@@ -77,17 +79,6 @@ libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
 	const auto z = getInterpolatedHeight({u, v});
 	return {position.x + (u - 0.5f) * size.x, position.y + (v - 0.5f) * size.y, z};
 }
-
-//std::vector<libv::vec4f> Chunk::getColors(const libv::vector_2D<SurfacePoint>& points_) {
-//	std::vector<libv::vec4f> colors;
-//	colors.reserve(points_.size_x() * points_.size_y());
-//	for (size_t y = 0; y < points_.size_y(); ++y) {
-//		for (size_t x = 0; x < points_.size_x(); ++x) {
-//			colors.emplace_back(points_(x, y).color);
-//		}
-//	}
-//	return colors;
-//}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -186,25 +177,6 @@ void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 //	}
 //}
 
-//void Chunk::setTexturePoints(const Config& config) {
-//	const auto numQuad = config.resolution;
-//	const auto numVertex = numQuad + 1;
-//
-//	libv::mt::parallel_for(threads, size_t{0}, numVertex, [&](auto yi) {
-//		const auto yf = static_cast<float>(yi);
-//		const auto size_f = static_cast<float>(numQuad);
-//
-//		for (int xi = 0; xi < numVertex; ++xi) {
-//			const auto xf = static_cast<float>(xi);
-//			const auto noise_value = config.rootNode->evaluate(xf / size_f + position.x, yf / size_f + position.y);
-//			const auto point = libv::vec3f{xf / size_f, yf / size_f, noise_value * 0.1f};
-//			const auto color = config.colorGrad.sample(noise_value);
-//
-//			points(xi, yi) = SurfacePoint{point + libv::vec3f{position, 0}, color};
-//		}
-//	});
-//}
-
 void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 //	const auto chunkSize = libv::vec2f{8, 8};
 //	const auto chunkPosition = chunkIndex.cast<float>() * chunkSize;
@@ -213,7 +185,7 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 	const auto step = chunk.size / static_cast<float>(numQuad);
 //	const auto step = chunkSize / static_cast<float>(chunkResolution);
 
-	chunk.temp_humidity_distribution.fill(0.f);
+//	chunk.temp_humidity_distribution.fill(0.f);
 
 	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
 		const auto yf = static_cast<float>(yi);

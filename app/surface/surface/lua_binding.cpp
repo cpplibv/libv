@@ -5,6 +5,7 @@
 // ext
 #include <fmt/format.h>
 // libv
+#include <libv/container/flat_set.hpp>
 #include <libv/lua/convert_color.hpp>
 #include <libv/lua/sol_type_to_string.hpp>
 #include <libv/math/gradient.hpp>
@@ -298,17 +299,6 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 		throw std::runtime_error("Unknown node type: " + table.as<std::string>());
 }
 
-SurfaceObject SurfaceLuaBinding::convertSurfaceObject(const sol::object& object) {
-	const auto table = convertTable(object);
-
-	SurfaceObject result;
-	result.size = table["size"];
-	result.count = table["count"];
-	result.color = convertColor(table.get<sol::object>("color"));
-
-	return result;
-}
-
 HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOffset) {
 	const auto table = convertTable(object);
 
@@ -320,10 +310,6 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOf
 
 	return result;
 }
-
-//std::vector<SurfaceObject> SurfaceLuaBinding::convertSurfaceObjects(const sol::object& object) {
-//	return convertArray<SurfaceObject>(object, convertSurfaceObject);
-//}
 
 template <typename T>
 Range<T> convertRange(const sol::object& object) {
@@ -397,48 +383,17 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 
 	auto result = std::make_shared<Config>();
 	result->globalSeed = table["seed"]; // Global seed is optional
-//	result->visualization = table["visualization"];
-//	result->currentScene = table["currentScene"];
 	result->resolution = table["resolution"];
 	result->numChunks = table["numChunks"];
 	result->numVeggie = table["numVeggie"];
-	result->amplitude = table["amplitude"];
 //	result->plantDistribution = table["plantDistribution"];
-//	result->circleNumber = table["circleNumber"];
-//	result->circleSize = table["circleSize"];
 
 	result->fogIntensity = table["fogIntensity"].get_or(0.05f);
 	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));
 	result->fogColor = fogColorOpt ? *fogColorOpt : libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};
-//	result->objects = convertSurfaceObjects(table.get<sol::object>("objects"));
 
 	return result;
 }
-
-//Biome emptyBiome() {
-//	Biome result;
-//	result.name = "empty";
-//	result.coord = {0, 0};
-////	result.cutOff = table["cutOff"];
-//	result.dominance = 0.f;
-//	libv::gradientf<libv::vec4f> colorGrad;
-//	colorGrad.add(0.f, libv::vec4f{1, 1, 1, 1});
-//	colorGrad.add(1.f, libv::vec4f{0, 0, 0, 1});
-//
-//	result.colorGrad = colorGrad;
-////	result.vegetation = convertVeggieTypes(table["vegetation"]);
-//
-//	return result;
-//}
-
-//void extendBiomes(libv::flat_set<Biome> biomes) {
-//	auto size = biomes.size();
-//	while (size < 5) {
-//		biomes.insert(emptyBiome());
-//		size++;
-//	}
-////	return biomes;
-//}
 
 std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
 	const auto env = sol::environment(lua, sol::create, lua.globals());

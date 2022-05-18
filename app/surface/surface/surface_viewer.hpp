@@ -12,8 +12,6 @@
 #include <surface/view/frame.hpp>
 #include <surface/surface/surface_canvas.hpp>
 
-#include <optional>
-
 
 namespace surface {
 

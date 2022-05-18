@@ -51,6 +51,7 @@ private:
 
 private:
 	void build_mesh();
+
 public:
 	void addTexture(const libv::glr::Texture& texture, const libv::vec2i& index, const libv::vec2f chunkPos, const libv::vec2f size);
 	void clear();

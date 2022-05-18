@@ -8,8 +8,6 @@ in vec3 fragmentPositionW;
 out float height;
 
 
-
-
 //baseMicro = function(seed)
 //	return add{
 //		constant {

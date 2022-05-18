@@ -7,24 +7,18 @@
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/noise/noise.hpp>
-#include <libv/utility/approx.hpp>
-#include <libv/math/mix.hpp>
-#include <libv/math/step.hpp>
 // std
 #include <memory>
-#include <cmath>
+// pro
+#include <surface/surface/fwd.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-using Seed = uint32_t;
-
-// -------------------------------------------------------------------------------------------------
-
 struct Node {
-	virtual float evaluate(float x, float y) = 0;
+	virtual float evaluate(float x, float y) noexcept = 0;
 	virtual ~Node() = default;
 };
 
@@ -33,38 +27,25 @@ struct Node {
 struct NodeConstant : Node {
 	float value = 0.f;
 
-	virtual float evaluate(float x, float y) override;
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeValue : Node {
 	Seed seed = 0x5EED;
 
-	virtual float evaluate(float x, float y) override {
-		return libv::noise_value(seed, x, y);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodePerlin : Node {
 	Seed seed = 0x5EED;
 
-	virtual float evaluate(float x, float y) override {
-		return libv::noise_perlin(seed, x, y);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeSimplex : Node {
 	Seed seed = 0x5EED;
 
-	virtual float evaluate(float x, float y) override {
-		return libv::noise_simplex(seed, x, y);
-
-//		if (seed == 0)
-//		return libv::noise_simplex2S(seed, x, y);
-//		if (seed == 1)
-//		return libv::noise_simplex(seed, x, y);
-//		if (seed == 2)
-//		return libv::noise_simplex_glsl(x, y);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeCellular : Node {
@@ -74,9 +55,7 @@ struct NodeCellular : Node {
 	libv::CellularReturnType returnType = libv::CellularReturnType::cellValue;
 	float jitter = 1.0f;
 
-	virtual float evaluate(float x, float y) override {
-		return libv::noise_cellular(seed, x, y, distanceFn, returnType, jitter);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct BaseFractalNode : Node {
@@ -86,13 +65,12 @@ struct BaseFractalNode : Node {
 	float frequency = 1.0f;
 	float lacunarity = 2.0f;
 	float persistence = 0.5f;
-	virtual float evaluate(float x, float y) override = 0;
+
+	virtual float evaluate(float x, float y) noexcept override = 0;
 };
 
 struct NodeSimplexFractal : BaseFractalNode {
-	virtual float evaluate(float x, float y) override {
-		return libv::noise_fractal(seed, x, y, libv::noise_simplex, octaves, amplitude, frequency, lacunarity, persistence);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeFractal : Node {
@@ -104,15 +82,10 @@ struct NodeFractal : Node {
 	float lacunarity = 2.0f;
 	float persistence = 0.5f;
 
-	explicit NodeFractal(std::unique_ptr<Node> input) : input(std::move(input)) {}
+	explicit inline NodeFractal(std::unique_ptr<Node> input) :
+			input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override {
-		Seed not_used_seed = 0;
-		return libv::noise_fractal(not_used_seed, x, y, [&](Seed, float x0, float y0) {
-					return input->evaluate(x0, y0);
-				},
-				octaves, amplitude, frequency, lacunarity, persistence);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 
 //	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
 //		const auto resultID = glsl.nextVarID();
@@ -138,13 +111,10 @@ struct NodeFractal : Node {
 struct NodeWarp : BaseFractalNode {
 	std::unique_ptr<Node> input;
 
-	//	Node* input;
-	explicit NodeWarp(std::unique_ptr<Node> input) : input(std::move(input)) {}
+	explicit inline NodeWarp(std::unique_ptr<Node> input) :
+			input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override {
-		auto [wx, wy] = libv::warpFractalIndependent(seed, x, y, octaves, amplitude, frequency, lacunarity, persistence);
-		return input->evaluate(wx, wy);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 
 //	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
 //		const auto resultCoordID = glsl.nextCoordID();
@@ -156,9 +126,7 @@ struct NodeWarp : BaseFractalNode {
 struct NodeCoordinate : Node {
 	libv::vec2f weights;
 
-	virtual float evaluate(float x, float y) override {
-		return weights.x * x + weights.y * y;
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 
 //	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
 //		const auto resultID = glsl.nextVarID();
@@ -171,9 +139,10 @@ struct NodePlus : Node {
 	using container = boost::container::small_vector<std::unique_ptr<Node>, 4>;
 	container inputs;
 
-	explicit NodePlus(container inputs) : inputs(std::move(inputs)) {}
+	explicit inline NodePlus(container inputs) :
+			inputs(std::move(inputs)) {}
 
-	virtual float evaluate(float x, float y) override;
+	virtual float evaluate(float x, float y) noexcept override;
 
 //	virtual int32_t glsl(ScriptGLSL& glsl, std::string_view coordinates) override {
 //		const auto boost::container::small_vector<GLSLVarID, 4>;
@@ -187,17 +156,10 @@ struct NodeMul : Node {
 	using container = boost::container::small_vector<std::unique_ptr<Node>, 4>;
 	container inputs;
 
-//	Node* input0;
-//	Node* input1;
-//
-//	virtual float evaluate(float x, float y) override {
-//		return
-//				input0->evaluate(x, y) +
-//						input1->evaluate(x, y);
-//	}
-	explicit NodeMul(container inputs) : inputs(std::move(inputs)) {}
+	explicit inline NodeMul(container inputs) :
+			inputs(std::move(inputs)) {}
 
-	virtual float evaluate(float x, float y) override;
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodePow : Node {
@@ -205,29 +167,23 @@ struct NodePow : Node {
 
 	float exponent = 1.f;
 
-	explicit NodePow(std::unique_ptr<Node> input) : input(std::move(input)) {}
+	explicit inline NodePow(std::unique_ptr<Node> input) :
+			input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override;
+	virtual float evaluate(float x, float y) noexcept override;
 };
-
 
 struct NodeMix : Node {
 	std::unique_ptr<Node> a;
 	std::unique_ptr<Node> b;
 	std::unique_ptr<Node> t;
 
-	NodeMix(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::unique_ptr<Node> t) :
-			a(std::move(a)), b(std::move(b)), t(std::move(t)) {}
+	inline NodeMix(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::unique_ptr<Node> t) :
+			a(std::move(a)),
+			b(std::move(b)),
+			t(std::move(t)) {}
 
-	virtual float evaluate(float x, float y) override {
-		const auto t_ = t->evaluate(x,y);
-		if(libv::approx(t_) == 0.f)
-			return a->evaluate(x,y);
-		else if(libv::approx(t_) == 1.f)
-			return b->evaluate(x,y);
-		else
-			return libv::mix(a->evaluate(x, y), b->evaluate(x, y), t_);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeClamp : Node {
@@ -235,64 +191,52 @@ struct NodeClamp : Node {
 	std::unique_ptr<Node> low;
 	std::unique_ptr<Node> high;
 
-	NodeClamp(std::unique_ptr<Node> value, std::unique_ptr<Node> low, std::unique_ptr<Node> high) :
-			value(std::move(value)), low(std::move(low)), high(std::move(high)) {}
+	inline NodeClamp(std::unique_ptr<Node> value, std::unique_ptr<Node> low, std::unique_ptr<Node> high) :
+			value(std::move(value)),
+			low(std::move(low)),
+			high(std::move(high)) {}
 
-	virtual float evaluate(float x, float y) override {
-		const auto value_ = value->evaluate(x,y);
-		const auto low_ = low->evaluate(x,y);
-		const auto high_ = high->evaluate(x,y);
-
-		return std::clamp(value_, low_, high_);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
-
-//TODO [0-1] koze besurit
 struct NodeSaturate : Node {
 	std::unique_ptr<Node> input;
 
-	explicit NodeSaturate(std::unique_ptr<Node> input) :
-		input(std::move(input)) {}
+	explicit inline NodeSaturate(std::unique_ptr<Node> input) :
+			input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override {
-		return std::clamp(input->evaluate(x,y), 0.f, 1.f);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeMin : Node {
 	std::unique_ptr<Node> value;
 	std::unique_ptr<Node> min;
 
-	NodeMin(std::unique_ptr<Node> value, std::unique_ptr<Node> min) :
-	value(std::move(value)), min(std::move(min)) {}
+	inline NodeMin(std::unique_ptr<Node> value, std::unique_ptr<Node> min) :
+			value(std::move(value)),
+			min(std::move(min)) {}
 
-	virtual float evaluate(float x, float y) override {
-		return std::min(value->evaluate(x,y), min->evaluate(x, y));
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeMax : Node {
 	std::unique_ptr<Node> value;
 	std::unique_ptr<Node> max;
 
-	NodeMax(std::unique_ptr<Node> value, std::unique_ptr<Node> max) :
-			value(std::move(value)), max(std::move(max)) {}
+	inline NodeMax(std::unique_ptr<Node> value, std::unique_ptr<Node> max) :
+			value(std::move(value)),
+			max(std::move(max)) {}
 
-	virtual float evaluate(float x, float y) override {
-		return std::max(value->evaluate(x,y), max->evaluate(x, y));
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeSin : Node {
 	std::unique_ptr<Node> input;
 
-	explicit NodeSin(std::unique_ptr<Node> input) :
+	explicit inline NodeSin(std::unique_ptr<Node> input) :
 			input(std::move(input)) {}
 
-	virtual float evaluate(float x, float y) override {
-		return std::sin(input->evaluate(x,y));
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
 struct NodeSmoothstep : Node {
@@ -300,38 +244,15 @@ struct NodeSmoothstep : Node {
 	std::unique_ptr<Node> edge0;
 	std::unique_ptr<Node> edge1;
 
-	NodeSmoothstep(std::unique_ptr<Node> value, std::unique_ptr<Node> edge0, std::unique_ptr<Node> edge1) :
-	value(std::move(value)), edge0(std::move(edge0)), edge1(std::move(edge1)) {}
+	inline NodeSmoothstep(std::unique_ptr<Node> value, std::unique_ptr<Node> edge0, std::unique_ptr<Node> edge1) :
+			value(std::move(value)),
+			edge0(std::move(edge0)),
+			edge1(std::move(edge1)) {}
 
-	virtual float evaluate(float x, float y) override {
-		const auto value_ = value->evaluate(x,y);
-		const auto edge0_ = edge0->evaluate(x,y);
-		const auto edge1_ = edge1->evaluate(x,y);
-
-		return libv::smoothstep(value_, edge0_, edge1_);
-	}
+	virtual float evaluate(float x, float y) noexcept override;
 };
 
-//TODO if node
-//struct NodeIf : Node {
-//	std::unique_ptr<Node> value;
-//	std::unique_ptr<Node> low;
-//	std::unique_ptr<Node> high;
-//
-//	NodeClamp(std::unique_ptr<Node> value, std::unique_ptr<Node> low, std::unique_ptr<Node> high) :
-//			value(std::move(value)), low(std::move(low)), high(std::move(high)) {}
-//
-//	virtual float evaluate(float x, float y) override {
-//		const auto value_ = value->evaluate(x,y);
-//		const auto low_ = low->evaluate(x,y);
-//		const auto high_ = high->evaluate(x,y);
-//
-//		return std::clamp(value_, low_, high_);
-//	}
-//};
-
-
-//TODO P2: MixNode b
+// -------------------------------------------------------------------------------------------------
 
 //TODO P4: NodeOutput might not be necessary for current scope
 //struct NodeOutput : Node {
@@ -344,8 +265,6 @@ struct NodeSmoothstep : Node {
 //		return result;
 //	}
 //};
-
-//TODO: multiply node
 
 //TODO P5: NodeSplit definitely out of scope for now
 //struct NodeSplit : Node {

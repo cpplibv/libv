@@ -24,8 +24,8 @@ constexpr auto attribute_tangent    = libv::glr::Attribute<6, libv::vec3f>{};
 constexpr auto attribute_bitangent  = libv::glr::Attribute<7, libv::vec3f>{};
 constexpr auto attribute_texture0   = libv::glr::Attribute<8, libv::vec2f>{};
 
-constexpr auto attribute_scale      = libv::glr::Attribute<11, float>{};
-constexpr auto attribute_rotation   = libv::glr::Attribute<12, float>{};
+//constexpr auto attribute_scale      = libv::glr::Attribute<11, float>{};
+//constexpr auto attribute_rotation   = libv::glr::Attribute<12, float>{};
 constexpr auto attribute_type       = libv::glr::Attribute<13, int32_t>{};
 constexpr auto attribute_custom1    = libv::glr::Attribute<14, libv::vec4f>{};
 constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};

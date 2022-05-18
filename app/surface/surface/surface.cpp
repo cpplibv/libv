@@ -11,6 +11,7 @@
 // pro
 #include <surface/log.hpp>
 #include <surface/surface/chunk.hpp>
+#include <surface/surface/config.hpp>
 
 
 namespace surface {
@@ -111,7 +112,6 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	if (oldFocalOriginIndex != newFocalOriginIndex) {
 		log_surface.trace("BORDER");
 
-		// Expire distant chunks
 		// Detect chunks out of range
 		currentTask->chunks.slide(newFocalOriginIndex - oldFocalOriginIndex, [&](libv::vec2i index, const auto& chunk) {
 			(void) index;
@@ -121,25 +121,12 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 			}
 			return nullptr;
 		});
-//		std::erase_if(currentTask->chunks, [&](const auto& pair) {
-//			const auto& chunk = pair.second;
-//			if ((chunk->position - xy(newFocalPosition)).length_sq() > distanceThresholdExpire * distanceThresholdExpire) {
-//				log_surface.trace("Killed CHUNKYYY {}", chunk->index);
-//				currentTask->queueExpired.emplace_back(chunk);
-//				chunk->state = ChunkState::expired;
-//				libv::erase_unstable(currentTask->queuePending, chunk);
-//				libv::erase_unstable(currentTask->queueReady, chunk);
-//				return true;
-//			}
-//			return false;
-//		});
 
 		auto t2 = timer.timef_ms().count();
 		log_surface.trace_if(t2 > 0.01f, "Focus update took: Slide {:8.4f} ms", t2);
 		timer.reset();
 
 		// Detect chunks in range
-		// Add new chunks into the pool
 		for (int y = -prefetchIndexCount; y <= prefetchIndexCount; ++y) {
 			for (int x = -prefetchIndexCount; x <= prefetchIndexCount; ++x) {
 				const auto index = newFocalOriginIndex + libv::vec2i{x, y};
@@ -192,32 +179,6 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 
 	return changed;
 }
-
-//std::shared_ptr<Chunk> Surface::tryPopReadyChunk() {
-//	if (!currentTask)
-//		return nullptr;
-//
-//	auto lock = std::unique_lock(currentTask->mutex);
-//	if (currentTask->queueReady.empty())
-//		return nullptr;
-//
-//	auto first = std::move(currentTask->queueReady.back());
-//	currentTask->queueReady.pop_back();
-//	return first;
-//}
-//
-//std::shared_ptr<Chunk> Surface::tryPopExpiredChunk() {
-//	if (!currentTask)
-//		return nullptr;
-//
-//	auto lock = std::unique_lock(currentTask->mutex);
-//	if (currentTask->queueExpired.empty())
-//		return nullptr;
-//
-//	auto first = std::move(currentTask->queueExpired.back());
-//	currentTask->queueExpired.pop_back();
-//	return first;
-//}
 
 // -------------------------------------------------------------------------------------------------
 

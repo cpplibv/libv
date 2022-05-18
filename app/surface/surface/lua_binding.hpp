@@ -5,21 +5,16 @@
 // ext
 #include <sol/sol.hpp>
 // libv
-#include <libv/container/flat_set.hpp>
+#include <libv/container/flat_set_fwd.hpp>
 // std
 #include <memory>
+// pro
+#include <surface/surface/fwd.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
-
-class Biome;
-class Config;
-class HeatMap;
-class Node;
-class SurfaceObject;
-class VeggieType;
 
 using Seed = uint32_t;
 
@@ -28,27 +23,21 @@ using Seed = uint32_t;
 class SurfaceLuaBinding {
 private:
 	sol::state lua;
-//	Config config;
 
-//	void setFractalConfig(const sol::table& luaConfig);
+public:
+	SurfaceLuaBinding();
+	[[nodiscard]] std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script);
 
 private:
 	static Seed convertSeed(const sol::object& object, Seed seedOffset);
 	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, Seed seedOffset);
-	static SurfaceObject convertSurfaceObject(const sol::object& object);
-//	std::vector<SurfaceObject> convertSurfaceObjects(const sol::object& object);
 	static HeatMap convertHeatMap(const sol::object& object, Seed seedOffset);
 	static Biome convertBiome(const sol::object& object);
 	static libv::flat_set<Biome> convertBiomes(const sol::object& object);
 	static VeggieType convertVeggieType(const sol::object& object);
 	static std::vector<VeggieType> convertVeggieTypes(const sol::object& object);
 
-	std::shared_ptr<Config> convertConfig(const sol::object& object);
-
-public:
-	SurfaceLuaBinding();
-	std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script);
-//	NodeTree getNodeTreeFromLuaScript(std::string_view script);
+	static std::shared_ptr<Config> convertConfig(const sol::object& object);
 };
 
 // -------------------------------------------------------------------------------------------------

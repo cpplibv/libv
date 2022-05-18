@@ -3,28 +3,6 @@
 -- -------------------------------------------------------------------------------------------------
 
 
-NodeType = {
-	constant = "constant",
-	value = "value",
-	perlin = "perlin",
-	simplex = "simplex",
-	cellular = "cellular",
-	simplexFractal = "simplexFractal",
-	warp = "warp",
-	fractal = "fractal",
-	coord = "coord",
-	add = "add",
-	mul = "mul",
-	pow = "pow",
-	mix = "mix",
-	clamp = "clamp",
-	saturate = "saturate",
-	min = "min",
-	max = "max",
-	sin = "sin",
-	smoothstep = "smoothstep",
-}
-
 DistFun = {
 	euclidean = 0,
 	euclideanSq = 1,
@@ -48,128 +26,128 @@ ReturnType = {
 constant = function(args_or_number)
 	if type(args_or_number) == "number" then
 		return {
-			nodeType = NodeType.constant,
+			nodeType = "constant",
 			value = args_or_number,
 		}
 	else
 		local node = args_or_number or {}
-		node.nodeType = NodeType.constant
+		node.nodeType = "constant"
 		return node
 	end
 end
 
 value = function(args)
 	args = args or {}
-	args.nodeType = NodeType.value
+	args.nodeType = "value"
 	return args
 end
 
 perlin = function(args)
 	args = args or {}
-	args.nodeType = NodeType.perlin
+	args.nodeType = "perlin"
 	return args
 end
 
 simplex = function(args)
 	args = args or {}
-	args.nodeType = NodeType.simplex
+	args.nodeType = "simplex"
 	return args
 end
 
 cellular = function(args)
 	args = args or {}
-	args.nodeType = NodeType.cellular
+	args.nodeType = "cellular"
 	return args
 end
 
 simplexFractal = function(args)
 	args = args or {}
-	args.nodeType = NodeType.simplexFractal
+	args.nodeType = "simplexFractal"
 	return args
 end
 
 warp = function(args)
 	args = args or {}
-	args.nodeType = NodeType.warp
+	args.nodeType = "warp"
 	return args
 end
 
 fractal = function(args)
 	args = args or {}
-	args.nodeType = NodeType.fractal
+	args.nodeType = "fractal"
 	return args
 end
 
 coord = function(args_or_x, none_or_y)
 	if type(args_or_x) == "number" and type(none_or_y) == "number" then
 		local node = {}
-		node.nodeType = NodeType.coord
+		node.nodeType = "coord"
 		node.weights = vec2f(args_or_x, none_or_y)
 		return node
 	else
 		local node = args_or_x or {}
-		node.nodeType = NodeType.coord
+		node.nodeType = "coord"
 		return node
 	end
 end
 
 add = function(args)
 	args = args or {}
-	args.nodeType = NodeType.add
+	args.nodeType = "add"
 	return args
 end
 
 mul = function(args)
 	args = args or {}
-	args.nodeType = NodeType.mul
+	args.nodeType = "mul"
 	return args
 end
 
 pow = function(args)
 	args = args or {}
-	args.nodeType = NodeType.pow
+	args.nodeType = "pow"
 	return args
 end
 
 mix = function(args)
 	args = args or {}
-	args.nodeType = NodeType.mix
+	args.nodeType = "mix"
 	return args
 end
 
 clamp = function(args)
 	args = args or {}
-	args.nodeType = NodeType.clamp
+	args.nodeType = "clamp"
 	return args
 end
 
 saturate = function(args)
 	args = args or {}
-	args.nodeType = NodeType.saturate
+	args.nodeType = "saturate"
 	return args
 end
 
 min = function(args)
 	args = args or {}
-	args.nodeType = NodeType.min
+	args.nodeType = "min"
 	return args
 end
 
 max = function(args)
 	args = args or {}
-	args.nodeType = NodeType.max
+	args.nodeType = "max"
 	return args
 end
 
 sin = function(args)
 	args = args or {}
-	args.nodeType = NodeType.sin
+	args.nodeType = "sin"
 	return args
 end
 
 smoothstep = function(args)
 	args = args or {}
-	args.nodeType = NodeType.smoothstep
+	args.nodeType = "smoothstep"
 	return args
 end
 

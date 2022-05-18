@@ -2,17 +2,7 @@
 
 #pragma once
 
+// fwd
+#include <libv/container/flat_set_fwd.hpp>
 // ext
 #include <boost/container/flat_set.hpp>
-
-
-namespace libv {
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T, typename Comp = std::less<>>
-using flat_set = boost::container::flat_set<T, Comp>;
-
-// -------------------------------------------------------------------------------------------------
-
-} // namespace libv

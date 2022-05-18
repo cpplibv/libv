@@ -57,12 +57,10 @@ inline std::atomic<bool> forceRebake = false;
 
 struct Scene {
 protected:
-//	libv::glr::UniformBuffer& uniform_stream;
-//	libv::glr::Queue& glr;
 	Renderer& renderer;
 
 public:
-	explicit Scene(Renderer& renderer) : renderer(renderer) {}
+	explicit inline Scene(Renderer& renderer) : renderer(renderer) {}
 
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) = 0;
@@ -70,10 +68,7 @@ public:
 //	virtual void clear(size_t count) = 0;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
-//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) = 0;
-	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
-		renderer.veggie.render(glr, uniform_stream, frustum);
-	}
+	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
 
 	virtual ~Scene() = default;
 };
@@ -81,197 +76,58 @@ public:
 struct SurfaceScene : Scene {
 	using Scene::Scene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-//		renderer.surface.clear();
-		for (const auto& chunk : chunks) {
-			renderer.surface.addChunk(generation, chunk);
-		}
-	}
-
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override {
-		renderer.surface.render(glr, uniform_stream, frustum);
-	}
-
-	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		int type = 0;
-		for (const auto& chunk : chunks)
-			for (const auto& veggie : chunk->veggies) {
-				type = (type + 1) % 5;
-//				renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
-				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
-			}
-	}
-
-//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-//		rendererVeggie.render(glr, uniform_stream, frustum);
-//	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
+	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
+//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override;
 };
-
-inline libv::glr::Texture createTexture(const libv::vector_2D<float>& heatmap) {
-	auto texture = libv::glr::Texture2D::R32F();
-	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
-	texture.set(libv::gl::MagFilter::Nearest);
-	texture.set(libv::gl::MinFilter::Nearest);
-	texture.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
-	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
-	return texture;
-}
-
-inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec3f>& heatmap) {
-	auto texture = libv::glr::Texture2D::RGB32F();
-	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
-	texture.set(libv::gl::MagFilter::Nearest);
-	texture.set(libv::gl::MinFilter::Nearest);
-	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
-	return texture;
-}
-
-inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heatmap) {
-	auto texture = libv::glr::Texture2D::RGBA32F();
-	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
-	texture.set(libv::gl::MagFilter::Nearest);
-	texture.set(libv::gl::MinFilter::Nearest);
-	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
-	return texture;
-}
 
 struct TextureScene : Scene {
 	using Scene::Scene;
 
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override {
-		(void) frustum;
-		auto s_guard = glr.state.push_guard();
-		glr.state.disableDepthMask();
-		glr.state.disableDepthTest();
-		renderer.surfaceTexture.render(glr, uniform_stream);
-	}
-
-	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		for (const auto& chunk : chunks)
-			for (const auto& veggie : chunk->veggies) {
-				renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
-			}
-	}
-
-//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override {
-//		rendererVeggie.render(glr, uniform_stream);
-//	}
-
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
+	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
+//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override;
 };
-
-//inline libv::vector_2D<float> getFloats(const libv::vector_2D<SurfacePoint>& points_) {
-//	libv::vector_2D<float> heatmap{points_.size()};
-////	colors.reserve(points_.size_x() * points_.size_y());
-//	for (size_t y = 0; y < points_.size_y(); ++y)
-//		for (size_t x = 0; x < points_.size_x(); ++x)
-//			heatmap(x, y) = points_(x, y).color.z;
-//	return heatmap;
-//}
-
-//inline libv::vector_2D<libv::vec4f> getColors(const libv::vector_2D<libv::vec3f>& points_) {
-//	libv::vector_2D<libv::vec4f> heatmap{points_.size()};
-////	colors.reserve(points_.size_x() * points_.size_y());
-//	for (size_t y = 0; y < points_.size_y(); ++y)
-//		for (size_t x = 0; x < points_.size_x(); ++x)
-//			heatmap(x, y) = points_(x, y).color;
-//	return heatmap;
-//}
 
 struct HeightHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		(void) generation;
-//		rendererTexture.clear();
-		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->height);
-			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
-		}
-	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
 struct BiomeHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		(void) generation;
-//		rendererTexture.clear();
-		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->color);
-			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
-		}
-	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
 struct TemperatureHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		(void) generation;
-//		rendererTexture.clear();
-		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->temperature);
-			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
-		}
-	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
 struct HumidityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		(void) generation;
-//		rendererTexture.clear();
-		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->humidity);
-			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
-		}
-	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
 struct FertilityHeatMap : TextureScene {
 	using TextureScene::TextureScene;
 
-	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-		(void) generation;
-//		rendererTexture.clear();
-		for (const auto& chunk : chunks) {
-			const auto heatMap = createTexture(chunk->fertility);
-			renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
-		}
-	}
+	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
-//TODO: revive distribution texture
+// TODO P5: revive distribution texture
 //struct TemperatureHumidityDistributionHeatMap : TextureScene {
+//	using TextureScene::TextureScene;
 //
-//	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override {
-//		rendererTexture.clear();
-//		const auto size = chunk->humidity.size_y() + 1;
-//		libv::vector_2D<float> result{size, size};
-//		result.fill(0.f);
-//
-//		for (const auto& chunk : chunks) {
-//			for (size_t y = 0; y < chunk->humidity.size_y(); ++y) {
-//				for (size_t x = 0; x < chunk->humidity.size_x(); ++x) {
-//					result(
-//							std::clamp(static_cast<size_t>(std::max(0.f, chunk->humidity(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
-//							std::clamp(static_cast<size_t>(std::max(0.f, chunk->temperature(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
-//					) += 0.005f;
-//				}
-//			}
-//		}
-//
-//		auto texturef = libv::glr::Texture2D::R32F();
-//		texturef.storage(1, result.size().cast<int32_t>());
-//		texturef.set(libv::gl::MagFilter::Nearest);
-//		texturef.set(libv::gl::MinFilter::Nearest);
-////		texturef.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-//		texturef.image(0, libv::vec2i{0, 0}, result.size().cast<int32_t>(), result.data());
-//
-//		renderer.addTexture(texturef, {-5.f, -5.f}, {10.f, 10.f});
-//	}
+//	virtual void build(const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 //};
+
+// -------------------------------------------------------------------------------------------------
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
@@ -282,21 +138,20 @@ private:
 	std::string currentConfigPath_;
 
 private:
-	surface::Renderer renderer;
+	Renderer renderer;
 
 	SurfaceLuaBinding binding;
-//	std::string configPaths;
 	libv::fsw::Watcher fileWatcher;
 
 private:
 	std::unique_ptr<Scene> activeScene;
 	std::unique_ptr<Surface> surface;
-//	std::vector<libv::vec2i> visibleChunks;
+
 	Frustum cameraFrustum;
-//	std::vector<Surface> surface;
 	bool surfaceDirty = false;
 	bool initializedSprites = false;
 
+private:
 	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
 	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized.vm4");
 	libv::rev::Model tree_02 = renderer.resource_context.loader.model.load("test_sphere.vm4");

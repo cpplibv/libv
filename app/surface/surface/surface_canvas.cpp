@@ -3,17 +3,182 @@
 // hpp
 #include <surface/surface/surface_canvas.hpp>
 // libv
-#include <libv/glr/queue.hpp>
 #include <libv/algo/wildcard.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/utility/read_file.hpp>
+// std
+#include <filesystem>
 // pro
 #include <surface/log.hpp>
-//std
-#include <filesystem>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
+
+inline libv::glr::Texture createTexture(const libv::vector_2D<float>& heatmap) {
+	auto texture = libv::glr::Texture2D::R32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
+}
+
+inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec3f>& heatmap) {
+	auto texture = libv::glr::Texture2D::RGB32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
+}
+
+inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heatmap) {
+	auto texture = libv::glr::Texture2D::RGBA32F();
+	texture.storage(1, libv::vec2z{heatmap.size_x(), heatmap.size_x()}.cast<int>());
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.image(0, libv::vec2i{0, 0}, heatmap.size().cast<int32_t>(), heatmap.data());
+	return texture;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Scene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+	renderer.veggie.render(glr, uniform_stream, frustum);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void SurfaceScene::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+//	renderer.surface.clear();
+	for (const auto& chunk : chunks) {
+		renderer.surface.addChunk(generation, chunk);
+	}
+}
+
+void SurfaceScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+	renderer.surface.render(glr, uniform_stream, frustum);
+}
+
+void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	int type = 0;
+	for (const auto& chunk : chunks)
+		for (const auto& veggie : chunk->veggies) {
+			type = (type + 1) % 5;
+//			renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+		}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void TextureScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+	(void) frustum;
+	auto s_guard = glr.state.push_guard();
+	glr.state.disableDepthMask();
+	glr.state.disableDepthTest();
+	renderer.surfaceTexture.render(glr, uniform_stream);
+}
+
+void TextureScene::buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	for (const auto& chunk : chunks)
+		for (const auto& veggie : chunk->veggies) {
+			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
+		}
+}
+
+//	void TextureScene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
+//		rendererVeggie.render(glr, uniform_stream);
+//	}
+
+// -------------------------------------------------------------------------------------------------
+
+void HeightHeatMap::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	(void) generation;
+//	rendererTexture.clear();
+	for (const auto& chunk : chunks) {
+		const auto heatMap = createTexture(chunk->height);
+		renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BiomeHeatMap::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	(void) generation;
+//	rendererTexture.clear();
+	for (const auto& chunk : chunks) {
+		const auto heatMap = createTexture(chunk->color);
+		renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void TemperatureHeatMap::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	(void) generation;
+//	rendererTexture.clear();
+	for (const auto& chunk : chunks) {
+		const auto heatMap = createTexture(chunk->temperature);
+		renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void HumidityHeatMap::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	(void) generation;
+//	rendererTexture.clear();
+	for (const auto& chunk : chunks) {
+		const auto heatMap = createTexture(chunk->humidity);
+		renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void FertilityHeatMap::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	(void) generation;
+//	rendererTexture.clear();
+	for (const auto& chunk : chunks) {
+		const auto heatMap = createTexture(chunk->fertility);
+		renderer.surfaceTexture.addTexture(heatMap, chunk->index, chunk->position, chunk->size);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+//	void TemperatureHumidityDistributionHeatMap::build(const std::vector<std::shared_ptr<Chunk>>& chunks) {
+//		rendererTexture.clear();
+//		const auto size = chunk->humidity.size_y() + 1;
+//		libv::vector_2D<float> result{size, size};
+//		result.fill(0.f);
+//
+//		for (const auto& chunk : chunks) {
+//			for (size_t y = 0; y < chunk->humidity.size_y(); ++y) {
+//				for (size_t x = 0; x < chunk->humidity.size_x(); ++x) {
+//					result(
+//							std::clamp(static_cast<size_t>(std::max(0.f, chunk->humidity(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_x() - 1),
+//							std::clamp(static_cast<size_t>(std::max(0.f, chunk->temperature(x, y)) * static_cast<float>(config.resolution)), 0uz, result.size_y() - 1)
+//					) += 0.005f;
+//				}
+//			}
+//		}
+//
+//		auto texture = libv::glr::Texture2D::R32F();
+//		texture.storage(1, result.size().cast<int32_t>());
+//		texture.set(libv::gl::MagFilter::Nearest);
+//		texture.set(libv::gl::MinFilter::Nearest);
+////		texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
+//		texture.image(0, libv::vec2i{0, 0}, result.size().cast<int32_t>(), result.data());
+//
+//		renderer.addTexture(texture, {-5.f, -5.f}, {10.f, 10.f});
+//	}
+
+// =================================================================================================
 
 SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_) :
 		cameraManager(controls),
@@ -199,13 +364,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		previousScene = currentScene;
 		activeScene = createScene(currentScene);
 		//build mesh
+		// <<< build / buildVeggie called twice? build mesh happens in here and in surfaceDirty too
 		activeScene->build(surface->getGeneration(), surface->getChunks());
 		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
 	}
-//	if (previousScene != currentScene) {
-//		previousScene = currentScene;
-//		activeScene = createScene(currentScene);
-//	}
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {

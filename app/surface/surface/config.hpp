@@ -6,29 +6,20 @@
 #include <libv/container/flat_set.hpp>
 #include <libv/math/gradient.hpp>
 #include <libv/math/vec.hpp>
+// std
+#include <memory>
 // pro
-#include <surface/surface/node.hpp>
+#include <surface/surface/fwd.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Visualization {
-	model,
-	spheres
-};
-
-enum class SurfaceObjectType {
-	tree,
-	bush,
-	rock
-};
-
 enum class NodeType {
 	perlin,
 	warp,
-	add
+	add,
 };
 
 enum class NoiseType {
@@ -36,29 +27,15 @@ enum class NoiseType {
 	perlin,
 	simplex,
 	simplex2S,
-	cellular
+	cellular,
 };
-
-//struct Fractal{
-//	//fractal
-//	int octaves;
-//	float amplitude;
-//	float frequency;
-//	float lacunarity;
-//	float persistence;
-//};
 
 enum class PlantDistribution {
 	random,
-	clustered
+	clustered,
 };
 
-struct SurfaceObject {
-	SurfaceObjectType type;
-	float size;
-	size_t count;
-	libv::vec4f color;
-};
+// -------------------------------------------------------------------------------------------------
 
 struct HeatMap {
 	std::string name;
@@ -75,7 +52,7 @@ struct Range {
 };
 
 template <typename T>
-struct Shift{
+struct Shift {
 	T offset;
 	T radius;
 };
@@ -124,52 +101,29 @@ struct Biome {
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
 class Config {
 public:
 	Seed globalSeed;
 
 	bool blendBiomes = true;
 
-	Visualization visualization;
 	size_t resolution; /// Number of quads/pixels per side
-	size_t numChunks; /// Number of quads/pixels per side
+	size_t numChunks;
 	size_t numVeggie;
-	float amplitude;
+
 	PlantDistribution plantDistribution;
-	int circleNumber;
-	float circleSize;
 
 	float fogIntensity;
 	libv::vec4f fogColor;
 
-//	std::vector<SurfaceObject> objects;
 	libv::flat_set<Biome> biomes;
-//	libv::gradientf<libv::vec4f> colorGrad;
-//	std::unique_ptr<Node> rootNode;
+
 	HeatMap height;
 	HeatMap temperature;
 	HeatMap humidity;
 	HeatMap fertility;
-
-//	std::unique_ptr<Node> heightRootNode;
-//	std::unique_ptr<Node> temperatureOffsetRootNode;
-//	std::unique_ptr<Node> humidityRootNode;
-//	std::unique_ptr<Node> fertilityRootNode;
-
-	//fractal
-//	int octaves;
-//	float amplitude;
-//	float frequency;
-//	float lacunarity;
-//	float persistence;
-//	//noise
-//	int seed;
-//	NoiseType noiseType;
-//
-//	//cellular
-//	libv::CellularDistanceFunction distanceFn = libv::CellularDistanceFunction::euclidean;
-//	libv::CellularReturnType returnType = libv::CellularReturnType::cellValue;
-//	float jitter = 1.0f;
 };
 
 // -------------------------------------------------------------------------------------------------

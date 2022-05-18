@@ -8,17 +8,17 @@
 #include <utility>
 // libv
 #include <libv/algo/erase_if_stable.hpp>
+#include <libv/container/flat_set.hpp>
 #include <libv/math/constants.hpp>
+#include <libv/math/step.hpp>
+#include <libv/utility/random/uniform_distribution.hpp>
+#include <libv/utility/random/xoroshiro128.hpp>
 // pro
 #include <surface/log.hpp>
+#include <surface/surface/veggie.hpp>
 
 
 namespace surface {
-
-// -------------------------------------------------------------------------------------------------
-
-Veggie::Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift) :
-		id(id), normal(normal), rotation(rotation), scale(scale), hsv_color_shift(hsvColorShift) {}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,6 @@ float BiomeMix::normalize() {
 	for (const auto& entry : entries) {
 		sum += entry.weight;
 	}
-
 
 	if (sum == 0.f) {
 		log_surface.fatal("Sum == 0.f");
@@ -154,7 +153,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 		auto valueDist = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
 		const auto value = std::clamp(valueDist(rng), 0.f, 1.f);
 
-		return Veggie(0, normal, rotation, scale, libv::vec3f{hue, saturation, value});
+		return Veggie(0, {}, normal, rotation, scale, libv::vec3f{hue, saturation, value});
 	}
 
 	return std::nullopt;
@@ -205,5 +204,7 @@ BiomeMix BiomePicker::mix(const libv::flat_set<Biome>& biomes, const libv::vec2f
 	}
 	return BiomeMix(std::move(entries));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface

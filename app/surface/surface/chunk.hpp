@@ -2,66 +2,20 @@
 
 #pragma once
 
-//multithreading
+// libv
+#include <libv/container/vector_2d.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/mt/hardware_concurrency.hpp>
 #include <libv/mt/thread_bulk.hpp>
-#include <libv/utility/read_file.hpp>
-
-#include <libv/math/vec.hpp>
-#include <libv/container/vector_2d.hpp>
-
+#include <libv/utility/random/xoroshiro128.hpp>
 // std
-#include <array>
-#include <map>
-
-#include <surface/surface/config.hpp>
-#include <surface/surface/biome.hpp>
-#include <surface/surface/node.hpp>
-
-//#include <libv/math/gradient.hpp>
+#include <surface/surface/fwd.hpp>
+#include <surface/surface/veggie.hpp>
 
 
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
-
-//struct TexturePoint {
-//	libv::vec2f pos;
-//	libv::vec4f color;
-//};
-
-struct SurfaceObjectPoint {
-	libv::vec3f position;
-	float size;
-	libv::vec4f color;
-
-//	bool hasTree = false;
-};
-
-//enum class VegetationType{
-//	rock,
-//	grass,
-//	bush,
-//	tree
-//};
-
-struct SurfaceObjectStorage {
-	std::vector<SurfaceObjectPoint> points;
-//	libv::vec4f color;
-	SurfaceObjectType type;
-};
-
-class QueryResult {
-	float height;
-	float temp;
-	float wet;
-	float fertility;
-};
-
-class BiomeCell {
-	libv::vec4f color;
-	Biome config;
-};
 
 //enum class ChunkState {
 //	pending,
@@ -87,12 +41,11 @@ public:
 	libv::vector_2D<float> temperature;
 	libv::vector_2D<float> humidity;
 	libv::vector_2D<float> fertility;
-	libv::vector_2D<float> temp_humidity_distribution;
-//	std::vector<SurfaceObjectStorage> featureList;
-	std::vector<Veggie> veggies;
+//	libv::vector_2D<float> temp_humidity_distribution;
+	std::vector<Veggie> veggies; // TODO P4: Rename to objects
 
 public:
-	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution, Seed globalSeed);
+	Chunk(libv::vec2i index, libv::vec2f position_, libv::vec2f size, uint32_t resolution, uint32_t globalSeed);
 
 public:
 	/// @param uv The relative local (uv) coordinates (in region of 0..1) of the requested point
@@ -113,7 +66,6 @@ public:
 	ChunkGen();
 
 	void generateChunk(const Config& config, Chunk& chunk);
-//	libv::vector_2D<TexturePoint> generateTexturePoints();
 	void placeVegetation(const Config& config, Chunk& chunk);
 
 private:

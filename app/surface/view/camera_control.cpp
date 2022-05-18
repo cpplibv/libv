@@ -218,6 +218,8 @@ void CameraControl2D::bind_default_controls(libv::ctrl::BindingRegister controls
 
 //	controls.bind("camera.snap_position", "Shift + Ctrl + O");
 //	controls.bind("camera.snap_angle", "Shift + Ctrl + I");
-
 }
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace surface

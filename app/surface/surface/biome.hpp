@@ -2,72 +2,21 @@
 
 #pragma once
 
-//libv
-#include <libv/math/step.hpp>
-#include <utility>
-#include <libv/utility/random/xoroshiro128.hpp> // fwdable
-#include <libv/utility/random/uniform_distribution.hpp>
-#include <libv/container/flat_set.hpp>
-
-//space
-#include <surface/surface/config.hpp>
-
-#include <cmath>
+// libv
+#include <libv/container/flat_set_fwd.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/utility/random/xoroshiro128_fwd.hpp>
+// std
 #include <optional>
-//std
-#include <iostream>
+// pro
+#include <surface/surface/config.hpp>
+#include <surface/surface/fwd.hpp>
+//#include <surface/surface/biome.hpp>
 
 
 namespace surface {
-enum class ForrestType {
-	forest,  // wet > 0.66
-	scrubland, // wet > 0.33
-	//grassland/savanna
-	desert // wet > 0
-};
 
-
-enum class VeggieClass {
-	evergreen,
-	tree,
-	sapling, //facsemete
-	bush, //bokor
-//	shrub, //cserje
-//	scrub, //bozotos/cserjes
-	fern // pafrany
-// ice, rock, grass
-
-};
-
-//struct Entry {
-//	libv::vec3f position;
-//	libv::vec3f normal;
-//	float rotation;
-//	float height or scale;
-//	libv::vec3f hsv_color_shift;
-//	int id;
-//};
-
-using VeggieId = int32_t;
-//inline VeggieId globalId = 0;
-
-class Veggie {
-public:
-	VeggieId id;
-
-	//id
-	libv::vec3f pos;
-	libv::vec3f normal; // = {0, 0, 1};
-	float rotation;
-	// Normal + rotation = quaternion?
-	float scale;
-	//clamp during randomization, except hue <- modf
-	libv::vec3f hsv_color_shift;
-
-public:
-	Veggie(VeggieId id, libv::vec3f normal, float rotation, float scale, const libv::vec3f& hsvColorShift);
-};
-
+// -------------------------------------------------------------------------------------------------
 
 struct WeightedEntry {
 	const Biome* biome = nullptr;
@@ -153,5 +102,7 @@ public:
 ////	return tempRelative * wetRelative ;
 ////	return tempRelative * wetRelative ;
 //}
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace surface
