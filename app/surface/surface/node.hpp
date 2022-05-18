@@ -84,7 +84,7 @@ struct BaseFractalNode : Node {
 
 struct NodeSimplexFractal : BaseFractalNode {
 	virtual float evaluate(float x, float y) override {
-		return libv::noise_fractal(seed, x, y, libv::noise_simplex<float>, octaves, amplitude, frequency, lacunarity, persistence);
+		return libv::noise_fractal(seed, x, y, libv::noise_simplex, octaves, amplitude, frequency, lacunarity, persistence);
 	}
 };
 

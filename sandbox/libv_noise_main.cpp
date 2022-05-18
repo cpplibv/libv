@@ -34,14 +34,14 @@ int main() {
 		}
 
 		fmt::print("Simplex      : {:6.3f}\n", timer.timef_ms().count());
-		timer.reset();
-
-		for (int i = 0; i < numIteration; ++i) {
-			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			value5 += libv::noise_simplex2S(seed, fi * fj, fi * 2.f);
-		}
-
-		fmt::print("Simplex2S    : {:6.3f}\n", timer.timef_ms().count());
+//		timer.reset();
+//
+//		for (int i = 0; i < numIteration; ++i) {
+//			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
+//			value5 += libv::noise_simplex2S(seed, fi * fj, fi * 2.f);
+//		}
+//
+//		fmt::print("Simplex2S    : {:6.3f}\n", timer.timef_ms().count());
 		timer.reset();
 
 		for (int i = 0; i < numIteration; ++i) {
@@ -66,28 +66,28 @@ int main() {
 		}
 
 		fmt::print("Wombat GLSL  : {:6.3f}\n", timer.timef_ms().count());
-		timer.reset();
-
-		for (int i = 0; i < numIteration; ++i) {
-			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			value2 += libv::noise_simplex_v(seed, fi * fj, fi * 2.f);
-		}
-
-		fmt::print("SIMD 1       : {:6.3f}\n", timer.timef_ms().count());
-		timer.reset();
-
-		for (int i = 0; i < numIteration; i += 4) {
-			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			libv::vec4f xs = libv::vec4f{fi + 0, fi + 1, fi + 2, fi + 3} * fj;
-			libv::vec4f ys{(fi + 0) * 2.f, (fi + 1) * 2.f, (fi + 2) * 2.f, (fi + 3) * 2.f};
-			const auto vs = libv::noise_simplex_v(seed, xs, ys);
-			value3 += vs.x + vs.y + vs.z + vs.w;
-
-	//		const auto fi = static_cast<float>(i);
-	//		value += libv::noise_simplex(0, fi, fi * 2.f);
-		}
-
-		fmt::print("SIMD 4       : {:6.3f}\n", timer.timef_ms().count());
+//		timer.reset();
+//
+//		for (int i = 0; i < numIteration; ++i) {
+//			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
+//			value2 += libv::noise_simplex_v(seed, fi * fj, fi * 2.f);
+//		}
+//
+//		fmt::print("SIMD 1       : {:6.3f}\n", timer.timef_ms().count());
+//		timer.reset();
+//
+//		for (int i = 0; i < numIteration; i += 4) {
+//			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
+//			libv::vec4f xs = libv::vec4f{fi + 0, fi + 1, fi + 2, fi + 3} * fj;
+//			libv::vec4f ys{(fi + 0) * 2.f, (fi + 1) * 2.f, (fi + 2) * 2.f, (fi + 3) * 2.f};
+//			const auto vs = libv::noise_simplex_v(seed, xs, ys);
+//			value3 += vs.x + vs.y + vs.z + vs.w;
+//
+//	//		const auto fi = static_cast<float>(i);
+//	//		value += libv::noise_simplex(0, fi, fi * 2.f);
+//		}
+//
+//		fmt::print("SIMD 4       : {:6.3f}\n", timer.timef_ms().count());
 		std::cout << std::endl;
 	}
 

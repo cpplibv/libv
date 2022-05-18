@@ -4,12 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
-//#include <libv/math/constants.hpp>
-// std
-#include <cassert>
-#include <cmath>
 // pro
-#include <libv/noise/noise_util.hpp>
 #include <libv/noise/seed.hpp>
 
 
@@ -55,36 +50,24 @@ enum class WarpFractalType {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-[[nodiscard]] T noise_value(Seed seed, T x, T y) noexcept;
+[[nodiscard]] float noise_value(Seed seed, float x, float y) noexcept;
+[[nodiscard]] float noise_perlin(Seed seed, float x, float y) noexcept;
+[[nodiscard]] float noise_simplex(Seed seed, float x, float y) noexcept;
 
-//[[nodiscard]] float noise_value(Seed seed, float x, float y, float z) noexcept;
+[[nodiscard]] float noise_simplex_g(float x, float y) noexcept; // Only baseline for glsl, remove it
 
-template <typename T>
-[[nodiscard]] float noise_perlin(Seed seed, T x, T y) noexcept;
+/// Slower simplex noise implementation, but matches the glsl variant
+/// The frequency is around twice of the \c noise_simplex variant
+/// Based on https://github.com/BrianSharpe/Wombat
+///		The implementation is optimized for glsl and therefore around 2x slower than the \c noise_simplex variant
+[[nodiscard]] float noise_simplex_glsl(float x, float y) noexcept;
 
-template <typename T>
-[[nodiscard]] T noise_simplex(Seed seed, T x, T y) noexcept;
+// -------------------------------------------------------------------------------------------------
 
-//template <typename T>
-//[[nodiscard]] float noise_simplex2(Seed seed, T x, T y) noexcept;
-
-template <typename T>
-[[nodiscard]] float noise_simplex2S(Seed seed, T x, T y);
-
-template <typename T>
-[[nodiscard]] constexpr inline T noise_simplex_g(T x, T y) noexcept;
-
-template <typename T>
-[[nodiscard]] constexpr inline T noise_simplex_glsl(T x, T y) noexcept;
-
-template <typename T>
-[[nodiscard]] T noise_cellular(
-		Seed seed,
-		T x, T y,
+[[nodiscard]] float noise_cellular(Seed seed, float x, float y,
 		CellularDistanceFunction distanceFn = CellularDistanceFunction::euclidean,
 		CellularReturnType returnType = CellularReturnType::cellValue,
-		float jitter = 1.0f);
+		float jitter = 1.0f) noexcept;
 
 /// FBM (Fractional Brownian Motion)
 template <typename T, typename NoiseFn>
@@ -93,24 +76,24 @@ template <typename T, typename NoiseFn>
 		T x, T y,
 		NoiseFn noiseFn,
 		int octaves,
-		float amplitude = 1.0,
+		float amplitude = 1.0f,
 		float frequency = 1.0f,
 		float lacunarity = 2.0f,
 		float persistence = 0.5f);
 
 // --- Warp ----------------------------------------------------------------------------------------
 
-constexpr inline libv::vec2f singleWarpSimplexGradient(Seed seed, float x, float y, float xr, float yr, float warpAmp, float frequency, bool outGradOnly);
+libv::vec2f singleWarpSimplexGradient(Seed seed, float x, float y, float xr, float yr, float warpAmp, float frequency, bool outGradOnly);
 
 /// Domain Warp
-constexpr inline libv::vec2f doSingleWarp(Seed seed, float x, float y, float xr, float yr, WarpType type, float amp, float freq);
+libv::vec2f doSingleWarp(Seed seed, float x, float y, float xr, float yr, WarpType type, float amp, float freq);
 
 /// Domain Warp Fractal Independent
-constexpr inline libv::vec2f warpFractalIndependent(
+libv::vec2f warpFractalIndependent(
 		Seed seed,
 		float x, float y,
 		int octaves = 5,
-		float amplitude = 1.0,
+		float amplitude = 1.0f,
 		float frequency = 0.01f,
 		float lacunarity = 2.0f,
 		float persistence = 0.5f,
@@ -118,12 +101,12 @@ constexpr inline libv::vec2f warpFractalIndependent(
 
 
 /// 2D warps the input position
-constexpr inline libv::vec2f warp(
+libv::vec2f warp(
 		Seed seed,
 		float x, float y,
 		WarpFractalType type,
 		int octaves = 5,
-		float amplitude = 1.0,
+		float amplitude = 1.0f,
 		float frequency = 0.01f,
 		float lacunarity = 2.0f,
 		float persistence = 0.5f);
