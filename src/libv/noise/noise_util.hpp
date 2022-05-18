@@ -2,17 +2,366 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
+// std
+#include <bit>
 #include <cstdint>
+// pro
+#include <libv/noise/seed.hpp>
 
 
 namespace libv {
-using Seed = uint32_t;
+
+// -------------------------------------------------------------------------------------------------
+
+static constexpr float ROOT2 = 1.4142135623730950488f;
+static constexpr float ROOT3 = 1.7320508075688772935f;
+
+template <typename S>
+struct SIMD_DISPATCH {
+
+	using mask32v = bool;
+	using float32v = float;
+	using int32v = int32_t;
+
+	// --- Generic
+	template <typename T>
+	[[nodiscard]] static constexpr inline T floor(T value) noexcept {
+		return std::floor(value);
+	}
+
+	// --- Algo
+	[[nodiscard]] static constexpr inline float32v fmax(float32v a, float32v b) noexcept {
+		return std::fmax(a, b);
+	}
+
+	template <typename T>
+	[[nodiscard]] static constexpr inline T select(mask32v mask, const T& a, const T& b) noexcept {
+		return mask ? a : b;
+	}
+
+	// --- Convert
+	[[nodiscard]] static constexpr inline int32v v_i32(int32v value) noexcept {
+		return value;
+	}
+
+	[[nodiscard]] static constexpr inline int32v convertf32_i32(float32v value) noexcept {
+		return static_cast<int32v>(value);
+	}
+
+	template <typename To, typename From>
+	[[nodiscard]] static constexpr inline To bit_cast(From value) noexcept {
+		return std::bit_cast<To>(value);
+	}
+
+	// --- Mask
+	template <typename T>
+	[[nodiscard]] static constexpr inline mask32v gt(T lhs, T rhs) noexcept {
+		return lhs > rhs;
+	}
+
+	[[nodiscard]] static constexpr inline float32v mask_f32(float32v value, mask32v mask) noexcept {
+		return mask ? value : 0.f;
+	}
+
+	[[nodiscard]] static constexpr inline float32v n_mask_f32(float32v value, mask32v mask) noexcept {
+		return mask ? 0.f : value;
+	}
+
+	[[nodiscard]] static constexpr inline int32v mask_i32(int32v value, mask32v mask) noexcept {
+		return mask ? value : 0;
+	}
+
+	[[nodiscard]] static constexpr inline int32v n_mask_i32(int32v value, mask32v mask) noexcept {
+		return mask ? 0 : value;
+	}
+
+	// --- Operation
+	template <typename T>
+	[[nodiscard]] static constexpr inline auto mul_add(T a, T b, T c) noexcept {
+		return a * b + c;
+	}
+	template <typename T, typename K>
+	[[nodiscard]] static constexpr inline auto n_mul_add(T a, T b, K c) noexcept {
+		return -(a * b) + c;
+	}
+
+	[[nodiscard]] static constexpr inline auto masked_sub_f32(float32v a, float32v b, mask32v mask) noexcept {
+		return a - mask_f32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto n_masked_sub_f32(float32v a, float32v b, mask32v mask) noexcept {
+		return a - n_mask_f32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto masked_add_i32(int32v a, int32v b, mask32v mask) noexcept {
+		return a + mask_i32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto n_masked_add_i32(int32v a, int32v b, mask32v mask) noexcept {
+		return a + n_mask_i32(b, mask);
+	}
+
+	// ---
+	template <typename... P>
+	static int32v hashPrimes(int32_t seed, P... primedPos) {
+//		int32v hash = int32v(seed);
+		int32v hash = seed;
+		hash ^= (primedPos ^ ...);
+
+		hash *= int32v(0x27d4eb2d);
+		return (hash >> 15) ^ hash;
+	}
+
+	static constexpr inline float32v gradientDot(int32v hash, float32v fX, float32v fY) {
+		// ( 1+R2, 1 ) ( -1-R2, 1 ) ( 1+R2, -1 ) ( -1-R2, -1 )
+		// ( 1, 1+R2 ) ( 1, -1-R2 ) ( -1, 1+R2 ) ( -1, -1-R2 )
+
+		int32v bit1 = hash << 31;
+		int32v bit2 = (hash >> 1) << 31;
+		mask32v bit4;
+
+//		if constexpr(FS::SIMD_Level == FastSIMD::Level_Scalar) {
+//			bit4 = int32_t(hash & int32v(1 << 2)) != 0;
+			bit4 = int32_t(hash & int32v(1 << 2)) != 0;
+//		} else {
+//		bit4 = left_shift_mask(hash, 29);
+//		bit4 = hash << 29;
+
+//			if constexpr(FS::SIMD_Level < FastSIMD::Level_SSE41) {
+//				bit4 >>= 31;
+//			}
+//		}
+
+//		fX ^= bit_cast<float>(bit1);
+//		fY ^= bit_cast<float>(bit2);
+		fX = bit_cast<float>(bit_cast<int32_t>(fX) ^ bit1);
+		fY = bit_cast<float>(bit_cast<int32_t>(fY) ^ bit2);
+
+		float32v a = select(bit4, fY, fX);
+		float32v b = select(bit4, fX, fY);
+
+		return mul_add(float32v(1.0f + ROOT2), a, b);
+	}
+};
+
+template <typename S>
+struct SIMD_DISPATCH<libv::vec4_t<S>> {
+
+	using mask32v = libv::vec4b;
+	using float32v = libv::vec4f;
+	using int32v = libv::vec4i;
+
+	// --- Generic
+	template <typename T>
+	[[nodiscard]] static constexpr inline libv::vec4_t<T> floor(const libv::vec4_t<T>& value) noexcept {
+		return libv::vec::floor(value);
+	}
+
+	// --- Algo
+	[[nodiscard]] static constexpr inline float32v fmax(float32v a, float32v b) noexcept {
+		return {std::fmax(a.x, b.x), std::fmax(a.y, b.y), std::fmax(a.z, b.z), std::fmax(a.w, b.w)};
+	}
+
+	template <typename T>
+	[[nodiscard]] static constexpr inline libv::vec4_t<T> select(mask32v mask, const libv::vec4_t<T>& a, const libv::vec4_t<T>& b) noexcept {
+		return {mask.x ? a.x : b.x, mask.y ? a.y : b.y, mask.z ? a.z : b.z, mask.w ? a.w : b.w};
+	}
+
+	// --- Mask
+	template <typename T>
+	[[nodiscard]] static constexpr inline libv::vec4b gt(const libv::vec4_t<T>& lhs, const libv::vec4_t<T>& rhs) noexcept {
+		return {lhs.x > rhs.x, lhs.y > rhs.y, lhs.z > rhs.z, lhs.w > rhs.w};
+	}
+
+	[[nodiscard]] static constexpr inline float32v mask_f32(float32v value, mask32v mask) noexcept {
+		return {mask.x ? value.x : 0.f, mask.y ? value.y : 0.f, mask.z ? value.z : 0.f, mask.w ? value.w : 0.f};
+	}
+
+	[[nodiscard]] static constexpr inline float32v n_mask_f32(float32v value, mask32v mask) noexcept {
+		return {mask.x ? 0.f : value.x, mask.y ? 0.f : value.y, mask.z ? 0.f : value.z, mask.w ? 0.f : value.w};
+	}
+
+	[[nodiscard]] static constexpr inline int32v mask_i32(int32v value, mask32v mask) noexcept {
+		return {mask.x ? value.x : 0, mask.y ? value.y : 0, mask.z ? value.z : 0, mask.w ? value.w : 0};
+	}
+
+	[[nodiscard]] static constexpr inline int32v n_mask_i32(int32v value, mask32v mask) noexcept {
+		return {mask.x ? 0 : value.x, mask.y ? 0 : value.y, mask.z ? 0 : value.z, mask.w ? 0 : value.w};
+	}
+
+	// --- Convert
+	[[nodiscard]] static constexpr inline libv::vec4i v_i32(int32_t value) noexcept {
+		return libv::vec4i::one(value);
+	}
+
+	[[nodiscard]] static constexpr inline libv::vec4_t<int32_t> convertf32_i32(const float32v& value) noexcept {
+		return value.cast<int32_t>();
+	}
+
+	template <typename To, typename From>
+	[[nodiscard]] static constexpr inline libv::vec4_t<To> bit_cast(const libv::vec4_t<From>& value) noexcept {
+		return {std::bit_cast<To>(value.x), std::bit_cast<To>(value.y), std::bit_cast<To>(value.z), std::bit_cast<To>(value.w)};
+	}
+
+	// --- Operation
+	template <typename T>
+	[[nodiscard]] static constexpr inline auto mul_add(const libv::vec4_t<T>& a, const libv::vec4_t<T>& b, const libv::vec4_t<T>& c) noexcept {
+		return a * b + c;
+	}
+	template <typename T, typename K>
+	[[nodiscard]] static constexpr inline auto n_mul_add(const T& a, const T& b, const K& c) noexcept {
+		return -(a * b) + c;
+	}
+
+	[[nodiscard]] static constexpr inline auto masked_sub_f32(float32v a, float32v b, mask32v mask) noexcept {
+		return a - mask_f32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto n_masked_sub_f32(float32v a, float32v b, mask32v mask) noexcept {
+		return a - n_mask_f32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto masked_add_i32(int32v a, int32v b, mask32v mask) noexcept {
+		return a + mask_i32(b, mask);
+	}
+
+	[[nodiscard]] static constexpr inline auto n_masked_add_i32(int32v a, int32v b, mask32v mask) noexcept {
+		return a + n_mask_i32(b, mask);
+	}
+
+//	static constexpr inline float32v gradientDot(int32v hash, float32v fX, float32v fY) {
+//		// ( 1+R2, 1 ) ( -1-R2, 1 ) ( 1+R2, -1 ) ( -1-R2, -1 )
+//		// ( 1, 1+R2 ) ( 1, -1-R2 ) ( -1, 1+R2 ) ( -1, -1-R2 )
+//
+//		int32v bit1 = (hash << 31);
+//		int32v bit2 = (hash >> 1) << 31;
+//		mask32v bit4;
+//
+////		if constexpr(FS::SIMD_Level == FastSIMD::Level_Scalar) {
+////			bit4 = int32_t(hash & int32v(1 << 2)) != 0;
+////		} else {
+//			bit4 = hash << 29;
+//
+////			if constexpr(FS::SIMD_Level < FastSIMD::Level_SSE41) {
+////				bit4 >>= 31;
+////			}
+////		}
+//
+//		fX ^= bit_cast_i32_f32(bit1);
+//		fY ^= bit_cast_i32_f32(bit2);
+//
+//		float32v a = select(bit4, fY, fX);
+//		float32v b = select(bit4, fX, fY);
+//
+//		return mul_add(float32v(1.0f + ROOT2), a, b);
+//	}
+
+	static constexpr inline mask32v left_shift_mask(int32v hash, int32_t n) {
+		return {
+				(hash.x << n) != 0,
+				(hash.y << n) != 0,
+				(hash.z << n) != 0,
+				(hash.w << n) != 0
+		};
+	}
+
+	static constexpr inline mask32v right_shift_mask(int32v hash, int32_t n) {
+		return {
+				(hash.x << n) != 0,
+				(hash.y << n) != 0,
+				(hash.z << n) != 0,
+				(hash.w << n) != 0
+		};
+	}
+
+	static constexpr inline int32v left_shift(int32v hash, int32_t n) {
+		return {
+				hash.x << n,
+				hash.y << n,
+				hash.z << n,
+				hash.w << n
+		};
+	}
+
+	static constexpr inline int32v right_shift(int32v hash, int32_t n) {
+		return {
+				hash.x << n,
+				hash.y << n,
+				hash.z << n,
+				hash.w << n
+		};
+	}
+
+	template <typename... IntVs>
+	static constexpr inline int32v xor_(const IntVs& ... vs) {
+		return {(vs.x ^ ...), (vs.y ^ ...), (vs.z ^ ...), (vs.w ^ ...)};
+	}
+
+//	static constexpr inline float32v xor_(float32v a, float32v b) {
+//		return {a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w};
+	static constexpr inline float32v xor_(float32v af, float32v bf) {
+		const auto a = bit_cast<int32_t>(af);
+		const auto b = bit_cast<int32_t>(bf);
+		return bit_cast<float>(int32v{a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w});
+	}
+
+	template <typename... P>
+	static int32v hashPrimes(int32_t seed, P... primedPos) {
+		int32v hash = int32v(seed);
+//	    hash ^= (primedPos ^ ...);
+
+//		hash ^= xor_(primedPos, ...);
+		hash = xor_(hash, xor_(primedPos...));
+
+		hash *= int32v(0x27d4eb2d);
+		return xor_(right_shift(hash, 15), hash);
+	}
+
+	static constexpr inline float32v gradientDot(int32v hash, float32v fX, float32v fY) {
+		// ( 1+R2, 1 ) ( -1-R2, 1 ) ( 1+R2, -1 ) ( -1-R2, -1 )
+		// ( 1, 1+R2 ) ( 1, -1-R2 ) ( -1, 1+R2 ) ( -1, -1-R2 )
+
+		int32v bit1 = left_shift(hash, 31);
+		int32v bit2 = left_shift(right_shift(hash, 1), 31);
+		mask32v bit4;
+
+//		if constexpr(FS::SIMD_Level == FastSIMD::Level_Scalar) {
+//			bit4 = int32_t(hash & int32v(1 << 2)) != 0;
+//		} else {
+		bit4 = left_shift_mask(hash, 29);
+
+//			if constexpr(FS::SIMD_Level < FastSIMD::Level_SSE41) {
+//				bit4 >>= 31;
+//			}
+//		}
+
+		fX = xor_(fX, bit_cast<float>(bit1));
+		fY = xor_(fY, bit_cast<float>(bit2));
+
+		float32v a = select(bit4, fY, fX);
+		float32v b = select(bit4, fX, fY);
+
+		return mul_add(float32v(1.0f + ROOT2), a, b);
+	}
+};
+
+namespace Primes {
+
+static constexpr int X = 501125321;
+static constexpr int Y = 1136930381;
+static constexpr int Z = 1720413743;
+static constexpr int W = 1066037191;
+
+static constexpr int Lookup[] = {X, Y, Z, W};
+
+}
 
 // -------------------------------------------------------------------------------------------------
 
 //template <typename T>
 //static int FastFloor(T f) { return f >= 0 ? static_cast<int> (f) : static_cast<int> (f) - 1; }
-
 
 template <typename T>
 struct Lookup {
@@ -41,7 +390,6 @@ static constexpr uint32_t PrimeZ = 1720413743;
 	return hash;
 }
 
-// !!! check on this
 [[nodiscard]] constexpr inline float ValCoord(Seed seed, uint32_t xPrimed, uint32_t yPrimed) noexcept {
 	uint32_t hashVal = hash(seed, xPrimed, yPrimed);
 
@@ -75,15 +423,14 @@ static constexpr uint32_t PrimeZ = 1720413743;
 	return xd * xg + yd * yg;
 }
 
-constexpr inline void GradCoordOut(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float& xo, float& yo) {
+constexpr inline void gradCoordOut(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float& xo, float& yo) {
 	uint32_t hashVal = hash(seed, xPrimed, yPrimed) & (255 << 1);
 
 	xo = Lookup<float>::RandVecs2D[hashVal];
 	yo = Lookup<float>::RandVecs2D[hashVal | 1];
 }
 
-constexpr inline void GradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float xd, float yd, float& xo, float& yo)
-{
+constexpr inline void gradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, float xd, float yd, float& xo, float& yo) {
 	uint32_t hashVal = hash(seed, xPrimed, yPrimed);
 	uint32_t index1 = hashVal & (127 << 1);
 	uint32_t index2 = (hashVal >> 7) & (255 << 1);
@@ -99,8 +446,7 @@ constexpr inline void GradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrime
 	yo = value * ygo;
 }
 
-constexpr inline void GradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, uint32_t zPrimed, float xd, float yd, float zd, float& xo, float& yo, float& zo)
-{
+constexpr inline void gradCoordDual(Seed seed, uint32_t xPrimed, uint32_t yPrimed, uint32_t zPrimed, float xd, float yd, float zd, float& xo, float& yo, float& zo) {
 	uint32_t hashVal = hash(seed, xPrimed, yPrimed, zPrimed);
 	uint32_t index1 = hashVal & (63 << 2);
 	uint32_t index2 = (hashVal >> 6) & (255 << 2);
@@ -251,10 +597,6 @@ const T Lookup<T>::RandVecs2D[] =
 //				-0.7870349638f, 0.03447489231f, 0.6159443543f, 0, -0.2015596421f, 0.6859872284f, 0.6991389226f, 0, -0.08581082512f, -0.10920836f, -0.9903080513f, 0, 0.5532693395f, 0.7325250401f, -0.396610771f, 0, -0.1842489331f, -0.9777375055f, -0.1004076743f, 0, 0.0775473789f, -0.9111505856f, 0.4047110257f, 0, 0.1399838409f, 0.7601631212f, -0.6344734459f, 0, 0.4484419361f, -0.845289248f, 0.2904925424f, 0
 //		};
 
-
-
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv
-

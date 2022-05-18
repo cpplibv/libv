@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/noise/perlin.hpp
+// Project: libv.math, File: src/libv/noise/white.hpp
 
 #pragma once
 
@@ -13,10 +13,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-std::vector<double> noise_texture_perlin2D(uint64_t seed, uint32_t X, uint32_t Y);
-float noise_perlin(libv::vec2f coord);
-//float noise_simplex(libv::vec2f coord);
-//float noise_value(libv::vec2f coord);
+//std::vector<double> noise_white_2D_1d(uint64_t seed, uint32_t X, uint32_t Y);
+std::vector<libv::vec3uc> noise_white_2D_3uc(uint64_t seed, uint32_t X, uint32_t Y);
 
 // -------------------------------------------------------------------------------------------------
 

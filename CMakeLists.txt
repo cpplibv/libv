@@ -748,9 +748,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_math STATIC
-	SOURCE src/libv/math/*.cpp
-	LINK   ext_glm # Remove (This will only happen with a vec concept)
+	TARGET libv_math INTERFACE
+#	SOURCE src/libv/math/*.cpp
+	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
 )
 
 wish_create_library(
@@ -907,7 +907,7 @@ wish_create_executable(
 	GENERATE codegen app/space/message/*.in.lua
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-	LINK   libv_vm4
+	LINK   libv_vm4 libv_noise
 	LINK   libv_sys
 )
 
@@ -1172,6 +1172,12 @@ wish_create_executable(
 	TARGET sandbox_libv_net
 	SOURCE sandbox/libv_net_main.cpp
 	LINK   libv_net libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_noise
+	SOURCE sandbox/libv_noise_main.cpp
+	LINK   libv_noise libv_utility libv_log ext_fmt
 )
 
 wish_create_executable(

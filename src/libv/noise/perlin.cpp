@@ -1,9 +1,7 @@
-// Project: libv.math, File: src/libv/math/noise/perlin.cpp
+// Project: libv.math, File: src/libv/noise/perlin.cpp
 
 // hpp
-#include <libv/math/noise/perlin.hpp>
-// ext
-#include <glm/gtc/noise.hpp>
+#include <libv/noise/perlin.hpp>
 // std
 #include <random>
 #include <algorithm>
@@ -92,16 +90,6 @@ std::vector<double> noise_texture_perlin2D(uint64_t seed, uint32_t X, uint32_t Y
 	}
 	return value;
 }
-
-float noise_perlin(libv::vec2f coord) {
-	return glm::perlin(glm::vec2{coord.x, coord.y});
-}
-
-//float noise_simplex(libv::vec2f coord) {
-//	return glm::simplex(glm::vec2{coord.x, coord.y});
-//}
-
-//float noise_fractal_simplex(libv::vec2f coord,)
 
 // -------------------------------------------------------------------------------------------------
 

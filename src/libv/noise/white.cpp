@@ -1,7 +1,7 @@
-// Project: libv.math, File: src/libv/math/noise/white.cpp
+// Project: libv.math, File: src/libv/noise/white.cpp
 
 // hpp
-#include <libv/math/noise/white.hpp>
+#include <libv/noise/white.hpp>
 // libv
 #include <libv/utility/random/uniform_distribution.hpp>
 // std
