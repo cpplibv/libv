@@ -112,7 +112,7 @@ private:
 
 public:
 	void add(std::string name, libv::vector_2D<libv::vec4uc> image) {
-		entries.emplace_back(name, image);
+		entries.emplace_back(name, std::move(image));
 	}
 
 	Atlas build_atlas(libv::vec2i size) {

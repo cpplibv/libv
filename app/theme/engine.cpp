@@ -425,7 +425,7 @@ void ImplEngine::_run_script() {
 			Atlas result = builder.build_atlas(atlas_size);
 
 			log_app.info("Atlas building successful  : {:7.3f}ms with size {}x{}", timer.timef_ms().count(), i, i);
-			callback(result.image, atlas_size);
+			callback(std::move(result.image), atlas_size);
 			break;
 		} catch (const std::exception& e) {
 			if (i != atlas_size_max) {

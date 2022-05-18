@@ -716,6 +716,7 @@ wish_create_library(
 	TARGET libv_fsw STATIC
 	SOURCE src/libv/fsw/*.cpp
 	LINK   libv_utility ext_efsw
+	LINK   libv_mt
 )
 
 wish_create_library(

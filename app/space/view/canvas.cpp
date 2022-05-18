@@ -8,8 +8,8 @@
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
-#include <libv/noise/perlin.hpp>
 #include <libv/math/step.hpp>
+#include <libv/noise/noise.hpp>
 // std
 #include <cassert>
 // pro
@@ -442,9 +442,9 @@ void SpaceCanvas::render_opaque(libv::glr::Queue& glr, libv::vec3f eye, Galaxy& 
 			const auto fi = static_cast<float>(i);
 
 			const auto m2_guard = glr.model.push_guard();
-			const auto noiseX = libv::noise_perlin({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
-			const auto noiseY = libv::noise_perlin({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 5});
-			const auto noiseZ = libv::noise_perlin({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 10});
+			const auto noiseX = libv::noise_perlin(0x5EED, time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e);
+			const auto noiseY = libv::noise_perlin(0x5EED, time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 5);
+			const auto noiseZ = libv::noise_perlin(0x5EED, time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 10);
 			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.2f - 0.1f;
 			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
 
