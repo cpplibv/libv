@@ -5,7 +5,9 @@
 // std
 #include <condition_variable>
 #include <mutex>
+#include <optional>
 #include <queue>
+#include <stop_token>
 
 
 namespace libv {
@@ -15,10 +17,10 @@ namespace mt {
 
 template <typename T>
 class concurrent_queue {
-	std::queue<T> queue;
 	mutable std::mutex queue_m;
-	mutable std::condition_variable received_cv;
-	mutable std::condition_variable consumed_cv;
+	std::queue<T> queue;
+	mutable std::condition_variable_any received_cv;
+	mutable std::condition_variable_any consumed_cv;
 
 	const std::size_t limit = std::numeric_limits<std::size_t>::max();
 
@@ -46,6 +48,40 @@ public:
 		std::unique_lock lock(queue_m);
 		while (queue.empty())
 			received_cv.wait(lock);
+
+		result = std::move(queue.front());
+		queue.pop();
+
+		lock.unlock();
+		consumed_cv.notify_all(); // notify_all to ensure that wait_empty would work
+
+		return result;
+	}
+
+	std::optional<T> pop(const std::stop_token& stop_token) {
+		std::optional<T> result;
+
+		std::unique_lock lock(queue_m);
+
+		received_cv.wait(lock, stop_token, [&]{ return !queue.empty(); });
+		if (stop_token.stop_requested())
+			return result;
+
+		result = std::move(queue.front());
+		queue.pop();
+
+		lock.unlock();
+		consumed_cv.notify_all(); // notify_all to ensure that wait_empty would work
+
+		return result;
+	}
+
+	std::optional<T> try_pop() {
+		std::optional<T> result;
+
+		std::unique_lock lock(queue_m);
+		if (queue.empty())
+			return result;
 
 		result = std::move(queue.front());
 		queue.pop();

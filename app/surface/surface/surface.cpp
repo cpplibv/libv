@@ -4,10 +4,10 @@
 #include <surface/surface/surface.hpp>
 // libv
 #include <libv/algo/erase_unstable.hpp>
-#include <libv/utility/index_spiral.hpp>
 #include <libv/utility/timer.hpp>
+//#include <libv/utility/index_spiral.hpp>
 // std
-#include <algorithm>
+//#include <algorithm>
 // pro
 #include <surface/log.hpp>
 #include <surface/surface/chunk.hpp>
@@ -22,39 +22,26 @@ SurfaceGenerationTask::SurfaceGenerationTask(std::stop_token&& stopToken, std::s
 	stopToken(std::move(stopToken)), config(config), chunkGen(chunkGen) {}
 
 void SurfaceGenerationTask::run() {
-	auto lock = std::unique_lock(mutex);
-
-	//	const auto chunkSize = todoSize;
-	//	const auto chunkIndex = libv::index_spiral(i);
-	//	const auto focalChunk = ;
-
 	while (true) {
-		std::shared_ptr<Chunk> nextChunk;
-
-		queuePending_cv.wait(lock, stopToken, [&]{ return !queuePending.empty(); });
-		if (stopToken.stop_requested()) {
+		auto nextChunkOpt = queuePending.pop(stopToken);
+		if (!nextChunkOpt) { // Generation Task is cancelled via stop token
 			log_surface.trace("Surface generation task is cancelled");
-			return; // Generation Task is cancelled
+			return;
 		}
 
-		nextChunk = queuePending.front().lock();
-		queuePending.pop_front();
-
-		if (!nextChunk)
+		auto nextChunk = nextChunkOpt->lock();
+		if (!nextChunk) // This chunk's generation is cancelled via weak_ptr expire
 			continue;
 
-		{
-			lock.unlock();
+		libv::Timer timer;
+		chunkGen->generateChunk(*config, *nextChunk);
+		chunkGen->placeVegetation(*config, *nextChunk);
+		log_surface.trace("TimerChunkGen{:>8}: {:8.4f} ms", nextChunk->index, timer.timed_ms().count());
 
-			libv::Timer timer;
-			chunkGen->generateChunk(*config, *nextChunk);
-			chunkGen->placeVegetation(*config, *nextChunk);
+		queueReady.emplace(std::move(nextChunk));
 
-			log_surface.trace("TimerChunkGen{:>8}: {:8.4f} ms", nextChunk->index, timer.timed_ms().count());
-
-			lock.lock();
-		}
-		queueReady.emplace_back(std::move(nextChunk));
+//		if (focalPointChanged)
+//			queuePending.sort(std::less<>{}, [](const auto& entry) { return length_sq(entry->position - focalPosition); });
 	}
 }
 
@@ -70,18 +57,41 @@ Surface::~Surface() {
 
 // -------------------------------------------------------------------------------------------------
 
-const auto size = libv::vec2f{32, 32};
+void Surface::scan(libv::vec2i center, int32_t scanRange) {
+	for (int y = -scanRange; y <= scanRange; ++y) {
+		for (int x = -scanRange; x <= scanRange; ++x) {
+			const auto index = center + libv::vec2i{x, y};
+			const auto position = index.cast<float>() * chunkSize;
+//			log_surface.trace("Check on {:8.4f} ms", t3);
 
-const auto distanceThresholdPrefetch = size.x * 3.f;
-const auto distanceThresholdExpire = distanceThresholdPrefetch * 3.f;
-const auto distanceThresholdInit = distanceThresholdPrefetch * 1.5f;
+			if (!chunks.contains(index))
+				continue; // I don't think it should happen (it could only happen if the scan size is bigger then the window size: aka bad configuration)
 
-const auto loadIndexCount = static_cast<int32_t>(distanceThresholdPrefetch / size.x) + 1;
+			auto& chunk = chunks(index);
+			if (chunk != nullptr)
+				continue;
+
+			log_surface.trace("Queue new chunk {}", index);
+			chunk = std::make_shared<Chunk>(
+					index,
+					position,
+					chunkSize,
+					currentTask->config->resolution + 1,
+					currentTask->config->globalSeed
+			);
+
+			currentTask->queuePending.emplace(chunk);
+		}
+	}
+}
 
 // -------------------------------------------------------------------------------------------------
 
 int Surface::gen(std::shared_ptr<const Config>&& config_) {
-	chunks.clear();
+	chunks.fill(nullptr);
+	activeChunks.clear();
+
+	++generation;
 
 	stopSource.request_stop();
 	stopSource = std::stop_source{};
@@ -94,39 +104,11 @@ int Surface::gen(std::shared_ptr<const Config>&& config_) {
 	});
 
 	const auto oldFocalPosition = focalPosition;
-	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / size).cast<int32_t>();
+	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / chunkSize).cast<int32_t>();
 
-	const auto scanSize = loadIndexCount + 1;
+	scan(oldFocalOriginIndex, chunkRangeScanInitialization);
 
-	// TODO P3: Duplicate code with scanning
-	for (int y = -scanSize; y <= scanSize; ++y) {
-		for (int x = -scanSize; x <= scanSize; ++x) {
-			const auto index = oldFocalOriginIndex + libv::vec2i{x, y};
-			const auto position = index.cast<float>() * size;
-//				log_surface.trace("Check on {:8.4f} ms", t3);
-
-			if (!currentTask->chunks.contains(index))
-				continue; // I don't think it should happen
-
-			auto& chunk = currentTask->chunks(index);
-			if (chunk != nullptr)
-				// ??? Unless generation change?
-				continue;
-
-			log_surface.trace("Queue new chunk {}", index);
-			chunk = std::make_shared<Chunk>(
-					index,
-					position,
-					size,
-					currentTask->config->resolution + 1,
-					currentTask->config->globalSeed
-			);
-			currentTask->queuePending.emplace_back(chunk);
-			currentTask->queuePending_cv.notify_all();
-		}
-	}
-
-	return ++generation;
+	return generation;
 }
 
 bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection) {
@@ -135,24 +117,23 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	if (!currentTask)
 		return changed;
 
-	auto lock = std::unique_lock(currentTask->mutex);
 	libv::Timer timer;
 
 	const auto oldFocalPosition = focalPosition;
 	const auto oldFocalDirection = focalDirection;
 
-	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / size).cast<int32_t>();
-	const auto newFocalOriginIndex = libv::lround(xy(newFocalPosition) / size).cast<int32_t>();
+	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / chunkSize).cast<int32_t>();
+	const auto newFocalOriginIndex = libv::lround(xy(newFocalPosition) / chunkSize).cast<int32_t>();
 
 	if (oldFocalOriginIndex != newFocalOriginIndex) {
 		log_surface.trace("BORDER");
 
 		// Detect chunks out of range
-		currentTask->chunks.slide(newFocalOriginIndex - oldFocalOriginIndex, [&](libv::vec2i index, const auto& chunk) {
+		chunks.slide(newFocalOriginIndex - oldFocalOriginIndex, [&](libv::vec2i index, const auto& chunk) {
 			(void) index;
 			if (chunk) {
 				log_surface.trace("Destroy CHUNKYYY {}", chunk->index);
-				libv::erase_unstable(chunks, chunk);
+				libv::erase_unstable(activeChunks, chunk);
 			}
 			return nullptr;
 		});
@@ -162,49 +143,21 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 		timer.reset();
 
 		// Detect chunks in range
-		for (int y = -loadIndexCount; y <= loadIndexCount; ++y) {
-			for (int x = -loadIndexCount; x <= loadIndexCount; ++x) {
-				const auto index = newFocalOriginIndex + libv::vec2i{x, y};
-				const auto position = index.cast<float>() * size;
-//				log_surface.trace("Check on {:8.4f} ms", t3);
-
-				if (!currentTask->chunks.contains(index))
-					continue; // I don't think it should happen
-
-				auto& chunk = currentTask->chunks(index);
-				if (chunk != nullptr)
-					// ??? Unless generation change?
-					continue;
-
-				log_surface.trace("Queue new chunk {}", index);
-				chunk = std::make_shared<Chunk>(
-						index,
-						position,
-						size,
-						currentTask->config->resolution + 1,
-						currentTask->config->globalSeed
-				);
-				currentTask->queuePending.emplace_back(chunk);
-				currentTask->queuePending_cv.notify_all();
-			}
-		}
+		scan(newFocalOriginIndex, chunkRangeScanUpdate);
 	}
 
 	auto t3 = timer.timef_ms().count();
 	log_surface.trace_if(t3 > 0.01f, "Focus update took: Scan {:8.4f} ms", t3);
 	timer.reset();
 
-//	for (auto& chunk : currentTask->queueReady) {
-//		chunks.emplace_back(std::move(chunk));
-//		changed = true;
-//	}
-	if (!currentTask->queueReady.empty()) {
-		auto& chunk = currentTask->queueReady.back();
-		chunks.emplace_back(std::move(chunk));
-		currentTask->queueReady.pop_back();
-		changed = true;
+//	while (auto chunk = currentTask->queueReady.try_pop()) {
+	if (auto chunk = currentTask->queueReady.try_pop()) {
+		if (auto chunkSP = chunk->lock()) {
+			// Check if the ready chunk is still something that we want
+			activeChunks.emplace_back(std::move(chunkSP));
+			changed = true;
+		}
 	}
-//	currentTask->queueReady.clear();
 
 	focalPosition = newFocalPosition;
 	focalDirection = newFocalDirection;

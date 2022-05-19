@@ -10,8 +10,10 @@
 #include <libv/math/vec.hpp>
 // std
 #include <array>
+#include <unordered_map>
 // pro
 #include <surface/view/render/shaders.hpp>
+#include <surface/view/vec_hash.hpp>
 
 
 namespace surface {
@@ -117,16 +119,20 @@ struct SpriteAtlas {
 
 // -------------------------------------------------------------------------------------------------
 
+//class SpriteChunk {
+//	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+//};
+
 class RendererSprite {
 private:
-	struct Entry {
-		int32_t type;
-		libv::vec3f position;
-		libv::vec3f normal;
-		float rotation;
-		float scale;
-		libv::vec3f hsv_color_shift;
-	};
+//	struct Entry {
+//		int32_t type;
+//		libv::vec3f position;
+//		libv::vec3f normal;
+//		float rotation;
+//		float scale;
+//		libv::vec3f hsv_color_shift;
+//	};
 
 	struct SpriteType {
 		std::string modelPath;
@@ -135,6 +141,7 @@ private:
 
 private:
 	ShaderSprite shader;
+//	std::unordered_map<libv::vec2i, SpriteChunk, VecHash> chunksMeshes;
 	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
 	std::shared_ptr<SpriteAtlas> spriteAtlas;
 	libv::glr::UniformBlockSharedView_std140 spriteDefinitionsBlock;
@@ -143,7 +150,13 @@ private:
 	std::vector<SpriteType> spriteTypes;
 
 private:
-	std::vector<Entry> entries;
+//	std::vector<Entry> entries;
+	std::vector<int32_t> entries_type;
+	std::vector<libv::vec3f> entries_position;
+	std::vector<libv::vec3f> entries_normal;
+	std::vector<libv::vec2f> entries_rotation_scale;
+	std::vector<libv::vec4f> entries_hsv_color_shift;
+
 	bool dirty = false;
 	bool active = false;
 

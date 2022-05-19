@@ -36,6 +36,7 @@ public:
 
 public:
 	libv::vector_2D<libv::vec3f> height; // Could be a single float, XY could be derived from index in vertex shader
+	libv::vector_2D<libv::vec3f> normal;
 	libv::vector_2D<libv::vec4f> color;
 
 	libv::vector_2D<float> temperature;

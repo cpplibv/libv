@@ -6,6 +6,7 @@
 #include <libv/algo/wildcard.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/utility/read_file.hpp>
+#include <libv/utility/timer.hpp>
 // std
 #include <filesystem>
 // pro
@@ -65,6 +66,9 @@ void SurfaceScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 
 void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
 	int type = 0;
+	renderer.sprite.clear();
+	log_surface.error("chunks.size(): {}", chunks.size());
+
 	for (const auto& chunk : chunks)
 		for (const auto& veggie : chunk->veggies) {
 			type = (type + 1) % 5;
@@ -84,6 +88,7 @@ void TextureScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 }
 
 void TextureScene::buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
+	renderer.sprite.clear();
 	for (const auto& chunk : chunks)
 		for (const auto& veggie : chunk->veggies) {
 			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_color_shift);
@@ -297,7 +302,7 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 //void SurfaceCanvas::updateVisibleChunks() {
 //	visibleChunks.clear();
 //	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
-//	for (const auto& chunk : surface->getChunks()) {
+//	for (const auto& chunk : surface->getActiveChunks()) {
 //		//Red check: throw away
 //		//Green check: generate and render
 //		const auto pos = libv::vec3f(chunk->position, 0.f);
@@ -357,7 +362,17 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 }
 
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
+	libv::Timer timer;
+	log_surface.trace("Start render");
+	const auto time = [&timer](std::string_view description) {
+		auto t0 = timer.timef_ms().count();
+		log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", description, t0);
+		timer.reset();
+	};
+
 	setupRenderStates(glr);
+	time("SetupRenderStates");
+
 	const auto s_guard = glr.state.push_guard();
 
 	if (previousScene != currentScene) {
@@ -365,9 +380,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		activeScene = createScene(currentScene);
 		//build mesh
 		// <<< build / buildVeggie called twice? build mesh happens in here and in surfaceDirty too
-		activeScene->build(surface->getGeneration(), surface->getChunks());
-		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
+		activeScene->build(surface->getGeneration(), surface->getActiveChunks());
+		activeScene->buildVeggie(surface->getGeneration(), surface->getActiveChunks());
 	}
+	time("Scene Change");
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
@@ -396,22 +412,30 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		}
 
 		//build mesh
-		activeScene->build(surface->getGeneration(), surface->getChunks());
-		activeScene->buildVeggie(surface->getGeneration(), surface->getChunks());
+		activeScene->build(surface->getGeneration(), surface->getActiveChunks());
+		time("surfaceDirty build");
+		activeScene->buildVeggie(surface->getGeneration(), surface->getActiveChunks());
+		time("surfaceDirty buildVeggie");
 
-	} else if (forceRebake.exchange(false))
+	} else if (forceRebake.exchange(false)) {
 		renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
+		time("forceRebake");
+	}
 
-	//render surface texture/_3d
+	// render surface texture/_3d
 	activeScene->render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
+	time("activeScene->render");
 
-	if (currentScene == SceneType::_3d && enableSkybox)
+	if (currentScene == SceneType::_3d && enableSkybox) {
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
+		time("renderer.sky.render");
+	}
 
 	// render plant model/debug
 	if (enableVegetation) {
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 		renderer.sprite.render(glr, renderer.resource_context.uniform_stream);
+		time("renderer.sprite.render");
 	}
 
 	{
@@ -452,12 +476,14 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 			tree_05.render(glr, renderer.resource_context.uniform_stream);
 		}
 	}
+	time("Test models render");
 
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();
 		glr.state.polygonModeFill(); // In case we are wireframe mode, force poly fill for the grid
 		glr.state.disableDepthMask();
 		renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
+		time("renderer.editorGrid.render");
 	}
 }
 

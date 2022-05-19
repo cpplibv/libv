@@ -13,6 +13,7 @@
 //#include <surface/view/render/renderer.hpp>
 // pro
 #include <surface/view/render/baker_sprite_atlas.hpp>
+#include <surface/log.hpp>
 
 
 namespace surface {
@@ -24,7 +25,8 @@ RendererSprite::RendererSprite(libv::rev::ResourceManager& loader) :
 
 void RendererSprite::updateMesh() {
 	dirty = false;
-	active = !entries.empty();
+	active = !entries_type.empty();
+//	active = !entries.empty();
 
 	mesh.clear();
 
@@ -44,28 +46,35 @@ void RendererSprite::updateMesh() {
 
 	auto index = mesh.index();
 
-	type.reserve(entries.size());
-	for (const auto& vertex : entries)
-		type(vertex.type);
+//	type.resize(entries.size());
+//	position.resize(entries.size());
+//	normal.resize(entries.size());
+//	rotation_scale.resize(entries.size());
+//	color0.resize(entries.size());
+//	index.resize(entries.size());
+//
+//	for (uint32_t i = 0; i < entries.size(); ++i) {
+//		const auto& vertex = entries[i];
+//
+//		type[i] = vertex.type;
+//		position[i] = vertex.position;
+//		normal[i] = vertex.normal;
+//		rotation_scale[i] = libv::vec2f(vertex.rotation, vertex.scale);
+//		color0[i] = libv::vec4f(vertex.hsv_color_shift, 1.f);
+//		index[i] = i;
+//	}
 
-	position.reserve(entries.size());
-	for (const auto& vertex : entries)
-		position(vertex.position);
+	log_surface.error("entries_type.size(): {}", entries_type.size());
 
-	normal.reserve(entries.size());
-	for (const auto& vertex : entries)
-		normal(vertex.normal);
+	type.set_from_range(entries_type);
+	position.set_from_range(entries_position);
+	normal.set_from_range(entries_normal);
+	rotation_scale.set_from_range(entries_rotation_scale);
+	color0.set_from_range(entries_hsv_color_shift);
 
-	rotation_scale.reserve(entries.size());
-	for (const auto& vertex : entries)
-		rotation_scale(vertex.rotation, vertex.scale);
-
-	color0.reserve(entries.size());
-	for (const auto& vertex : entries)
-		color0(libv::vec4f(vertex.hsv_color_shift, 1.f));
-
-	for (uint32_t i = 0; i < entries.size(); ++i)
-		index(i);
+	index.resize(entries_type.size());
+	for (uint32_t i = 0; i < entries_type.size(); ++i)
+		index[i] = i;
 }
 
 int32_t RendererSprite::registerSprite(std::string modelPath, float sizeMultiplier) {
@@ -125,11 +134,22 @@ void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::
 }
 
 void RendererSprite::clear() {
-	entries.clear();
+	entries_type.clear();
+	entries_position.clear();
+	entries_normal.clear();
+	entries_rotation_scale.clear();
+	entries_hsv_color_shift.clear();
+
+//	entries.clear();
 }
 
 void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_color_shift) {
-	entries.emplace_back(type, position, normal, rotation, scale, hsv_color_shift);
+//	entries.emplace_back(type, position, normal, rotation, scale, hsv_color_shift);
+	entries_type.emplace_back(type);
+	entries_position.emplace_back(position);
+	entries_normal.emplace_back(normal);
+	entries_rotation_scale.emplace_back(rotation, scale);
+	entries_hsv_color_shift.emplace_back(hsv_color_shift, 1.f);
 	dirty = true;
 }
 

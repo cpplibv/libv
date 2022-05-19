@@ -11,6 +11,61 @@
 
 
 
+Baseline
+T 2 surface: SetupRenderStates:         0.0247 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty build:        2.7337 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty buildVeggie:  0.2855 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: activeScene->render:       0.0246 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: renderer.sprite.render:   45.0471 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: Test models render:        0.0349 ms, app/surface/surface/surface_canvas.cpp:364
+
+Attribute resize + direct assign and merge for cycle
+T 2 surface: SetupRenderStates:         0.0353 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty build:        2.5441 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty buildVeggie:  0.2600 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: activeScene->render:       0.0229 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: renderer.sprite.render:   18.1492 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: Test models render:        0.0368 ms, app/surface/surface/surface_canvas.cpp:364
+
+Set from range
+T 2 surface: SetupRenderStates:   0.0240 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty build:   2.6274 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: surfaceDirty buildVeggie:   0.2948 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: activeScene->render:   0.0248 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: renderer.sprite.render:  15.1497 ms, app/surface/surface/surface_canvas.cpp:364
+T 2 surface: Test models render:   0.0452 ms, app/surface/surface/surface_canvas.cpp:364
+
+Normals during chunk generation
+T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:366
+T 2 surface: SetupRenderStates                       :   0.0464 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: surfaceDirty build                      :   1.6836 ms, app/surface/surface/surface_canvas.cpp:369
+E 2 surface: chunks.size(): 121, app/surface/surface/surface_canvas.cpp:70
+T 2 surface: surfaceDirty buildVeggie                :   0.2135 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: activeScene->render                     :   0.0207 ms, app/surface/surface/surface_canvas.cpp:369
+E 2 surface: entries_type.size(): 12051, app/surface/view/render/renderer_sprite.cpp:67
+T 2 surface: renderer.sprite.render                  :   0.1188 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: Test models render                      :   0.0267 ms, app/surface/surface/surface_canvas.cpp:369
+
+		T 2 surface: surfaceDirty build:   2.7700 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: surfaceDirty buildVeggie:   1.7535 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: activeScene->render:   0.0298 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: renderer.sprite.render: 287.9569 ms, app/surface/surface/surface_canvas.cpp:364
+
+		T 2 surface: surfaceDirty build:   9.5457 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: surfaceDirty buildVeggie:   1.9361 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: activeScene->render:   0.5636 ms, app/surface/surface/surface_canvas.cpp:364
+		T 2 surface: renderer.sprite.render: 381.2531 ms, app/surface/surface/surface_canvas.cpp:364
+
+		T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:366
+		T 2 surface: SetupRenderStates                       :   0.0523 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: surfaceDirty build                      :  34.5505 ms, app/surface/surface/surface_canvas.cpp:369
+		E 2 surface: chunks.size(): 154, app/surface/surface/surface_canvas.cpp:70
+		T 2 surface: surfaceDirty buildVeggie                :   1.9159 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: activeScene->render                     :   3.5316 ms, app/surface/surface/surface_canvas.cpp:369
+		E 2 surface: entries_type.size(): 118537, app/surface/view/render/renderer_sprite.cpp:67
+		T 2 surface: renderer.sprite.render                  :   2.4251 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: Test models render                      :   0.0468 ms, app/surface/surface/surface_canvas.cpp:369
+
 
 
 

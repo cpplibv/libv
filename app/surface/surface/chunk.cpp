@@ -28,8 +28,9 @@ Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t
 		size(size),
 		resolution(resolution),
 		rng(static_cast<uint64_t>(index.x) + (static_cast<uint64_t>(index.y) << 32u), globalSeed),
-		height(resolution, resolution),
-		color(resolution, resolution),
+		height(resolution, resolution, libv::uninitialized),
+		normal(resolution, resolution, libv::uninitialized),
+		color(resolution, resolution, libv::uninitialized),
 		temperature(resolution, resolution),
 		humidity(resolution, resolution),
 		fertility(resolution, resolution) {
@@ -244,6 +245,95 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 //					{1,0,0,1}};
 //			std::cout << " fertility: " << fertility<<std::endl;
 
+		}
+	});
+
+	const auto calculateNormalFromPoints = [&](libv::vec3f pL, libv::vec3f pR, libv::vec3f pU, libv::vec3f pD) {
+		return libv::normalize(libv::cross(pR - pL, pU - pD));
+	};
+
+	const auto calculateNormal = [&](uint32_t x, uint32_t y) {
+		if (x == 0 || x == chunk.height.size_x() - 1)
+			return libv::vec3f{0, 0, 1};
+		if (y == 0 || y == chunk.height.size_y() - 1)
+			return libv::vec3f{0, 0, 1};
+
+		const auto pL = chunk.height(x - 1, y);
+		const auto pR = chunk.height(x + 1, y);
+		const auto pU = chunk.height(x, y + 1);
+		const auto pD = chunk.height(x, y - 1);
+
+		return calculateNormalFromPoints(pL, pR, pU, pD);
+	};
+
+//	threads.execute_and_wait()
+//	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
+	libv::mt::parallel_for(threads, 1uz, numVertex - 1, [&](auto yi) {
+		const auto yf = static_cast<float>(yi);
+
+		for (std::size_t xi = 1; xi < numVertex - 1; ++xi) {
+			const auto xf = static_cast<float>(xi);
+			const auto x = xf * step.x - chunk.size.x * 0.5f;
+			const auto y = yf * step.y - chunk.size.y * 0.5f;
+
+//			chunk.height(xi, yi) = libv::vec3f{
+//					chunk.position.x + x,
+//					chunk.position.y + y,
+//					config.height.rootNode->evaluate(x + chunk.position.x, y + chunk.position.y)};
+
+			chunk.normal(xi, yi) = calculateNormal(xi, yi);
+		}
+	});
+
+	libv::mt::parallel_for(threads, 0uz, 4uz, [&](auto sideIndex) {
+		libv::vec2i start = libv::uninitialized;
+		libv::vec2i direction = libv::uninitialized;
+		libv::vec2f side = libv::uninitialized;
+
+		switch (sideIndex) {
+		case 0:
+			start = {0, 0};
+			direction = {1, 0};
+			side = libv::vec2f{0, -1} * step;
+			break;
+		case 1:
+			start = {numVertex - 1, 0};
+			direction = {0, 1};
+			side = libv::vec2f{1, 0} * step;
+			break;
+		case 2:
+			start = {numVertex - 1, numVertex - 1};
+			direction = {-1, 0};
+			side = libv::vec2f{0, 1} * step;
+			break;
+		case 3:
+			start = {0, numVertex - 1};
+			direction = {0, -1};
+			side = libv::vec2f{-1, 0} * step;
+			break;
+		}
+
+		// !!! Corners
+//		for (std::size_t i = 1; i < numVertex - 1; ++i) {
+
+		for (std::size_t i = 1; i < numVertex - 1; ++i) {
+			const auto pos = start + i * direction;
+			const auto posf = pos.cast<float>();
+			const auto x = posf.x * step.x - chunk.size.x * 0.5f;
+			const auto y = posf.y * step.y - chunk.size.y * 0.5f;
+
+//			const auto missingHeight = libv::vec3f{0, 0, 0};
+			const auto missingHeight = libv::vec3f{
+					chunk.position.x + x + side.x,
+					chunk.position.y + y + side.y,
+					config.height.rootNode->evaluate(x + chunk.position.x + side.x, y + chunk.position.y + side.y)};
+
+			const auto pL = sideIndex == 3 ? missingHeight : chunk.height(pos.x - 1, pos.y);
+			const auto pR = sideIndex == 1 ? missingHeight : chunk.height(pos.x + 1, pos.y);
+			const auto pU = sideIndex == 2 ? missingHeight : chunk.height(pos.x, pos.y + 1);
+			const auto pD = sideIndex == 0 ? missingHeight : chunk.height(pos.x, pos.y - 1);
+
+			chunk.normal(pos) = calculateNormalFromPoints(pL, pR, pU, pD);
 		}
 	});
 }

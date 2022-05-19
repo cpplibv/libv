@@ -3,9 +3,10 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
-#include <libv/mt/worker_thread.hpp>
 #include <libv/container/sliding_window_2d.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/mt/concurrent_queue.hpp>
+#include <libv/mt/worker_thread.hpp>
 // std
 #include <condition_variable>
 #include <deque>
@@ -14,6 +15,7 @@
 #include <vector>
 // pro
 #include <surface/surface/fwd.hpp>
+#include <surface/surface/surface_constants.hpp>
 #include <surface/view/vec_hash.hpp>
 
 
@@ -29,15 +31,9 @@ struct SurfaceGenerationTask {
 	// Exclusive access:
 	const std::shared_ptr<ChunkGen> chunkGen;
 
-	// Concurrent access with Surface:
-	std::mutex mutex;
-	std::condition_variable_any queuePending_cv;
-
-	std::deque<std::weak_ptr<Chunk>> queuePending;
-	std::vector<std::shared_ptr<Chunk>> queueReady;
-
-	//
-	libv::sliding_window_2D<std::shared_ptr<Chunk>> chunks{-12, -12, 25, 25, nullptr};
+	// (Thread-safe) Concurrent access with Surface:
+	libv::mt::concurrent_queue<std::weak_ptr<Chunk>> queuePending;
+	libv::mt::concurrent_queue<std::weak_ptr<Chunk>> queueReady;
 
 public:
 	SurfaceGenerationTask(std::stop_token&& stopToken, std::shared_ptr<const Config>&& config, const std::shared_ptr<ChunkGen>& chunkGen);
@@ -55,7 +51,13 @@ private:
 	std::shared_ptr<SurfaceGenerationTask> currentTask;
 
 	int generation = 0;
-	std::vector<std::shared_ptr<Chunk>> chunks;
+	std::vector<std::shared_ptr<Chunk>> activeChunks;
+	libv::sliding_window_2D<std::shared_ptr<Chunk>> chunks{
+			-chunkRangeWindowSize,
+			-chunkRangeWindowSize,
+			chunkRangeWindowSize * 2 + 1,
+			chunkRangeWindowSize * 2 + 1,
+			nullptr};
 
 	libv::vec3f focalPosition;
 	libv::vec3f focalDirection;
@@ -66,13 +68,16 @@ public:
 	Surface();
 	~Surface();
 
+private:
+	void scan(libv::vec2i center, int32_t scanRange);
+
 public:
 	int gen(std::shared_ptr<const Config>&& config_);
 	bool update(libv::vec3f focalPosition, libv::vec3f focalDirection);
 
 public:
-	[[nodiscard]] inline const std::vector<std::shared_ptr<Chunk>>& getChunks() const noexcept {
-		return chunks;
+	[[nodiscard]] inline const std::vector<std::shared_ptr<Chunk>>& getActiveChunks() const noexcept {
+		return activeChunks;
 	}
 
 	[[nodiscard]] inline int getGeneration() const noexcept {

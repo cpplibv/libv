@@ -59,6 +59,7 @@ private:
 	};
 
 private:
+	std::unordered_map<libv::vec2i, std::vector<uint32_t>, VecHash> stripIndices;
 	std::unordered_map<libv::vec2i, ChunkMesh, VecHash> chunkMeshMap;
 	ShaderSurface shader;
 

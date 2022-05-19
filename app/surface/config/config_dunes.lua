@@ -23,7 +23,7 @@ config = {
 	--numChunks = 441,
 	--numVeggie = 150,
 	--numVeggie = 500,
-	numVeggie = 1600,
+	numVeggie = 1601,
 	--numVeggie = 16000,
 
 	fogIntensity = 0.02,
@@ -112,6 +112,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(100, 40%, 80%)" },
+			--{ 1, "hsv(0, 30%, 80%)" }
 			{ 1, "hsv(120, 30%, 80%)" }
 		},
 		vegetation = {
