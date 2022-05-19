@@ -70,6 +70,16 @@ Surface::~Surface() {
 
 // -------------------------------------------------------------------------------------------------
 
+const auto size = libv::vec2f{32, 32};
+
+const auto distanceThresholdPrefetch = size.x * 3.f;
+const auto distanceThresholdExpire = distanceThresholdPrefetch * 3.f;
+const auto distanceThresholdInit = distanceThresholdPrefetch * 1.5f;
+
+const auto loadIndexCount = static_cast<int32_t>(distanceThresholdPrefetch / size.x) + 1;
+
+// -------------------------------------------------------------------------------------------------
+
 int Surface::gen(std::shared_ptr<const Config>&& config_) {
 	chunks.clear();
 
@@ -83,6 +93,39 @@ int Surface::gen(std::shared_ptr<const Config>&& config_) {
 		task->run();
 	});
 
+	const auto oldFocalPosition = focalPosition;
+	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / size).cast<int32_t>();
+
+	const auto scanSize = loadIndexCount + 1;
+
+	// TODO P3: Duplicate code with scanning
+	for (int y = -scanSize; y <= scanSize; ++y) {
+		for (int x = -scanSize; x <= scanSize; ++x) {
+			const auto index = oldFocalOriginIndex + libv::vec2i{x, y};
+			const auto position = index.cast<float>() * size;
+//				log_surface.trace("Check on {:8.4f} ms", t3);
+
+			if (!currentTask->chunks.contains(index))
+				continue; // I don't think it should happen
+
+			auto& chunk = currentTask->chunks(index);
+			if (chunk != nullptr)
+				// ??? Unless generation change?
+				continue;
+
+			log_surface.trace("Queue new chunk {}", index);
+			chunk = std::make_shared<Chunk>(
+					index,
+					position,
+					size,
+					currentTask->config->resolution + 1,
+					currentTask->config->globalSeed
+			);
+			currentTask->queuePending.emplace_back(chunk);
+			currentTask->queuePending_cv.notify_all();
+		}
+	}
+
 	return ++generation;
 }
 
@@ -95,16 +138,8 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	auto lock = std::unique_lock(currentTask->mutex);
 	libv::Timer timer;
 
-	const auto oldFocalPosition = currentTask->focalPosition;
-	const auto oldFocalDirection = currentTask->focalDirection;
-
-	const auto size = libv::vec2f{32, 32};
-
-	const auto distanceThresholdPrefetch = size.x * 3.f;
-	const auto distanceThresholdExpire = distanceThresholdPrefetch * 3.f;
-	const auto distanceThresholdInit = distanceThresholdPrefetch * 1.5f;
-
-	const auto prefetchIndexCount = static_cast<int32_t>(distanceThresholdPrefetch / size.x) + 1;
+	const auto oldFocalPosition = focalPosition;
+	const auto oldFocalDirection = focalDirection;
 
 	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / size).cast<int32_t>();
 	const auto newFocalOriginIndex = libv::lround(xy(newFocalPosition) / size).cast<int32_t>();
@@ -127,8 +162,8 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 		timer.reset();
 
 		// Detect chunks in range
-		for (int y = -prefetchIndexCount; y <= prefetchIndexCount; ++y) {
-			for (int x = -prefetchIndexCount; x <= prefetchIndexCount; ++x) {
+		for (int y = -loadIndexCount; y <= loadIndexCount; ++y) {
+			for (int x = -loadIndexCount; x <= loadIndexCount; ++x) {
 				const auto index = newFocalOriginIndex + libv::vec2i{x, y};
 				const auto position = index.cast<float>() * size;
 //				log_surface.trace("Check on {:8.4f} ms", t3);
@@ -171,8 +206,8 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	}
 //	currentTask->queueReady.clear();
 
-	currentTask->focalPosition = newFocalPosition;
-	currentTask->focalDirection = newFocalDirection;
+	focalPosition = newFocalPosition;
+	focalDirection = newFocalDirection;
 
 	auto t = timer.timef_ms().count();
 	log_surface.trace_if(t > 0.01f, "Focus update took {:8.4f} ms", t);

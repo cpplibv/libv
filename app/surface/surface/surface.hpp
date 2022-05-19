@@ -39,9 +39,6 @@ struct SurfaceGenerationTask {
 	//
 	libv::sliding_window_2D<std::shared_ptr<Chunk>> chunks{-12, -12, 25, 25, nullptr};
 
-	libv::vec3f focalPosition;
-	libv::vec3f focalDirection;
-
 public:
 	SurfaceGenerationTask(std::stop_token&& stopToken, std::shared_ptr<const Config>&& config, const std::shared_ptr<ChunkGen>& chunkGen);
 
@@ -59,6 +56,9 @@ private:
 
 	int generation = 0;
 	std::vector<std::shared_ptr<Chunk>> chunks;
+
+	libv::vec3f focalPosition;
+	libv::vec3f focalDirection;
 
 	libv::mt::worker_thread control{"gen/control"}; // Control thread is last member to be the first to join
 
