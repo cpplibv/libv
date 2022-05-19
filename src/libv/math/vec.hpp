@@ -7,6 +7,7 @@
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/meta/force_inline.hpp>
+#include <libv/meta/uninitialized.hpp>
 // std
 #include <cmath>
 #include <ostream> // Remove include after https://github.com/fmtlib/fmt/issues/2449 is resolved
@@ -30,9 +31,11 @@ namespace libv {
 
 template <std::size_t N, typename T>
 struct vec_base_t {
-	T data_[N]{};
+	T data_[N];
 
-	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept = default;
+	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : data_{} { }
+	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
+
 	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
@@ -57,10 +60,12 @@ struct vec_base_t {
 
 template <typename T>
 struct vec_base_t<2, T> {
-	T x{};
-	T y{};
+	T x;
+	T y;
 
-	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept = default;
+	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{} { }
+	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
+
 	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
@@ -83,11 +88,13 @@ struct vec_base_t<2, T> {
 
 template <typename T>
 struct vec_base_t<3, T> {
-	T x{};
-	T y{};
-	T z{};
+	T x;
+	T y;
+	T z;
 
-	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept = default;
+	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{}, z{} {}
+	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
+
 	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
@@ -116,12 +123,14 @@ struct vec_base_t<3, T> {
 
 template <typename T>
 struct vec_base_t<4, T> {
-	T x{};
-	T y{};
-	T z{};
-	T w{};
+	T x;
+	T y;
+	T z;
+	T w;
 
-	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept = default;
+	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{}, z{}, w{} {}
+	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
+
 	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;

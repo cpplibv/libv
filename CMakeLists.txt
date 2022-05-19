@@ -1064,6 +1064,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_container
+	SOURCE sandbox/libv_container_main.cpp
+	LINK   ext_fmt libv_container libv_utility libv_math
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_colony
 	SOURCE sandbox/libv_colony_main.cpp
 	LINK   ext_colony

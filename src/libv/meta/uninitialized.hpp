@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/uninitialized.hpp
+// Project: libv.utility, File: src/libv/meta/uninitialized.hpp
 
 #pragma once
 
@@ -7,9 +7,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Uninitialized_t {};
+struct uninitialized_t {};
 
-static constexpr Uninitialized_t uninitialized{};
+static constexpr uninitialized_t uninitialized{};
 
 // -------------------------------------------------------------------------------------------------
 

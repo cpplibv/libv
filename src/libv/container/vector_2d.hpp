@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/meta/uninitialized.hpp>
 // std
 #include <memory>
 #include <span>
@@ -32,6 +33,9 @@ public:
 	constexpr inline vector_2D(libv::vec2z size, const T& init_value) :
 			vector_2D(size.x, size.y, init_value) {}
 
+	constexpr inline vector_2D(libv::vec2z size, libv::uninitialized_t tag) :
+			vector_2D(size.x, size.y, tag) {}
+
 	constexpr inline vector_2D(std::size_t x, std::size_t y) :
 			size_(x, y),
 			storage(std::make_unique_for_overwrite<T[]>(x * y)) {}
@@ -40,6 +44,15 @@ public:
 			size_(x, y),
 			storage(std::make_unique_for_overwrite<T[]>(x * y)) {
 		fill(init_value);
+	}
+
+	constexpr inline vector_2D(std::size_t x, std::size_t y, libv::uninitialized_t) :
+			size_(x, y),
+			storage(reinterpret_cast<T*>(::operator new(sizeof(T) * x * y))) {
+
+		// Raw allocation with placement new with libv::uninitialized which should be optimized away
+		for (std::size_t i = 0; i < x * y; ++i)
+			::new (&storage[i]) T(libv::uninitialized);
 	}
 
 public:
