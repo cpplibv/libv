@@ -9,6 +9,8 @@
 #include <libv/math/mat.hpp>
 #include <libv/math/mix.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/meta/force_inline.hpp>
+#include <libv/meta/uninitialized.hpp>
 // std
 #include <cmath>
 #include <ostream>
@@ -26,25 +28,27 @@ struct quat_t {
 	using value_type = T;
 
 public:
-	T w = 1;
-	T x = 0;
-	T y = 0;
-	T z = 0;
+	T w; // = 1
+	T x; // = 0
+	T y; // = 0
+	T z; // = 0
 
 public:
 	// constructors --------------------------------------------------------------------------------
 
-	constexpr inline quat_t() noexcept = default;
-	constexpr inline quat_t(const quat_t&) noexcept = default;
-	constexpr inline quat_t& operator=(const quat_t&) & noexcept = default;
-	constexpr inline quat_t(quat_t&&) noexcept = default;
-	constexpr inline quat_t& operator=(quat_t&&) & noexcept = default;
+	constexpr LIBV_FORCE_INLINE quat_t() noexcept : w{1}, x{0}, y{0}, z{0} {}
+	explicit(false) constexpr LIBV_FORCE_INLINE quat_t(libv::uninitialized_t) noexcept { }
 
-	constexpr inline quat_t(T w, T x, T y, T z) noexcept : w(w), x(x), y(y), z(z) {}
+	constexpr LIBV_FORCE_INLINE quat_t(const quat_t&) noexcept = default;
+	constexpr LIBV_FORCE_INLINE quat_t& operator=(const quat_t&) & noexcept = default;
+	constexpr LIBV_FORCE_INLINE quat_t(quat_t&&) noexcept = default;
+	constexpr LIBV_FORCE_INLINE quat_t& operator=(quat_t&&) & noexcept = default;
 
-	explicit constexpr inline quat_t(const mat3_t<T>& m) noexcept : quat_t(from_mat(m)) {}
+	constexpr LIBV_FORCE_INLINE quat_t(T w, T x, T y, T z) noexcept : w(w), x(x), y(y), z(z) {}
 
-	explicit constexpr inline quat_t(const mat4_t<T>& mat) noexcept : quat_t(mat3_t<T>{mat}) {}
+	explicit constexpr LIBV_FORCE_INLINE quat_t(const mat3_t<T>& m) noexcept : quat_t(from_mat(m)) {}
+
+	explicit constexpr LIBV_FORCE_INLINE quat_t(const mat4_t<T>& mat) noexcept : quat_t(mat3_t<T>{mat}) {}
 
 	// named constructors --------------------------------------------------------------------------
 
@@ -62,7 +66,7 @@ public:
 	}
 
 	/// \param angle - (Radians)
-	[[nodiscard]] static constexpr inline quat_t create_rotate(T angle, vec3_t<T> axis) noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE quat_t create_rotate(T angle, vec3_t<T> axis) noexcept {
 		return angle_axis(angle, axis);
 	}
 
@@ -140,29 +144,29 @@ public:
 		}
 	}
 
-	[[nodiscard]] static constexpr inline quat_t from_mat(mat4_t<T> mat) noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE quat_t from_mat(mat4_t<T> mat) noexcept {
 		return from_mat(mat3_t<T>{mat});
 	}
 
 	template <typename Quat>
-	[[nodiscard]] static constexpr inline quat_t from_quat(const Quat& q) noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE quat_t from_quat(const Quat& q) noexcept {
 		return quat_t{q.w, q.x, q.y, q.z};
 	}
 
 public:
 	// operator unary ------------------------------------------------------------------------------
 
-	constexpr inline quat_t operator+() const noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t operator+() const noexcept {
 		return *this;
 	}
 
-	constexpr inline quat_t operator-() const noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t operator-() const noexcept {
 		return quat_t{-w, -x, -y, -z};
 	}
 
 	// operator+ -----------------------------------------------------------------------------------
 
-	constexpr inline quat_t& operator+=(quat_t q2) noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& operator+=(quat_t q2) noexcept {
 		w += q2.w;
 		x += q2.x;
 		y += q2.y;
@@ -170,11 +174,11 @@ public:
 		return *this;
 	}
 
-	[[nodiscard]] friend constexpr inline quat_t operator+(quat_t q1, quat_t q2) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator+(quat_t q1, quat_t q2) noexcept {
 		return quat_t(q1) += q2;
 	}
 
-	constexpr inline quat_t& operator-=(quat_t q2) noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& operator-=(quat_t q2) noexcept {
 		w -= q2.w;
 		x -= q2.x;
 		y -= q2.y;
@@ -182,7 +186,7 @@ public:
 		return *this;
 	}
 
-	[[nodiscard]] friend constexpr inline quat_t operator-(quat_t q1, quat_t q2) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator-(quat_t q1, quat_t q2) noexcept {
 		return quat_t(q1) -= q2;
 	}
 
@@ -198,7 +202,7 @@ public:
 		return *this;
 	}
 
-	[[nodiscard]] friend constexpr inline quat_t operator*(quat_t q1, quat_t q2) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator*(quat_t q1, quat_t q2) noexcept {
 		return quat_t(q1) *= q2;
 	}
 
@@ -212,22 +216,22 @@ public:
 		return vec + ((uv * q1.w) + uuv) * T{2};
 	}
 
-	[[nodiscard]] friend constexpr inline vec3_t<T> operator*(vec3_t<T> vec, quat_t q2) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE vec3_t<T> operator*(vec3_t<T> vec, quat_t q2) noexcept {
 		return q2.inverse_copy() * vec;
 	}
 
-	[[nodiscard]] friend constexpr inline vec4_t<T> operator*(quat_t q1, vec4_t<T> vec) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE vec4_t<T> operator*(quat_t q1, vec4_t<T> vec) noexcept {
 		return vec4_t<T>{q1 * xyz(vec), vec.w};
 	}
 
-	[[nodiscard]] friend constexpr inline vec4_t<T> operator*(vec4_t<T> vec, quat_t q2) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE vec4_t<T> operator*(vec4_t<T> vec, quat_t q2) noexcept {
 		return q2.inverse_copy() * vec;
 	}
 
 	// Quat, Scalar
 
 	template <typename K>
-	constexpr inline quat_t& operator*=(K scalar) noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& operator*=(K scalar) noexcept {
 		w *= scalar;
 		x *= scalar;
 		y *= scalar;
@@ -236,13 +240,13 @@ public:
 	}
 
 	template <typename K>
-	[[nodiscard]] friend constexpr inline quat_t operator*(quat_t q, K scalar) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator*(quat_t q, K scalar) noexcept {
 		return quat_t{q.w * scalar, q.x * scalar, q.y * scalar, q.z * scalar
 		};
 	}
 
 	template <typename K>
-	[[nodiscard]] friend constexpr inline quat_t operator*(K scalar, quat_t q) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator*(K scalar, quat_t q) noexcept {
 		return quat_t{scalar * q.w, scalar * q.x, scalar * q.y, scalar * q.z
 		};
 	}
@@ -256,14 +260,14 @@ public:
 //		return *this;
 //	}
 
-//	[[nodiscard]] friend constexpr inline quat_t operator/(quat_t q1, quat_t q2) noexcept {
+//	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator/(quat_t q1, quat_t q2) noexcept {
 //		return quat_t(q1) *= q2;
 //	}
 
 	// Quat, Scalar
 
 	template <typename K>
-	constexpr inline quat_t& operator/=(K scalar) noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& operator/=(K scalar) noexcept {
 		w /= scalar;
 		x /= scalar;
 		y /= scalar;
@@ -272,38 +276,38 @@ public:
 	}
 
 	template <typename K>
-	[[nodiscard]] friend constexpr inline quat_t operator/(quat_t q, K scalar) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator/(quat_t q, K scalar) noexcept {
 		return quat_t{q.w / scalar, q.x / scalar, q.y / scalar, q.z / scalar};
 	}
 
 	template <typename K>
-	[[nodiscard]] friend constexpr inline quat_t operator/(K scalar, quat_t q) noexcept {
+	[[nodiscard]] friend constexpr LIBV_FORCE_INLINE quat_t operator/(K scalar, quat_t q) noexcept {
 		return quat_t{scalar / q.w, scalar / q.x, scalar / q.y, scalar / q.z};
 	}
 
 	// conjugate -----------------------------------------------------------------------------------
 
-	constexpr inline quat_t& conjugate() noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& conjugate() noexcept {
 		x = -x;
 		y = -y;
 		z = -z;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr inline quat_t conjugate_copy() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t conjugate_copy() const noexcept {
 		return quat_t{w, -x, -y, -z};
 	}
 
 	// inverse -------------------------------------------------------------------------------------
 
-	constexpr inline quat_t& inverse() noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& inverse() noexcept {
 		const auto d = length_sq();
 		this->conjugate();
 		*this /= d;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr inline quat_t inverse_copy() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t inverse_copy() const noexcept {
 		return conjugate_copy() /= length_sq();
 	}
 
@@ -327,48 +331,48 @@ public:
 		return *this;
 	}
 
-	[[nodiscard]] constexpr inline quat_t normalize_copy() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t normalize_copy() const noexcept {
 		return quat_t{*this}.normalize();
 	}
 
 	// rotate --------------------------------------------------------------------------------------
 
-	constexpr inline quat_t& rotate(T angle, vec3_t<T> axis) noexcept {
+	constexpr LIBV_FORCE_INLINE quat_t& rotate(T angle, vec3_t<T> axis) noexcept {
 		*this *= create_rotate(angle, axis);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr inline quat_t rotate_copy(T angle, vec3_t<T> axis) const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t rotate_copy(T angle, vec3_t<T> axis) const noexcept {
 		return *this * create_rotate(angle, axis);
 	}
 
 	// query ---------------------------------------------------------------------------------------
 
-	[[nodiscard]] constexpr inline bool has_inf() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool has_inf() const noexcept {
 		return std::isinf(w) || std::isinf(x) || std::isinf(y) || std::isinf(z);
 	}
 
-	[[nodiscard]] constexpr inline bool has_nan() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool has_nan() const noexcept {
 		return std::isnan(w) || std::isnan(x) || std::isnan(y) || std::isnan(z);
 	}
 
-	[[nodiscard]] constexpr inline vec3_t<T> forward() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE vec3_t<T> forward() const noexcept {
 		return *this * vec3_t<T>{1, 0, 0};
 	}
 
-	[[nodiscard]] constexpr inline vec3_t<T> right() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE vec3_t<T> right() const noexcept {
 		return *this * vec3_t<T>{0, -1, 0};
 	}
 
-	[[nodiscard]] constexpr inline vec3_t<T> up() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE vec3_t<T> up() const noexcept {
 		return *this * vec3_t<T>{0, 0, 1};
 	}
 
-	[[nodiscard]] constexpr inline T length_sq() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE T length_sq() const noexcept {
 		return w * w + x * x + y * y + z * z;
 	}
 
-	[[nodiscard]] constexpr inline T length() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE T length() const noexcept {
 		return std::sqrt(length_sq());
 	}
 
@@ -398,7 +402,7 @@ public:
 		};
 	}
 
-	[[nodiscard]] constexpr inline mat4_t<T> to_mat4() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE mat4_t<T> to_mat4() const noexcept {
 		return mat4_t<T>{to_mat3()};
 	}
 
@@ -433,7 +437,7 @@ public:
 		return std::atan2(siny_cosp, cosy_cosp);
 	}
 
-	[[nodiscard]] constexpr inline vec3_t<T> euler_angles() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE vec3_t<T> euler_angles() const noexcept {
 		return vec3_t<T>{roll(), pitch(), yaw()};
 	}
 
@@ -460,8 +464,8 @@ public:
 
 	// operator== ----------------------------------------------------------------------------------
 
-	[[nodiscard]] constexpr inline bool operator==(const quat_t& other) const noexcept = default;
-	[[nodiscard]] constexpr inline bool operator!=(const quat_t& other) const noexcept = default;
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool operator==(const quat_t& other) const noexcept = default;
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool operator!=(const quat_t& other) const noexcept = default;
 
 	// operator<<(ostream, vec) --------------------------------------------------------------------
 public:
@@ -474,44 +478,44 @@ public:
 // =================================================================================================
 
 template <typename T>
-[[nodiscard]] constexpr inline T length(const quat_t<T>& q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE T length(const quat_t<T>& q) noexcept {
 	return q.length();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline quat_t<T> inverse(const quat_t<T>& q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t<T> inverse(const quat_t<T>& q) noexcept {
 	return q.inverse_copy();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline quat_t<T> conjugate(const quat_t<T>& q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t<T> conjugate(const quat_t<T>& q) noexcept {
 	return q.conjugate_copy();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline quat_t<T> normalize(const quat_t<T>& q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t<T> normalize(const quat_t<T>& q) noexcept {
 	return q.normalize_copy();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline mat3_t<T> to_mat3(quat_t<T> q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE mat3_t<T> to_mat3(quat_t<T> q) noexcept {
 	return q.to_mat3();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline mat4_t<T> to_mat4(quat_t<T> q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE mat4_t<T> to_mat4(quat_t<T> q) noexcept {
 	return q.to_mat4();
 }
 
 template <typename T>
-[[nodiscard]] constexpr inline vec3_t<T> euler_angles(quat_t<T> q) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE vec3_t<T> euler_angles(quat_t<T> q) noexcept {
 	return q.euler_angles();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-[[nodiscard]] constexpr inline T dot(quat_t<T> q1, quat_t<T> q2) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE T dot(quat_t<T> q1, quat_t<T> q2) noexcept {
 	return q1.w * q2.w +
 			q1.x * q2.x +
 			q1.y * q2.y +
@@ -534,7 +538,7 @@ template <typename T>
 ///	\param q2 - Value at \c a = 1
 ///	\param a - Interpolation value. Has to be in the [0, 1] range
 template <typename T>
-[[nodiscard]] constexpr inline quat_t<T> lerp(quat_t<T> q1, quat_t<T> q2, T a) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE quat_t<T> lerp(quat_t<T> q1, quat_t<T> q2, T a) noexcept {
 	// assert(a >= T{0});
 	// assert(a <= T{1});
 	return q1 * (T{1} - a) + (q2 * a);
