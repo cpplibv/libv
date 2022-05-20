@@ -31,39 +31,68 @@ int main() {
 	};
 
 
-	constexpr std::size_t size = 10240;
+	constexpr std::size_t size4 = 4 * 1024;
+	constexpr std::size_t size = size4 * 4;
 
-	measure("float", [] {
+	measure("vector_2D float", [] {
 		libv::vector_2D<float> container{size, size};
 	});
 
-//	measure("float uninitialized", [] {
+//	measure("vector_2D float uninitialized", [] {
 //		libv::vector_2D<float> container{size, size, libv::uninitialized};
 //	});
 
-	measure("float zero", [] {
+	measure("vector_2D float zero", [] {
 		libv::vector_2D<float> container{size, size, 0};
 	});
 
-	measure("float one", [] {
+	measure("vector_2D float one", [] {
 		libv::vector_2D<float> container{size, size, 42};
 	});
 
-	measure("vec4f", [] {
-		libv::vector_2D<libv::vec4f> container{size, size};
+	measure("vector_2D vec4f", [] {
+		libv::vector_2D<libv::vec4f> container{size4, size};
 	});
 
-	measure("vec4f uninitialized", [] {
-		libv::vector_2D<libv::vec4f> container{size, size, libv::uninitialized};
+	measure("vector_2D vec4f uninitialized", [] {
+		libv::vector_2D<libv::vec4f> container{size4, size, libv::uninitialized};
 	});
 
-	measure("vec4f zero", [] {
-		libv::vector_2D<libv::vec4f> container{size, size, libv::vec4f{0, 0, 0, 0}};
+	measure("vector_2D vec4f zero", [] {
+		libv::vector_2D<libv::vec4f> container{size4, size, libv::vec4f{0, 0, 0, 0}};
 	});
 
-	measure("vec4f one", [] {
-		libv::vector_2D<libv::vec4f> container{size, size, libv::vec4f{42, 42, 42, 42}};
+	measure("vector_2D vec4f one", [] {
+		libv::vector_2D<libv::vec4f> container{size4, size, libv::vec4f{42, 42, 42, 42}};
 	});
+
+	// -------------------------------------------------------------------------------------------------
+
+	measure("vector float", [] {
+		std::vector<float> container;
+		container.resize(size * size);
+	});
+
+	measure("vector float zero", [] {
+		std::vector<float> container;
+		container.resize(size * size, 0.f);
+	});
+
+	measure("vector vec4f", [] {
+		std::vector<libv::vec4f> container;
+		container.resize(size4 * size);
+	});
+
+	measure("vector vec4f uninitialized", [] {
+		std::vector<libv::vec4f> container;
+		container.resize(size4 * size, libv::uninitialized);
+	});
+
+//	measure("vector vec4f uninitialized allocator", [] {
+//		std::vector<libv::vec4f, libv::uninitialized_allocator<libv::vec4f>> container;
+//
+//		container.resize(size * size);
+//	});
 
 	return 0;
 }
