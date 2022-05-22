@@ -62,3 +62,55 @@ TEST_CASE("Test index_spiral", "[libv.utility.index_spiral]") {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+auto list_from_spiral_loop(int32_t ring) {
+	std::vector<libv::vec2i> result;
+
+	libv::index_spiral_loop(ring, [&](libv::vec2i index) {
+		result.emplace_back(index);
+	});
+
+	return result;
+}
+
+auto list_from_index_spiral(int32_t count) {
+	std::vector<libv::vec2i> result;
+
+	for (int32_t i = 0; i < count; ++i)
+		result.emplace_back(libv::index_spiral(i));
+
+	return result;
+}
+
+template <typename... Is>
+auto list(Is... is) {
+	return std::vector<libv::vec2i>{is...};
+}
+
+
+TEST_CASE("Test index_spiral_loop", "[libv.utility.index_spiral]") {
+	using vec2 = libv::vec2i;
+
+	CHECK(list_from_spiral_loop(0) == list());
+	CHECK(list_from_spiral_loop(1) == list(vec2(0, 0)));
+	CHECK(list_from_spiral_loop(2) == list(
+			vec2(0, 0),
+			vec2(1, 0),
+			vec2(1, 1),
+			vec2(0, 1),
+			vec2(-1, 1),
+			vec2(-1, 0),
+			vec2(-1, -1),
+			vec2(0, -1),
+			vec2(1, -1)
+	));
+
+	CHECK(list_from_spiral_loop(0) == list_from_index_spiral(0));
+	CHECK(list_from_spiral_loop(1) == list_from_index_spiral(1));
+	CHECK(list_from_spiral_loop(2) == list_from_index_spiral(9));
+	CHECK(list_from_spiral_loop(3) == list_from_index_spiral(25));
+	CHECK(list_from_spiral_loop(4) == list_from_index_spiral(7 * 7));
+	CHECK(list_from_spiral_loop(5) == list_from_index_spiral(9 * 9));
+}
+
+// -------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline libv::vec2i index_spiral(const size_t index) {
+[[nodiscard]] constexpr inline libv::vec2i index_spiral(const size_t index) {
 	// +---+---+---+---+---+
 	// | G | F | E | D | C |
 	// +---+---+---+---+---+
@@ -53,6 +53,43 @@ namespace libv {
 	}
 
 	return {0, 0};
+}
+
+template <typename Fn>
+constexpr inline void index_spiral_loop(int num_ring, Fn&& fn) {
+	// +---+---+---+---+---+
+	// | G | F | E | D | C |
+	// +---+---+---+---+---+
+	// | H | 4 | 3 | 2 | B |
+	// +---+---+---+---+---+
+	// | I | 5 | 0 | 1 | A |
+	// +---+---+---+---+---+
+	// | J | 6 | 7 | 8 | 9 |
+	// +---+---+---+---+---+
+	// | K | L | M | N | O |
+	// +---+---+---+---+---+
+
+	if (num_ring < 1)
+		return;
+
+	fn(libv::vec2i{0, 0});
+
+	for (int ring = 1; ring < num_ring; ++ring) {
+		const auto quarter_population = ring * 2;
+		const auto quarter_start = -quarter_population / 2 + 1;
+
+		for (int y = 0; y < quarter_population; ++y)
+			fn(libv::vec2i{ring, quarter_start + y});
+
+		for (int x = 0; x < quarter_population; ++x)
+			fn(libv::vec2i{-quarter_start - x, ring});
+
+		for (int y = 0; y < quarter_population; ++y)
+			fn(libv::vec2i{-ring, -quarter_start - y});
+
+		for (int x = 0; x < quarter_population; ++x)
+			fn(libv::vec2i{quarter_start + x, -ring});
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
