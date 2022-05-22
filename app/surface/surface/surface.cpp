@@ -4,8 +4,8 @@
 #include <surface/surface/surface.hpp>
 // libv
 #include <libv/algo/erase_unstable.hpp>
+#include <libv/utility/index_spiral.hpp>
 #include <libv/utility/timer.hpp>
-//#include <libv/utility/index_spiral.hpp>
 // std
 //#include <algorithm>
 // pro
@@ -57,6 +57,32 @@ Surface::~Surface() {
 
 // -------------------------------------------------------------------------------------------------
 
+void Surface::scanSpiral(libv::vec2i center, int32_t scanRange) {
+	libv::index_spiral_loop(scanRange, [&](const auto spiral_index) {
+		const auto index = center + spiral_index;
+		const auto position = index.template cast<float>() * chunkSize;
+//			log_surface.trace("Check on {:8.4f} ms", t3);
+
+		if (!chunks.contains(index))
+			return; // (Bad configuration)
+
+		auto& chunk = chunks(index);
+		if (chunk != nullptr)
+			return;
+
+		log_surface.trace("Queue new chunk {}", index);
+		chunk = std::make_shared<Chunk>(
+				index,
+				position,
+				chunkSize,
+				currentTask->config->resolution + 1,
+				currentTask->config->globalSeed
+		);
+
+		currentTask->queuePending.emplace(chunk);
+	});
+}
+
 void Surface::scan(libv::vec2i center, int32_t scanRange) {
 	for (int y = -scanRange; y <= scanRange; ++y) {
 		for (int x = -scanRange; x <= scanRange; ++x) {
@@ -65,7 +91,7 @@ void Surface::scan(libv::vec2i center, int32_t scanRange) {
 //			log_surface.trace("Check on {:8.4f} ms", t3);
 
 			if (!chunks.contains(index))
-				continue; // I don't think it should happen (it could only happen if the scan size is bigger then the window size: aka bad configuration)
+				continue; // (Bad configuration)
 
 			auto& chunk = chunks(index);
 			if (chunk != nullptr)
@@ -106,7 +132,7 @@ int Surface::gen(std::shared_ptr<const Config>&& config_) {
 	const auto oldFocalPosition = focalPosition;
 	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / chunkSize).cast<int32_t>();
 
-	scan(oldFocalOriginIndex, chunkRangeScanInitialization);
+	scanSpiral(oldFocalOriginIndex, chunkRangeScanInitialization);
 
 	return generation;
 }
@@ -120,7 +146,7 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	libv::Timer timer;
 
 	const auto oldFocalPosition = focalPosition;
-	const auto oldFocalDirection = focalDirection;
+//	const auto oldFocalDirection = focalDirection;
 
 	const auto oldFocalOriginIndex = libv::lround(xy(oldFocalPosition) / chunkSize).cast<int32_t>();
 	const auto newFocalOriginIndex = libv::lround(xy(newFocalPosition) / chunkSize).cast<int32_t>();

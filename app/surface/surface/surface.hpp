@@ -69,6 +69,7 @@ public:
 	~Surface();
 
 private:
+	void scanSpiral(libv::vec2i center, int32_t scanRange);
 	void scan(libv::vec2i center, int32_t scanRange);
 
 public:
