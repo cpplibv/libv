@@ -20,7 +20,7 @@ struct Veggie {
 	float rotation; // Normal + rotation = quaternion?
 	float scale;
 	// clamp during randomization, except hue <- modf
-	libv::vec3f hsv_color_shift;
+	libv::vec3f hsv_shift;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -23,8 +23,8 @@ config = {
 	--numChunks = 441,
 	--numVeggie = 150,
 	--numVeggie = 500,
-	numVeggie = 1601,
-	--numVeggie = 16000,
+	--numVeggie = 1601,
+	numVeggie = 20000,
 
 	fogIntensity = 0.02,
 	fogColor = "hsv(120, 5%, 95%)";

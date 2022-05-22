@@ -163,7 +163,7 @@ private:
 		//libv::vec3f normal;
 		//float rotation;
 		//float height or scale;
-		//libv::vec3f hsv_color_shift;
+		//libv::vec3f hsv_shift;
 		//int id;
 	};
 

@@ -252,7 +252,7 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 		return libv::normalize(libv::cross(pR - pL, pU - pD));
 	};
 
-	const auto calculateNormal = [&](uint32_t x, uint32_t y) {
+	const auto calculateNormal = [&](std::size_t x, std::size_t y) {
 		if (x == 0 || x == chunk.height.size_x() - 1)
 			return libv::vec3f{0, 0, 1};
 		if (y == 0 || y == chunk.height.size_y() - 1)
@@ -269,12 +269,12 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 //	threads.execute_and_wait()
 //	libv::mt::parallel_for(threads, 0uz, numVertex, [&](auto yi) {
 	libv::mt::parallel_for(threads, 1uz, numVertex - 1, [&](auto yi) {
-		const auto yf = static_cast<float>(yi);
+//		const auto yf = static_cast<float>(yi);
 
 		for (std::size_t xi = 1; xi < numVertex - 1; ++xi) {
-			const auto xf = static_cast<float>(xi);
-			const auto x = xf * step.x - chunk.size.x * 0.5f;
-			const auto y = yf * step.y - chunk.size.y * 0.5f;
+//			const auto xf = static_cast<float>(xi);
+//			const auto x = xf * step.x - chunk.size.x * 0.5f;
+//			const auto y = yf * step.y - chunk.size.y * 0.5f;
 
 //			chunk.height(xi, yi) = libv::vec3f{
 //					chunk.position.x + x,
@@ -291,23 +291,24 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 		libv::vec2f side = libv::uninitialized;
 
 		switch (sideIndex) {
+		default:
 		case 0:
 			start = {0, 0};
 			direction = {1, 0};
 			side = libv::vec2f{0, -1} * step;
 			break;
 		case 1:
-			start = {numVertex - 1, 0};
+			start = {static_cast<int32_t>(numVertex) - 1, 0};
 			direction = {0, 1};
 			side = libv::vec2f{1, 0} * step;
 			break;
 		case 2:
-			start = {numVertex - 1, numVertex - 1};
+			start = {static_cast<int32_t>(numVertex) - 1, static_cast<int32_t>(numVertex) - 1};
 			direction = {-1, 0};
 			side = libv::vec2f{0, 1} * step;
 			break;
 		case 3:
-			start = {0, numVertex - 1};
+			start = {0, static_cast<int32_t>(numVertex) - 1};
 			direction = {0, -1};
 			side = libv::vec2f{-1, 0} * step;
 			break;

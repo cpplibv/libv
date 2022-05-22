@@ -59,6 +59,9 @@ struct UniformLayoutSpriteDefinitions {
 
 inline const auto layout_definitions = libv::glr::layout_std140<UniformLayoutSpriteDefinitions>(uniformBlock_definitions);
 
+//	std::cout << libv::glr::layout_to_string<UniformLayoutSpriteDefinitions>("SpriteDefinitions") << std::endl;
+//	std::cout << libv::glr::layout_std140_size<UniformLayoutSpriteDefinitions>() << std::endl;
+
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsSprite {
@@ -119,9 +122,12 @@ struct SpriteAtlas {
 
 // -------------------------------------------------------------------------------------------------
 
-//class SpriteChunk {
-//	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
-//};
+class Frustum;
+
+struct SpriteChunk {
+	int generation = -1;
+	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+};
 
 class RendererSprite {
 private:
@@ -131,7 +137,7 @@ private:
 //		libv::vec3f normal;
 //		float rotation;
 //		float scale;
-//		libv::vec3f hsv_color_shift;
+//		libv::vec3f hsv_shift;
 //	};
 
 	struct SpriteType {
@@ -141,8 +147,7 @@ private:
 
 private:
 	ShaderSprite shader;
-//	std::unordered_map<libv::vec2i, SpriteChunk, VecHash> chunksMeshes;
-	libv::glr::Mesh mesh{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
+	std::unordered_map<libv::vec2i, SpriteChunk, VecHash> spriteChunks;
 	std::shared_ptr<SpriteAtlas> spriteAtlas;
 	libv::glr::UniformBlockSharedView_std140 spriteDefinitionsBlock;
 
@@ -150,15 +155,13 @@ private:
 	std::vector<SpriteType> spriteTypes;
 
 private:
-//	std::vector<Entry> entries;
 	std::vector<int32_t> entries_type;
 	std::vector<libv::vec3f> entries_position;
 	std::vector<libv::vec3f> entries_normal;
 	std::vector<libv::vec2f> entries_rotation_scale;
-	std::vector<libv::vec4f> entries_hsv_color_shift;
+	std::vector<libv::vec4f> entries_hsv_shift;
 
-	bool dirty = false;
-	bool active = false;
+//	bool active = false;
 
 public:
 	bool fogEnabled = true;
@@ -169,7 +172,7 @@ public:
 	explicit RendererSprite(libv::rev::ResourceManager& loader);
 
 private:
-	void updateMesh();
+	void updateMesh(libv::glr::Mesh& mesh);
 
 public:
 	int32_t registerSprite(std::string modelPath, float sizeMultiplier);
@@ -177,10 +180,13 @@ public:
 	void bakeSprites(libv::rev::ResourceManager& loader, libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 
 public:
-	void clear();
-	void add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_color_shift);
+	void clearChunks();
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
+	int chunkGeneration(libv::vec2i index);
+	void add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_shift);
+	void commitChunk(int generation, libv::vec2i index);
+
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
 };
 
 // -------------------------------------------------------------------------------------------------

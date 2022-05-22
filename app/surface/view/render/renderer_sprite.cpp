@@ -4,16 +4,12 @@
 #include <surface/view/render/renderer_sprite.hpp>
 // libv
 #include <libv/glr/queue.hpp>
-#include <libv/rev/materials/material_sprite_baker.hpp>
-#include <libv/rev/model.hpp>
 #include <libv/rev/resource_manager.hpp>
-#include <libv/utility/min_max.hpp>
-//#include <libv/glr/procedural/cube.hpp>
-
-//#include <surface/view/render/renderer.hpp>
 // pro
-#include <surface/view/render/baker_sprite_atlas.hpp>
 #include <surface/log.hpp>
+#include <surface/surface/surface_constants.hpp>
+#include <surface/view/frustum.hpp>
+#include <surface/view/render/baker_sprite_atlas.hpp>
 
 
 namespace surface {
@@ -23,20 +19,8 @@ namespace surface {
 RendererSprite::RendererSprite(libv::rev::ResourceManager& loader) :
 		shader(loader.shader, "builtin/sprite.vs", "builtin/sprite.gs", "builtin/sprite.fs") {}
 
-void RendererSprite::updateMesh() {
-	dirty = false;
-	active = !entries_type.empty();
-//	active = !entries.empty();
-
+void RendererSprite::updateMesh(libv::glr::Mesh& mesh) {
 	mesh.clear();
-
-	if (!active)
-		return;
-
-//		std::cout << libv::glr::layout_to_string<UniformLayoutSpriteDefinitions>("SpriteDefinitions") << std::endl;
-//		std::cout << libv::glr::layout_std140_size<UniformLayoutSpriteDefinitions>() << std::endl;
-
-	// --- Mesh
 
 	auto type = mesh.attribute(attribute_type);
 	auto position = mesh.attribute(attribute_position);
@@ -46,31 +30,11 @@ void RendererSprite::updateMesh() {
 
 	auto index = mesh.index();
 
-//	type.resize(entries.size());
-//	position.resize(entries.size());
-//	normal.resize(entries.size());
-//	rotation_scale.resize(entries.size());
-//	color0.resize(entries.size());
-//	index.resize(entries.size());
-//
-//	for (uint32_t i = 0; i < entries.size(); ++i) {
-//		const auto& vertex = entries[i];
-//
-//		type[i] = vertex.type;
-//		position[i] = vertex.position;
-//		normal[i] = vertex.normal;
-//		rotation_scale[i] = libv::vec2f(vertex.rotation, vertex.scale);
-//		color0[i] = libv::vec4f(vertex.hsv_color_shift, 1.f);
-//		index[i] = i;
-//	}
-
-	log_surface.error("entries_type.size(): {}", entries_type.size());
-
 	type.set_from_range(entries_type);
 	position.set_from_range(entries_position);
 	normal.set_from_range(entries_normal);
 	rotation_scale.set_from_range(entries_rotation_scale);
-	color0.set_from_range(entries_hsv_color_shift);
+	color0.set_from_range(entries_hsv_shift);
 
 	index.resize(entries_type.size());
 	for (uint32_t i = 0; i < entries_type.size(); ++i)
@@ -133,38 +97,44 @@ void RendererSprite::bakeSprites(libv::rev::ResourceManager& loader, libv::glr::
 	}
 }
 
-void RendererSprite::clear() {
-	entries_type.clear();
-	entries_position.clear();
-	entries_normal.clear();
-	entries_rotation_scale.clear();
-	entries_hsv_color_shift.clear();
-
-//	entries.clear();
+void RendererSprite::clearChunks() {
+	spriteChunks.clear();
 }
 
-void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_color_shift) {
-//	entries.emplace_back(type, position, normal, rotation, scale, hsv_color_shift);
+int RendererSprite::chunkGeneration(libv::vec2i index) {
+	return spriteChunks[index].generation;
+}
+
+void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_shift) {
 	entries_type.emplace_back(type);
 	entries_position.emplace_back(position);
 	entries_normal.emplace_back(normal);
 	entries_rotation_scale.emplace_back(rotation, scale);
-	entries_hsv_color_shift.emplace_back(hsv_color_shift, 1.f);
-	dirty = true;
+	entries_hsv_shift.emplace_back(hsv_shift, 1.f);
 }
 
-void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	if (dirty)
-		updateMesh();
+void RendererSprite::commitChunk(int generation, libv::vec2i index) {
+	auto& spriteChunk = spriteChunks[index];
+	spriteChunk.generation = generation;
 
-	if (!active)
+	updateMesh(spriteChunk.mesh);
+
+	entries_type.clear();
+	entries_position.clear();
+	entries_normal.clear();
+	entries_rotation_scale.clear();
+	entries_hsv_shift.clear();
+}
+
+void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+	if (spriteChunks.empty())
 		return;
 
 	glr.program(shader.program());
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
-	auto block_matrices = uniform_stream.block_shared(layout_matrices);
+	auto block_matrices = uniform_stream.block_unique(layout_matrices);
 	block_matrices[layout_matrices.matMVP] = glr.mvp();
 	block_matrices[layout_matrices.matM] = glr.model;
 	block_matrices[layout_matrices.matP] = glr.projection;
@@ -173,7 +143,24 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(spriteDefinitionsBlock);
 	glr.texture(spriteAtlas->textureColor, textureChannel_diffuse);
 	glr.texture(spriteAtlas->textureNormal, textureChannel_normal);
-	glr.render(mesh);
+
+	std::erase_if(spriteChunks, [&](const auto& pair) {
+		const auto& [index, spriteChunk] = pair;
+
+		const auto eye = glr.eye();
+		const auto chunkPosition = index.template cast<float>() * 32.0f;
+		const auto threshold = worldRangeUnloadRender;
+		if (libv::length_sq(xy(eye) - chunkPosition) > threshold * threshold) { // !!! Constants regarding size and chunk count
+			log_surface.error("Destroying render mesh {} (range: {}) eye {}", index, libv::length(xy(eye) - chunkPosition), eye);
+			return true;
+		}
+
+		if (frustum.sphereInFrustum({chunkPosition, 0}, chunkSideLength * libv::sqrt2) != Frustum::Position::OUTSIDE) {
+			glr.render(spriteChunk.mesh);
+		}
+
+		return false;
+	});
 }
 
 // -------------------------------------------------------------------------------------------------

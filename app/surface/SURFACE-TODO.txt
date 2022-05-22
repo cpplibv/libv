@@ -8,6 +8,16 @@
 
 
 
+kill sprite index VBO
+
+
+vec2f lua convert function is buggy
+remember last config
+vegi chunks
+priority sorting
+
+
+
 
 
 
@@ -37,14 +47,38 @@ T 2 surface: Test models render:   0.0452 ms, app/surface/surface/surface_canvas
 
 Normals during chunk generation
 T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:366
-T 2 surface: SetupRenderStates                       :   0.0464 ms, app/surface/surface/surface_canvas.cpp:369
-T 2 surface: surfaceDirty build                      :   1.6836 ms, app/surface/surface/surface_canvas.cpp:369
 E 2 surface: chunks.size(): 121, app/surface/surface/surface_canvas.cpp:70
-T 2 surface: surfaceDirty buildVeggie                :   0.2135 ms, app/surface/surface/surface_canvas.cpp:369
-T 2 surface: activeScene->render                     :   0.0207 ms, app/surface/surface/surface_canvas.cpp:369
 E 2 surface: entries_type.size(): 12051, app/surface/view/render/renderer_sprite.cpp:67
-T 2 surface: renderer.sprite.render                  :   0.1188 ms, app/surface/surface/surface_canvas.cpp:369
-T 2 surface: Test models render                      :   0.0267 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: SetupRenderStates        :   0.0464 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: surfaceDirty build       :   1.6836 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: surfaceDirty buildVeggie :   0.2135 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: activeScene->render      :   0.0207 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: renderer.sprite.render   :   0.1188 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: Test models render       :   0.0267 ms, app/surface/surface/surface_canvas.cpp:369
+
+Rework surface generation communication and cache index strips
+T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:366
+E 2 surface: chunks.size(): 121, app/surface/surface/surface_canvas.cpp:70
+E 2 surface: entries_type.size(): 12051, app/surface/view/render/renderer_sprite.cpp:67
+T 2 surface: SetupRenderStates        :  0.0513 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: buildMesh                :  1.3778 ms 5 5, app/surface/view/render/renderer_surface.cpp:72
+T 2 surface: surfaceDirty build       :  1.4162 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: surfaceDirty buildVeggie :  0.2241 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: activeScene->render      :  0.0269 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: renderer.sprite.render   :  0.1343 ms, app/surface/surface/surface_canvas.cpp:369
+T 2 surface: Test models render       :  0.0483 ms, app/surface/surface/surface_canvas.cpp:369
+
+Chunked sprites
+T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:376
+E 2 surface: chunks.size(): 81, app/surface/surface/surface_canvas.cpp:71
+T 2 surface: SetupRenderStates        :  0.0450 ms, app/surface/surface/surface_canvas.cpp:379
+T 2 surface: buildMesh                :  1.4139 ms 4 -4, app/surface/view/render/renderer_surface.cpp:73
+T 2 surface: surfaceDirty build       :  1.4348 ms, app/surface/surface/surface_canvas.cpp:379
+T 2 surface: surfaceDirty buildVeggie :  0.0192 ms, app/surface/surface/surface_canvas.cpp:379
+T 2 surface: activeScene->render      :  0.0146 ms, app/surface/surface/surface_canvas.cpp:379
+T 2 surface: renderer.sprite.render   :  0.0106 ms, app/surface/surface/surface_canvas.cpp:379
+T 2 surface: Test models render       :  0.0248 ms, app/surface/surface/surface_canvas.cpp:379
+
 
 		T 2 surface: surfaceDirty build:   2.7700 ms, app/surface/surface/surface_canvas.cpp:364
 		T 2 surface: surfaceDirty buildVeggie:   1.7535 ms, app/surface/surface/surface_canvas.cpp:364
@@ -66,24 +100,22 @@ T 2 surface: Test models render                      :   0.0267 ms, app/surface/
 		T 2 surface: renderer.sprite.render                  :   2.4251 ms, app/surface/surface/surface_canvas.cpp:369
 		T 2 surface: Test models render                      :   0.0468 ms, app/surface/surface/surface_canvas.cpp:369
 
+		T 2 surface: Start render, app/surface/surface/surface_canvas.cpp:366
+		E 2 surface: chunks.size(): 117, app/surface/surface/surface_canvas.cpp:70
+		E 2 surface: entries_type.size(): 82150, app/surface/view/render/renderer_sprite.cpp:67
+		T 2 surface: SetupRenderStates        :  0.0499 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: buildMesh                :  1.2496 ms 18 18, app/surface/view/render/renderer_surface.cpp:72
+		T 2 surface: surfaceDirty build       :  1.2844 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: surfaceDirty buildVeggie :  1.3395 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: activeScene->render      :  0.0290 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: renderer.sprite.render   :  1.5429 ms, app/surface/surface/surface_canvas.cpp:369
+		T 2 surface: Test models render       :  0.0335 ms, app/surface/surface/surface_canvas.cpp:369
 
 
 
-vegi chunks
-camera movement
-priority sorting
-
-
-const auto distanceThresholdInit = 50.f;
-expire chunk should delete them from renderer
-
-
-
-
-seed a non seeded noise : random x y offset and rotation
+seed a non seeded noise : random x y offset and rotation, mat3
 
 scene change does not clear sprites just adds a new batch
-
 
 sprite not smooth but discrete angle following
 \ sprite looks at eye, it should be just parallel with camera right, this would fix issues with orbit z hard clipping into each other and covering the other partially
@@ -141,14 +173,6 @@ Sprites:
 				? drop one half pixel from the UV
 
 
-vec2f lua convert function is buggy
-remember last config
-
-
-
-Stability:
-	!!! during regeneration and exit (esc) deadlock-y
-
 Visuals:
 	skybox / background
 		libv.rev: builtin:cube (XYZ cube)
@@ -169,7 +193,7 @@ Visuals:
 			config sun properties
 
 	issues
-		normal map edge pixel calculation
+		normal map corner pixel calculation (edge is now solved, but corner is not)
 		texture view duplicate border pixels
 		texture view sometimes can flicker a row on chunk borders
 			most likely half pixel issue
@@ -178,7 +202,7 @@ Visuals:
 		normal, height
 		textures on 3D: temperature, humidity etc
 
-point xyz -> z (only)
+point/height xyz -> z (only)
 
 
 libv.glr: mesh submesh update (for surface chunks)

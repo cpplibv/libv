@@ -38,7 +38,7 @@ void RendererVeggie::addVeggies(int generation, const libv::vec2i& index, const 
 	std::vector<Sphere> spheres;
 	spheres.reserve(veggies.size());
 	for (const auto& veggie : veggies) {
-		spheres.emplace_back(veggie.pos, veggie.scale, libv::vec4f{libv::color::hsv_to_rgb(veggie.hsv_color_shift), 1.f}, 6, 6);
+		spheres.emplace_back(veggie.pos, veggie.scale, libv::vec4f{libv::color::hsv_to_rgb(veggie.hsv_shift), 1.f}, 6, 6);
 	}
 
 	buildMesh(chunkRenderData.mesh, spheres);

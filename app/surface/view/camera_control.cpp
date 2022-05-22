@@ -183,38 +183,33 @@ void CameraControl2D::register_controls(libv::ctrl::FeatureRegister controls) {
 	static constexpr auto c0_zoom = 2.0f; (void) c0_zoom; //suppressing false warning
 	static constexpr auto c0_translate = 1.1f; (void) c0_translate; //suppressing false warning
 
-//	(void) c0_translate; // Suppressing a false warning
-
 	controls.feature_analog<CameraOrtho>("camera2D.orbit_distance", sg_zoom, [](const auto& arg, CameraOrtho& ctx) {
 		const auto value = libv::linearized_change(ctx.zoom(), c0_zoom, arg.value_f());
-//		ctx.zoom(std::clamp(value, 0.000001f, value));
+//		ctx.zoom(std::clamp(value, 0.000001f, 1000.f));
 		ctx.zoom(std::max(0.000001f, value));
 	});
 
 	controls.feature_analog<CameraOrtho>("camera2D.move_forward", sg_translate, [](const auto& arg, CameraOrtho& ctx) {
-//		const auto value = arg.value_f() * std::pow(ctx.orbit_distance(), c0_translate);
-//		ctx.move_forward(value);
-		ctx.move_forward(arg.value_f());
+		const auto value = arg.value_f() * std::pow(ctx.zoom() * 250.f, c0_translate);
+		ctx.move_forward(value);
 	});
 
 	controls.feature_analog<CameraOrtho>("camera2D.move_right", sg_translate, [](const auto& arg, CameraOrtho& ctx) {
-//		const auto value = arg.value_f() * std::pow(ctx.orbit_distance(), c0_translate);
-//		ctx.move_right(value);
-		ctx.move_right(arg.value_f());
+		const auto value = arg.value_f() * std::pow(ctx.zoom() * 250.f, c0_translate);
+		ctx.move_right(value);
 	});
 }
 
 void CameraControl2D::bind_default_controls(libv::ctrl::BindingRegister controls) {
 	controls.bind("camera2D.orbit_distance", "Scroll", -1);
-	controls.bind("camera2D.orbit_distance", "t");
-	controls.bind("camera2D.orbit_distance", "g", -1);
+	controls.bind("camera2D.orbit_distance", "T");
+	controls.bind("camera2D.orbit_distance", "G", -1);
 
 	controls.bind("camera2D.move_forward", "Up");
 	controls.bind("camera2D.move_forward", "Down", -1);
 
 	controls.bind("camera2D.move_right", "Right");
 	controls.bind("camera2D.move_right", "Left", -1);
-
 
 //	controls.bind("camera.snap_position", "Shift + Ctrl + O");
 //	controls.bind("camera.snap_angle", "Shift + Ctrl + I");
