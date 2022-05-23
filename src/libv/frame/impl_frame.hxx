@@ -41,7 +41,7 @@ public:
 	std::shared_ptr<Core> core = getCoreInstance();
 
 public:
-	uint32_t swapInterval = 1;
+	int32_t swapInterval = 1;
 	libv::vec2i aspectRatio = {-1, -1};
 	libv::vec2f contentScale = {1, 1};
 	libv::vec2i framebufferSize;

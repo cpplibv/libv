@@ -261,6 +261,15 @@ public:
 	void setInitialFocus(bool initialFocus);
 	void setFocusOnShow(bool focusOnShow);
 
+	///	Default value is 1 (vsync enabled)
+	///
+	/// @param swapInterval
+	/// 		negative value: allows to swap immediately even if a frame arrives a little bit late.
+	/// 		zero: disable vertical synchronization (vsync).
+	/// 		one: enable vertical synchronization (vsync)
+	/// 		2+: number of frames to wait before swapping the buffers (fps limiting)
+	void setSwapInterval(int32_t swapInterval);
+
 	/// Negative values interpreted as no aspect ratio constraint
 	void setAspectRatio(int numer, int denom);
 	/// Negative values interpreted as no aspect ratio constraint
@@ -305,6 +314,9 @@ public:
 	libv::vec2i getSize() const;
 	libv::vec4i getFrameSize() const; /// x - left, y - top, z - right, w - bottom
 	std::string getTitle() const;
+
+	int32_t getSwapInterval() const;
+
 	// ... Additional getters on demand
 
 	bool isDecorated() const;

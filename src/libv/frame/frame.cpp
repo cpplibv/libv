@@ -92,6 +92,8 @@ void Frame::cmdFrameCreate() {
 	self->core->execute(std::bind(&Frame::cmdCoreCreate, this));
 	if (self->window) {
 		glfwMakeContextCurrent(self->window);
+		glfwSwapInterval(self->swapInterval);
+
 		self->context.executeAsync(std::bind(&Frame::loopInit, this));
 		this->contextCreate();
 	}
@@ -104,6 +106,8 @@ void Frame::cmdFrameRecreate() {
 	self->core->execute(std::bind(&Frame::cmdCoreRecreate, this));
 	if (self->window) {
 		glfwMakeContextCurrent(self->window);
+		glfwSwapInterval(self->swapInterval);
+
 		this->contextCreate();
 	}
 }
@@ -450,6 +454,16 @@ void Frame::setFocusOnShow(bool focusOnShow) {
 	});
 }
 
+void Frame::setSwapInterval(int32_t swapInterval) {
+	self->context.executeAsync([this, swapInterval] {
+		std::lock_guard lock(self->frameState_m);
+		log_frame.trace("Set frame SwapInterval of {} to {}", self->title, swapInterval);
+		self->swapInterval = swapInterval;
+		if (self->window)
+			glfwSwapInterval(swapInterval);
+	});
+}
+
 void Frame::setAspectRatio(int numer, int denom) {
 	setAspectRatio(libv::vec2i{numer, denom});
 }
@@ -605,6 +619,11 @@ libv::vec4i Frame::getFrameSize() const {
 std::string Frame::getTitle() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->title;
+}
+
+int32_t Frame::getSwapInterval() const {
+	std::lock_guard lock(self->frameState_m);
+	return self->swapInterval;
 }
 
 bool Frame::isDecorated() const {
