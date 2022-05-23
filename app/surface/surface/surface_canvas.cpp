@@ -68,7 +68,7 @@ void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 
 	int type = 0;
 //	renderer.sprite.clear();
-	log_surface.error("chunks.size(): {}", chunks.size());
+//	log_surface.error("chunks.size(): {}", chunks.size());
 
 	for (const auto& chunk : chunks) {
 		if (renderer.sprite.chunkGeneration(chunk->index) == generation)
@@ -352,12 +352,20 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 		renderer.sky.fogIntensity = conf->fogIntensity;
 		renderer.sky.fogColor = conf->fogColor;
+//		renderer.sky.sunColor = conf->sunColor;
+//		renderer.sky.sunDirection = conf->sunDirection;
 		renderer.sprite.fogIntensity = conf->fogIntensity;
 		renderer.sprite.fogColor = conf->fogColor;
+		renderer.sprite.sunColor = conf->sunColor;
+		renderer.sprite.sunDirection = conf->sunDirection;
 		renderer.surface.fogIntensity = conf->fogIntensity;
 		renderer.surface.fogColor = conf->fogColor;
+		renderer.surface.sunColor = conf->sunColor;
+		renderer.surface.sunDirection = conf->sunDirection;
 		renderer.veggie.fogIntensity = conf->fogIntensity;
 		renderer.veggie.fogColor = conf->fogColor;
+//		renderer.veggie.sunColor = conf->sunColor;
+//		renderer.veggie.sunDirection = conf->sunDirection;
 
 		surface->gen(std::move(conf));
 	}
@@ -369,17 +377,17 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 
 	surfaceDirty = surface->update(cameraManager.position(), cameraManager.forward());
 
-	auto t0 = timer.timef_ms().count();
-	log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", "Canvas update took SUM", t0);
+//	auto t0 = timer.timef_ms().count();
+//	log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", "Canvas update took SUM", t0);
 }
 
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	libv::Timer timerSum;
 	libv::Timer timer;
-	log_surface.trace("Start render");
+//	log_surface.trace("Start render");
 	const auto time = [&timer](std::string_view description) {
 		auto t0 = timer.timef_ms().count();
-		log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", description, t0);
+//		log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", description, t0);
 		timer.reset();
 	};
 
@@ -400,9 +408,9 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
+//			renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
 //			const auto treeIDNormalized = renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
-//			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
+			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
 //			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
 //			const auto treeCactusAID = renderer.sprite.registerSprite("tree_cactus_a_03.vm4", 1.0f / 10.f);
 //			const auto treePalmID = renderer.sprite.registerSprite("tree_palm_02.vm4", 1.0f / 20.f);
@@ -501,7 +509,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	auto tSum = timerSum.timef_ms().count();
-	log_surface.trace_if(tSum > 0.01f, "{:25}:{:8.4f} ms", "Canvas render took SUM", tSum);
+//	log_surface.trace_if(tSum > 0.01f, "{:25}:{:8.4f} ms", "Canvas render took SUM", tSum);
 }
 
 // -------------------------------------------------------------------------------------------------

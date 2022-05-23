@@ -72,6 +72,44 @@ namespace surface {
 	}
 }
 
+[[nodiscard]] inline std::optional<libv::vec3f> convertVec3fOptional(const sol::object& object) {
+	if (object.get_type() == sol::type::userdata) {
+		if (object.is<libv::vec3f>())
+			return object.as<libv::vec3f>();
+		else
+			return std::nullopt;
+
+	} else if (object.get_type() == sol::type::table) {
+		auto table = object.as<sol::table>();
+		{
+			auto n1 = table.get<sol::object>(1);
+			auto n2 = table.get<sol::object>(2);
+			auto n3 = table.get<sol::object>(3);
+			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number)
+				return libv::vec3f(n1.as<float>(), n2.as<float>(), n3.as<float>());
+		}
+		{
+			auto n1 = table.get<sol::object>("r");
+			auto n2 = table.get<sol::object>("g");
+			auto n3 = table.get<sol::object>("b");
+			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number)
+				return libv::vec3f(n1.as<float>(), n2.as<float>(), n3.as<float>());
+		}
+		{
+			auto n1 = table.get<sol::object>("x");
+			auto n2 = table.get<sol::object>("y");
+			auto n3 = table.get<sol::object>("z");
+			if (n1.get_type() == sol::type::number && n2.get_type() == sol::type::number && n3.get_type() == sol::type::number)
+				return libv::vec3f(n1.as<float>(), n2.as<float>(), n3.as<float>());
+		}
+
+		return std::nullopt;
+
+	} else {
+		return std::nullopt;
+	}
+}
+
 [[nodiscard]] inline libv::vec2f convertVec2f(const sol::object& object) {
 	auto result = convertVec2fOptional(object);
 
@@ -148,7 +186,6 @@ SurfaceLuaBinding::SurfaceLuaBinding() {
 	lua.open_libraries(sol::lib::math);
 	lua.open_libraries(sol::lib::package);
 	libv::lua::open_libraries(lua, libv::lua::lualib::vec);
-
 }
 
 Seed SurfaceLuaBinding::convertSeed(const sol::object& object, Seed seedOffset) {
@@ -162,9 +199,10 @@ std::unique_ptr<Node> SurfaceLuaBinding::convertNodeTree(const sol::object& obje
 	const auto table = convertTable(object);
 
 	std::vector<std::unique_ptr<Node>> children;
-	for (const auto&[key, value] : table) {
+	for (const auto& [key, value] : table) {
 		if (value.get_type() == sol::type::table)
-			children.emplace_back(convertNodeTree(value, seedOffset));
+			if (value.as<sol::table>().get<sol::object>("nodeType").get_type() == sol::type::string)
+				children.emplace_back(convertNodeTree(value, seedOffset));
 	}
 
 	auto solNodeType = table["nodeType"];
@@ -388,9 +426,16 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	result->numVeggie = table["numVeggie"];
 //	result->plantDistribution = table["plantDistribution"];
 
-	result->fogIntensity = table["fogIntensity"].get_or(0.05f);
 	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));
 	result->fogColor = fogColorOpt ? *fogColorOpt : libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};
+
+	result->fogIntensity = table["fogIntensity"].get_or(0.05f);
+
+	const auto sunColorOpt = libv::lua::convert_color(table.get<sol::object>("sunColor"));
+	result->sunColor = sunColorOpt ? xyz(*sunColorOpt) : libv::vec3f{1.0f, 1.0f, 1.0f};
+
+	const auto sunDirectionOpt = convertVec3fOptional(table.get<sol::object>("sunDirection"));
+	result->sunDirection = sunDirectionOpt ? sunDirectionOpt->normalize_copy() : libv::vec3f{0.784464f, 0.196116f, 0.588348f};
 
 	return result;
 }

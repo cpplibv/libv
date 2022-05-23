@@ -118,6 +118,11 @@ public:
 	float fogIntensity;
 	libv::vec4f fogColor;
 
+	libv::vec3f sunColor;
+	libv::vec3f sunDirection;
+
+	std::string skyboxTexture;
+
 	libv::flat_set<Biome> biomes;
 
 	HeatMap height;

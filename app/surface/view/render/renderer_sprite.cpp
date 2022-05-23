@@ -134,6 +134,8 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
+	glr.uniform(shader.uniform().sunColor, sunColor);
+	glr.uniform(shader.uniform().sunDirection, sunDirection);
 	auto block_matrices = uniform_stream.block_unique(layout_matrices);
 	block_matrices[layout_matrices.matMVP] = glr.mvp();
 	block_matrices[layout_matrices.matM] = glr.model;
@@ -155,9 +157,8 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 			return true;
 		}
 
-		if (frustum.sphereInFrustum({chunkPosition, 0}, chunkSideLength * libv::sqrt2) != Frustum::Position::OUTSIDE) {
+		if (frustum.sphereInFrustum({chunkPosition, 0}, chunkSideLength * libv::sqrt2 * 0.5f) != Frustum::Position::OUTSIDE)
 			glr.render(spriteChunk.mesh);
-		}
 
 		return false;
 	});

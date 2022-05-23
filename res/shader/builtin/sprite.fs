@@ -17,6 +17,8 @@ uniform sampler2DArray textureColor;
 uniform sampler2DArray textureNormal;
 
 uniform vec4 fogColor = vec4(0.7, 0.8, 0.9, 1.0);
+uniform vec3 sunColor = vec3(1.0, 0.9, 0.8);
+uniform vec3 sunDirection = vec3(0.784464, 0.196116, 0.588348);
 
 
 // -------------------------------------------------------------------------------------------------
@@ -86,11 +88,12 @@ void main() {
 
 	vec3 N = normalize(normal); // Normal vector
 	vec3 V = normalize(eye - fs_in.positionW); // View vector
-	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
+//	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
+	vec3 L = sunDirection; // Light vector
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
-	float strength_ambient = 1;
+	float strength_ambient = 0.2;
 	float strength_diffuse = max(dot(N, L), 0.0);
 	float strength_specular = pow(max(dot(V, R), 0.0), 16);
 
@@ -100,7 +103,7 @@ void main() {
 			strength_diffuse * 0.6 +
 			strength_specular * 0.1;
 
-	color.rgb *= attenuation;
+	color.rgb *= attenuation * sunColor;
 
 	// --- Fog ---
 

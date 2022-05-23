@@ -17,8 +17,6 @@ local global_takeover = {
 config = {
 	seed = 0,
 	resolution = 256,
-	--numChunks = 9,
-	numChunks = 81,
 	--numChunks = 169,
 	--numChunks = 441,
 	--numVeggie = 150,
@@ -26,8 +24,11 @@ config = {
 	--numVeggie = 1601,
 	numVeggie = 20000,
 
-	fogIntensity = 0.02,
 	fogColor = "hsv(120, 5%, 95%)";
+	fogIntensity = 0.02,
+
+	sunColor = "hsv(0, 10%, 95%)";
+	sunDirection = vec3f(0.8, 0.2, 0.6),
 }
 
 biomes = {
@@ -123,12 +124,12 @@ biomes = {
 			--	probability = 0.2,
 			--},
 			{
-				name = "bush",
+				name = "treeRed",
 				scale = range(2.0, 4.0),
 				hue = shift(-60.0, 10.0),
 				saturation = shift(0.2, 0.1),
 				value = shift(0.1, 0.1),
-				probability = 0.03,
+				probability = 0.02,
 			},
 			{
 				name = "tree",

@@ -32,12 +32,16 @@ struct UniformsSurface {
 	libv::glr::Uniform_bool fogEnabled;
 	libv::glr::Uniform_float fogIntensity;
 	libv::glr::Uniform_vec4f fogColor;
+	libv::glr::Uniform_vec3f sunColor;
+	libv::glr::Uniform_vec3f sunDirection;
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(textureBase, "textureBase", textureChannel_diffuse);
 		access(fogEnabled, "fogEnabled", true);
 		access(fogIntensity, "fogIntensity", 0.05f);
 		access(fogColor, "fogColor", libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f});
+		access(sunColor, "sunColor", libv::vec3f{1.0f, 0.9f, 0.8f});
+		access(sunDirection, "sunDirection", libv::vec3f{0.784464f, 0.196116f, 0.588348f});
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -69,6 +73,8 @@ public:
 	bool fogEnabled = true;
 	float fogIntensity = 0.05f;
 	libv::vec4f fogColor = libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};
+	libv::vec3f sunColor = libv::vec3f{1.0f, 0.9f, 0.8f};
+	libv::vec3f sunDirection = libv::vec3f{0.784464f, 0.196116f, 0.588348f};
 
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);

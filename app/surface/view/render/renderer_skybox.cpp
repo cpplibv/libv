@@ -40,6 +40,8 @@ void RendererSkybox::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 //	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
+//	glr.uniform(shader.uniform().sunColor, sunColor);
+//	glr.uniform(shader.uniform().sunDirection, sunDirection);
 
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 //	uniforms[layout_matrices.matMVP] = glr.mvp();

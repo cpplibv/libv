@@ -97,6 +97,8 @@ void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
+//	glr.uniform(shader.uniform().sunColor, sunColor);
+//	glr.uniform(shader.uniform().sunDirection, sunDirection);
 
 	const auto& eye = glr.eye();
 	for (const auto &[_, veggie] : vegetationMap) {

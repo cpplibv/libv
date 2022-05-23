@@ -7,16 +7,21 @@
 
 
 
+skybox texture from config
+
+
+
+
+
+make a couple of decent trees
 
 kill sprite index VBO
 
 
-vec2f lua convert function is buggy
+
 remember last config
 vegi chunks
 priority sorting
-
-
 
 
 
@@ -176,8 +181,6 @@ Sprites:
 Visuals:
 	skybox / background
 		libv.rev: builtin:cube (XYZ cube)
-		skybox texture from config
-		find a couple of good skybox
 
 	micro texture
 		per biome based texture
@@ -190,7 +193,6 @@ Visuals:
 	lighting
 		sun
 			switching
-			config sun properties
 
 	issues
 		normal map corner pixel calculation (edge is now solved, but corner is not)

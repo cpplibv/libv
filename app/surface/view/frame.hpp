@@ -25,10 +25,19 @@ struct SurfaceFrame : public libv::Frame {
 		setOpenGLSamples(libv::Frame::OpenGLSamples{4});
 		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 		setIcon(icon_set_iris_cyan());
+//		setSwapInterval(0);
 
 		onKey.output([this](const libv::input::EventKey& e) {
 			if (e.keycode == libv::input::Keycode::Escape)
 				closeForce();
+//			if (e.keycode == libv::input::Keycode::KPAsterisk)
+//				setSwapInterval(-1);
+//			if (e.keycode == libv::input::Keycode::KPPlus)
+//				setSwapInterval(0);
+//			if (e.keycode == libv::input::Keycode::KPMinus)
+//				setSwapInterval(1);
+//			if (e.keycode == libv::input::Keycode::KPEnter)
+//				setSwapInterval(2);
 		});
 
 		// TODO P1: Fix bug where setDisplayMode(DisplayMode::fullscreen_windowed) fails with assert (incorrect matrix)

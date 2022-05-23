@@ -315,7 +315,7 @@ void ChunkGen::generateChunk(const Config& config, Chunk& chunk) {
 		}
 
 		// !!! Corners
-//		for (std::size_t i = 1; i < numVertex - 1; ++i) {
+		chunk.normal(start.cast<std::size_t>()) = libv::vec3f(0, 0, 1);
 
 		for (std::size_t i = 1; i < numVertex - 1; ++i) {
 			const auto pos = start + i * direction;

@@ -69,8 +69,8 @@ void RendererSurface::buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<sur
 	color0.set_from_range(chunk->color.span());
 	index.set_from_range(cachedIndices);
 
-	auto t0 = timer.timef_ms().count();
-	log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms {}", "buildMesh", t0, chunk->index);
+//	auto t0 = timer.timef_ms().count();
+//	log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms {}", "buildMesh", t0, chunk->index);
 }
 
 void RendererSurface::clear() {
@@ -83,6 +83,8 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
 	glr.uniform(shader.uniform().fogIntensity, fogIntensity);
 	glr.uniform(shader.uniform().fogColor, fogColor);
+	glr.uniform(shader.uniform().sunColor, sunColor);
+	glr.uniform(shader.uniform().sunDirection, sunDirection);
 	glr.texture(texture.texture(), textureChannel_diffuse);
 
 	std::erase_if(chunkMeshMap, [&](const auto& pair) {

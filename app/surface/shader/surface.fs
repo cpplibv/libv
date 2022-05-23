@@ -15,13 +15,16 @@ out vec4 result;
 uniform sampler2D textureBase;
 
 uniform vec4 fogColor = vec4(0.7, 0.8, 0.9, 1.0);
+uniform vec3 sunColor = vec3(1.0, 0.9, 0.8);
+uniform vec3 sunDirection = vec3(0.784464, 0.196116, 0.588348);
 
 
 void main() {
 	vec3 N = normalize(fragmentNormal); // Normal vector
 	vec3 V = normalize(eye - fragmentPositionW); // View vector
 //	vec3 L = vec3(0, 0, 1); // Light vector
-	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
+//	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
+	vec3 L = sunDirection;
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
@@ -45,7 +48,7 @@ void main() {
 	texBase = mix(texBase, texBaseLarge, 0.2);
 //	texBase = hsv_to_rgb(rgb_to_hsv(texBase) * vec3(1, 0, 1));
 
-	result = vec4(texBase * fragmentColor.rgb * attenuation, fragmentColor.a);
+	result = vec4(texBase * fragmentColor.rgb * attenuation * sunColor, fragmentColor.a);
 
 	// --- Fog ---
 
