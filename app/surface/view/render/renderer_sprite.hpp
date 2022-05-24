@@ -162,6 +162,7 @@ private:
 	std::vector<int32_t> entries_type;
 	std::vector<libv::vec3f> entries_position;
 	std::vector<libv::vec3f> entries_normal;
+	std::vector<libv::vec3f> entries_surface_normal;
 	std::vector<libv::vec2f> entries_rotation_scale;
 	std::vector<libv::vec4f> entries_hsv_shift;
 
@@ -187,7 +188,7 @@ public:
 	void clearChunks();
 
 	int chunkGeneration(libv::vec2i index);
-	void add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_shift);
+	void add(int32_t type, libv::vec3f position, libv::vec3f normal, libv::vec3f surfaceNormal, float rotation, float scale, libv::vec3f hsv_shift);
 	void commitChunk(int generation, libv::vec2i index);
 
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);

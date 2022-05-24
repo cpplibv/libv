@@ -87,9 +87,15 @@ void main() {
 	// --- Fake lighting ---
 
 	vec3 N = normalize(normal); // Normal vector
+
+//	N = normalize(mix(N, fs_in.surfaceNormal, 0.5)); // Blend surface normals
+
 	vec3 V = normalize(eye - fs_in.positionW); // View vector
 //	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
 	vec3 L = sunDirection; // Light vector
+
+	float surfaceShade = max(dot(fs_in.surfaceNormal, L), 0.0);
+//	float surfaceShade = 1;
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
@@ -98,10 +104,10 @@ void main() {
 	float strength_specular = pow(max(dot(V, R), 0.0), 16);
 
 	float attenuation =
-			fresnel(1, N, V) * 0.3 +
+			fresnel(1, N, V) * mix(0.1, 0.3, surfaceShade) +
 			strength_ambient * 0.4 +
-			strength_diffuse * 0.7 +
-			strength_specular * 0.1;
+			strength_diffuse * surfaceShade * 0.7 +
+			strength_specular * surfaceShade * 0.1;
 
 	color.rgb *= attenuation * sunColor;
 
@@ -129,6 +135,7 @@ void main() {
 //	result.rgb = vec3(dot(normal, L));
 //	result.rgb = normalize(normal);
 //	result.rgb = normal;
+//	result.rgb = fs_in.surfaceNormal * 0.5 + 0.5;
 
 //	result.rgb = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f;
 //	result.rgb = texture(textureNormal, vec3(uv, fs_in.type)).rgb * 2f - 1f;

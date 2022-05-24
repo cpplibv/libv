@@ -37,7 +37,7 @@ Chunk::Chunk(libv::vec2i index, libv::vec2f position, libv::vec2f size, uint32_t
 //		temp_humidity_distribution(resolution, resolution) {
 }
 
-float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
+libv::vec3f Chunk::getInterpolatedValue(libv::vec2f uv, const libv::vector_2D<libv::vec3f>& map) const {
 	//	             (1,1)
 	// O    NW O  upY  O NE
 	//       leftX  * rightX
@@ -56,10 +56,10 @@ float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	const auto downY = static_cast<int>(uv.y * step);
 	const auto upY = downY + 1;
 
-	const auto NW = height(leftX, upY);
-	const auto NE = height(rightX, upY);
-	const auto SW = height(leftX, downY);
-	const auto SE = height(rightX, downY);
+	const auto NW = map(leftX, upY);
+	const auto NE = map(rightX, upY);
+	const auto SW = map(leftX, downY);
+	const auto SE = map(rightX, downY);
 	//triangle 1 = NW, SW, SE, triangle 2 = NW, SE, NE
 	const auto quadU = libv::fract(uv.x * step);
 	const auto quadV = libv::fract(uv.y * step);
@@ -67,18 +67,22 @@ float Chunk::getInterpolatedHeight(libv::vec2f uv) const {
 	const auto isPointInNWSWSE = isPointInSWTriangle({quadU, quadV});
 
 	if (isPointInNWSWSE)
-		return (1 - quadU - quadV) * SW.z + quadU * SE.z + quadV * NW.z;
+		return (1 - quadU - quadV) * SW + quadU * SE + quadV * NW;
 	else
-		return (-1 + quadU + quadV) * NE.z + (1 - quadU) * NW.z + (1 - quadV) * SE.z;
+		return (-1 + quadU + quadV) * NE + (1 - quadU) * NW + (1 - quadV) * SE;
 }
 
-libv::vec3f Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
+PositionNormal Chunk::pickRandomPoint(libv::xoroshiro128& rng) const {
 	auto distUV = libv::make_uniform_distribution_exclusive(0.f, 1.f);
 	const auto u = distUV(rng);
 	const auto v = distUV(rng);
 
-	const auto z = getInterpolatedHeight({u, v});
-	return {position.x + (u - 0.5f) * size.x, position.y + (v - 0.5f) * size.y, z};
+	const auto z = getInterpolatedValue({u, v}, height).z;
+	const auto n = getInterpolatedValue({u, v}, normal);
+	return PositionNormal{
+			{position.x + (u - 0.5f) * size.x, position.y + (v - 0.5f) * size.y, z},
+			n
+	};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -141,8 +145,10 @@ void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 
 		const auto point = chunk.pickRandomPoint(rngLocal);
 
-		const auto temp = config.temperature.rootNode->evaluate(point.x, point.y) - point.z * config.temperature.heightSensitivity;
-		const auto wet = config.humidity.rootNode->evaluate(point.x, point.y);
+		const auto position = point.position;
+		const auto normal = point.normal;
+		const auto temp = config.temperature.rootNode->evaluate(position.x, position.y) - position.z * config.temperature.heightSensitivity;
+		const auto wet = config.humidity.rootNode->evaluate(position.x, position.y);
 //		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
 		auto picker = BiomePicker();
@@ -151,7 +157,8 @@ void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 		const auto& biome = config.blendBiomes ? mix.random(rngLocal) : mix.primary();
 
 		if (auto veggie = mix.getRandomVeggie(biome, rngLocal)) {
-			veggie->pos = point;
+			veggie->pos = position;
+			veggie->surfaceNormal = normal;
 
 			auto lock = std::unique_lock(chunk_m);
 			chunk.veggies.emplace_back(std::move(veggie.value()));

@@ -17,6 +17,7 @@ struct Veggie {
 
 	libv::vec3f pos;
 	libv::vec3f normal; // = {0, 0, 1};
+	libv::vec3f surfaceNormal; // = {0, 0, 1};
 	float rotation; // Normal + rotation = quaternion?
 	float scale;
 	// clamp during randomization, except hue <- modf

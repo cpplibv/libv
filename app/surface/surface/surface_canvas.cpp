@@ -77,7 +77,7 @@ void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 		for (const auto& veggie : chunk->veggies) {
 			type = (type + 1) % 5;
 //			renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_shift);
-			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_shift);
+			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
 		}
 		renderer.sprite.commitChunk(generation, chunk->index);
 	}
@@ -99,7 +99,7 @@ void TextureScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 			continue;
 
 		for (const auto& veggie : chunk->veggies) {
-			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_shift);
+			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
 		}
 		renderer.sprite.commitChunk(generation, chunk->index);
 	}

@@ -25,6 +25,7 @@ void RendererSprite::updateMesh(libv::glr::Mesh& mesh) {
 	auto type = mesh.attribute(attribute_type);
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
+	auto surfaceNormal = mesh.attribute(attribute_tangent);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto rotation_scale = mesh.attribute(attribute_custom0_f2);
 
@@ -33,6 +34,7 @@ void RendererSprite::updateMesh(libv::glr::Mesh& mesh) {
 	type.set_from_range(entries_type);
 	position.set_from_range(entries_position);
 	normal.set_from_range(entries_normal);
+	surfaceNormal.set_from_range(entries_surface_normal);
 	rotation_scale.set_from_range(entries_rotation_scale);
 	color0.set_from_range(entries_hsv_shift);
 
@@ -105,10 +107,11 @@ int RendererSprite::chunkGeneration(libv::vec2i index) {
 	return spriteChunks[index].generation;
 }
 
-void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, float rotation, float scale, libv::vec3f hsv_shift) {
+void RendererSprite::add(int32_t type, libv::vec3f position, libv::vec3f normal, libv::vec3f surfaceNormal, float rotation, float scale, libv::vec3f hsv_shift) {
 	entries_type.emplace_back(type);
 	entries_position.emplace_back(position);
 	entries_normal.emplace_back(normal);
+	entries_surface_normal.emplace_back(surfaceNormal);
 	entries_rotation_scale.emplace_back(rotation, scale);
 	entries_hsv_shift.emplace_back(hsv_shift, 1.f);
 }
@@ -122,6 +125,7 @@ void RendererSprite::commitChunk(int generation, libv::vec2i index) {
 	entries_type.clear();
 	entries_position.clear();
 	entries_normal.clear();
+	entries_surface_normal.clear();
 	entries_rotation_scale.clear();
 	entries_hsv_shift.clear();
 }

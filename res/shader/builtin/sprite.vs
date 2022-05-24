@@ -9,6 +9,7 @@
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec4 vertexHSVColorShift;
+layout(location = 6) in vec3 vertexSurfaceNormal;
 layout(location = 13) in int vertexType;
 layout(location = 15) in vec2 vertexRotationScale;
 
@@ -36,6 +37,7 @@ void main() {
 	vs_out.type = vertexType;
 
 	vs_out.normalUp = vertexNormal;
+	vs_out.surfaceNormal = vertexSurfaceNormal;
 	vs_out.rotation = vertexRotationScale.x;
 //	vs_out.normalUp = vec3(0, 0, 1); // !!!
 //	vs_out.rotation = pi *0; // !!!

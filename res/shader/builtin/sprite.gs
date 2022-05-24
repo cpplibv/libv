@@ -128,6 +128,7 @@ void main() {
 	fs_in.hsvColorShift = vs_out[0].hsvColorShift;
 	fs_in.type = vs_out[0].type;
 	fs_in.fogFactor = vs_out[0].fogFactor;
+	fs_in.surfaceNormal = vs_out[0].surfaceNormal;
 
 	// v1
 	// fs_in.color = vec4(1, 0, 0, 1);

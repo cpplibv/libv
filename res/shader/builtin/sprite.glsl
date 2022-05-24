@@ -7,6 +7,7 @@ struct GeometryData {
 	vec3 eyeDir;
 
 	vec3 normalUp;
+	vec3 surfaceNormal;
 	float rotation;
 	float scale;
 
@@ -19,7 +20,8 @@ struct GeometryData {
 struct FragmentData {
 	vec3 positionW;
 	vec4 rotationQuat;
-//	vec4 rotationNormalQuat;
+
+	vec3 surfaceNormal;
 
 	vec2 uv;
 	vec2 tile_index;
