@@ -153,7 +153,7 @@ private:
 
 private:
 	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
-	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized.vm4");
+	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized_2.vm4");
 	libv::rev::Model tree_02 = renderer.resource_context.loader.model.load("test_sphere.vm4");
 	libv::rev::Model tree_03 = renderer.resource_context.loader.model.load("stone_01.vm4");
 	libv::rev::Model tree_04 = renderer.resource_context.loader.model.load("tree_palm_02.vm4");

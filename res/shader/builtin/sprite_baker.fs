@@ -27,7 +27,8 @@ uniform sampler2D texture0;
 void main() {
 	vec3 N = normalize(fragmentNormalW);
 
-	N = gl_FrontFacing ? N : -N; // If the two sided normal looks away from the camera, flip it to point toward the camera
+//	N = gl_FrontFacing ? N : -N; // If the two sided normal looks away from the camera, flip it to point toward the camera
+	// NOTE: Models with 'fixed' vertex normals the inversion would break the normal vectors
 
 	//gvec textureLod(gsampler sampler, vec texCoord, float lod);
 	vec4 color = textureLod(texture0, fragmentTexture0, 0).rgba;
@@ -50,6 +51,13 @@ void main() {
 	resultColor = color;
 //	resultColor = vec4(1, 1, 1, 1);
 	resultNormal = vec4(N * 0.5 + 0.5, 1);
+
+
+
+//	resultColor = vec4(resultNormal.rgb, 1);
+
+
+
 //	resultNormal = vec4(normalize(fragmentPositionW - vec3(0, 0, 1)), 1);
 //	resultNormal = vec4(normalize(fragmentPositionW - vec3(0, 0, 30)) * 0.5 + 0.5, 1);
 //	resultNormal = vec4(mix(N, V, 0.5) * 0.5 + 0.5, 1);

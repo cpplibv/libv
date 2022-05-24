@@ -408,9 +408,10 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
+			renderer.sprite.registerSprite("tree_01_normalized_2.vm4", 0.2f / 66.85f);
 //			renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
 //			const auto treeIDNormalized = renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
-			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
+//			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
 //			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
 //			const auto treeCactusAID = renderer.sprite.registerSprite("tree_cactus_a_03.vm4", 1.0f / 10.f);
 //			const auto treePalmID = renderer.sprite.registerSprite("tree_palm_02.vm4", 1.0f / 20.f);
@@ -461,6 +462,9 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 	}
 
 	{
+		const auto s2_guard = glr.state.push_guard();
+		glr.state.disableCullFace();
+
 		for (int i = 0; i < 10; ++i) {
 			auto m_guard = glr.model.push_guard();
 			glr.model.translate(-1.f, 1.0f * static_cast<float>(i), 0.f);

@@ -28,7 +28,8 @@ config = {
 	fogIntensity = 0.02,
 
 	sunColor = "hsv(0, 10%, 95%)";
-	sunDirection = vec3f(0.8, 0.2, 0.6),
+	--sunDirection = vec3f(0.891186, 0.0560718, 0.450159),
+	sunDirection = vec3f(0.9, 0.06, 0.7),
 }
 
 biomes = {
@@ -127,9 +128,9 @@ biomes = {
 				name = "treeRed",
 				scale = range(2.0, 4.0),
 				hue = shift(-60.0, 10.0),
-				saturation = shift(0.2, 0.1),
-				value = shift(0.1, 0.1),
-				probability = 0.02,
+				saturation = shift(0.3, 0.1),
+				value = shift(0.25, 0.1),
+				probability = 0.01,
 			},
 			{
 				name = "tree",
@@ -139,7 +140,7 @@ biomes = {
 				--value = shift(0.0, 0.04),
 				hue = shift(0.0, 0.0),
 				saturation = shift(0.0, 0.0),
-				value = shift(0.0, 0.0),
+				value = shift(0.2, 0.1),
 				probability = 1.0,
 			},
 		}

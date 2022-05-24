@@ -98,9 +98,9 @@ void main() {
 	float strength_specular = pow(max(dot(V, R), 0.0), 16);
 
 	float attenuation =
-			fresnel(1, N, V) * 0.4 +
-			strength_ambient * 0.2 +
-			strength_diffuse * 0.6 +
+			fresnel(1, N, V) * 0.3 +
+			strength_ambient * 0.4 +
+			strength_diffuse * 0.7 +
 			strength_specular * 0.1;
 
 	color.rgb *= attenuation * sunColor;
@@ -113,6 +113,8 @@ void main() {
 
 	result = color;
 //	result = vec4(1, 0, 0, 1);
+//	result.rgb = texture(textureColor, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb;
+//	result.a = 1;
 
 
 //	result.rgb = step(0.0, normal);
@@ -130,7 +132,7 @@ void main() {
 
 //	result.rgb = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f;
 //	result.rgb = texture(textureNormal, vec3(uv, fs_in.type)).rgb * 2f - 1f;
-//	result.rgb = normal;
+//	result.rgb = normal * 0.5 + 0.5;
 //	result.rgb = step(0.75, normal);
 
 //	result.rgb = vec3(fs_in.tile_index.y / 2.0);
