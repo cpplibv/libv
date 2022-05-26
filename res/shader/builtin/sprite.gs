@@ -14,8 +14,6 @@ in GeometryData vs_out[1];
 
 out FragmentData fs_in;
 
-//uniform vec2 render_resolution; // Program block
-
 
 // -------------------------------------------------------------------------------------------------
 
@@ -45,16 +43,6 @@ void main() {
 	//	def.angle_x_max
 	//	def.angle_y_min
 	//	def.angle_y_max
-
-	// -------------------------------------------------------------------------------------------------
-
-	//	vec4 origin = gl_in[0].gl_Position;
-	//	origin /= origin.w;
-
-	//	vec2 pixel_size = 2.0 / render_resolution;
-	//	vec2 pixel_size = vec2(0.09, 0.16);
-
-	// gl_PrimitiveIDIn
 
 	// -------------------------------------------------------------------------------------------------
 
@@ -96,23 +84,8 @@ void main() {
 
 	float spriteHalfSize = def.model_scale * vs_out[0].scale * 0.5;
 
-			//  -0.5 .. 0.5
-			//    0  ..  1
-			//    0  .. tau
-			//    0  .. tau/num
 	vec4 rotH = qAngleAxis(-horizontal_diff * tau / (def.tile_num_x), vec3(0, 0, 1));
-
-			//  -0.5 .. 0.5
-			//    0  ..  1
-			//    0  .. tau
-			//    0  .. tau/num
-//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), vec3(0, -1, 0));
-
-//	vec4 rotV = qAngleAxis((vertical_diff) * (pi / 2) / (def.tile_num_y - 1), vec3(0, -1, 0));
-//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), qrotate(rotH, vec3(0, -1, 0)));
-//	vec4 rotV = qAngleAxis((vertical_diff + 0.5) * (pi / 2) / (def.tile_num_y - 1), qrotate(qinverse(rotH), vec3(0, -1, 0)));
 	vec4 rotV = qAngleAxis((vertical_diff) * (pi / 2) / (def.tile_num_y - 1),
-//			qrotate(qneg(rotH), vec3(0, -1, 0))
 			qrotate((qAngleAxis(-horizontal * tau / (def.tile_num_x), vec3(0, 0, 1))), vec3(0, -1, 0))
 	);
 
@@ -124,35 +97,30 @@ void main() {
 	fs_in.tile_index = vec2(horizontal_tile, vertical_tile);
 	fs_in.dither = vec2(horizontal_diff, vertical_diff);
 	fs_in.rotationQuat = rotationQuat;
-//	fs_in.rotationNormalQuat = rotationNormalQuat;
 	fs_in.hsvColorShift = vs_out[0].hsvColorShift;
 	fs_in.type = vs_out[0].type;
 	fs_in.fogFactor = vs_out[0].fogFactor;
 	fs_in.surfaceNormal = vs_out[0].surfaceNormal;
 
 	// v1
-	// fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 0);
 	fs_in.positionW = (matM * vec4(center + right * spriteHalfSize - up * spriteHalfSize, 1)).xyz;
 	gl_Position = matMVP * vec4(center + right * spriteHalfSize - up * spriteHalfSize, 1);
 	EmitVertex();
 
 	// v2
-	// fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(1, 1);
 	fs_in.positionW = (matM * vec4(center + right * spriteHalfSize + up * spriteHalfSize, 1)).xyz;
 	gl_Position = matMVP * vec4(center + right * spriteHalfSize + up * spriteHalfSize, 1);
 	EmitVertex();
 
 	// v0
-	// fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 0);
 	fs_in.positionW = (matM * vec4(center - right * spriteHalfSize - up * spriteHalfSize, 1)).xyz;
 	gl_Position = matMVP * vec4(center - right * spriteHalfSize - up * spriteHalfSize, 1);
 	EmitVertex();
 
 	// v3
-	// fs_in.color = vec4(1, 0, 0, 1);
 	fs_in.uv = vec2(0, 1);
 	fs_in.positionW = (matM * vec4(center - right * spriteHalfSize + up * spriteHalfSize, 1)).xyz;
 	gl_Position = matMVP * vec4(center - right * spriteHalfSize + up * spriteHalfSize, 1);

@@ -59,6 +59,7 @@ libv.utility: xoroshiro128 shall handle {0,0} as low quality input
 
 
 
+libv.rev: builtin:cube (XYZ cube)
 
 libv.rev.res: Events
 	libv.rev.res: Texture fs tracking

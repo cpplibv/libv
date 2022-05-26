@@ -11,7 +11,11 @@ config = {
 	numVeggie = 100,
 
 	fogIntensity = 0.035,
-	fogColor = "rgb(0.9, 0.8, 0.6)";
+	fogColor = "rgb(0.9, 0.7, 0.5)";
+
+	sunColor = "rgb(0.9, 0.8, 0.6)";
+
+	skyboxTexture = "cube_redDesertNight.dds",
 }
 
 biomes = {
@@ -22,7 +26,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(50, 70%, 80%)" },
-			{ 1, "#DB8848" }
+			{ 1, "#FB8848" }
 		},
 		vegetation = {
 			{
@@ -46,7 +50,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "#F2D77C" }
+			{ 1, "#FFB77C" }
 		},
 		vegetation = {
 			--{

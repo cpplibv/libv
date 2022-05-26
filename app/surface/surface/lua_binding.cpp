@@ -422,9 +422,14 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	auto result = std::make_shared<Config>();
 	result->globalSeed = table["seed"]; // Global seed is optional
 	result->resolution = table["resolution"];
-	result->numChunks = table["numChunks"];
+//	result->numChunks = table["numChunks"];
 	result->numVeggie = table["numVeggie"];
 //	result->plantDistribution = table["plantDistribution"];
+
+	const auto skyboxTextureObj = table.get<sol::object>("skyboxTexture");
+	result->skyboxTexture = skyboxTextureObj.get_type() == sol::type::string ?
+			skyboxTextureObj.as<std::string_view>() :
+			"cube_fluffball.dds";
 
 	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));
 	result->fogColor = fogColorOpt ? *fogColorOpt : libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};

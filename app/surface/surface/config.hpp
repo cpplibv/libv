@@ -110,7 +110,7 @@ public:
 	bool blendBiomes = true;
 
 	size_t resolution; /// Number of quads/pixels per side
-	size_t numChunks;
+//	size_t numChunks;
 	size_t numVeggie;
 
 	PlantDistribution plantDistribution;

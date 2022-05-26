@@ -367,6 +367,8 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 //		renderer.veggie.sunColor = conf->sunColor;
 //		renderer.veggie.sunDirection = conf->sunDirection;
 
+		renderer.sky.texture = renderer.resource_context.loader.texture.load(conf->skyboxTexture);
+
 		surface->gen(std::move(conf));
 	}
 

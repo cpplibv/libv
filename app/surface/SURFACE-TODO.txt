@@ -7,20 +7,17 @@
 
 
 
-skybox texture from config
-
-
-
-
 
 make a couple of decent trees
+	1-2 pine?
+
+
+
+
 
 kill sprite index VBO
 
-
-
 remember last config
-vegi chunks
 priority sorting
 
 
@@ -120,8 +117,6 @@ T 2 surface: Test models render       :  0.0248 ms, app/surface/surface/surface_
 
 seed a non seeded noise : random x y offset and rotation, mat3
 
-scene change does not clear sprites just adds a new batch
-
 sprite not smooth but discrete angle following
 \ sprite looks at eye, it should be just parallel with camera right, this would fix issues with orbit z hard clipping into each other and covering the other partially
 
@@ -149,7 +144,6 @@ startup crash, source unknown
 
 
 Sprites:
-	surface normals for additional fake lighting based on the hills
 	sprite bottom side make it darker
 	sprite ambient lighting should not affect normals that point downward
 	sprite normals should be faked to be more on a sphere
@@ -177,22 +171,12 @@ Sprites:
 			on the sprite atlas edge, there is a smudge
 				? drop one half pixel from the UV
 
-
 Visuals:
-	skybox / background
-		libv.rev: builtin:cube (XYZ cube)
-
 	micro texture
 		per biome based texture
 			2 float
 				texture index
-				scale (repetation size)
-
-	veggi type
-
-	lighting
-		sun
-			switching
+				scale (repetition size)
 
 	issues
 		normal map corner pixel calculation (edge is now solved, but corner is not)
@@ -213,6 +197,7 @@ libv.glr: mesh submesh update (for surface chunks)
 Big things left
 	Water
 	LOD
+	Veggi type
 
 
 

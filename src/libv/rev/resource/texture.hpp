@@ -20,7 +20,7 @@ private:
 	libv::intrusive2_ptr<InternalTexture> self;
 
 public:
-	// Texture() = default; We could have a default ctor, we will see if we need one
+	Texture() noexcept;
 	explicit Texture(libv::intrusive2_ptr<InternalTexture> self);
 	Texture(const Texture&) noexcept;
 	Texture& operator=(const Texture&) & noexcept;

@@ -16,13 +16,14 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererSkybox::RendererSkybox(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "skybox.vs", "skybox.fs"),
+//		shader(rctx.loader.shader, "skybox.vs", "skybox.fs"),
+		shader(rctx.loader.shader, "skybox.vs", "skybox.fs") {
 //		texture(rctx.loader.texture.load("sky.dds")) {
 //		texture(rctx.loader.texture.load("builtin:white")) {
 //		texture(rctx.loader.texture.load("cube_debug_transparent.dds")) {
 //		texture(rctx.loader.texture.load("cube_nebula_purple_0001.dds")) {
 //		texture(rctx.loader.texture.load("cube_AmbienceExposure4k.dds")) {
-		texture(rctx.loader.texture.load("cube_fluffball.dds")) {
+//		texture(rctx.loader.texture.load("cube_fluffball.dds")) {
 //		texture(rctx.loader.texture.load("cube_redDesertNight.dds")) {
 
 	auto position = mesh.attribute(attribute_position);

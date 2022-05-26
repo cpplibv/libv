@@ -51,9 +51,10 @@ struct RendererSkybox {
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderSkybox shader;
-	libv::rev::Texture texture;
 
 public:
+	libv::rev::Texture texture;
+
 	bool fogEnabled = true;
 	float fogIntensity = 0.05f;
 	libv::vec4f fogColor = libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};

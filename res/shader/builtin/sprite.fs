@@ -37,12 +37,12 @@ void main() {
 	//	vec2 dither_seed = trunc(fs_in.uv * 64);
 	//	sprite random + sprite pos based viewport position, so, combine this two
 
-	//	float dither_offset = rand(dither_seed); // !!! tile resolution? I think
+	//	float dither_offset = rand(dither_seed); // !! tile resolution? I think
 	//	dither_offset *= 0.5;
 	//	dither_offset += (1 - length(fs_in.uv * 2.0 - 1.0) / sqrt(2.0)) * 0.5;
 	////	dither_offset += (1 - length(fs_in.uv * 2.0 - 1.0)) * 0.5;
 	//
-	//	float dither_offset2 = rand(dither_seed + 100); // !!! tile resolution? I think
+	//	float dither_offset2 = rand(dither_seed + 100); // !! tile resolution? I think
 	//	dither_offset2 *= 0.5;
 	//	dither_offset2 += (1 - length(fs_in.uv * 2.0 - 1.0) / sqrt(2.0)) * 0.5;
 	//
@@ -71,7 +71,6 @@ void main() {
 	vec2 uv = fs_in.uv;
 
 	vec4 color = texture(textureColor, vec3(tile_origin + uv * tile_size, fs_in.type)).rgba;
-//	vec3 normal = normalize(texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f);
 	vec3 normal = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f;
 	normal = qrotate(fs_in.rotationQuat, normalize(normal));
 
@@ -84,18 +83,22 @@ void main() {
 
 	color.rgb = hsv_to_rgb(normalize_hsv(rgb_to_hsv(color.rgb) + fs_in.hsvColorShift.rgb));
 
-	// --- Fake lighting ---
+	// --- Lighting ---
 
 	vec3 N = normalize(normal); // Normal vector
 
 //	N = normalize(mix(N, fs_in.surfaceNormal, 0.5)); // Blend surface normals
 
 	vec3 V = normalize(eye - fs_in.positionW); // View vector
-//	vec3 L = normalize(vec3(0.8, 0.2, 0.6)); // Light vector
 	vec3 L = sunDirection; // Light vector
 
-	float surfaceShade = max(dot(fs_in.surfaceNormal, L), 0.0);
-//	float surfaceShade = 1;
+//	float surfaceShadeDiffuse = max(dot(fs_in.surfaceNormal, L), 0.0);
+//	float surfaceShadeSpecular = pow(max(dot(V, reflect(-L, fs_in.surfaceNormal)), 0.0), 4);
+
+	float surfaceShade = min(1.0,
+			max(dot(fs_in.surfaceNormal, L), 0.0) + // From diffuse
+			pow(max(dot(V, reflect(-L, fs_in.surfaceNormal)), 0.0), 16) * 0.2 // From specular
+	);
 
 	vec3 R = reflect(-L, N); // Reflection vector
 
@@ -106,7 +109,7 @@ void main() {
 	float attenuation =
 			fresnel(1, N, V) * mix(0.1, 0.3, surfaceShade) +
 			strength_ambient * 0.4 +
-			strength_diffuse * surfaceShade * 0.7 +
+			strength_diffuse * surfaceShade * 0.6 +
 			strength_specular * surfaceShade * 0.1;
 
 	color.rgb *= attenuation * sunColor;
@@ -118,19 +121,16 @@ void main() {
 	// --- Result / Debug
 
 	result = color;
+
 //	result = vec4(1, 0, 0, 1);
 //	result.rgb = texture(textureColor, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb;
 //	result.a = 1;
-
 
 //	result.rgb = step(0.0, normal);
 //	if (fs_in.dither.y > 0.45)
 //		result.a = 0.5;
 
-
-
 //	result.rgb = vec3(fs_in.dither.y / 3.14 * 2);
-
 
 //	result.rgb = vec3(dot(normal, L));
 //	result.rgb = normalize(normal);

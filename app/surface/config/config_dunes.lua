@@ -30,6 +30,10 @@ config = {
 	sunColor = "hsv(0, 10%, 95%)";
 	--sunDirection = vec3f(0.891186, 0.0560718, 0.450159),
 	sunDirection = vec3f(0.9, 0.06, 0.7),
+
+	skyboxTexture = "cube_fluffball.dds",
+	--skyboxTexture = "cube_redDesertNight.dds",
+	--skyboxTexture = "cube_AmbienceExposure4k.dds",
 }
 
 biomes = {

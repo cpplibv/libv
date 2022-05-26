@@ -11,6 +11,8 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
+Texture::Texture() noexcept = default;
+
 Texture::Texture(libv::intrusive2_ptr<InternalTexture> self) :
 	self(std::move(self)) {
 }
