@@ -13,7 +13,7 @@ config = {
 	fogIntensity = 0.015,
 	fogColor = "rgb(0.7, 0.8, 0.9)";
 
-	sunColor = "hsv(0, 95%, 95%)";
+	sunColor = "hsv(0, 15%, 95%)";
 	sunDirection = vec3f(0.8, 0.2, 0.6),
 }
 
@@ -180,60 +180,60 @@ height = {
 		--[2.0] = "grey",
 	},
 	nodes =
-				--warp {
-				--	--value = 0.5,
-				--	seed = 1568,
-				--	octaves = 6,
-				--	amplitude = 0.0,
-				--	frequency = 0.5,
-				--	lacunarity = 2.0,
-				--	persistence = 0.25,
-				--	--simplex{
-				--	--	seed = 126
-				--	--}
-		clamp {
-			mul {
-				constant(4.0),
-				pow {
-					exponent = 2.0,
-					add {
-						simplexFractal {
-							seed = 600733745,
-							octaves = 4,
-							amplitude = 0.75,
-							frequency = 0.01,
-							lacunarity = 2.0,
-							persistence = 0.5,
+		warp {
+			seed = 98001,
+			octaves = 3,
+			amplitude = 50.0,
+			frequency = 0.02,
+			lacunarity = 2.0,
+			persistence = 0.25,
+			--frequency = 0.015,
+			--persistence = 0.5,
+
+			clamp {
+				mul {
+					constant(4.0),
+					pow {
+						exponent = 2.0,
+						add {
+							simplexFractal {
+								seed = 600733745,
+								octaves = 4,
+								amplitude = 0.75,
+								frequency = 0.01,
+								lacunarity = 2.0,
+								persistence = 0.5,
+							},
+							--constant(0),
+							--min {
+							--	add {
+							--		--coord(0, -0.2),
+							--		--coord{weights = vec2f(0, -0.2)},
+							--		coord{weights = {0, -0.1}},
+							--		constant(2),
+							--	},
+							--	add {
+							--		coord(0, 0.2),
+							--		--{
+							--		--	nodeType = "coord",
+							--		--	--weights = {0, -0.2},
+							--		--	weights = { x = 0, y = -0.15 },
+							--		--	--weights = vec2f(0, -0.1),
+							--		--},
+							--		constant(2),
+							--	},
+							--	--constant(0.0),
+							--	--coord(0, 0.03),
+							--},
+							--coord{weights = {0, -0.03}},
 						},
-						--constant(0),
-						--min {
-						--	add {
-						--		--coord(0, -0.2),
-						--		--coord{weights = vec2f(0, -0.2)},
-						--		coord{weights = {0, -0.1}},
-						--		constant(2),
-						--	},
-						--	add {
-						--		coord(0, 0.2),
-						--		--{
-						--		--	nodeType = "coord",
-						--		--	--weights = {0, -0.2},
-						--		--	weights = { x = 0, y = -0.15 },
-						--		--	--weights = vec2f(0, -0.1),
-						--		--},
-						--		constant(2),
-						--	},
-						--	--constant(0.0),
-						--	--coord(0, 0.03),
-						--},
-						--coord{weights = {0, -0.03}},
 					},
 				},
-			},
 
-			constant(0.0),
-			constant(4.0),
-		},
+				constant(0.0),
+				constant(4.0),
+			},
+		}
 }
 
 temperature = {

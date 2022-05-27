@@ -410,7 +410,8 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			renderer.sprite.registerSprite("tree_01_normalized_2.vm4", 0.2f / 66.85f);
+			renderer.sprite.registerSprite("tree_pine_05.vm4", 2.f);
+//			renderer.sprite.registerSprite("tree_01_normalized_2.vm4", 0.2f / 66.85f);
 //			renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
 //			const auto treeIDNormalized = renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
 //			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
