@@ -25,6 +25,8 @@ class Node;
 class VeggieType;
 struct Veggie;
 
+struct SpriteMappingEntry;
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace surface

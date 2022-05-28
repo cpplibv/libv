@@ -65,11 +65,12 @@ struct Limit {
 
 struct VeggieType {
 	std::string name;
+	int32_t modelID;
+
 	float probability = 1.0f;
 //	float size = 1.0f;
 
 //	Range<float> fertility;
-	std::string path;
 	Range<float> scale;
 
 /// hsv diff color: saturation, value mehet, hue 20-30 fok vec3f(hue, saturation, value)

@@ -5,6 +5,7 @@
 // ext
 #include <fmt/format.h>
 // libv
+#include <libv/algo/linear_find.hpp>
 #include <libv/container/flat_set.hpp>
 #include <libv/lua/convert_color.hpp>
 #include <libv/lua/sol_type_to_string.hpp>
@@ -12,6 +13,7 @@
 // pro
 #include <surface/surface/config.hpp>
 #include <surface/surface/node.hpp>
+#include <surface/surface/sprite_mapping.hpp>
 
 
 namespace surface {
@@ -120,28 +122,28 @@ namespace surface {
 }
 
 //TODO: template container
-template <typename T, typename ConvertFn>
-[[nodiscard]] std::vector<T> convertArray(const sol::object& object, ConvertFn convert) {
+template <typename T, typename ConvertFn, typename... Args>
+[[nodiscard]] std::vector<T> convertArray(const sol::object& object, ConvertFn convert, Args&&... args) {
 	std::vector<T> result;
 	const auto table = convertTable(object);
 	const auto size = table.size();
 	result.reserve(size);
 	for (size_t i = 1; i <= size; ++i) {
 		const auto value = table.get<sol::object>(i);
-		result.emplace_back(convert(value));
+		result.emplace_back(convert(value, args...));
 	}
 	return result;
 }
 
-template <typename T, typename ConvertFn>
-[[nodiscard]] libv::flat_set<T> convertArraySet(const sol::object& object, ConvertFn convert) {
+template <typename T, typename ConvertFn, typename... Args>
+[[nodiscard]] libv::flat_set<T> convertArraySet(const sol::object& object, ConvertFn convert, Args&&... args) {
 	libv::flat_set<T> result;
 	const auto table = convertTable(object);
 	const auto size = table.size();
 	result.reserve(size);
 	for (size_t i = 1; i <= size; ++i) {
 		const auto value = table.get<sol::object>(i);
-		result.emplace(convert(value));
+		result.emplace(convert(value, args...));
 	}
 	return result;
 }
@@ -379,13 +381,17 @@ Limit<T> convertLimit(const sol::object& object) {
 	return result;
 }
 
-VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
+VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping) {
 	const auto table = convertTable(object);
 
 	VeggieType result;
 	result.name = table["name"];
+
+	const auto model = table.get<std::string_view>("model");
+	const auto mapping = libv::linear_find_optional(spriteMapping, model, &SpriteMappingEntry::name);
+	result.modelID = mapping ? mapping->id : 0;
+
 	result.probability = table["probability"] != sol::type::number ? 1.f : table["probability"];
-	result.path = table["path"];
 	result.scale = table["scale"] == sol::type::nil ? Range<float>{0.5f, 2.0f} : convertRange<float>(table.get<sol::object>("scale"));
 	result.hue = table["hue"] == sol::type::nil ? Shift<float>{0.f, 1.f} : convertShift<float>(table.get<sol::object>("hue"));
 	result.saturation = table["saturation"] == sol::type::nil ? Shift<float>{0.0f, 0.1f} : convertShift<float>(table.get<sol::object>("saturation"));
@@ -393,11 +399,11 @@ VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object) {
 	return result;
 }
 
-std::vector<VeggieType> SurfaceLuaBinding::convertVeggieTypes(const sol::object& object) {
-	return convertArray<VeggieType>(object, convertVeggieType);
+std::vector<VeggieType> SurfaceLuaBinding::convertVeggieTypes(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping) {
+	return convertArray<VeggieType>(object, convertVeggieType, spriteMapping);
 }
 
-Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
+Biome SurfaceLuaBinding::convertBiome(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping) {
 	const auto table = convertTable(object);
 
 	Biome result;
@@ -407,13 +413,13 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object) {
 	result.takeover = table["takeover"] == sol::type::nil ? Limit<float>{0.45f, 0.6f} : convertLimit<float>(table.get<sol::object>("takeover"));
 	result.dominance = table["dominance"] != sol::type::number ? 1.f : table["dominance"];
 	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
-	result.vegetation = convertVeggieTypes(table.get<sol::object>("vegetation"));
+	result.vegetation = convertVeggieTypes(table.get<sol::object>("vegetation"), spriteMapping);
 
 	return result;
 }
 
-libv::flat_set<Biome> SurfaceLuaBinding::convertBiomes(const sol::object& object) {
-	return convertArraySet<Biome>(object, convertBiome);
+libv::flat_set<Biome> SurfaceLuaBinding::convertBiomes(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping) {
+	return convertArraySet<Biome>(object, convertBiome, spriteMapping);
 }
 
 std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& object) {
@@ -445,7 +451,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	return result;
 }
 
-std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script) {
+std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::string_view script, const std::vector<SpriteMappingEntry>& spriteMapping) {
 	const auto env = sol::environment(lua, sol::create, lua.globals());
 	lua.script(script, env);
 
@@ -457,7 +463,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::getConfigFromLuaScript(const std::str
 	result->temperature = convertHeatMap(env.get<sol::object>("temperature"), result->globalSeed);
 	result->humidity = convertHeatMap(env.get<sol::object>("humidity"), result->globalSeed);
 	result->fertility = convertHeatMap(env.get<sol::object>("fertility"), result->globalSeed);
-	result->biomes = convertBiomes(env.get<sol::object>("biomes"));
+	result->biomes = convertBiomes(env.get<sol::object>("biomes"), spriteMapping);
 //	extendBiomes(result.biomes);
 
 	return result;

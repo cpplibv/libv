@@ -26,16 +26,16 @@ private:
 
 public:
 	SurfaceLuaBinding();
-	[[nodiscard]] std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script);
+	[[nodiscard]] std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script, const std::vector<SpriteMappingEntry>& spriteMapping);
 
 private:
 	static Seed convertSeed(const sol::object& object, Seed seedOffset);
 	static std::unique_ptr<Node> convertNodeTree(const sol::object& object, Seed seedOffset);
 	static HeatMap convertHeatMap(const sol::object& object, Seed seedOffset);
-	static Biome convertBiome(const sol::object& object);
-	static libv::flat_set<Biome> convertBiomes(const sol::object& object);
-	static VeggieType convertVeggieType(const sol::object& object);
-	static std::vector<VeggieType> convertVeggieTypes(const sol::object& object);
+	static Biome convertBiome(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping);
+	static libv::flat_set<Biome> convertBiomes(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping);
+	static VeggieType convertVeggieType(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping);
+	static std::vector<VeggieType> convertVeggieTypes(const sol::object& object, const std::vector<SpriteMappingEntry>& spriteMapping);
 
 	static std::shared_ptr<Config> convertConfig(const sol::object& object);
 };

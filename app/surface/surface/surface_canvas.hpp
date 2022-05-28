@@ -8,9 +8,11 @@
 #include <libv/glr/queue.hpp>
 #include <libv/ui/component/canvas.hpp>
 // std
+#include <map>
 #include <mutex>
 // pro
 #include <surface/surface/lua_binding.hpp>
+#include <surface/surface/sprite_mapping.hpp>
 #include <surface/surface/surface.hpp>
 #include <surface/view/camera_manager.hpp>
 #include <surface/view/render/renderer.hpp>
@@ -150,6 +152,9 @@ private:
 	Frustum cameraFrustum;
 	bool surfaceDirty = false;
 	bool initializedSprites = false;
+
+private:
+	std::vector<SpriteMappingEntry> spriteMappings;
 
 private:
 	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");

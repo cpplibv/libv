@@ -54,7 +54,6 @@ void Scene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifor
 // -------------------------------------------------------------------------------------------------
 
 void SurfaceScene::build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
-//	renderer.surface.clear();
 	for (const auto& chunk : chunks) {
 		renderer.surface.addChunk(generation, chunk);
 	}
@@ -65,20 +64,13 @@ void SurfaceScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 }
 
 void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) {
-
-	int type = 0;
-//	renderer.sprite.clear();
-//	log_surface.error("chunks.size(): {}", chunks.size());
-
 	for (const auto& chunk : chunks) {
 		if (renderer.sprite.chunkGeneration(chunk->index) == generation)
 			continue;
 
-		for (const auto& veggie : chunk->veggies) {
-			type = (type + 1) % 5;
-//			renderer.sprite.add(type, veggie.pos, veggie.normal, veggie.rotation, veggie.scale, veggie.hsv_shift);
-			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
-		}
+		for (const auto& veggie : chunk->veggies)
+			renderer.sprite.add(veggie.id, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
+
 		renderer.sprite.commitChunk(generation, chunk->index);
 	}
 }
@@ -98,9 +90,9 @@ void TextureScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 		if (renderer.sprite.chunkGeneration(chunk->index) == generation)
 			continue;
 
-		for (const auto& veggie : chunk->veggies) {
-			renderer.sprite.add(0, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
-		}
+		for (const auto& veggie : chunk->veggies)
+			renderer.sprite.add(veggie.id, veggie.pos, veggie.normal, veggie.surfaceNormal, veggie.rotation, veggie.scale, veggie.hsv_shift);
+
 		renderer.sprite.commitChunk(generation, chunk->index);
 	}
 }
@@ -210,6 +202,22 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, s
 		if (event.path.filename().generic_string().starts_with("sprite_"))
 			forceRebake = true;
 	});
+
+	spriteMappings.emplace_back(0, "oak", "tree_01_normalized_2.vm4", 0.2f / 66.85f);
+	spriteMappings.emplace_back(1, "pine", "tree_pine_05.vm4", 2.f);
+	spriteMappings.emplace_back(2, "palm", "tree_palm_02.vm4", 1.0f / 20.f);
+	spriteMappings.emplace_back(3, "rock", "stone_01.vm4", 1.0f / 250.f);
+	spriteMappings.emplace_back(4, "cactus_a", "tree_cactus_a_03.vm4", 1.0f / 10.f);
+	spriteMappings.emplace_back(5, "cactus_b", "tree_cactus_b_04.vm4", 1.0f / 7.f);
+
+	//	renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
+	//	renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
+	//	renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
+	//	renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
+	//	renderer.sprite.registerSprite("test_sphere.vm4", 5.f / 100.f);
+	//	renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
+	//	renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
+	//	renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
 
 	surface = std::make_unique<Surface>();
 	activeScene = createScene(currentScene);
@@ -346,7 +354,7 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 		changed = false;
 		auto lock = std::unique_lock(mutex); // To guard the currentConfigPath read
 		auto script = libv::read_file_str_or_throw(currentConfigPath_);
-		auto conf = binding.getConfigFromLuaScript(script);
+		auto conf = binding.getConfigFromLuaScript(script, spriteMappings);
 
 		conf->blendBiomes = blendBiomes;
 
@@ -410,21 +418,13 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
-			renderer.sprite.registerSprite("tree_pine_05.vm4", 2.f);
-//			renderer.sprite.registerSprite("tree_01_normalized_2.vm4", 0.2f / 66.85f);
-//			renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
-//			const auto treeIDNormalized = renderer.sprite.registerSprite("tree_01_normalized.vm4", 0.2f / 66.85f);
-//			const auto tree2ID = renderer.sprite.registerSprite("test_tree_cone.vm4", 1.0f / 70.0f);
-//			const auto treeID = renderer.sprite.registerSprite("tree_01.vm4", 0.2f / 66.85f);
-//			const auto treeCactusAID = renderer.sprite.registerSprite("tree_cactus_a_03.vm4", 1.0f / 10.f);
-//			const auto treePalmID = renderer.sprite.registerSprite("tree_palm_02.vm4", 1.0f / 20.f);
-//			const auto stoneID = renderer.sprite.registerSprite("stone_01.vm4", 1.0f / 250.f);
-//			const auto treeCactusBID = renderer.sprite.registerSprite("tree_cactus_b_04.vm4", 1.0f / 7.f);
-//			const auto sphereID00 = renderer.sprite.registerSprite("test_sphere.vm4", 5.f / 100.f);
-//			renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
-//			renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
-//			renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
-//			renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
+
+			for (const auto& spriteMapping : spriteMappings) {
+				const auto id = renderer.sprite.registerSprite(spriteMapping.path, spriteMapping.scale);
+				assert(id == spriteMapping.id);
+				(void) id;
+			}
+
 			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
 
 //			for (int x = 0; x < 10; ++x) {

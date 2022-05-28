@@ -50,12 +50,6 @@ biomes = {
 			{ 1, "hsv(0, 0%, 100%)" }
 		},
 		vegetation = {
-			--{
-			--	name = "rock",
-			--	color = "hsv(69, 10%, 60%)",
-			--	size = 0.022,
-			--	probability = 0.002,
-			--}
 		}
 	},
 	{
@@ -73,6 +67,7 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
+				model = "pine",
 				scale = range(1.0, 2.0),
 				--hue = shift(20.0, 5.0),
 				--saturation = shift(0.0, 0.0),
@@ -84,30 +79,6 @@ biomes = {
 			},
 		}
 	},
-	--{
-	--	name = "mountain",
-	--	coord = vec2f(0.2, 0.2),
-	--	dominance = 1.0,
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "hsv(210, 10%, 98%)" },
-	--		{ 1, "hsv(215, 14%, 92%)" }
-	--	},
-	--	vegetation = {
-	--	--	{
-	--	--		name = "tree",
-	--	--		color = "hsv(60, 80%, 100%)",
-	--	--		size = 0.025,
-	--	--		probability = 0.2,
-	--	--	},
-	--	--	{
-	--	--		name = "bush",
-	--	--		color = "hsv(69, 80%, 100%)",
-	--	--		size = 0.022,
-	--	--		probability = 0.2,
-	--	--	}
-	--	}
-	--},
 	{
 		name = "grassland",
 		coord = vec2f(0.2, 0.2),
@@ -130,6 +101,7 @@ biomes = {
 			--},
 			{
 				name = "treeRed",
+				model = "oak",
 				scale = range(2.0, 4.0),
 				hue = shift(-60.0, 10.0),
 				saturation = shift(0.3, 0.1),
@@ -138,6 +110,7 @@ biomes = {
 			},
 			{
 				name = "tree",
+				model = "oak",
 				scale = range(1.0, 3.0),
 				--hue = shift(20.0, 5.0),
 				--saturation = shift(0.0, 0.0),
@@ -150,7 +123,7 @@ biomes = {
 		}
 	},
 	{
-		name = "desert",
+		name = "sandbed",
 		coord = vec2f(0.9, 0.2),
 		dominance = 1.0,
 		--handover = global_handover,
@@ -162,22 +135,41 @@ biomes = {
 			{ 1, "hsv(34, 14%, 100%)" }
 		},
 		vegetation = {
-			--{
-			--	name = "tree",
-			--	color = "hsv(60, 80%, 100%)",
-			--	size = 0.05,
-			--	probability = 0.2,
-			--	--fertilityRange = vec2f{0.6, 1.0},
-			--	--color = "hsv(120, 60%, 100%)",
-			--},
 			{
 				name = "rock",
-				color = "hsv(69, 10%, 60%)",
-				size = 0.022,
-				probability = 0.002,
+				model = "rock",
+				probability = 0.02,
+				scale = range(0.5, 1.5),
+				hue = shift(0.0, 0.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.2, 0.2),
 			}
 		}
 	},
+	--{
+	--	name = "sandbed-darl",
+	--	coord = vec2f(3.0, 0.2),
+	--	dominance = 1.0,
+	--	handover = global_handover,
+	--	takeover = global_takeover,
+	--
+	--	cutOff = vec2f(0.1, 0.4),
+	--	colorGrad = {
+	--		{ 0, "hsv(36, 35%, 98%)" },
+	--		{ 1, "hsv(34, 14%, 50%)" }
+	--	},
+	--	vegetation = {
+	--		{
+	--			name = "rock",
+	--			model = "rock",
+	--			probability = 0.02,
+	--			scale = range(0.5, 1.5),
+	--			hue = shift(0.0, 0.0),
+	--			saturation = shift(0.0, 0.0),
+	--			value = shift(0.2, 0.2),
+	--		}
+	--	}
+	--},
 }
 
 -- =================================================================================================

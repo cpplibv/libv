@@ -153,7 +153,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 		auto valueDist = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
 		const auto value = std::clamp(valueDist(rng), 0.f, 1.f);
 
-		return Veggie(0, {}, normal, {}, rotation, scale, libv::vec3f{hue, saturation, value});
+		return Veggie(veggieType->modelID, {}, normal, {}, rotation, scale, libv::vec3f{hue, saturation, value});
 	}
 
 	return std::nullopt;
