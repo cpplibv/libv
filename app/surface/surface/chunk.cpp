@@ -163,9 +163,9 @@ void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 			std::vector<Veggie> resultBulk;
 			resultBulk.reserve(batchSize);
 
-			for (int i = 0; i < batchSize; ++i) {
+			for (std::size_t i = 0; i < batchSize; ++i)
 				add_veggie(resultBulk, rngLocal);
-			}
+
 			auto lock = std::unique_lock(chunk_m);
 			chunk.veggies.insert(chunk.veggies.end(), resultBulk.begin(), resultBulk.end());
 		});

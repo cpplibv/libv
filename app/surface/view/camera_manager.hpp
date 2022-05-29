@@ -33,7 +33,7 @@ public:
 	explicit inline CameraManager(libv::ctrl::Controls& controls) :
 			controls(controls) {
 
-		camera3D.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
+		camera3D.look_at({6.f, 6.f, 4.8f}, {0.5f, 0.5f, 0.f});
 	}
 
 private:

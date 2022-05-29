@@ -52,9 +52,12 @@ using Mesh = libv::glr::Mesh;
 struct RendererResourceContext {
 	libv::rev::ResourceManager loader{[] {
 		libv::rev::Settings settings;
-		settings.texture.base_path = "../../res/texture/";
-		settings.shader.base_path = "shader/";
-		settings.model.base_path = "../../res/model/";
+//		settings.texture.base_path = "../../res/texture/";
+//		settings.texture.base_path = "../../res/shader/";
+//		settings.model.base_path = "../../res/model/";
+		settings.texture.base_path = "res/texture/";
+		settings.shader.base_path = "res/shader/";
+		settings.model.base_path = "res/model/";
 		return settings;
 	}()};
 //	libv::rev::ShaderLoader shader_loader{"shader/"};
@@ -63,7 +66,8 @@ struct RendererResourceContext {
 
 	RendererResourceContext() {
 		// Include the res/shader/ folder from libv
-		loader.shader.add_include_directory("", "../../res/shader/");
+//		loader.shader.add_include_directory("", "../../res/shader/");
+//		loader.shader.add_include_directory("", "res/shader/");
 //		// Include the res/model/ folder from libv
 //		model_loader.add_include_directory("", "../../res/model/");
 	}

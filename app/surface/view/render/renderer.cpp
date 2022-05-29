@@ -24,8 +24,9 @@
 namespace surface {
 
 // -------------------------------------------------------------------------------------------------
+
 RendererDebug::RendererDebug(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "surface/flat_color.vs", "surface/flat_color.fs") {
 }
 
 void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
@@ -387,7 +388,7 @@ void RendererDebug::clear_debug_shapes() {
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "surface/flat_color.vs", "surface/flat_color.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -430,7 +431,7 @@ void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+		shader(rctx.loader.shader, "surface/editor_grid_plane.vs", "surface/editor_grid_plane.fs") {
 	auto position = mesh_grid.attribute(attribute_position);
 	auto index = mesh_grid.index();
 

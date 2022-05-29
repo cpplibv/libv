@@ -310,7 +310,7 @@ struct SpriteAtlasBaker {
 		ssaaSamples(static_cast<int32_t>(std::sqrt(ssaaSamples))),
 		bakeSize(atlasSize * this->ssaaSamples),
 		loader(loader),
-		shaderSpriteBakerDownsample(loader.shader, "rev_sandbox/full_screen.vs", "builtin/sprite_baker_downsample.fs") {
+		shaderSpriteBakerDownsample(loader.shader, "builtin/full_screen.vs", "builtin/sprite_baker_downsample.fs") {
 
 		assert(ssaaSamples == 1 || ssaaSamples == 4 || ssaaSamples == 9 || ssaaSamples == 16);
 

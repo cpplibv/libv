@@ -36,7 +36,7 @@ public:
 //	surface::CameraPlayer::screen_picker screen_picker;
 
 public:
-	explicit SurfaceViewer(const std::string& configPath);
+	explicit SurfaceViewer(const std::string& configPath, const std::string& configFolder);
 
 private:
 	void initUI(const std::string& configPath);

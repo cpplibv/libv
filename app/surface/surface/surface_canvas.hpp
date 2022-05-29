@@ -66,8 +66,6 @@ public:
 
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) = 0;
-//	virtual void clear() = 0;
-//	virtual void clear(size_t count) = 0;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
 	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
@@ -81,7 +79,6 @@ struct SurfaceScene : Scene {
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
-//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override;
 };
 
 struct TextureScene : Scene {
@@ -89,7 +86,6 @@ struct TextureScene : Scene {
 
 	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
-//	virtual void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) override;
 };
 
 struct HeightHeatMap : TextureScene {
@@ -138,6 +134,7 @@ public:
 private:
 	std::mutex mutex;
 	std::string currentConfigPath_;
+	std::string configFolder;
 
 private:
 	Renderer renderer;
@@ -156,16 +153,16 @@ private:
 private:
 	std::vector<SpriteMappingEntry> spriteMappings;
 
-private:
-	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
-	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized_2.vm4");
-	libv::rev::Model tree_02 = renderer.resource_context.loader.model.load("test_sphere.vm4");
-	libv::rev::Model tree_03 = renderer.resource_context.loader.model.load("stone_01.vm4");
-	libv::rev::Model tree_04 = renderer.resource_context.loader.model.load("tree_palm_02.vm4");
-	libv::rev::Model tree_05 = renderer.resource_context.loader.model.load("tree_cactus_a_03.vm4");
+//private:
+//	libv::rev::Model tree_01 = renderer.resource_context.loader.model.load("tree_01.vm4");
+//	libv::rev::Model tree_01_n = renderer.resource_context.loader.model.load("tree_01_normalized_2.vm4");
+//	libv::rev::Model tree_02 = renderer.resource_context.loader.model.load("test_sphere.vm4");
+//	libv::rev::Model tree_03 = renderer.resource_context.loader.model.load("stone_01.vm4");
+//	libv::rev::Model tree_04 = renderer.resource_context.loader.model.load("tree_palm_02.vm4");
+//	libv::rev::Model tree_05 = renderer.resource_context.loader.model.load("tree_cactus_a_03.vm4");
 
 public:
-	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath);
+	explicit SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath, std::string configFolder);
 	std::string cycleConfig();
 
 private:
@@ -174,8 +171,6 @@ private:
 private:
 	virtual void attach() override;
 	void setupRenderStates(libv::glr::Queue& glr);
-//	void updateVisibleChunks();
-//	void setConfig();
 	virtual void render(libv::glr::Queue& glr) override;
 	virtual void update(libv::ui::time_duration delta_time) override;
 };

@@ -12,6 +12,8 @@
 // pro
 #include <surface/log.hpp>
 
+#include <libv/gl/gl.hpp>
+
 
 namespace surface {
 
@@ -96,10 +98,6 @@ void TextureScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 		renderer.sprite.commitChunk(generation, chunk->index);
 	}
 }
-
-//	void TextureScene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-//		rendererVeggie.render(glr, uniform_stream);
-//	}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -187,28 +185,31 @@ void FertilityHeatMap::build(int generation, const std::vector<std::shared_ptr<C
 
 // =================================================================================================
 
-SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_) :
+SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, std::string configPath_, std::string configFolder) :
 		cameraManager(controls),
 		currentConfigPath_(std::move(configPath_)),
-		renderer(ui) {
+		configFolder(std::move(configFolder)),
+		renderer(ui),
+		binding(this->configFolder) {
 
-	fileWatcher.subscribe_directory("config/", [this](const libv::fsw::Event& event) {
+	fileWatcher.subscribe_directory(this->configFolder, [this](const libv::fsw::Event& event) {
 		auto lock = std::unique_lock(mutex);
 		if (event.path.generic_string() == currentConfigPath_)
 			changed = true;
 	});
 
-	fileWatcher.subscribe_directory("../../res/shader/", [this](const libv::fsw::Event& event) {
+	fileWatcher.subscribe_directory("res/shader/", [this](const libv::fsw::Event& event) {
 		if (event.path.filename().generic_string().starts_with("sprite_"))
 			forceRebake = true;
 	});
 
-	spriteMappings.emplace_back(0, "oak", "tree_01_normalized_2.vm4", 0.2f / 66.85f);
-	spriteMappings.emplace_back(1, "pine", "tree_pine_05.vm4", 2.f);
-	spriteMappings.emplace_back(2, "palm", "tree_palm_02.vm4", 1.0f / 20.f);
-	spriteMappings.emplace_back(3, "rock", "stone_01.vm4", 1.0f / 250.f);
-	spriteMappings.emplace_back(4, "cactus_a", "tree_cactus_a_03.vm4", 1.0f / 10.f);
-	spriteMappings.emplace_back(5, "cactus_b", "tree_cactus_b_04.vm4", 1.0f / 7.f);
+	int32_t nextSpriteID = 0;
+	spriteMappings.emplace_back(nextSpriteID++, "oak", "tree_01_normalized_2.vm4", 0.2f / 66.85f);
+	spriteMappings.emplace_back(nextSpriteID++, "pine", "tree_pine_05.vm4", 2.f);
+	spriteMappings.emplace_back(nextSpriteID++, "palm", "tree_palm_02.vm4", 1.0f / 20.f);
+	spriteMappings.emplace_back(nextSpriteID++, "rock", "stone_01.vm4", 1.0f / 250.f);
+	spriteMappings.emplace_back(nextSpriteID++, "cactus_a", "tree_cactus_a_03.vm4", 1.0f / 10.f);
+	spriteMappings.emplace_back(nextSpriteID++, "cactus_b", "tree_cactus_b_04.vm4", 1.0f / 7.f);
 
 	//	renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
 	//	renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
@@ -231,8 +232,7 @@ std::string SurfaceCanvas::cycleConfig() {
 	bool next = false;
 	bool first = true;
 	std::string firstConfig;
-	const auto dir = "config/";
-	for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+	for (const auto& entry : std::filesystem::directory_iterator(configFolder)) {
 		if (not entry.is_regular_file())
 			continue;
 
@@ -297,7 +297,6 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.state.blendDst_One_Minus_SourceAlpha();
 
 	glr.state.enableCullFace();
-//	glr.state.disableCullFace();
 	glr.state.cullBackFace();
 	glr.state.frontFaceCCW();
 
@@ -316,20 +315,6 @@ void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {
 	glr.clearColor();
 	glr.clearDepth();
 }
-
-//void SurfaceCanvas::updateVisibleChunks() {
-//	visibleChunks.clear();
-//	const auto& frustum = cameraManager.getCameraFrustum(canvas_size);
-//	for (const auto& chunk : surface->getActiveChunks()) {
-//		//Red check: throw away
-//		//Green check: generate and render
-//		const auto pos = libv::vec3f(chunk->position, 0.f);
-//		if (frustum.sphereInFrustum(pos, chunk->size.length() / 2.f) != Frustum::Position::OUTSIDE) {
-//			visibleChunks.emplace_back(chunk->index);
-//		}
-//		//Yellow check: lowprio generate, build but not render
-//	}
-//}
 
 void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 	(void) delta_time;
@@ -392,17 +377,17 @@ void SurfaceCanvas::update(libv::ui::time_duration delta_time) {
 }
 
 void SurfaceCanvas::render(libv::glr::Queue& glr) {
-	libv::Timer timerSum;
-	libv::Timer timer;
+//	libv::Timer timerSum;
+//	libv::Timer timer;
 //	log_surface.trace("Start render");
-	const auto time = [&timer](std::string_view description) {
-		auto t0 = timer.timef_ms().count();
+//	const auto time = [&timer](std::string_view description) {
+//		auto t0 = timer.timef_ms().count();
 //		log_surface.trace_if(t0 > 0.01f, "{:25}:{:8.4f} ms", description, t0);
-		timer.reset();
-	};
+//		timer.reset();
+//	};
 
 	setupRenderStates(glr);
-	time("SetupRenderStates");
+//	time("SetupRenderStates");
 
 	const auto s_guard = glr.state.push_guard();
 
@@ -414,7 +399,7 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 		activeScene->build(surface->getGeneration(), surface->getActiveChunks());
 		activeScene->buildVeggie(surface->getGeneration(), surface->getActiveChunks());
 	}
-	time("Scene Change");
+//	time("Scene Change");
 
 	if (surfaceDirty) {
 		if (!std::exchange(initializedSprites, true)) {
@@ -427,95 +412,105 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 
 			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
 
-//			for (int x = 0; x < 10; ++x) {
-//				for (int y = 0; y < 10; ++y) {
-//					const auto xf = static_cast<float>(x);
-//					const auto yf = static_cast<float>(y);
-//					renderer.sprite.add(x % 2 == 0, {xf, yf, 0.f});
-////					renderer.sprite.add(0, {xf, yf, 0.f}, hsv_shift, normal, rotation);
-//				}
-//			}
+			const auto& gl = glr.out_of_order_gl();
+			log_surface.info("{:46} [{:>10} ]", "CurrentAvailableVideoMemory",        gl.getCurrentAvailableVideoMemory());
+			log_surface.info("{:46} [{:>10} ]", "MaxColorAttachments",                gl.getMaxColorAttachments());
+			log_surface.info("{:46} [{:>10} ]", "MaxSamples",                         gl.getMaxSamples());
+			log_surface.info("{:46} [{:>10} ]", "MaxSamplesInteger",                  gl.getMaxSamplesInteger());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnits",               gl.getMaxTextureImageUnits());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsCompute",        gl.getMaxTextureImageUnitsCompute());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsFragment",       gl.getMaxTextureImageUnitsFragment());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsGeometry",       gl.getMaxTextureImageUnitsGeometry());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsTessControl",    gl.getMaxTextureImageUnitsTessControl());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsTessEvaluation", gl.getMaxTextureImageUnitsTessEvaluation());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsVertex",         gl.getMaxTextureImageUnitsVertex());
+			log_surface.info("{:46} [{:>10} ]", "MaxTextureSize",                     gl.getMaxTextureSize());
+			log_surface.info("{:46} [{:>10} ]", "MaxUniformBlockSize",                gl.getMaxUniformBlockSize());
+			log_surface.info("{:46} [{:>10} ]", "MaxUniformBufferBindings",           gl.getMaxUniformBufferBindings());
+			log_surface.info("{:46} [{:>10} ]", "MaxVertexAttribs",                   gl.getMaxVertexAttribs());
+			log_surface.info("{:46} [{:>10} ]", "MaxVertexUniformComponents",         gl.getMaxVertexUniformComponents());
+			log_surface.info("{:46} [{:>10} ]", "UniformBufferOffsetAlignment",       gl.getUniformBufferOffsetAlignment());
 		}
 
 		//build mesh
 		activeScene->build(surface->getGeneration(), surface->getActiveChunks());
-		time("surfaceDirty build");
+//		time("surfaceDirty build");
 		activeScene->buildVeggie(surface->getGeneration(), surface->getActiveChunks());
-		time("surfaceDirty buildVeggie");
+//		time("surfaceDirty buildVeggie");
 
 	} else if (forceRebake.exchange(false)) {
 		renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
-		time("forceRebake");
+//		time("forceRebake");
 	}
 
 	// render surface texture/_3d
 	activeScene->render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
-	time("activeScene->render");
+//	time("activeScene->render");
 
 	if (currentScene == SceneType::_3d && enableSkybox) {
 		renderer.sky.render(glr, renderer.resource_context.uniform_stream);
-		time("renderer.sky.render");
+//		time("renderer.sky.render");
 	}
 
 	// render plant model/debug
 	if (enableVegetation) {
 		activeScene->renderVeggie(glr, renderer.resource_context.uniform_stream, cameraFrustum);
 		renderer.sprite.render(glr, renderer.resource_context.uniform_stream, cameraFrustum);
-		time("renderer.sprite.render");
+//		time("renderer.sprite.render");
 	}
 
-	{
-		const auto s2_guard = glr.state.push_guard();
-		glr.state.disableCullFace();
-
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(-1.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(1.f / 66.85f);
-			tree_01.render(glr, renderer.resource_context.uniform_stream);
-		}
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(2.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(5.f * 5.f / 100.f);
-			tree_02.render(glr, renderer.resource_context.uniform_stream);
-		}
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(5.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(1.f / 66.85f);
-			tree_01_n.render(glr, renderer.resource_context.uniform_stream);
-		}
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(8.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(5.f * 1.0f / 250.f);
-			tree_03.render(glr, renderer.resource_context.uniform_stream);
-		}
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(11.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(5.f * 1.0f / 20.f);
-			tree_04.render(glr, renderer.resource_context.uniform_stream);
-		}
-		for (int i = 0; i < 10; ++i) {
-			auto m_guard = glr.model.push_guard();
-			glr.model.translate(14.f, 1.0f * static_cast<float>(i), 0.f);
-			glr.model.scale(5.f * 1.0f / 10.f);
-			tree_05.render(glr, renderer.resource_context.uniform_stream);
-		}
-	}
-	time("Test models render");
+//	{
+//		const auto s2_guard = glr.state.push_guard();
+//		glr.state.disableCullFace();
+//
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(-1.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(1.f / 66.85f);
+//			tree_01.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(2.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(5.f * 5.f / 100.f);
+//			tree_02.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(5.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(1.f / 66.85f);
+//			tree_01_n.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(8.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(5.f * 1.0f / 250.f);
+//			tree_03.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(11.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(5.f * 1.0f / 20.f);
+//			tree_04.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//		for (int i = 0; i < 10; ++i) {
+//			auto m_guard = glr.model.push_guard();
+//			glr.model.translate(14.f, 1.0f * static_cast<float>(i), 0.f);
+//			glr.model.scale(5.f * 1.0f / 10.f);
+//			tree_05.render(glr, renderer.resource_context.uniform_stream);
+//		}
+//	}
+//	time("Test models render");
 
 	if (currentScene == SceneType::_3d && enableGrid) {
 		const auto s_guard = glr.state.push_guard();
 		glr.state.polygonModeFill(); // In case we are wireframe mode, force poly fill for the grid
 		glr.state.disableDepthMask();
 		renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
-		time("renderer.editorGrid.render");
+//		time("renderer.editorGrid.render");
 	}
 
-	auto tSum = timerSum.timef_ms().count();
+//	auto tSum = timerSum.timef_ms().count();
 //	log_surface.trace_if(tSum > 0.01f, "{:25}:{:8.4f} ms", "Canvas render took SUM", tSum);
 }
 

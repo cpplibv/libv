@@ -1,6 +1,6 @@
 -- Test surface config example: noise
 
-require("config/common/nodes")
+require("common/nodes")
 
 -- -------------------------------------------------------------------------------------------------
 

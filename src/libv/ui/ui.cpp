@@ -658,6 +658,7 @@ void UI::focus(CoreComponent& component) {
 void UI::detachFocused(CoreComponent& component) {
 	current_thread_context(context());
 
+	(void) component;
 	assert(libv::make_observer_ptr(&component) == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
 	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, degrees<float>{315});
 }

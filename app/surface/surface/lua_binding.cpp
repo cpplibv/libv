@@ -181,13 +181,15 @@ void setFractalConfig(T& node, const sol::object& object) {
 
 // -------------------------------------------------------------------------------------------------
 
-SurfaceLuaBinding::SurfaceLuaBinding() {
+SurfaceLuaBinding::SurfaceLuaBinding(const std::string& configFolder) {
 	lua.open_libraries(sol::lib::base);
 	lua.open_libraries(sol::lib::table);
 	lua.open_libraries(sol::lib::string);
 	lua.open_libraries(sol::lib::math);
 	lua.open_libraries(sol::lib::package);
 	libv::lua::open_libraries(lua, libv::lua::lualib::vec);
+
+	lua["package"]["path"] = lua["package"]["path"].get<std::string>() + ";" + configFolder + "?.lua";
 }
 
 Seed SurfaceLuaBinding::convertSeed(const sol::object& object, Seed seedOffset) {

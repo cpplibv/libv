@@ -21,13 +21,13 @@ namespace surface {
 
 // -------------------------------------------------------------------------------------------------
 
-SurfaceViewer::SurfaceViewer(const std::string& configPath) :
-		ui([] {
+SurfaceViewer::SurfaceViewer(const std::string& configPath, const std::string& configFolder) :
+		ui([&] {
 			libv::ui::Settings settings;
 			// TODO P1: Internalize used UI resources under surface, currently: app/surface/../../res/
-			settings.res_font.base_path = "../../res/font/";
-			settings.res_shader.base_path = "../../res/shader/";
-			settings.res_texture.base_path = "../../res/texture/";
+			settings.res_font.base_path = "res/font/";
+			settings.res_shader.base_path = "res/shader/";
+			settings.res_texture.base_path = "res/texture/";
 
 			settings.res_font.restict_under_base = false; // TODO P1: Should go away with proper res folder
 			settings.res_shader.restict_under_base = false; // TODO P1: Should go away with proper res folder
@@ -36,9 +36,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath) :
 			settings.track_style_scripts = true;
 			return settings;
 		}()),
-		canvas("canvas", ui, controls, configPath),
+		canvas("canvas", ui, controls, configPath, configFolder),
 		mainLayers("layers"),
-		sceneTitle("sceneTitle"){
+		sceneTitle("sceneTitle") {
 
 //	frame.setSize(1024, 1024);
 //	frame.setAlwaysOnTop(true);
@@ -208,7 +208,7 @@ void SurfaceViewer::initUI(const std::string& configPath) {
 	mainLayers.add(canvas);
 
 	libv::ui::Label label("version_lbl");
-	label.text("v1.0");
+	label.text("v1.4");
 	label.font_color(libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
 	label.align_horizontal(libv::ui::AlignHorizontal::right);
 	label.align_vertical(libv::ui::AlignVertical::bottom);

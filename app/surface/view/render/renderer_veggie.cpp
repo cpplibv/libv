@@ -14,7 +14,7 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererVeggie::RendererVeggie(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "surface/flat_color.vs", "surface/flat_color.fs") {
 }
 
 //void RendererVeggie::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count) {

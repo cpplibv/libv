@@ -71,7 +71,7 @@ void main() {
 	vec2 uv = fs_in.uv;
 
 	vec4 color = texture(textureColor, vec3(tile_origin + uv * tile_size, fs_in.type)).rgba;
-	vec3 normal = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2f - 1f;
+	vec3 normal = texture(textureNormal, vec3(tile_origin + uv * tile_size, fs_in.type)).rgb * 2.0 - 1.0;
 	normal = qrotate(fs_in.rotationQuat, normalize(normal));
 
 	if (color.a < 0.49)

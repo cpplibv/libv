@@ -17,7 +17,7 @@ namespace surface {
 
 RendererSkybox::RendererSkybox(RendererResourceContext& rctx) :
 //		shader(rctx.loader.shader, "skybox.vs", "skybox.fs"),
-		shader(rctx.loader.shader, "skybox.vs", "skybox.fs") {
+		shader(rctx.loader.shader, "surface/skybox.vs", "surface/skybox.fs") {
 //		texture(rctx.loader.texture.load("sky.dds")) {
 //		texture(rctx.loader.texture.load("builtin:white")) {
 //		texture(rctx.loader.texture.load("cube_debug_transparent.dds")) {

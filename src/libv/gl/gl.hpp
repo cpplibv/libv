@@ -686,7 +686,7 @@ public:
 		return get<GLint>(GL_MAX_TEXTURE_IMAGE_UNITS);
 	}
 	[[nodiscard]] inline GLint getCurrentAvailableVideoMemory() const {
-		GLint availableKB[4];
+		GLint availableKB[4]{0, 0, 0, 0};
 
 		if (GLEW_NVX_gpu_memory_info)
 			glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, availableKB);

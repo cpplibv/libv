@@ -16,7 +16,7 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "surface.vs", "surface.fs"),
+		shader(rctx.loader.shader, "surface/surface.vs", "surface/surface.fs"),
 		texture(rctx.loader.texture.load("dirt_grayscale.jpg")) {}
 //		texture(rctx.loader.texture.load("dirt.jpg")) {}
 //		texture(rctx.loader.texture.load("salt.jpg")) {}

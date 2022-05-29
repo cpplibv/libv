@@ -76,9 +76,9 @@ vec4 qnormalize(const vec4 a) {
 
 /// @param vec - unit vector
 vec3 qrotate(const vec4 quat, const vec3 vec) {
-	const vec3 quatVector = quat.xyz;
-	const vec3 uv = cross(quatVector, vec);
-	const vec3 uuv = cross(quatVector, uv);
+	vec3 quatVector = quat.xyz;
+	vec3 uv = cross(quatVector, vec);
+	vec3 uuv = cross(quatVector, uv);
 
 	return vec + ((uv * quat.w) + uuv) * 2.0;
 }
@@ -93,15 +93,15 @@ vec3 qrotate(const vec4 quat, const vec3 vec) {
 /// @param start - unit vector
 /// @param dest - unit vector
 vec4 qfromUnitVectors(const vec3 start, const vec3 dest) {
-	const float m = sqrt(2.0 + 2.0 * dot(start, dest));
-	const vec3 w = (1.0 / m) * cross(start, dest);
+	float m = sqrt(2.0 + 2.0 * dot(start, dest));
+	vec3 w = (1.0 / m) * cross(start, dest);
 	return vec4(w.x, w.y, w.z, 0.5 * m);
 }
 
 /// @param start - not required to be a unit vector
 /// @param dest - not required to be a unit vector
 vec4 qfromNonUnitVectors(const vec3 start, const vec3 dest) {
-	const vec3 w = cross(start, dest);
+	vec3 w = cross(start, dest);
 	vec4 q = vec4(w.x, w.y, w.z, dot(start, dest));
 	q.w += qlength(q);
 	return qnormalize(q);

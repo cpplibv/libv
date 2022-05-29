@@ -25,7 +25,7 @@ private:
 	sol::state lua;
 
 public:
-	SurfaceLuaBinding();
+	SurfaceLuaBinding(const std::string& configFolder);
 	[[nodiscard]] std::shared_ptr<Config> getConfigFromLuaScript(const std::string_view script, const std::vector<SpriteMappingEntry>& spriteMapping);
 
 private:
