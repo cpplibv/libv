@@ -25,7 +25,7 @@ void SurfaceGenerationTask::run() {
 	while (true) {
 		auto nextChunkOpt = queuePending.pop(stopToken);
 		if (!nextChunkOpt) { // Generation Task is cancelled via stop token
-			log_surface.trace("Surface generation task is cancelled");
+//			log_surface.trace("Surface generation task is cancelled");
 			return;
 		}
 
@@ -33,10 +33,10 @@ void SurfaceGenerationTask::run() {
 		if (!nextChunk) // This chunk's generation is cancelled via weak_ptr expire
 			continue;
 
-		libv::Timer timer;
+//		libv::Timer timer;
 		chunkGen->generateChunk(*config, *nextChunk);
 		chunkGen->placeVegetation(*config, *nextChunk);
-		log_surface.trace("TimerChunkGen{:>8}: {:8.4f} ms", nextChunk->index, timer.timed_ms().count());
+//		log_surface.trace("TimerChunkGen{:>8}: {:8.4f} ms", nextChunk->index, timer.timed_ms().count());
 
 		queueReady.emplace(std::move(nextChunk));
 
@@ -70,7 +70,7 @@ void Surface::scanSpiral(libv::vec2i center, int32_t scanRange) {
 		if (chunk != nullptr)
 			return;
 
-		log_surface.trace("Queue new chunk {}", index);
+//		log_surface.trace("Queue new chunk {}", index);
 		chunk = std::make_shared<Chunk>(
 				index,
 				position,
@@ -97,7 +97,7 @@ void Surface::scan(libv::vec2i center, int32_t scanRange) {
 			if (chunk != nullptr)
 				continue;
 
-			log_surface.trace("Queue new chunk {}", index);
+//			log_surface.trace("Queue new chunk {}", index);
 			chunk = std::make_shared<Chunk>(
 					index,
 					position,
@@ -143,7 +143,7 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	if (!currentTask)
 		return changed;
 
-	libv::Timer timer;
+//	libv::Timer timer;
 
 	const auto oldFocalPosition = focalPosition;
 //	const auto oldFocalDirection = focalDirection;
@@ -152,29 +152,29 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	const auto newFocalOriginIndex = libv::lround(xy(newFocalPosition) / chunkSize).cast<int32_t>();
 
 	if (oldFocalOriginIndex != newFocalOriginIndex) {
-		log_surface.trace("BORDER");
+//		log_surface.trace("BORDER");
 
 		// Detect chunks out of range
 		chunks.slide(newFocalOriginIndex - oldFocalOriginIndex, [&](libv::vec2i index, const auto& chunk) {
 			(void) index;
 			if (chunk) {
-				log_surface.trace("Destroy CHUNKYYY {}", chunk->index);
+//				log_surface.trace("Destroy CHUNKYYY {}", chunk->index);
 				libv::erase_unstable(activeChunks, chunk);
 			}
 			return nullptr;
 		});
 
-		auto t2 = timer.timef_ms().count();
-		log_surface.trace_if(t2 > 0.01f, "Focus update took: Slide {:8.4f} ms", t2);
-		timer.reset();
+//		auto t2 = timer.timef_ms().count();
+//		log_surface.trace_if(t2 > 0.01f, "Focus update took: Slide {:8.4f} ms", t2);
+//		timer.reset();
 
 		// Detect chunks in range
 		scan(newFocalOriginIndex, chunkRangeScanUpdate);
 	}
 
-	auto t3 = timer.timef_ms().count();
-	log_surface.trace_if(t3 > 0.01f, "Focus update took: Scan {:8.4f} ms", t3);
-	timer.reset();
+//	auto t3 = timer.timef_ms().count();
+//	log_surface.trace_if(t3 > 0.01f, "Focus update took: Scan {:8.4f} ms", t3);
+//	timer.reset();
 
 //	while (auto chunk = currentTask->queueReady.try_pop()) {
 	if (auto chunk = currentTask->queueReady.try_pop()) {
@@ -188,8 +188,8 @@ bool Surface::update(libv::vec3f newFocalPosition, libv::vec3f newFocalDirection
 	focalPosition = newFocalPosition;
 	focalDirection = newFocalDirection;
 
-	auto t = timer.timef_ms().count();
-	log_surface.trace_if(t > 0.01f, "Focus update took {:8.4f} ms", t);
+//	auto t = timer.timef_ms().count();
+//	log_surface.trace_if(t > 0.01f, "Focus update took {:8.4f} ms", t);
 
 	return changed;
 }

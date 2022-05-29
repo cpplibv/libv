@@ -47,7 +47,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "hsv(0, 0%, 100%)" }
+			{ 1, vec3f(2, 2, 2) }
 		},
 		vegetation = {
 		}
@@ -264,27 +264,6 @@ bumps =
 
 height = {
 	name = "height",
-	heightSensitivity = 0.0,
-	colorGrad = {
-		{ -1.0, "hsv(240, 80%, 20%)" },
-		{ -0.01, "hsv(240, 80%, 60%)" },
-		--{0.0 , "hsv(240, 70%, 99%)"},
-		{ 0.0, "hsv(220, 80%, 60%)" },
-		{ 0.01, "hsv(60, 80%, 90%)" },
-		{ 0.05, "hsv(120, 70%, 75%)" },
-		{ 0.1, "hsv(120, 100%, 50%)" },
-		{ 0.5, "hsv(120, 100%, 60%)" },
-		{ 0.6, "hsv(120, 60%, 60%)" },
-		{ 1.0, "hsv(220, 5%, 95%)" },
-		--{key = -2.0 ,value =  "blue"},
-		--{key = 0.0 , value = "yellow"},
-		--{key = 1.0 , value = "green"},
-		--{key = 2.0 , value = "grey"},
-		--[-2.0] = "blue",
-		--[0.0] = "yellow",
-		--[1.0] = "green",
-		--[2.0] = "grey",
-	},
 	nodes =
 		add {
 			mul { constant(2), mountainRange },

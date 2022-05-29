@@ -5,12 +5,12 @@ require("config/common/nodes")
 -- -------------------------------------------------------------------------------------------------
 
 config = {
-	seed = 500,
+	seed = 501,
 	resolution = 256,
 	numChunks = 169,
-	numVeggie = 100,
+	numVeggie = 400,
 
-	fogIntensity = 0.035,
+	fogIntensity = 0.015,
 	fogColor = "rgb(0.9, 0.7, 0.5)";
 
 	sunColor = "rgb(0.9, 0.8, 0.6)";
@@ -21,7 +21,7 @@ config = {
 biomes = {
 	{
 		name = "grassland2",
-		coord = vec2f(0.2, 0.8),
+		coord = vec2f(-1.8, 0.8),
 		dominance = 1.0,
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
@@ -31,15 +31,24 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
-				color = "#DB8840",
+				model = "cactus_a",
+				scale = range(1.5, 3.5),
 				size = 0.03,
-				probability = 0.2,
+				probability = 0.1,
 			},
 			{
 				name = "bush",
-				color = "#DB8860",
+				model = "cactus_b",
+				scale = range(0.4, 0.9),
 				size = 0.02,
-				probability = 0.6,
+				probability = 0.1,
+			},
+			{
+				name = "rock",
+				model = "rock",
+				scale = range(1.0, 2.0),
+				size = 0.02,
+				probability = 0.3,
 			},
 		}
 	},
@@ -53,19 +62,17 @@ biomes = {
 			{ 1, "#FFB77C" }
 		},
 		vegetation = {
-			--{
-			--	name = "tree",
-			--	color = "hsv(60, 80%, 100%)",
-			--	size = 0.05,
-			--	probability = 0.2,
-			--	--fertilityRange = vec2f{0.6, 1.0},
-			--	--color = "hsv(120, 60%, 100%)",
-			--},
 			{
 				name = "rock",
-				color = "#F2D77C",
-				size = 0.02,
-				probability = 0.8,
+				model = "cactus_a",
+				scale = range(1.5, 3.5),
+				probability = 0.5,
+			},
+			{
+				name = "rock",
+				model = "cactus_b",
+				scale = range(1.0, 1.5),
+				probability = 0.5,
 			}
 		}
 	},
@@ -84,53 +91,74 @@ height = {
 	nodes =
 	min {
 
-		pow {
-			exponent = 2.0,
-			--exponent = 1.0,
-			add {
-				--mix {
-					mul {
-						constant {
-							value = 0.5
-						},
-						value {
-							seed = 200,
-						},
-					},
-					mul {
-						value {
-							seed = 125
-						},
-						simplexFractal {
-							seed = 345,
-							octaves = 5,
-							amplitude = 0.5,
-							frequency = 0.25,
-							lacunarity = 2.0,
-							persistence = 0.5,
-						},
-					},
-					--add {
-					--	coord(0.05, 0),
-					--	constant {
-					--		value = 0.5,
-					--	}
-					--}
-				--},
+		mul {
+			constant(5),
+			pow {
+				exponent = 2.0,
+				--exponent = 1.0,
+				add {
+					--mix {
+						mul {
+							constant {
+								value = 0.5
+							},
+							fractal {
+								seed = 0,
+								octaves = 1,
+								amplitude = 1.0,
+								frequency = 0.2,
+								lacunarity = 2.0,
+								persistence = 0.5,
 
+								value {
+									seed = 200,
+								},
+							},
+						},
+						mul {
+							fractal {
+								seed = 0,
+								octaves = 1,
+								amplitude = 1.0,
+								frequency = 0.2,
+								lacunarity = 2.0,
+								persistence = 0.5,
+
+								value {
+									seed = 125,
+								},
+							},
+							simplexFractal {
+								seed = 345,
+								octaves = 5,
+								amplitude = 0.5,
+								frequency = 0.05,
+								lacunarity = 2.0,
+								persistence = 0.5,
+							},
+						},
+						--add {
+						--	coord(0.05, 0),
+						--	constant {
+						--		value = 0.5,
+						--	}
+						--}
+					--},
+
+				},
 			},
 		},
 		add{
 			simplexFractal {
 				seed = 345,
-				octaves = 5,
-				amplitude = 0.2,
-				frequency = 0.2,
+				octaves = 4,
+				amplitude = 0.8,
+				frequency = 0.03,
 				lacunarity = 2.0,
 				persistence = 0.5,
 			},
 			constant {
-				value = 0.9
+				value = 0.7 * 4
 			}
 		}
 
@@ -194,23 +222,5 @@ fertility = {
 		{ 0.0, "white" },
 		{ 1.0, "green" }
 	},
-	nodes = add {
-		warp {
-			seed = 1233,
-			octaves = 2,
-			amplitude = 1,
-			frequency = 0.5,
-			lacunarity = 2,
-			persistence = 0.5,
-			cellular {
-				seed = 14523,
-				distanceFn = DistFun.euclidean,
-				returnType = ReturnType.cellValue,
-				jitter = 1,
-			},
-		},
-		constant {
-			value = 0.5
-		},
-	}
+	nodes = constant(0)
 }

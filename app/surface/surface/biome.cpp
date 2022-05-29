@@ -129,7 +129,7 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 
 		auto normalRDist = libv::make_uniform_distribution_exclusive(0.f, libv::tau);
 //		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f);
-		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f / 9.f);
+		auto normalUDist = libv::make_uniform_distribution_exclusive(0.f, libv::pi / 2.f / 12.f);
 		const auto r = normalRDist(rng);
 		const auto u = normalUDist(rng);
 		const auto normal = libv::vec3f(
@@ -148,10 +148,10 @@ std::optional<Veggie> BiomeMix::getRandomVeggie(const Biome& biome, libv::xorosh
 		const auto hue = std::fmod(hueDist(rng), 360.f) / 360.f;
 
 		auto saturationDist = libv::make_uniform_distribution_inclusive(veggieType->saturation.offset - veggieType->saturation.radius, veggieType->saturation.offset + veggieType->saturation.radius);
-		const auto saturation = std::clamp(saturationDist(rng), 0.f, 1.f);
+		const auto saturation = std::clamp(saturationDist(rng), -1.f, 1.f);
 
 		auto valueDist = libv::make_uniform_distribution_inclusive(veggieType->value.offset - veggieType->value.radius, veggieType->value.offset + veggieType->value.radius);
-		const auto value = std::clamp(valueDist(rng), 0.f, 1.f);
+		const auto value = std::clamp(valueDist(rng), -1.f, 1.f);
 
 		return Veggie(veggieType->modelID, {}, normal, {}, rotation, scale, libv::vec3f{hue, saturation, value});
 	}

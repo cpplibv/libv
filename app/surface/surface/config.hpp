@@ -41,7 +41,7 @@ struct HeatMap {
 	std::string name;
 	float heightSensitivity;
 //	libv::vec4f color;
-	libv::gradientf<libv::vec4f> colorGrad;
+//	libv::gradientf<libv::vec4f> colorGrad;
 	std::unique_ptr<Node> rootNode;
 };
 
