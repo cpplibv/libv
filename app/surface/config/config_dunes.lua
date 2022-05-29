@@ -17,15 +17,10 @@ local global_takeover = {
 config = {
 	seed = 0,
 	resolution = 256,
-	--numChunks = 169,
-	--numChunks = 441,
-	--numVeggie = 150,
-	--numVeggie = 500,
-	--numVeggie = 1601,
 	numVeggie = 20000,
 
 	fogColor = "hsv(120, 5%, 95%)";
-	fogIntensity = 0.02,
+	fogIntensity = 0.0175,
 
 	sunColor = "hsv(0, 10%, 95%)";
 	--sunDirection = vec3f(0.891186, 0.0560718, 0.450159),
@@ -146,30 +141,30 @@ biomes = {
 			}
 		}
 	},
-	--{
-	--	name = "sandbed-darl",
-	--	coord = vec2f(3.0, 0.2),
-	--	dominance = 1.0,
-	--	handover = global_handover,
-	--	takeover = global_takeover,
-	--
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "hsv(36, 35%, 98%)" },
-	--		{ 1, "hsv(34, 14%, 50%)" }
-	--	},
-	--	vegetation = {
-	--		{
-	--			name = "rock",
-	--			model = "rock",
-	--			probability = 0.02,
-	--			scale = range(0.5, 1.5),
-	--			hue = shift(0.0, 0.0),
-	--			saturation = shift(0.0, 0.0),
-	--			value = shift(0.2, 0.2),
-	--		}
-	--	}
-	--},
+	{
+		name = "sandbed-darl",
+		coord = vec2f(4.0, 0.2),
+		dominance = 1.0,
+		handover = global_handover,
+		takeover = global_takeover,
+
+		cutOff = vec2f(0.1, 0.4),
+		colorGrad = {
+			{ 0, "hsv(36, 35%, 98%)" },
+			{ 1, "hsv(34, 14%, 50%)" }
+		},
+		vegetation = {
+			{
+				name = "rock",
+				model = "rock",
+				probability = 0.02,
+				scale = range(0.5, 1.5),
+				hue = shift(0.0, 0.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.2, 0.2),
+			}
+		}
+	},
 }
 
 -- =================================================================================================
@@ -234,14 +229,11 @@ microRange = mul {
 		min {
 			baseMicro(2222),
 			min {
-				--baseMicro(3333),
-				--min {
-					baseMicro(4444),
-					min {
-						baseMicro(5555),
-						baseMicro(6666),
-					},
-				--},
+				baseMicro(4444),
+				min {
+					baseMicro(5555),
+					baseMicro(6666),
+				},
 			},
 		},
 	},
@@ -270,54 +262,6 @@ height = {
 			mul { constant(1), microRange },
 			mul { constant(2), bumps },
 		}
-	--nodes = pow {
-	--	exponent = 2.0,
-	--
-	--	min {
-	--		simplexFractal {
-	--			seed = 33543745,
-	--			octaves = 5,
-	--			amplitude = 0.5,
-	--			frequency = 0.1,
-	--			lacunarity = 2.0,
-	--			persistence = 0.5,
-	--		},
-	--		mix {
-	--			constant {
-	--				value = 0,
-	--			},
-	--			add {
-	--				simplexFractal {
-	--					seed = 600733745,
-	--					octaves = 5,
-	--					amplitude = 0.5,
-	--					frequency = 0.1,
-	--					lacunarity = 2.0,
-	--					persistence = 0.5,
-	--				},
-	--				constant {
-	--					value = 0.5,
-	--				},
-	--			},
-	--			--},
-	--			saturate {
-	--				add {
-	--					simplexFractal {
-	--						seed = 602364345,
-	--						octaves = 5,
-	--						amplitude = 1.0,
-	--						frequency = 0.10,
-	--						lacunarity = 1.5,
-	--						persistence = 0.5,
-	--					},
-	--					constant {
-	--						value = 0.5,
-	--					},
-	--				},
-	--			},
-	--		},
-	--	},
-	--},
 }
 
 temperature = {
@@ -349,29 +293,7 @@ humidity = {
 		{ 0.0, "white" },
 		{ 1.0, "blue" }
 	},
-	nodes = --add {
-	add {
-		--simplexFractal {
-		--	seed = 103421,
-		--
-		--	octaves = 6,
-		--	amplitude = 0.5,
-		--	frequency = 0.5,
-		--	lacunarity = 2.0,
-		--	persistence = 0.5,
-		--},
-		--cellular {
-		--	seed = 123,
-		--	distanceFn = DistFun.euclidean,
-		--	--distanceFn = DistFun.manhattan,
-		--	returnType = ReturnType.cellValue,
-		--	--returnType = ReturnType.distance,
-		--	jitter = 1,
-		--},
-		constant {
-			value = 0.7
-		},
-	}
+	nodes = constant(0.7),
 }
 
 fertility = {

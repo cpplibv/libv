@@ -7,8 +7,8 @@ require("common/nodes")
 config = {
 	seed = 0,
 	resolution = 256,
-	numVeggie = 500,
-	--numVeggie = 20000,
+	--numVeggie = 500,
+	numVeggie = 20000,
 
 	fogIntensity = 0.015,
 	fogColor = "rgb(0.7, 0.8, 0.9)";
@@ -18,6 +18,19 @@ config = {
 }
 
 biomes = {
+	{
+		name = "snow",
+		coord = vec2f(-2, 0),
+		dominance = 1.0,
+		--handover = { soft = 0.3, hard = 0.0 },
+		--takeover = { soft = 0.8, hard = 0.9 },
+		colorGrad = {
+			{ 0, "hsv(210, 10%, 98%)" },
+			{ 1, vec3f(2, 2, 2) }
+		},
+		vegetation = {
+		}
+	},
 	{
 		name = "mountain",
 		coord = vec2f(-1, 0),
@@ -29,18 +42,15 @@ biomes = {
 			{ 1, "hsv(215, 14%, 92%)" }
 		},
 		vegetation = {
-		--	{
-		--		name = "tree",
-		--		color = "hsv(60, 80%, 100%)",
-		--		size = 0.025,
-		--		probability = 0.2,
-		--	},
-		--	{
-		--		name = "bush",
-		--		color = "hsv(69, 80%, 100%)",
-		--		size = 0.022,
-		--		probability = 0.2,
-		--	}
+			{
+				name = "rock",
+				model = "rock",
+				scale = range(1.0, 5.0),
+				hue = shift(160.0, 25.0),
+				saturation = shift(-0.2, 0.1),
+				value = shift(0.4, 0.2),
+				probability = 0.005,
+			}
 		}
 	},
 	{
@@ -56,15 +66,10 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(150, 65%, 70%)",
-				size = 0.05,
-				probability = 0.3,
-			},
-			{
-				name = "bush",
-				color = "hsv(145, 70%, 60%)",
-				size = 0.022,
-				probability = 0.7,
+				model = "oak",
+				scale = range(1.0, 3.0),
+				value = shift(0.1, 0.05),
+				probability = 1.0,
 			},
 		}
 	},
@@ -81,15 +86,10 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(150, 65%, 70%)",
-				size = 0.05,
-				probability = 0.3,
-			},
-			{
-				name = "bush",
-				color = "hsv(145, 70%, 60%)",
-				size = 0.022,
-				probability = 0.7,
+				model = "pine",
+				scale = range(0.5, 2.0),
+				saturation = shift(-0.3, 0.1),
+				probability = 1.0,
 			},
 		}
 	},
@@ -104,14 +104,6 @@ biomes = {
 			{ 1, "hsv(34, 54%, 92%)" }
 		},
 		vegetation = {
-			--{
-			--	name = "tree",
-			--	color = "hsv(60, 80%, 100%)",
-			--	size = 0.05,
-			--	probability = 0.2,
-			--	--fertilityRange = vec2f{0.6, 1.0},
-			--	--color = "hsv(120, 60%, 100%)",
-			--},
 			{
 				name = "rock",
 				color = "hsv(69, 10%, 60%)",
@@ -120,129 +112,92 @@ biomes = {
 			}
 		}
 	},
-	--{
-	--	name = "water",
-	--	coord = vec2f(1.5, 0),
-	--	dominance = 1.0,
-	--	cutOff = vec2f(0.1, 0.4),
-	--	colorGrad = {
-	--		{ 0, "hsv(36, 35%, 98%)" },
-	--		{ 1, "hsv(180, 90%, 92%)" }
-	--	},
-	--	vegetation = {
-	--		--{
-	--		--	name = "tree",
-	--		--	color = "hsv(60, 80%, 100%)",
-	--		--	size = 0.05,
-	--		--	probability = 0.2,
-	--		--	--fertilityRange = vec2f{0.6, 1.0},
-	--		--	--color = "hsv(120, 60%, 100%)",
-	--		--},
-	--		{
-	--			name = "rock",
-	--			color = "hsv(69, 10%, 60%)",
-	--			size = 0.022,
-	--			probability = 0.1,
-	--		}
-	--	}
-	--},
 }
-
---local flexSimplex = function (args)
---	return
---		simplexFractal(args);
---end
-
---mountain ----------> grassland ---> desert
---		   \--> forest >--/
 
 height = {
 	name = "height",
 	heightSensitivity = 0.0,
-	colorGrad = {
-		{ -1.0, "hsv(240, 80%, 20%)" },
-		{ -0.01, "hsv(240, 80%, 60%)" },
-		--{0.0 , "hsv(240, 70%, 99%)"},
-		{ 0.0, "hsv(220, 80%, 60%)" },
-		{ 0.01, "hsv(60, 80%, 90%)" },
-		{ 0.05, "hsv(120, 70%, 75%)" },
-		{ 0.1, "hsv(120, 100%, 50%)" },
-		{ 0.5, "hsv(120, 100%, 60%)" },
-		{ 0.6, "hsv(120, 60%, 60%)" },
-		{ 1.0, "hsv(220, 5%, 95%)" },
-		--{key = -2.0 ,value =  "blue"},
-		--{key = 0.0 , value = "yellow"},
-		--{key = 1.0 , value = "green"},
-		--{key = 2.0 , value = "grey"},
-		--[-2.0] = "blue",
-		--[0.0] = "yellow",
-		--[1.0] = "green",
-		--[2.0] = "grey",
-	},
 	nodes =
-		warp {
-			seed = 98001,
-			octaves = 3,
-			amplitude = 50.0,
-			frequency = 0.02,
-			lacunarity = 2.0,
-			persistence = 0.25,
-			--frequency = 0.015,
-			--persistence = 0.5,
+			add {
+				warp {
+					seed = 98001,
+					octaves = 4,
+					amplitude = 50.0,
+					frequency = 0.02,
+					lacunarity = 2.0,
+					persistence = 0.25,
 
-			clamp {
-				mul {
-					constant(4.0),
-					pow {
-						exponent = 2.0,
+					simplexFractal {
+						seed = 433322,
+						octaves = 4,
+						amplitude = 0.75,
+						frequency = 0.01,
+						lacunarity = 2.0,
+						persistence = 0.5,
+					},
+				},
+				simplexFractal {
+					seed = 4894558,
+					octaves = 4,
+					amplitude = 0.25,
+					frequency = 0.035,
+					lacunarity = 2.0,
+					persistence = 0.5,
+				},
+				simplexFractal {
+					seed = 4894558,
+					octaves = 4,
+					amplitude = 2.75,
+					frequency = 0.0015,
+					lacunarity = 2.0,
+					persistence = 0.5,
+				},
+				warp {
+					seed = 98001,
+					octaves = 3,
+					amplitude = 50.0,
+					frequency = 0.02,
+					lacunarity = 2.0,
+					persistence = 0.25,
+
+					clamp {
+						mul {
+							constant(4.0),
+							pow {
+								exponent = 2.0,
+								add {
+									simplexFractal {
+										seed = 600733745,
+										octaves = 4,
+										amplitude = 0.75,
+										frequency = 0.01,
+										lacunarity = 2.0,
+										persistence = 0.5,
+									},
+								},
+							},
+						},
+
+						constant(0.0),
 						add {
+							constant(3.5),
 							simplexFractal {
-								seed = 600733745,
+								seed = 455553745,
 								octaves = 4,
-								amplitude = 0.75,
-								frequency = 0.01,
+								amplitude = 0.45,
+								frequency = 0.1,
 								lacunarity = 2.0,
 								persistence = 0.5,
 							},
-							--constant(0),
-							--min {
-							--	add {
-							--		--coord(0, -0.2),
-							--		--coord{weights = vec2f(0, -0.2)},
-							--		coord{weights = {0, -0.1}},
-							--		constant(2),
-							--	},
-							--	add {
-							--		coord(0, 0.2),
-							--		--{
-							--		--	nodeType = "coord",
-							--		--	--weights = {0, -0.2},
-							--		--	weights = { x = 0, y = -0.15 },
-							--		--	--weights = vec2f(0, -0.1),
-							--		--},
-							--		constant(2),
-							--	},
-							--	--constant(0.0),
-							--	--coord(0, 0.03),
-							--},
-							--coord{weights = {0, -0.03}},
 						},
 					},
-				},
-
-				constant(0.0),
-				constant(4.0),
-			},
-		}
+				}
+			}
 }
 
 temperature = {
 	name = "temperature",
 	heightSensitivity = 0.4, --//200m-kent 1 fok
-	colorGrad = {
-		{ 0.0, "white" },
-		{ 1.0, "red" }
-	},
 	nodes = add {
 		simplexFractal {
 			seed = 1,
@@ -253,7 +208,7 @@ temperature = {
 			persistence = 0.5,
 		},
 		constant {
-			value = 0.5
+			value = 0.9
 		}
 	}
 }
@@ -261,34 +216,30 @@ temperature = {
 humidity = {
 	name = "humidity",
 	--heightSensitivity = 0.2,
-	colorGrad = {
-		{ 0.0, "white" },
-		{ 1.0, "blue" }
-	},
 	nodes = --add {
-	add {
-		simplexFractal {
-			seed = 143421,
+		add {
+			simplexFractal {
+				seed = 143421,
 
-			octaves = 3,
-			amplitude = 0.45,
-			frequency = 0.02,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
-		simplexFractal {
-			seed = 143422,
+				octaves = 3,
+				amplitude = 0.45,
+				frequency = 0.02,
+				lacunarity = 2.0,
+				persistence = 0.5,
+			},
+			simplexFractal {
+				seed = 143422,
 
-			octaves = 3,
-			amplitude = 0.45,
-			frequency = 0.02,
-			lacunarity = 2.0,
-			persistence = 0.5,
-		},
-		--constant {
-		--	value = -0.5
-		--},
-	}
+				octaves = 3,
+				amplitude = 0.45,
+				frequency = 0.02,
+				lacunarity = 2.0,
+				persistence = 0.5,
+			},
+			--constant {
+			--	value = -0.5
+			--},
+		}
 }
 
 fertility = {
