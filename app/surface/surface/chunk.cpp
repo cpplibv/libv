@@ -131,39 +131,49 @@ void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
 	std::mutex rng_m;
 	chunk.veggies.reserve(config.numVeggie / 5); // TODO P3: Should check if reserving for 20% isn't memory wasteful | reserve more maybe even 100%, shrink to fit when done = 2 allocation, but never more, and 0 memory waste
 
-	// NOTE: This parallelism doesn't yield too much gain, but still better than single thread
-	// The entire generation of 81 chunk with 100 veggie per chunk in milliseconds:
-	// Baseline / No operation: 145 - 148
-	// Single thread: 170 - 180
-	// Multi-thread: 159 - 162 (current)
-	// Multi-thread lockless assigment: 158 - 161 (would need post merge, possible, not enough gain)
 
-	libv::mt::parallel_for(threads, 0uz, config.numVeggie, [&](auto) {
-		auto rngLock = std::unique_lock(rng_m);
-		auto rngLocal = chunk.rng.fork(); // RNG has to be forked under a mutex
-		rngLock.unlock();
-
+	auto add_veggie = [&](auto& list, auto& rngLocal) {
 		const auto point = chunk.pickRandomPoint(rngLocal);
 
 		const auto position = point.position;
 		const auto normal = point.normal;
 		const auto temp = config.temperature.rootNode->evaluate(position.x, position.y) - position.z * config.temperature.heightSensitivity;
 		const auto wet = config.humidity.rootNode->evaluate(position.x, position.y);
-//		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
+		//		const auto fert = config.fertility.rootNode->evaluate(x + position.x, y + position.y);
 
 		auto picker = BiomePicker();
 		auto mix = picker.mix(config.biomes, libv::vec2f(temp, wet));
-
 		const auto& biome = config.blendBiomes ? mix.random(rngLocal) : mix.primary();
 
 		if (auto veggie = mix.getRandomVeggie(biome, rngLocal)) {
 			veggie->pos = position;
 			veggie->surfaceNormal = normal;
 
-			auto lock = std::unique_lock(chunk_m);
-			chunk.veggies.emplace_back(std::move(veggie.value()));
+			list.emplace_back(std::move(veggie.value()));
 		}
-	});
+	};
+
+	constexpr std::size_t batchSize = 50;
+	if (config.numVeggie > batchSize)
+		libv::mt::parallel_for(threads, 0uz, config.numVeggie / batchSize, [&](auto) {
+			auto rngLock = std::unique_lock(rng_m);
+			auto rngLocal = chunk.rng.fork(); // RNG has to be forked under a mutex
+			rngLock.unlock();
+
+			std::vector<Veggie> resultBulk;
+			resultBulk.reserve(batchSize);
+
+			for (int i = 0; i < batchSize; ++i) {
+				add_veggie(resultBulk, rngLocal);
+			}
+			auto lock = std::unique_lock(chunk_m);
+			chunk.veggies.insert(chunk.veggies.end(), resultBulk.begin(), resultBulk.end());
+		});
+
+	for (std::size_t i = 0; i < config.numVeggie % batchSize; ++i) {
+		add_veggie(chunk.veggies, chunk.rng);
+	}
+
 }
 
 //void ChunkGen::placeVegetationRandom(const Config& config, Chunk& chunk) {
