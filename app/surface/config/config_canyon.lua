@@ -8,10 +8,10 @@ config = {
 	seed = 501,
 	resolution = 256,
 	numChunks = 169,
-	numVeggie = 400,
+	numVeggie = 500,
 
-	fogIntensity = 0.015,
-	fogColor = "rgb(0.9, 0.7, 0.5)";
+	fogIntensity = 0.01,
+	fogColor = "rgb(0.99, 0.7, 0.5)";
 
 	sunColor = "rgb(0.9, 0.8, 0.6)";
 
@@ -59,7 +59,7 @@ biomes = {
 		cutOff = vec2f(0.1, 0.4),
 		colorGrad = {
 			{ 0, "hsv(36, 35%, 98%)" },
-			{ 1, "#FFB77C" }
+			{ 1, "hsv(25, 35%, 98%)" }
 		},
 		vegetation = {
 			{
@@ -78,6 +78,102 @@ biomes = {
 	},
 }
 
+canyon=min {
+
+	mul {
+		constant(5),
+		pow {
+			exponent = 2.0,
+			--exponent = 1.0,
+			add {
+				--mix {
+				mul {
+					constant {
+						value = 0.5
+					},
+					fractal {
+						seed = 0,
+						octaves = 1,
+						amplitude = 1.0,
+						frequency = 0.2,
+						lacunarity = 2.0,
+						persistence = 0.5,
+
+						value {
+							seed = 200,
+						},
+					},
+				},
+				mul {
+					fractal {
+						seed = 0,
+						octaves = 1,
+						amplitude = 1.0,
+						frequency = 0.2,
+						lacunarity = 2.0,
+						persistence = 0.5,
+
+						value {
+							seed = 125,
+						},
+					},
+					simplexFractal {
+						seed = 345,
+						octaves = 5,
+						amplitude = 0.5,
+						frequency = 0.05,
+						lacunarity = 2.0,
+						persistence = 0.5,
+					},
+				},
+				--add {
+				--	coord(0.05, 0),
+				--	constant {
+				--		value = 0.5,
+				--	}
+				--}
+				--},
+
+			},
+		},
+	},
+	add{
+		simplexFractal {
+			seed = 345,
+			octaves = 4,
+			amplitude = 0.8,
+			frequency = 0.03,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		},
+		constant {
+			value = 0.7 * 4
+		}
+	}
+
+}
+
+mask=
+clamp{
+
+	add{
+		simplexFractal {
+			seed = 103421,
+
+			octaves = 6,
+			amplitude = 5,
+			frequency = 0.01,
+			lacunarity = 2.0,
+			persistence = 0.5,
+		},
+		constant(1),
+	},
+	constant(0),
+	constant(1),
+}
+
+
+
 height = {
 	name = "height",
 	heightSensitivity = 0.0,
@@ -89,80 +185,15 @@ height = {
 		{ 1.0, "hsv(220, 5%, 95%)" },
 	},
 	nodes =
-	min {
-
-		mul {
-			constant(5),
-			pow {
-				exponent = 2.0,
-				--exponent = 1.0,
-				add {
-					--mix {
-						mul {
-							constant {
-								value = 0.5
-							},
-							fractal {
-								seed = 0,
-								octaves = 1,
-								amplitude = 1.0,
-								frequency = 0.2,
-								lacunarity = 2.0,
-								persistence = 0.5,
-
-								value {
-									seed = 200,
-								},
-							},
-						},
-						mul {
-							fractal {
-								seed = 0,
-								octaves = 1,
-								amplitude = 1.0,
-								frequency = 0.2,
-								lacunarity = 2.0,
-								persistence = 0.5,
-
-								value {
-									seed = 125,
-								},
-							},
-							simplexFractal {
-								seed = 345,
-								octaves = 5,
-								amplitude = 0.5,
-								frequency = 0.05,
-								lacunarity = 2.0,
-								persistence = 0.5,
-							},
-						},
-						--add {
-						--	coord(0.05, 0),
-						--	constant {
-						--		value = 0.5,
-						--	}
-						--}
-					--},
-
-				},
-			},
+	mix{
+		constant{
+			value=0
 		},
-		add{
-			simplexFractal {
-				seed = 345,
-				octaves = 4,
-				amplitude = 0.8,
-				frequency = 0.03,
-				lacunarity = 2.0,
-				persistence = 0.5,
-			},
-			constant {
-				value = 0.7 * 4
-			}
-		}
+		canyon,
+	mask
 
 	}
+
 }
 
 

@@ -10,7 +10,7 @@ config = {
 	--numVeggie = 500,
 	numVeggie = 20000,
 
-	fogIntensity = 0.015,
+	fogIntensity = 0.01,
 	fogColor = "rgb(0.7, 0.8, 0.9)";
 
 	sunColor = "hsv(0, 15%, 95%)";

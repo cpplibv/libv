@@ -73,14 +73,8 @@ struct NodeSimplexFractal : BaseFractalNode {
 	virtual float evaluate(float x, float y) noexcept override;
 };
 
-struct NodeFractal : Node {
+struct NodeFractal : BaseFractalNode {
 	std::unique_ptr<Node> input;
-	Seed seed = 0x5EED;
-	int octaves = 1;
-	float amplitude = 1.0;
-	float frequency = 1.0f;
-	float lacunarity = 2.0f;
-	float persistence = 0.5f;
 
 	explicit inline NodeFractal(std::unique_ptr<Node> input) :
 			input(std::move(input)) {}

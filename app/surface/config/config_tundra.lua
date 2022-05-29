@@ -25,7 +25,7 @@ config = {
 	--numChunks = 9,
 	numChunks = 81,
 	--numChunks = 169,
-	numVeggie = 200,
+	numVeggie = 20000,
 	--numVeggie = 500,
 	--numVeggie = 1000,
 
@@ -47,19 +47,20 @@ biomes = {
 		vegetation = {
 			{
 				name = "tree",
+				model = "pine",
 				probability = 0.2,
-				path = "resource/tundra_tree.xyz",
+				--path = "resource/tundra_tree.xyz",
 				scale = range(0.5, 2.0),
-				hue = shift(0, 30), --0-360
+				hue = shift(0, 0), --0-360
 				saturation = shift(0.8, 0.1), --0-1
 				value = shift(0.8, 0.1), --0-1
 			},
 			{
-				name = "bush",
+				name = "oak",
 				probability = 0.2,
 				path = "resource/tundra_bush.xyz",
 				scale = range(0.5, 2.0),
-				hue = shift(0, 30), --0-360
+				hue = shift(0, 0), --0-360
 				saturation = shift(0.8,0.1), --0-1
 				value = shift(0.8,0.1), --0-1
 			},
@@ -77,7 +78,7 @@ biomes = {
 		},
 		vegetation = {
 			{
-				name = "tree",
+				name = "oak",
 				probability = 0.2,
 				path = "resource/tundra_tree.xyz",
 				scale = range(0.5, 2.0),
@@ -85,15 +86,15 @@ biomes = {
 				saturation = shift(0.7,0.1), --0-1
 				value = shift(0.6,0.1), --0-1
 			},
-			{
-				name = "bush",
-				probability = 0.2,
-				path = "resource/tundra_bush.xyz",
-				scale = range(0.5, 2.0),
-				hue = shift(110, 30), --0-360
-				saturation = shift(0.75,0.1), --0-1
-				value = shift(0.75,0.1), --0-1
-			},
+			--{
+			--	name = "bush",
+			--	probability = 0.2,
+			--	path = "resource/tundra_bush.xyz",
+			--	scale = range(0.5, 2.0),
+			--	hue = shift(110, 30), --0-360
+			--	saturation = shift(0.75,0.1), --0-1
+			--	value = shift(0.75,0.1), --0-1
+			--},
 		}
 	},
 	{
@@ -117,6 +118,8 @@ biomes = {
 			--},
 			{
 				name = "rock",
+				model = "rock",
+
 				probability = 0.8,
 				path = "resource/tundra_rock.xyz",
 				scale = range(0.5, 2.0),
@@ -147,6 +150,7 @@ biomes = {
 			--},
 			{
 				name = "rock",
+				model = "rock",
 				probability = 0.8,
 				path = "resource/tundra_rock.xyz",
 				scale = range(0.5, 2.0),
@@ -191,13 +195,16 @@ height = {
 					persistence = 0.5,
 				},
 			},
-			simplexFractal {
+			fractal {
 				seed = 2,
 				octaves = 10,
 				amplitude = 0.4,
 				frequency = 0.2,
 				lacunarity = 2.0,
 				persistence = 0.5,
+				simplex{
+					seed=123
+				}
 			},
 			--constant {
 			--	value = 0.5,

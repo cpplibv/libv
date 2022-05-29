@@ -3,6 +3,16 @@
 require("common/nodes")
 
 -- -------------------------------------------------------------------------------------------------
+local global_handover = {
+	soft = 0.2,
+	hard = 0.1
+}
+
+local global_takeover = {
+	soft = 0.35,
+	hard = 0.6
+}
+
 
 config = {
 	--currentScene = "temperature",
@@ -14,7 +24,12 @@ config = {
 	--treeSize = 0.003,
 	--circleNumber = 50,
 	--circleSize = 0.01,
-	numVeggie = 100,
+	fogIntensity = 0.02,
+	fogColor = "hsv(160, 70%, 75%)",
+	numVeggie = 50000,
+	skyboxTexture = "cube_nebula_green_0001.dds",
+	--skyboxTexture = "cube_redDesertNight.dds",
+	--skyboxTexture = "cube_AmbienceExposure4k.dds",
 
 --                      /\
 --  COLD|BARREN        /  \ Polar
@@ -67,112 +82,56 @@ config = {
 
 --not regions, biomes-forest types
 biomes = {
-	--{
-	--	name = "no-biome",
-	--	name = "polar",
-	--	name = "subpolar-boreal",
-	--	name = "temperate-rainforest",
-	--	name = "temperate-forest",
-	--	name = "temperate-grassland",
-	--	name = "tropical-savanna",
-	--{
-	--	name = "red",
-	--	dominance = 1.0,
-	--	coord = vec2f(0.3, 0.3),
-	--	cutOff = vec2f(0.3, 0.6),
-	--	colorGrad = {
-	--		--red
-	--		{0, "hsv(20, 100%, 30%)"},
-	--		{1, "hsv(20, 100%, 80%)"}
-	--	},
-	--	vegetation = {
-	--		{
-	--			name = "tree",
-	--			color = "hsv(25, 100%, 100%)",
-	--			size = 0.03,
-	--			probability = 0.2,
-	--		},
-	--		{
-	--			name = "bush",
-	--			color = "hsv(30, 100%, 100%)",
-	--			size = 0.02,
-	--			probability = 0.2,
-	--		}
-	--	}
-	--},
-	--{
-	--	name = "blue",
-	--	dominance = 1.0,
-	--	coord = vec2f(0.6, 0.6),
-	--	cutOff = vec2f(0.3, 0.6),
-	--	colorGrad = {
-	--		--blue
-	--		{0, "hsv(210, 70%, 30%)"},
-	--		{1, "hsv(210, 70%, 100%)"}
-	--	},
-	--	vegetation = {
-	--		{
-	--			name = "tree",
-	--			color = "hsv(210, 70%, 100%)",
-	--			size = 0.03,
-	--			probability = 0.2,
-	--		},
-	--		{
-	--			name = "bush",
-	--			color = "hsv(219, 70%, 100%)",
-	--			size = 0.02,
-	--			probability = 0.2,
-	--		}
-	--	}
-	--},
 	{
 		name = "dark-blue",
 		dominance = 1,
-		coord = vec2f(0.1, 0.9),
-		cutOff = vec2f(0.3, 0.9),
+		coord = vec2f(0.3, 0.1),
+		handover = global_handover,
+		takeover = global_takeover,
 		colorGrad = {
 			--blue
 			{0, "hsv(210, 70%, 30%)"},
-			{1, "hsv(210, 70%, 50%)"}
+			{1, "hsv(170, 30%, 70%)"}
 		},
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(210, 70%, 70%)",
-				size = 0.03,
-				probability = 0.2,
+				model = "rock",
+				scale = range(1.0, 2.0),
+				--hue = shift(20.0, 5.0),
+				--saturation = shift(0.0, 0.0),
+				--value = shift(0.0, 0.04),
+				hue = shift(100.0, 30.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.0, 0.0),
+				probability = 0.1,
 			},
-			{
-				name = "bush",
-				color = "hsv(219, 70%, 65%)",
-				size = 0.02,
-				probability = 0.2,
-			}
 		}
 	},
 	{
 		name = "green",
-		coord = vec2f(0.5, 0.8),
+		coord = vec2f(1.5, 0.8),
 		dominance = 1.0,
-		cutOff = vec2f(0.45, 0.5),
+		handover = global_handover,
+		takeover = global_takeover,
 		colorGrad = {
 			--green
 			{0, "hsv(120, 60%, 30%)"},
-			{1, "hsv(120, 60%, 100%)"}
+			{1, "hsv(120, 60%, 70%)"}
 		},
 		vegetation = {
 			{
 				name = "tree",
-				color = "hsv(125, 60%, 100%)",
-				size = 0.025,
-				probability = 0.2,
+				model = "pine",
+				scale = range(0.4, 0.8),
+				--hue = shift(20.0, 5.0),
+				--saturation = shift(0.0, 0.0),
+				--value = shift(0.0, 0.04),
+				hue = shift(80.0, 15.0),
+				saturation = shift(0.0, 0.0),
+				value = shift(0.00, 0.0),
+				probability = 1,
 			},
-			{
-				name = "bush",
-				color = "hsv(129, 60%, 100%)",
-				size = 0.022,
-				probability = 0.2,
-			}
 		}
 	},
 	--{
@@ -209,88 +168,142 @@ biomes = {
 }
 
 height = {
-	name = "height",
-	heightSensitivity = 0.0,
-	colorGrad = {
-		{ -1.0, "hsv(240, 80%, 20%)" },
-		{ -0.01, "hsv(240, 80%, 60%)" },
-		--{0.0 , "hsv(240, 70%, 99%)"},
-		{ 0.0, "hsv(220, 80%, 60%)" },
-		{ 0.01, "hsv(60, 80%, 90%)" },
-		{ 0.05, "hsv(120, 70%, 75%)" },
-		{ 0.1, "hsv(120, 100%, 50%)" },
-		{ 0.5, "hsv(120, 100%, 60%)" },
-		{ 0.6, "hsv(120, 60%, 60%)" },
-		{ 1.0, "hsv(220, 5%, 95%)" },
-		--{key = -2.0 ,value =  "blue"},
-		--{key = 0.0 , value = "yellow"},
-		--{key = 1.0 , value = "green"},
-		--{key = 2.0 , value = "grey"},
-		--[-2.0] = "blue",
-		--[0.0] = "yellow",
-		--[1.0] = "green",
-		--[2.0] = "grey",
-	},
-	nodes = pow {
-		exponent = 2.0,
-		--	}
-		--}
-		add {
-			--perlin{},
-			warp {
-				--value = 0.5,
-				seed = 423,
-				octaves = 5,
-				amplitude = 0.05,
-				frequency = 0.25,
-				lacunarity = 2.0,
-				persistence = 0.5,
-				--simplex{
-				--	seed = 126
-				--}
+	nodes =
+	add{
+		coord(0.1,0.1),
+		pow{
+			exponent = 0.8,
+			mix{
+
 				simplexFractal {
-					seed = 810,
+					seed = 435,
 					octaves = 6,
-					amplitude = 0.4,
-					frequency = 0.5,
+					amplitude = 0.5,
+					frequency = 0.01,
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
-			},
-			simplexFractal {
-				seed = 1,
-				octaves = 6,
-				amplitude = 0.2,
-				frequency = 0.2,
-				lacunarity = 2.0,
-				persistence = 0.5,
-			},
-			--simplexFractal {
-			--	seed = 1000,
-			--	octaves = 6,
-			--	amplitude = 0.6,
-			--	frequency = 0.2,
-			--	lacunarity = 2.0,
-			--	persistence = 0.5,
-			--},
-			constant {
-				value = 0.2
-			},
-			--cellular {
-			--	distanceFn = DistFun.manhattan,
-			--	returnType = ReturnType.distance2Div,
-			--	jitter = 1,
-			--},
+				min{
+					add{
+						simplexFractal {
+							seed = 123,
+							octaves = 6,
+							amplitude = 1,
+							frequency = 0.2,
+							lacunarity = 2.0,
+							persistence = 0.5,
+						},
+						constant{
+							value=0.5
+						}
+					},
+					add{
+						simplexFractal {
+							seed = 810,
+							octaves = 6,
+							amplitude = 1,
+							frequency = 0.2,
+							lacunarity = 2.0,
+							persistence = 0.5,
+						},
+						constant{
+							value=0.5
+						}
+					},
+				},
 
-		}
+
+				clamp{
+					add{
+						simplexFractal {
+							seed = 810,
+							octaves = 6,
+							amplitude = 1,
+							frequency = 0.1,
+							lacunarity = 2.0,
+							persistence = 0.5,
+						},
+						constant{
+							value=0.5
+						}
+					},
+
+					constant{
+						value=0
+					},
+					constant{
+						value=2
+					}
+				}
+			}
+
 	}
+
+	}
+
+
+
+
+	--pow {
+	--	exponent = 2.0,
+	--	--	}
+	--	--}
+	--	add {
+	--		--perlin{},
+	--		warp {
+	--			--value = 0.5,
+	--			seed = 423,
+	--			octaves = 5,
+	--			amplitude = 0.05,
+	--			frequency = 0.25,
+	--			lacunarity = 2.0,
+	--			persistence = 0.5,
+	--			--simplex{
+	--			--	seed = 126
+	--			--}
+	--			simplexFractal {
+	--				seed = 810,
+	--				octaves = 6,
+	--				amplitude = 0.4,
+	--				frequency = 0.5,
+	--				lacunarity = 2.0,
+	--				persistence = 0.5,
+	--			},
+	--		},
+	--		simplexFractal {
+	--			seed = 1,
+	--			octaves = 6,
+	--			amplitude = 0.2,
+	--			frequency = 0.2,
+	--			lacunarity = 2.0,
+	--			persistence = 0.5,
+	--		},
+	--		--simplexFractal {
+	--		--	seed = 1000,
+	--		--	octaves = 6,
+	--		--	amplitude = 0.6,
+	--		--	frequency = 0.2,
+	--		--	lacunarity = 2.0,
+	--		--	persistence = 0.5,
+	--		--},
+	--		constant {
+	--			value = 1
+	--		},
+	--		--cellular {
+	--		--	distanceFn = DistFun.manhattan,
+	--		--	returnType = ReturnType.distance2Div,
+	--		--	jitter = 1,
+	--		--},
+	--
+	--	}
+	--}
 }
 
 
 --heatMaps = {
 temperature = {
 	name = "temperature",
-	heightSensitivity = 5, --//200m-kent 1 fok
+	heightSensitivity = 0.4, --//200m-kent 1 fok
 	colorGrad = {
 		{ 0.0, "white" },
 		{ 1.0, "red" }
