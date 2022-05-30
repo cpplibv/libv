@@ -335,10 +335,11 @@ size_t TextLayout::getClosestCharacterIndexInline(libv::vec2f position) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f TextLayout::content(libv::vec2f new_limit) {
-	if (string_.empty())
-		return {0.f, 0.f};
-
 	const auto lineAdvance = font_->getLineAdvance(fontSize_);
+
+	if (string_.empty())
+		return {0.f, lineAdvance};
+
 	if (new_limit.x < 0.0f)
 		new_limit.x = std::numeric_limits<float>::max();
 
