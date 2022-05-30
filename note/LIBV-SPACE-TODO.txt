@@ -81,40 +81,16 @@ libv.math: gradient
 
 
 
-
+Evolving an Actor Library Based on Lessons Learned from Large-Scale Deployments - Benjamin Hindman
 https://www.youtube.com/watch?v=P6Y-Z1uPp4c
 
+Back to Basics: Concurrency - Mike Shah - CppCon 2021
+https://www.youtube.com/watch?v=pfIC-kle4b0
 
+Normal Maps, Tangent Space & IBL • Shaders for Game Devs [Part 3]
+https://www.youtube.com/watch?v=E4PHFnvMzFc
 
-
-
-Surface needs:
-	ui
-		! color picker
-		! gradient picker
-		style/property nesting
-		static composition
-		components
-			toggle
-			drop down
-			number input
-			number slider
-			color input
-				color picker
-			gradient input
-			tabs (card layout with controls)
-		default style sheet
-	options
-		store/load/save/track
-	args?
-	lua
-		track
-		include
-		hot reload
-	measurement (and monitoring)
-	threading
-		2D parallel scanning algorithms
-		work off-load to background thread
+visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 
 
 
@@ -126,6 +102,23 @@ Surface needs:
 
 
 
+
+ui
+	libv.ui: color picker
+	libv.ui: gradient picker
+	libv.ui: Component / Style composition (Tabs component)
+			style/property nesting
+			static composition
+	libv.ui: components
+		libv.ui: toggle
+		libv.ui: drop down
+		libv.ui: number input
+		libv.ui: number slider
+		libv.ui: color input
+			libv.ui: color picker
+		libv.ui: gradient input
+		libv.ui: tabs (card layout with controls)
+	libv.ui: default style sheet
 
 
 
@@ -241,6 +234,7 @@ app.space: During shutdown do not broadcast client disconnections one-by-one to 
 
 app.space: Low Performance P4: app.space: 200*200 debug sphere causes low fps
 		| debug shapes have to switch to pre-uploaded meshes
+		| and instanced rendering
 
 app.space: Bug P4: crash with assert
 	open server
@@ -258,6 +252,13 @@ app.space: Formation
 		Fleet-fleet merge
 
 -----------------------------------------------------------------
+
+TODO P1: Shortcut to save camera position and reload it upon restart
+         > Requires persistence
+TODO P1: Auto runtime hook option for random uniform variables
+TODO P1: Persist auto runtime hook options
+         > Requires persistence
+
 
 
 app.space: Controls: Clicking on shuffle button deselects
@@ -513,56 +514,10 @@ app.space: headless server
 	a separate executable needed without any symbol usage of non-headless gamemode
 
 
-visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
-
-watch shader part 3 https://www.youtube.com/watch?v=E4PHFnvMzFc
-
-
-What do I need from libv to make a 'minimal' working iris program?
-	libv.ui
-		2 List component
-		3 Scroll pane = scroll area + scroll bar + connecting them
-		5 Font outline render
-			freetype2 Now has an SDF render option
-			spread property set:
-				const FT_Int spread = 8;
-				FT_Property_Set(library, "sdf", "spread", &spread);
-				8bit uint normalized to [+spread .. -spread]
-			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
-
-	libv.ctrl
-		4 Interaction with UI
-		5 Resolve analog-binary accidental collusion with time
-
-	libv.serial
-		3 Safe container resize/reserve on deserialization
-
-	libv.update
-		Resource
-			1 Working resource download protocol
-			1 Update/Resource signature verification
-		Working update
-			1 Self update support
-			1 Marry Resource and Update
-		Deployment
-			2 Scripts to create a new build and deploy to libv.update servers
-
-	libv.state
-		5 Generated source for state machines
 
 blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
 		full screen quad pass with render_resolution / 2 with v blur shader
 		full screen quad pass with render_resolution / 2 with h blur shader
 		full screen quad pass with render_resolution / 8 with v blur shader
 		full screen quad pass with render_resolution / 8 with h blur shader
-
-
-
---- Article collection -----------------------------------------------------------------------------
-
-Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
-CMake source generation step: https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
-Deterministic Lockstep: https://gafferongames.com/post/deterministic_lockstep/
-
-Improving vegetation vertex normals: https://www.artstation.com/artwork/w6nQ96
 

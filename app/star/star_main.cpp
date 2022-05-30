@@ -1,6 +1,13 @@
 // Project: libv, File: app/star/star_main.cpp
 
+//// ext
+//#include <fmt/chrono.h>
+//#include <fmt/ostream.h>
+// libv
+#include <libv/arg/arg.hpp>
+#include <libv/utility/last_write_time.hpp>
 // std
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 // pro
@@ -11,29 +18,65 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: Shortcut to save camera position and reload it upon restart
-//          > Requires persistence
-// TODO P1: Auto runtime hook option for random uniform variables
-// TODO P1: Persist auto runtime hook options
-//          > Requires persistence
-
-// -------------------------------------------------------------------------------------------------
-
 int main(int argc, const char** argv) {
-	(void) argc;
-	(void) argv;
 
-//	libv::logger_stream.deny_below("libv.gl", libv::Logger::Severity::Info);
-//	libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
-//	libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
-//	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
-//	libv::logger_stream.deny_below("libv.net", libv::Logger::Severity::Info);
+	auto args = libv::arg::Parser("Star", "Star - System integration demo");
+
+//	const auto arg_config = args.require<std::string>
+//			("-c", "--config")
+//			("config", "Path to the config file")
+//			= "config_dunes.lua";
+
+	const auto arg_verbose = args.flag
+			("-v", "--verbose")
+			("verbose", "Enables verbose mode");
+
+	const auto arg_help = args.flag
+			("-h", "--help", "?", "-?")
+			("help", "Display the help message");
+
+//	args.positional(arg_config);
+
+	if (!args.standard_validate(argc, argv, std::cerr, 120))
+		return EXIT_FAILURE;
+
+	if (arg_verbose.value())
+		args.report(std::cout, 120);
+
+	if (arg_help.value()) {
+		args.usage(std::cout, 120);
+		return EXIT_SUCCESS;
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+//	if (!arg_verbose.value()) {
+//		libv::logger_stream.deny_below(libv::Logger::Severity::Info);
+////		libv::logger_stream.deny_below("libv.gl", libv::Logger::Severity::Info);
+////		libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
+////		libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
+////		libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
+////		libv::logger_stream.deny_below("libv.net", libv::Logger::Severity::Info);
+//	}
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;
 
 	try {
-		star::log_star.info("Hello Star! {}", star::version);
+//		static constexpr auto DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
+//		static constexpr auto DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
+//		static constexpr auto DEFAULT_PROJECT_FOLDER = "project";
+//
+//		const auto path = std::filesystem::path(argv[0]);
+//		const auto path_bin = path.filename();
+//		const auto path_dir = path.parent_path();
+//		const auto config_filename = std::filesystem::path(DEFAULT_CONFIG_FILENAME);
+//		const auto config_path = path_dir / config_filename;
+//		const auto lwt = libv::last_write_time(path);
+//		app::log_app.info("Current path  {}", std::filesystem::current_path().generic_string());
+//		app::log_app.info("Executable    {}/{}", path_dir.generic_string(), path_bin.generic_string());
+//		app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", lwt);
+		star::log_star.info("Star {}", star::version);
 
 		// Change working directory
 		if (std::filesystem::exists("app/star/"))

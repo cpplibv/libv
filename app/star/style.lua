@@ -103,6 +103,10 @@ ui.style("main-menu.version-lbl") {
 	--align_horizontal = "justify_all",
 	--anchor = "center_center",
 
+ui.style("settings") {
+	caret_color = {1, 1, 1, 1},
+}
+
 ui.style("settings.main") {
 	anchor = "center",
 	--size = "1r, 1r",

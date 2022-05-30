@@ -611,6 +611,7 @@ wish: use ProcessorCount instead of system call
 ext: Acquire a crypto lib
 ext: Acquire a hashing lib (the MD5 will not be enough forever)
 libv: Move from std::holds_alternative to std::get_if
+libv.glr: UniformBlockSharedView_std140
 
 
 
@@ -620,6 +621,47 @@ libv: Move from std::holds_alternative to std::get_if
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+
+
+
+
+
+
+
+
+
+What do I need from libv to make a 'minimal' working iris program?
+	libv.ui
+		2 List component
+		3 Scroll pane = scroll area + scroll bar + connecting them
+		5 Font outline render
+			freetype2 Now has an SDF render option
+			spread property set:
+				const FT_Int spread = 8;
+				FT_Property_Set(library, "sdf", "spread", &spread);
+				8bit uint normalized to [+spread .. -spread]
+			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
+
+	libv.ctrl
+		4 Interaction with UI
+		5 Resolve analog-binary accidental collusion with time
+
+	libv.serial
+		3 Safe container resize/reserve on deserialization
+
+	libv.update
+		Resource
+			1 Working resource download protocol
+			1 Update/Resource signature verification
+		Working update
+			1 Self update support
+			1 Marry Resource and Update
+		Deployment
+			2 Scripts to create a new build and deploy to libv.update servers
+
+	libv.state
+		5 Generated source for state machines
 
 
 
@@ -1342,7 +1384,6 @@ libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<
 libv.glr: Mesh attributes should use a single VBO
 
 libv.glr: Procedural gizmo mesh
-libv.glr: UniformBlockSharedView_std140
 
 
 --- Checkpoint ---
@@ -1400,7 +1441,6 @@ cpp: enun class default underlying type is int, specify underlying type for ever
 cpp: check if every possible operator had been made to a hidden friend
 cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
 libv.gl: use mdspan for image updates instead of raw loops
-libv.gl: glReadBuffer and glDrawBuffer | not urgent as the defaults are correct
 libv.gl: learn glPixelStore / implement
 libv.gl: glsl preprocessor support for "#pragma vertex" and "#pragma fragment" to auto split files, useful for small test and debug shaders
 

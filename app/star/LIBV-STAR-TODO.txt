@@ -1,0 +1,41 @@
+
+Star - System integration demo
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+app.star: Settings page back clear the focus while apply will rotate it to next
+
+
+
+
+options
+	store/load/save/track
+
+app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
+
+app.star: Self-Updater
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- Article collection -----------------------------------------------------------------------------
+
+Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+CMake source generation step: https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
+Deterministic Lockstep: https://gafferongames.com/post/deterministic_lockstep/
+
+Improving vegetation vertex normals: https://www.artstation.com/artwork/w6nQ96
+

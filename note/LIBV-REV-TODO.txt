@@ -26,6 +26,8 @@ libv.rev: Move files: internal_ to internal/internal_
 libv.rev: Move files: glsl_ to glsl/glsl_
 libv.rev: Move files: *shader* to resource/*shader*
 libv.utility: xoroshiro128 shall handle {0,0} as low quality input
+libv.gl: Add support for glDrawBuffers https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawBuffers.xhtml
+libv.glr: Add support for glDrawBuffers
 
 
 
@@ -161,12 +163,9 @@ libv.gl: Add support for anisotropic filtering (not always available)
 libv.glr: Add support for anisotropic filtering
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
 			glGenerateMipmap(GL_TEXTURE_2D);
+libv.rev: Add support for anisotropic filtering
 
 
-libv.gl: Add support for glDrawBuffers https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawBuffers.xhtml
-		| Might not be necessary | Maybe needed for a shadow pass
-libv.glr: Add support for glDrawBuffers
-		| Might not be necessary | Maybe needed for a shadow pass
 
 libv.glr: Add support for GL_TEXTURE_COMPARE_MODE
 libv.glr: Add support for GL_TEXTURE_COMPARE_FUNC

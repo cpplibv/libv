@@ -1,18 +1,8 @@
 // Project: libv, File: app/vm4_viewer/main.cpp
 
-// libv
-#include <libv/utility/last_write_time.hpp>
-// ext
-#include <fmt/chrono.h>
-#include <fmt/ostream.h>
-// std
-#include <filesystem>
-#include <iostream>
-#include <chrono>
+
 // pro
-#include <vm4_viewer/config.hpp>
 #include <vm4_viewer/frame.hpp>
-#include <vm4_viewer/log.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -39,29 +29,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr auto DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
-static constexpr auto DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
-static constexpr auto DEFAULT_PROJECT_FOLDER = "project";
-
-// -------------------------------------------------------------------------------------------------
-
 int main(int argc, const char** argv) {
-	std::cout << libv::logger_stream;
-//	libv::logger_stream.deny_below(libv::Logger::Severity::Info);
-
-	const auto path = std::filesystem::path(argv[0]);
-	const auto path_bin = path.filename();
-	const auto path_dir = path.parent_path();
-	const auto config_filename = std::filesystem::path(DEFAULT_CONFIG_FILENAME);
-	const auto config_path = path_dir / config_filename;
-	const auto lwt = libv::last_write_time(path);
-
-	app::log_app.info("Current path  {}", std::filesystem::current_path().generic_string());
-	app::log_app.info("Executable    {}/{}", path_dir.generic_string(), path_bin.generic_string());
-	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", lwt);
-//	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", fmt::localtime(std::chrono::system_clock::to_time_t(lwt)));
-
-	app::ConfigViewer config(config_path);
 
 	{
 		app::VM4ViewerFrame frame{config};

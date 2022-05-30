@@ -29,12 +29,12 @@ namespace star {
 struct ImplGameClient {
 	std::shared_ptr<ClientConfig> settings_;
 
+	libv::ui::UI ui;
+
 	GameClientFrame frame;
 
 	libv::Nexus nexus_;
 //	libv::ctrl::Controls controls;
-
-	libv::ui::UI ui;
 
 //	Renderer renderer{ui};
 //
