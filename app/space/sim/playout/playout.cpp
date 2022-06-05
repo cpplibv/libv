@@ -60,7 +60,8 @@ void Playout::update(time_duration delta_time) {
 
 	stateChangeEntries.clear();
 
-	simulation->update(delta_time); // !!! Sim time not delta time, or playout licensed tick count
+	// TODO P1: app.space: Sim time not delta time, or playout licensed tick count
+	simulation->update(delta_time);
 }
 
 // -------------------------------------------------------------------------------------------------

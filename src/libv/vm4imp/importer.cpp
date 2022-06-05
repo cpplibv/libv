@@ -250,6 +250,9 @@ public:
 					vertex.texture0 = libv::vec::from_xy(mesh->mTextureCoords[0][j]);
 
 				if (mesh->HasBones()) {
+//					mesh->mBones[0]->mName
+//					mesh->mBones[0]->mNumWeights
+//					mesh->mBones[0]->mWeights
 					//vertex.boneID = vec4i();
 					//vertex.boneWeight = vec4();
 				}

@@ -91,7 +91,7 @@ namespace detail { // ----------------------------------------------------------
 template <typename T>
 		requires std::is_arithmetic_v<T>
 constexpr inline void parser_function(T& value, std::string_view str, OutcomeArgumentParse& outcome) {
-	std::from_chars_result result = std::from_chars<T>(str.begin(), str.end(), value);
+	std::from_chars_result result = std::from_chars(str.data(), str.data() + str.size(), value);
 	std::error_code ec = std::make_error_code(result.ec);
 
 	// TODO P4: Use libv.utility parse_number
@@ -322,6 +322,7 @@ public:
 class Parser {
 	std::string program_name;
 	std::string program_description;
+	std::string executable_path_;
 
 	std::unordered_map<std::string, std::shared_ptr<BaseArgument>> identifiers;
 	std::vector<std::shared_ptr<BaseArgument>> arguments;
@@ -346,6 +347,7 @@ public:
 	}
 
 public:
+//	Argument<std::string> exe() {
 //	Builder<Require<std::string>> exe() {
 //		if (!arg_exe)
 //			arg_exe = std::make_shared<Require<std::string>>("exe");
@@ -427,6 +429,9 @@ public:
 	bool parse(const int argc, const char* const* argv) {
 		std::size_t positional_index = 0;
 
+		if (argc > 0)
+			executable_path_ = argv[0];
+
 		for (int i = 1; i < argc; ++i) {
 			BaseArgument* selected;
 
@@ -505,6 +510,9 @@ public:
 
 	std::ostream& report(std::ostream& os, int width = 120) const {
 		(void) width; // TODO P5: libv.arg: use width
+
+		if (!executable_path_.empty())
+			os << "Executable path: " << executable_path_ << "\n";
 
 		if (!arguments.empty())
 			os << "Parsed arguments:\n";

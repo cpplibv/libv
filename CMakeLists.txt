@@ -33,7 +33,6 @@ message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-# TODO P2: wish: debug symbol automated turn on/off
 # TODO P3: wish: add support for skipping library build/links via directly amending the sources of a dependency (only for DEV build)
 # TODO P4: wish: inheritance for wish_create_executable and create_library
 # TODO P5: wish: modernize based on (GLOB will stay tho): https://www.youtube.com/watch?v=bsXLMQ6WgIk
@@ -627,7 +626,7 @@ wish_create_external(
 wish_create_external(
 	NAME vide
 	GIT_REPOSITORY https://github.com/cpplibv/vide.git
-	GIT_TAG 40f6709e0a7b0d88d519c0d85d7e2c9d1a807325
+	GIT_TAG 0a8204b7d4e2ae83540cb8418efd21157f8202ab
 #	GIT_REPOSITORY /e/dev/cpp/forks/vide
 #	GIT_TAG dev
 	CMAKE_ARGS
@@ -962,8 +961,8 @@ wish_create_executable(
 #	LINK   libv_update
 #
 #	LINK   libv_net libv_process
-#	LINK   libv_diff # <<< P4: Just for testing
-#	LINK   libv_serial # <<< P4: Just for testing
+#	LINK   libv_diff # Just for testing
+#	LINK   libv_serial # Just for testing
 #)
 #
 #wish_create_executable(
@@ -998,8 +997,8 @@ wish_create_executable(
 #	SOURCE app/update/create_update.cpp
 #	LINK   libv_log libv_arg libv_diff
 #	LINK   libv_serial
-#	LINK   libv_process # <<< P4: Just for testing
-#	LINK   update_common # <<< P4: Just for testing
+#	LINK   libv_process # Just for testing
+#	LINK   update_common # Just for testing
 #)
 #
 #wish_create_executable(
@@ -1007,8 +1006,8 @@ wish_create_executable(
 #	SOURCE app/update/apply_update.cpp
 #	LINK   libv_log libv_arg libv_diff
 #	LINK   libv_serial
-#	LINK   libv_process # <<< P4: Just for testing
-#	LINK   update_common # <<< P4: Just for testing
+#	LINK   libv_process # Just for testing
+#	LINK   update_common # Just for testing
 #)
 #
 #add_custom_target(update DEPENDS update_client update_server apply_update create_update resource_server)

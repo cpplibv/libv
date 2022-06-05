@@ -124,13 +124,8 @@ SceneMenuBar::~SceneMenuBar() {
 	nexus.disconnect_all(this);
 }
 
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// <<< Do not forget about the prettier API (auto c = container.add<Component>())
 
-
-
+// Ideas for prettier APIs
 //libv::ui::Component create_hud_styled_build_chain(
 //		PlayoutDelayBuffer& playout_delay_buffer,
 //		SpaceSession& space_session,

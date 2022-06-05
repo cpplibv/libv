@@ -8,20 +8,10 @@
 
 
 
-
-
-
-
-
-kill sprite index VBO
+kill sprite index VBO, reuse and share one index VBO (libv.glr mesh support to adopt VAO as index)
 
 remember last config
 priority sorting
-
-
-
-
-
 
 seed a non-seeded noise : random x y offset and rotation, mat3
 
@@ -108,58 +98,7 @@ Big things left
 	Veggi type
 
 
-
-=== DONE ========================================================================================
-
-
-
-
-DONE: next step: mesh triangle strips, shader a depth miatt (flat)
-DONE: bug image size (heightMap.storage meret allitas is kell)
-only build mesh when change
-Rename Surface to Chunk
-03.09: Add gradient to heightmap
-simplify pointInTriangle bc its |_ triangle
-hotkey for switching between wire and fill
-TODO revive texture
-
-
-
- regenerate surface/chunk (to test the generation working)
- do not clear old chunk data, let the regeneration clear chunks
-     config selection with cycle
-
- vegi range limit (just first x chunk, just y height)
- Config
- 	unsubscribe or subscribe to folder
- 	dynamic configPathList filling
- 		std::file_system recursive, wild card matching
-    command line argument for config - libv::arg::Parser vagy kezzel
-    ui label
-
-
-
-
 === Queue ========================================================================================
-
-dont rebuild everything for every update (1, 12, 123 stb) chunk, veggie check
-
-nodes
- 	coordinate (vec2 scale) dot product
- 	smooth step, sin
- 	remap
-
- create your own good looking surface config
- 	warp + cellular = cserepes talaj
- frustum culling
- toggle freeze
-Veggi instantiation
-Smooth cutoff/cutin Biome blending
- =================================================================================================
-
-
-
-horizontal expansion
 
 
 LOD
@@ -168,8 +107,8 @@ priority based generation order and rendering
 config
 	remember last: profile file, json (libv::serial)
 
-additional nodes
-	curve/envelop, tangens
+Additional nodes:
+	curve/envelop, tangens, remap, height
 
 
 
@@ -230,16 +169,8 @@ EPICS:
 		vegetation textures
 
 
-BUG: Pixel ismetles
-hook shader error overlay
 3D noise algok:
-	DONE: seed csere
 	time-mal menni z koordinatan
-
-template for supporting simd
-	WIP: simd vec4f x, vec4f y, int seed
-	almost done: template noise methods
-	template util methods
 
 generation limit 16ms {seed, center_x, center_y, pregenerated_data} -> chunk
 	multithreading, better containers
@@ -342,6 +273,7 @@ SurfaceViewer
 
 
 === OUT OF SCOPE ===================================================================================
+
 picture in picture: simultaneous visualization of 2D and 3D views, both with possible intermediate result/value vis.
 
 pop hatas elkerules: geomorphing (x, y, z1, z2)
@@ -362,11 +294,9 @@ lakes
  vizszint megadasa (0- vizszint + 5)
  folyo shader <- designer rakta le a folyot
 
- =================================================================================================
+==================================================================================================
 
-
-FastNoiseLite(int seed = 1337)
-{
+FastNoiseLite(int seed = 1337) {
 	mSeed = seed;
 	mFrequency = 0.01f;
 	mNoiseType = NoiseType_OpenSimplex2;
@@ -390,7 +320,6 @@ FastNoiseLite(int seed = 1337)
 	mFractalBounding = 1 / 1.75f;
 	mDomainWarpAmp = 1.0f;
 }
-
 
 
 #pragma glslify: _warpRegular = require('./gl-noise/warpRegular.glsl', NOISE_FUN=fbmNoiseDual3D_warp, WarpParams=WarpParams)
@@ -471,3 +400,7 @@ vec2 fbmNoiseDual3D( vec3 pos, FbmNoiseParams noise ) {
 
 
 vec2 identity( vec2 value, WarpParams warp ) { return value; }
+
+--- Art collection ---------------------------------------------------------------------------------
+
+Sand Dunes: https://www.artstation.com/artwork/9NOvbo

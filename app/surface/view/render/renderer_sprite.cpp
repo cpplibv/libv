@@ -156,7 +156,7 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 		const auto eye = glr.eye();
 		const auto chunkPosition = index.template cast<float>() * 32.0f;
 		const auto threshold = worldRangeUnloadRender;
-		if (libv::length_sq(xy(eye) - chunkPosition) > threshold * threshold) { // !!! Constants regarding size and chunk count
+		if (libv::length_sq(xy(eye) - chunkPosition) > threshold * threshold) { // TODO P1: app.surface: Constants regarding size and chunk count
 //			log_surface.error("Destroying render mesh {} (range: {}) eye {}", index, libv::length(xy(eye) - chunkPosition), eye);
 			return true;
 		}

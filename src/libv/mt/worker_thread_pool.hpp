@@ -18,7 +18,7 @@ namespace mt {
 class impl_worker_thread_pool;
 
 class worker_thread_pool {
-	std::unique_ptr<impl_worker_thread_pool> self;
+	std::shared_ptr<impl_worker_thread_pool> self;
 
 public:
 	explicit worker_thread_pool(std::size_t n, std::string name = "unnamed-pool");

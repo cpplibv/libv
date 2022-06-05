@@ -92,13 +92,13 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 
 //		const auto eye = glr.eye();
 //		const auto chunkPosition = libv::vec3f(index.template cast<float>() * 32.0f, 0);
-//		if (libv::length_sq(eye - chunkPosition) > 32.f * 32.f * 8.f * 8.f) // !!! Constants regarding size and chunk count
+//		if (libv::length_sq(eye - chunkPosition) > 32.f * 32.f * 8.f * 8.f) // TODO P1: app.surface: Constants regarding size and chunk count
 //			return true;
 
 		const auto eye = glr.eye();
 		const auto chunkPosition = index.template cast<float>() * 32.0f;
 		const auto threshold = worldRangeUnloadRender;
-		if (libv::length_sq(xy(eye) - chunkPosition) > threshold * threshold) { // !!! Constants regarding size and chunk count
+		if (libv::length_sq(xy(eye) - chunkPosition) > threshold * threshold) { // TODO P1: app.surface: Constants regarding size and chunk count
 //			log_surface.error("Destroying render mesh {} (range: {}) eye {}", index, libv::length(xy(eye) - chunkPosition), eye);
 			return true;
 		}

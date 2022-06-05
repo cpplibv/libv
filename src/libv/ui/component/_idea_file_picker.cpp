@@ -25,7 +25,6 @@
 ////#include <libv/ui/shader/shader_font.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 //#include <libv/ui/shader/shader_image.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 ////#include <libv/ui/shader/shader_quad.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
-//#include <libv/utility/generic_path.hpp>
 //// std
 ////#include <sstream>
 //// pro

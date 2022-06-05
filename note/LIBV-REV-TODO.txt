@@ -59,6 +59,24 @@ libv.glr: Add support for glDrawBuffers
 
 
 
+vec2 dirToRectilinear(vec3 dir) {
+	float x = atan2(dir.y, dir.x) / tau + 0.5;
+	float y = dir.z * 0.5 + 0.5;
+	return vec2(x, y);
+}
+
+read:
+	https://open.gl/feedback
+	https://ogldev.org/www/tutorial28/tutorial28.html
+
+
+place.it:
+	forward+ rendering with 2 pass: forward base + forward add ('base' only uses sun, 'add' does every other lighting as additive)
+	free high quality textures: https://quixel.com/megascans/free
+
+libv.vm4: remove bitangent from the model format and calculate it on the fly as cross(normal, tangent) (or cross(normal, tangent))
+app.mimp: check last write time, and skip anything who doesn't needs to be updated unless the mimp version changed (more like the exe lwt changed)
+
 
 
 libv.rev: builtin:cube (XYZ cube)

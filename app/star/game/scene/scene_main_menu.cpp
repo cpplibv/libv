@@ -97,7 +97,7 @@ libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
 					btn.style("main-menu.menu.entry");
 					btn.text("Exit");
 					btn.event().submit.connect([&gameClient] {
-						gameClient.nexus().broadcast(RequestClientExit());
+						gameClient.nexus().broadcast_global(RequestClientExit());
 					});
 					menu_box.add(std::move(btn));
 				}
@@ -113,7 +113,7 @@ libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
 	} {
 		libv::ui::Label lbl("version_lbl");
 		lbl.style("main-menu.version-lbl");
-		lbl.text(star::version);
+		lbl.text(star::build.version_name);
 		layers.add(std::move(lbl));
 	}
 

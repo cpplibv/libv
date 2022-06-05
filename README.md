@@ -2,50 +2,51 @@
 
 LIBV is a library collection that contains a lot of reusable code.  
 
-The library collection is not complete and based on its structure and objective it most likely will always keep evolving.
-But, many of the contained libraries are design complete and their high quality API can be considered stable.  
-Documentation is sparse, but for most cases the strict conventions and code quality should be sufficiently high enough to be self documenting.  
 Feature development is mostly on-demand, but most library were designed in a bottom-top manner.  
+Documentation is sparse, but for most cases the strict conventions and code quality should be sufficiently high enough to be self documenting.  
 
 ## Libraries
 
- Library      | Status       | Description
-:------------ |--------------|:--------------------------------------------------------------
-algo          | stable       |
-arg           | stable       | Light command line argument parser
-color         | -            | Early idea
-container     | stable       |
-ctrl          | stable       | Input event processing and routing library
-diff          | stable       | Patch creator and applier library
-ecs           | experimental | Entity component system
-frame         | stable       | A Frame handler library for OpenGL contexts and event handling
-fsw           | stable       | File system watcher
-gl            | stable       | A C++ OpenGL API wrapper library
-glr           | experimental | A Remote / Deferred OpenGL renderer library
-hash          | stable       | Various hash function library
-img           | experimental | Image loader and saver library
-input         | stable       | Light input enum and input event type container library
-log           | stable       | Logging library
-lua           | stable       | Lua binding for libv types and utilities
-math          | stable       |
-meta          | stable       | Meta programming utilities and reflection facilities
-mt            | experimental | Various thread utility classes and functions
-net           | experimental |
-parse         | stable       | Various parsers based on boost::spirit::x3
-process       | experimental | Inter-process utilities
-range         | stable       | Various range views based on range::v3
-rev           | experimental | Higher level render engine above on libv.glr
-security      | stable       | Some hashing and RSA related wrapper over OpenSSL
-serial        | stable       | Serialization library
-sys           | stable       | Poratable wrapper for some OS features
-sig           | deprecated   | A Signal-Slot paradigm implementation
-sig2          | stable       | Not published yet
-state         | experimental | State machine library / wrapper
-ui            | experimental | GUI library above openGL
-update        | experimental | Application (self) updater library for both client, server and master side
-utility       | stable       | Various utility classes and functions
-vm4           | unstable     | VM4 model and animation format
-vm4imp        | stable       | VM4 model format importer
+Most of the libraries in the collection are design complete and can be considered stable, but the collection
+prioritizes research and velocity over stability.  
+
+| Library   | Status / API | Description                                                                |
+|:----------|--------------|:---------------------------------------------------------------------------|
+| algo      | Stable       |                                                                            |
+| arg       | Stable       | Light command line argument parser                                         |
+| color     | Idea         | Early idea                                                                 |
+| container | Stable       |                                                                            |
+| ctrl      | Stable       | Input event processing and routing library                                 |
+| diff      | Stable       | Patch creator and applier library                                          |
+| ecs       | Experimental | Entity component system                                                    |
+| frame     | Stable       | A Frame handler library for OpenGL contexts and event handling             |
+| fsw       | Stable       | File system watcher                                                        |
+| gl        | Stable       | A C++ OpenGL API wrapper library                                           |
+| glr       | Experimental | A Remote / Deferred OpenGL renderer library                                |
+| hash      | Stable       | Various hash function library                                              |
+| img       | Experimental | Image loader and saver library                                             |
+| input     | Stable       | Light input enum and input event type container library                    |
+| log       | Stable       | Logging library                                                            |
+| lua       | Stable       | Lua binding for libv types and utilities                                   |
+| math      | Stable       |                                                                            |
+| meta      | Stable       | Meta programming utilities and reflection facilities                       |
+| mt        | Experimental | Various thread utility classes and functions                               |
+| net       | Experimental |                                                                            |
+| parse     | Stable       | Various parsers based on boost::spirit::x3                                 |
+| process   | Experimental | Inter-process utilities                                                    |
+| range     | Stable       | Various range views based on range::v3                                     |
+| rev       | Experimental | Higher level render engine above on libv.glr                               |
+| security  | Stable       | Some hashing and RSA related wrapper over OpenSSL                          |
+| serial    | Stable       | Serialization library. Light-weight wrapper over Vide                      |
+| sys       | Stable       | Portable wrapper for some OS features                                      |
+| sig       | Deprecated   | A Signal-Slot paradigm implementation                                      |
+| sig2      | Stable       | Not published yet                                                          |
+| state     | Experimental | State machine library / wrapper                                            |
+| ui        | Experimental | GUI library above openGL                                                   |
+| update    | Experimental | Application (self) updater library for both client, server and master side |
+| utility   | Stable       | Various utility classes and functions                                      |
+| vm4       | Unstable     | VM4 model and animation format                                             |
+| vm4imp    | Stable       | VM4 model format importer                                                  |
 
 ## Install
 
@@ -54,7 +55,8 @@ To create a proper packaging I am waiting on the C++ packaging and dependency ma
 but even without fully adopting the whole library collection, I made it available and open source, so it might help out some.
 
 Building the libraries is possible with the usual CMake method except 
-fetching the dependencies the `ext` target has to be built first (This step is only required for the first time and when the dependencies change).
+during the first build the `ext` target has to be built to fetch the dependencies 
+(This step is only required for the first time and when the dependencies change).
 
 ## License
 

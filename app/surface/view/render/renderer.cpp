@@ -274,7 +274,7 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 }
 
 void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	// !!! P3: Rebuild is too expensive on each frame
+	// TODO P1: app.surface: Rebuild is too expensive on each frame
 
 	if (dirty) {
 		build_points_mesh(mesh_point);
@@ -472,7 +472,7 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 ////	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4");
 ////	log_surface.fatal("load_or_throw...");
 ////	auto model_t = libv::vm4::load_or_throw(file);
-////	// !!! exception from here gets silently ignored
+////	// TODO P1: app.surface: exception from here gets silently ignored
 ////	log_surface.fatal("done...");
 ////
 ////	model.emplace(std::move(model_t));

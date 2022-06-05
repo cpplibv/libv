@@ -5,7 +5,6 @@
 #include <libv/mt/hardware_concurrency.hpp>
 #include <libv/mt/worker_thread_pool.hpp>
 #include <libv/serial/archive/binary.hpp>
-#include <libv/utility/generic_path.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
@@ -29,7 +28,7 @@ bool execute_import(const std::string& path) {
 	const auto output_path = std::filesystem::path(path).replace_extension("vm4").generic_string();
 	const auto script_path = std::filesystem::path(path).replace_extension("lua").generic_string();
 
-//	if (!std::filesystem::is_regular_file(script_path)) return false; // !!! just to only run 1
+//	if (!std::filesystem::is_regular_file(script_path)) return false; // For testing just to only run one
 
 	libv::vm4::log_vm4.info("Importing {}...", path);
 	auto model = libv::vm4::import(path);
@@ -44,7 +43,7 @@ bool execute_import(const std::string& path) {
 	}
 
 	if (model) {
-		libv::vm4::log_vm4.info("Saving    {}...", libv::generic_path(output_path));
+		libv::vm4::log_vm4.info("Saving    {}...", output_path);
 
 		std::ofstream ofs(output_path, std::ios::out | std::ios::binary);
 		libv::archive::BinaryOutput oar(ofs);

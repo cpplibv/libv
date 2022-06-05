@@ -19,10 +19,10 @@ template <typename S, typename T>
 static constexpr bool similar_v = std::is_same_v<std::decay_t<S>, std::decay_t<T>>;
 
 template <typename S, typename T>
-using Similar = std::enable_if_t<similar<S, T>::value>;
+using Similar = std::enable_if_t<similar_v<S, T>>;
 
 template <typename S, typename T>
-using NotSimilar = std::enable_if_t<!similar<S, T>::value>;
+using NotSimilar = std::enable_if_t<!similar_v<S, T>>;
 
 // -------------------------------------------------------------------------------------------------
 

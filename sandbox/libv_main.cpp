@@ -658,6 +658,7 @@
 //}
 
 // =================================================================================================
+// === Code binary size tracking ===
 
 // libv
 #include <libv/algo/slice.hpp>
@@ -783,3 +784,35 @@ int main() {
 		return EXIT_FAILURE;
 	}
 }
+
+//// =================================================================================================
+//
+//#include <iostream>
+//#include <expected>
+//
+//
+//std::expected<int, std::error_code> foo() {
+//	return std::unexpected<std::error_code>{std::make_error_code(std::errc::invalid_argument)};
+////	return {52};
+//}
+//
+//int main() {
+////	std::expected<int, bool> var;
+////	var.emplace(45);
+////	var.emplace(false);
+//
+////	std::expected<int, int> var;
+////	var.emplace(45);
+////	var.emplace(std::unexpected<int>(45));
+////	var = std::unexpected<int>(45);
+//
+//	auto var = foo();
+//
+////	var = std::unexpect;
+////	var.emplace(std::unexpect, false);
+//
+//	if (var)
+//		std::cout << "Value: " << var.value() << std::endl;
+//	else
+//		std::cout << "Error: " << var.error() << std::endl;
+//}

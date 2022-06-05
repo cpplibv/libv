@@ -47,7 +47,8 @@ public:
 	//Universe& universe;
 	Playout& playout;
 
-	libv::ctrl::Controls& controls; // !!! Should not store it (?) only to bypass controls invalidation issue
+	// TODO P1: app.space: Should not store it (?) only to bypass controls invalidation issue
+	libv::ctrl::Controls& controls;
 
 	CameraPlayer camera;
 	CameraPlayer::screen_picker screen_picker;

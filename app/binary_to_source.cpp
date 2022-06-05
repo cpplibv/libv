@@ -7,8 +7,8 @@
 #include <libv/utility/concat.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
-#include <libv/utility/generic_path.hpp>
 // std
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 
@@ -53,7 +53,7 @@ std::pair<void*, std::size_t> {function_name}() {{
 int main(int argc, const char** argv) {
 	if (argc != 3 && argc != 4) {
 		fmt::print("Expected 2 or 3 argument but received {}\n", argc);
-		fmt::print("Usage: {} <input_file> <output_file> [function_name]\n", libv::generic_path(argv[0]));
+		fmt::print("Usage: {} <input_file> <output_file> [function_name]\n", std::filesystem::path(argv[0]).generic_string());
 		return EXIT_FAILURE;
 	}
 

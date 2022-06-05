@@ -23,7 +23,7 @@ std::string debug_binary_as_json(std::span<const std::byte> message) {
 //		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
 //		SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(false, result);
 
-		// !!!
+		// TODO P1: app.space:
 
 //		libv::archive::BinaryInput iar(message);
 //		libv::archive::JSONAnyOutput oar(result);

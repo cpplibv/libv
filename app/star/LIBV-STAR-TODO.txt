@@ -6,57 +6,107 @@ Star - System integration demo
 
 
 
-wish: debug/dev/release artifact paths
-
-CMAKE_BUILD_TYPE
-
-
-
-OpenGL 4.5 Shall be the new baseline
-libv.gl: trace/debug log the capabilities (take care of that one that causes an error in 3.3 that would need 4.2)
-
-
-Build all with GCC 12 and cleanup warnings
 
 
 
 
 
+
+
+
+
+Things that I dont like:
+	- ! the way config update is hooked up to main loop
+		ugly, not automated
+		make sure that this not happen:
+			polling causes ui update to be delayed with 1 frame if placed wrongly
+				button.press -> handle event -> render old data
+					-> config update -> broadcast events -> update components -> render new data
+	- dirtyFile bool
+	- update function (polling) (the way the dirty container is drained)
+	- poll_warmup_cooldown
+
+config cleanup
+	includes
+	markers
+	comments
+	visibility
+
+
+
+
+
+
+
+
+
+star: settings cleanup
+	includes
+	markers
+	comments
+star: event > broadcast > event loop abortion logic
+star: "save/apply" preview and commit changes
+
+
+
+
+
+customization of behaviour:
+	on_corrupt_file::exit
+	on_corrupt_file::exit_and_alert
+	on_corrupt_file::prompt_user
+	on_corrupt_file::reset_to_default
+	on_corrupt_file::reset_to_default_and_alert
+
+	on_missing_file::create_default
+	on_missing_file::create_default_and_alert
+	on_missing_file::do_nothing
+	on_missing_file::exit
+	on_missing_file::exit_and_alert
+	on_missing_file::prompt_user
+
+	on_entry_change::auto_save(5s, 30s)
+	on_entry_change::do_nothing
+
+star: Settings
+	reset to default
+	grouping / separators / paging
+	tooltips with description
+
+	UI
+		libv.ui: radio button / radio group
+		libv.ui: toggle button
+
+
+
+
+
+
+
+libv.ui: .add<Component>() syntax on containers
+		const auto& c = container.add<Component>()
+		const auto& c = container.add_n<Component>("name")
+		const auto& c = container.add_ns<Component>("name", "style")
+		const auto& c = container.add_s<Component>("style")
+		extra args?:
+		const auto& c = container.add<Component>(args...)
+		const auto& c = container.add_n<Component>("name", args...)
+		const auto& c = container.add_ns<Component>("name", "style", args...)
+		const auto& c = container.add_s<Component>("style", args...)
+
+libv.ui: Solve the issue with inheriting state selectors
+
+libv.ui: Warn whenever a UI component out lives the UI object itself
+
+
+
+
+
+=================================================================================================
 
 
 app.star: Settings page back clear the focus while apply will rotate it to next
-
-
-
-
-options
-	store/load/save/track
-
 app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-
-
-options: store/load/save/track/delayed_save
-// !!! exception, handle, save, write, auto-save
-
-
-
-
-
-
-
-
-
-ClientConfig config;
-ConfigManager manager;
-
-manager.watch(config.graphics.msaa_enable, [](const auto& var) {
-	var
-
-
-
-
-
-
 
 
 
@@ -74,8 +124,14 @@ app.star: Self-Updater
 
 
 
+--- Paper ------------------------------------------------------------------------------------------
 
+Config:
+	Configuration > Setting > Property
 
+	Separate change and commit changes
+		only store the new values during change
+		during next frame loop apply change and broadcast events
 
 
 --- Article collection -----------------------------------------------------------------------------

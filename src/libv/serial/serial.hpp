@@ -13,5 +13,7 @@
 // -------------------------------------------------------------------------------------------------
 
 #define LIBV_SERIAL_EXTENSION_NAMESPACE vide
+#define LIBV_FUNCTION_NAME_SAVE VIDE_FUNCTION_NAME_SAVE
+#define LIBV_FUNCTION_NAME_LOAD VIDE_FUNCTION_NAME_LOAD
 
 // -------------------------------------------------------------------------------------------------

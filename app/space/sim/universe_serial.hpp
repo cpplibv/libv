@@ -58,7 +58,8 @@ template <typename Archive> void Universe::serialize(Archive& ar) {
 	ar(LIBV_NVP(galaxy));
 
 	ar(LIBV_NVP_NAMED("factionNeutral", SerialID{factionNeutral_}));
-	ar(LIBV_NVP_NAMED("factionControlled", SerialID{factionControlled_})); // !!! factionControlled placement )?
+	// TODO P1: app.space: factionControlled placement )?
+	ar(LIBV_NVP_NAMED("factionControlled", SerialID{factionControlled_}));
 
 //	ar(LIBV_NVP(selectedFleetIDList), SnapshotType::local);
 	if (ar.isLocal())

@@ -23,20 +23,21 @@ private:
 	std::unique_ptr<ImplGameClient> self;
 
 public:
-	explicit GameClient(const std::filesystem::path& settingsFilepath);
+	explicit GameClient(const std::filesystem::path& configFilepath);
 	~GameClient();
 
 private:
 	void register_nexus();
 	void unregister_nexus();
 	void init_ui();
+	void update();
 
 public:
 	void run();
 
 public:
-	[[nodiscard]] libv::Nexus& nexus() noexcept;
-	[[nodiscard]] const std::shared_ptr<ClientConfig>& settings() const noexcept;
+	[[nodiscard]] libv::Nexus2& nexus() noexcept;
+	[[nodiscard]] std::shared_ptr<ClientConfig> config() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

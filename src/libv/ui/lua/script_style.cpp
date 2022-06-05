@@ -842,16 +842,16 @@ void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
 
 		if (!result.valid()) {
 			sol::error err = result;
-			return log_ui.error("Script execution failed: {}", err.what());
+			return log_ui.error("Style script execution failed: {}", err.what());
 		}
 
 		if (result.get_type() != sol::type::none)
-			log_ui.warn("Script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
+			log_ui.warn("Style script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
 
-		log_ui.info("Script loading successful in {:7.3f}ms", timer.timef_ms().count());
+		log_ui.info("Style script loading successful in {:7.3f}ms", timer.timef_ms().count());
 
 	} catch (const std::exception& e) {
-		log_ui.error("Script execution failed: {}", e.what());
+		log_ui.error("Style script execution failed: {}", e.what());
 	}
 }
 

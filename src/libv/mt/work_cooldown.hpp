@@ -13,7 +13,7 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Deduplicates work execution requests after an execution for a cooldown period.
+/// Deduplicates work execution requests: after an execution for a cooldown period.
 /// - The first request while idle is scheduled immediately, enters cooldown.
 /// - The first request during the cooldown is rescheduled after the cooldown ends and extends the cooldown.
 /// - Repeated requests during the cooldown are discarded.
@@ -58,9 +58,9 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-/// Deduplicates work execution requests before an execution for a warmup and after it for a cooldown period.
+/// Deduplicates work execution requests: before an execution for a warmup, and after it for a cooldown period.
 /// - The first request while idle is rescheduled after the warmup ends, enters warmup.
-/// - Requests during the warmup are discarded.
+/// - Repeated requests during the warmup are discarded.
 /// - Once the warmup period ends it executes the request and enters cooldown.
 /// - The first request during the cooldown is rescheduled after the cooldown ends and extends the cooldown.
 /// - Repeated requests during the cooldown are discarded.
@@ -108,9 +108,9 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-/// Deduplicates work execution requests before an execution for a warmup period.
+/// Deduplicates work execution requests: before an execution for a warmup period.
 /// - The first request while idle is rescheduled after the warmup ends, enters warmup.
-/// - Requests during the warmup are discarded.
+/// - Repeated requests during the warmup are discarded.
 /// - Once the warmup period ends it executes the request and returns to idle.
 class work_warmup {
 private:

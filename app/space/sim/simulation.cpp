@@ -148,7 +148,7 @@ std::string Simulation::debugAsJson() const {
 SnapshotHash Simulation::hashState() const {
 //	SnapshotArchive<libv::archive::BasicHasher> oar{isLocal, snapshot.data};
 //	0;
-	// !!!
+	// TODO P1: app.space:
 	return SnapshotHash{0};
 }
 
@@ -166,7 +166,7 @@ void Simulation::process(CTO_FleetSpawn&& cto) {
 
 //	fleets.emplace_back(cto.id, cto.position);
 
-	// !!! Synchronized FleetID generation
+	// TODO P1: app.space: Synchronized FleetID generation
 
 	// <<< Random faction assignments, and yeah, random string generation
 	auto dist = libv::make_uniform_distribution_inclusive(0, 6);
@@ -341,7 +341,7 @@ void Simulation::process(CTO_PlanetSpawn&& cto) {
 	// Permission check
 	// Bound check
 	auto rng_planet = libv::xoroshiro128(+universe->nextPlanetID);
-	// !!! Synchronized PlanetID generation (Split request and action CTO's?)
+	// TODO P1: app.space: Synchronized PlanetID generation (Split request and action CTO's?)
 	universe->galaxy.planets.emplace_back(generatePlanet(ctx, universe->nextPlanetID++, cto.position, rng_planet));
 	universe->galaxy.planets.back()->faction = universe->factionNeutral();
 }

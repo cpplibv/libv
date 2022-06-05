@@ -6,7 +6,6 @@
 #include <libv/algo/wildcard.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/types/std_optional.hpp>
-#include <libv/utility/generic_path.hpp>
 // std
 #include <filesystem>
 #include <fstream>
@@ -31,7 +30,7 @@ int main(int, char**) {
 		if (not p.is_regular_file())
 			continue;
 
-		const auto gp = libv::generic_path(p);
+		const auto gp = p.path().generic_string();
 
 		if (not libv::match_wildcard_glob(gp, filter_pattern))
 			continue;
@@ -42,7 +41,7 @@ int main(int, char**) {
 		const auto output_path = std::filesystem::path(gp).replace_extension("vm4");
 
 		if (model) {
-			libv::vm4::log_vm4.info("Saving    {}...", libv::generic_path(output_path));
+			libv::vm4::log_vm4.info("Saving    {}...", output_path.generic_string());
 
 			std::ofstream ofs(output_path, std::ios::out | std::ios::binary);
 			libv::archive::BinaryOutput oar(ofs);

@@ -1,18 +1,16 @@
-// Project: libv, File: app/star/game/fwd.hpp
+// Project: libv.mt, File: src/libv/mt/fwd.hpp
 
 #pragma once
 
 
-namespace star {
+namespace libv {
+namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ClientConfigT;
-template <typename ConfigT> class Config;
-using ClientConfig = Config<ClientConfigT>;
-
-class GameClient;
+class worker_thread;
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace star
+} // namespace mt
+} // namespace libv

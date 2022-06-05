@@ -52,6 +52,10 @@ public:
 
 	// named constructors --------------------------------------------------------------------------
 
+	[[nodiscard]] static constexpr inline quat_t identity() noexcept {
+		return quat_t();
+	}
+
 	/// \param angle - (Radians)
 	[[nodiscard]] static constexpr inline quat_t angle_axis(T angle, vec3_t<T> axis) noexcept {
 		// Axis of rotation must be normalised
@@ -140,7 +144,7 @@ public:
 			return quat_t((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal);
 		default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
 			assert(false);
-			return quat_t(1, 0, 0, 0);
+			return quat_t::identity();
 		}
 	}
 

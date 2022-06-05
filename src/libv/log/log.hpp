@@ -3,6 +3,7 @@
 #pragma once
 
 // ext
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 // libv
@@ -280,7 +281,6 @@ public:
 	}
 
 private:
-	template <typename = void>
 	constexpr auto color_args(const std::string_view format) {
 		// Note: This function could be implemented in a true constexpr way.
 		//			Implementation could also be improved.
@@ -317,16 +317,14 @@ private:
 	}
 
 private:
-//	template <typename OS, typename Args>
-//	inline void ostream_if_possible(OS& os, const Args& arg) {
-//		(void) arg;
-//		os << " ?,";
-//	}
-//
-//	template <typename OS, typename Args>
-//	inline void ostream_if_possible(OS& os, const Args& arg) WISH_REQUIRES(requires { os << arg; }) {
-//		os << " \"" << arg << "\",";
-//	}
+	template <typename OS, typename Args>
+	inline void ostream_if_possible(OS& os, const Args& arg) {
+		if constexpr (requires { os << arg; }) {
+			os << " \"" << arg << "\",";
+		} else {
+			os << " ?,";
+		}
+	}
 
 	template <typename... Args>
 	/*NEVER_INLINE*/ std::string formatMessage(
@@ -338,8 +336,8 @@ private:
 		} catch (const fmt::format_error& ex) {
 			message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", fmt, ex.what());
 			std::ostringstream argument_ss;
-//			(ostream_if_possible(argument_ss, args), ...);
-			((argument_ss << " \"" << args << "\","), ...);
+			(ostream_if_possible(argument_ss, args), ...);
+//			((argument_ss << " \"" << args << "\","), ...);
 			message += argument_ss.str();
 		}
 		return message;

@@ -10,11 +10,12 @@
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
-#include <libv/utility/nexus.hpp>
-#include <libv/utility/memory/observer_ptr.hpp>
+//#include <libv/utility/nexus.hpp>
+//#include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/utility/parse_number.hpp>
 // pro
-#include <star/game/client_config.hpp>
+#include <star/game/config/client_config.hpp>
+//#include <star/game/config/config.hpp>
 #include <star/game/game_client.hpp>
 #include <star/game/scene/scene_main_menu.hpp>
 #include <star/game/scene/scene_root.hpp>
@@ -24,45 +25,15 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-class ConfigWatcher {
-private:
-	libv::Nexus& nexus;
-	std::unordered_multimap<libv::observer_ptr<BaseConfigEntry>, std::function<void(BaseConfigEntry&)>> handlers;
-
-public:
-	explicit ConfigWatcher(libv::Nexus& nexus) : nexus(nexus) {
-		nexus.connect<ConfigEntryChange>(this, [this](const ConfigEntryChange& event) {
-			const auto [begin, end] = handlers.equal_range(libv::make_observer_ptr(&event.entry));
-			for (auto it = begin; it != end; ++it)
-				it->second(event.entry);
-		});
-	}
-
-	~ConfigWatcher() {
-		nexus.disconnect_all(this);
-	}
-
-	template <typename T, typename Fn>
-	void watch(ConfigEntry<T>& entry, Fn&& fn) {
-		fn(entry);
-
-		handlers.emplace(libv::make_observer_ptr(&entry), [f = std::forward<Fn>(fn)](BaseConfigEntry& entry_) mutable {
-			auto ptr = dynamic_cast<ConfigEntry<T>*>(&entry_);
-			assert(ptr);
-			f(*ptr);
-		});
-	}
-};
-
 struct SettingsBuilder {
-	ConfigWatcher& watcher;
+	const void* ownerPtr;
 	GameClient& gameClient;
 
 	libv::ui::PanelLine main;
 	libv::ui::PanelGrid grid{"grid"};
 
-	explicit SettingsBuilder(ConfigWatcher& watcher, GameClient& gameClient) :
-		watcher(watcher),
+	explicit SettingsBuilder(const void* ownerPtr, GameClient& gameClient) :
+		ownerPtr(ownerPtr),
 		gameClient(gameClient) {
 
 		grid.style("settings.grid");
@@ -74,9 +45,141 @@ struct SettingsBuilder {
 
 		main.style("settings.main");
 		main.add(grid);
+	}
 
+	void toggle(ConfigEntry<bool>& entry) {
+		//	libv::ui::PanelLine line;
+		//	line.style("settings.entry.panel");
+		//line.tooltip(entry.description());
+
+	//	libv::ui::CheckBox cbox;
+		libv::ui::Label label;
+		label.style("settings.entry.lbl");
+		label.text(entry.name());
+		grid.add(std::move(label));
+
+		libv::ui::Button btn;
+		btn.style("settings.entry.value.toggle");
+		entry.subscribe_and_call(ownerPtr, [btn](const ConfigEntry<bool>::Change& event) mutable {
+			// !!! Event loop abortion logic, or nah,
+			//  		as no change will be called if text matches old value
+			//			^ second half is not true, make it true
+			btn.text(event.entry.load() ? "On" : "Off");
+		});
+		btn.event().submit.connect_system([&entry]() {
+			entry.store(!entry.load());
+		});
+		grid.add(std::move(btn));
+	}
+
+	void number(ConfigEntry<int>& entry) {
+		//	libv::ui::PanelLine line;
+		//	line.style("settings.entry.panel");
+		//line.tooltip(entry.description());
+
+		libv::ui::Label label;
+		label.style("settings.entry.lbl");
+		label.text(entry.name());
+		grid.add(std::move(label));
+
+		libv::ui::InputField input;
+		input.style("settings.entry.value.number");
+
+		entry.subscribe_and_call(ownerPtr, [input](const ConfigEntry<int>::Change& event) mutable {
+			// !!! Event loop abortion logic, or nah,
+			//  		as no change will be called if text matches old value
+			//			^ second half is not true, make it true
+			input.text(std::to_string(event.entry.load()));
+		});
+		input.event().change.connect_system([&entry, input]() {
+			entry.store(libv::parse_number_or_throw<int>(input.text()));
+		});
+		grid.add(std::move(input));
+	}
+
+	void text(ConfigEntry<std::string>& entry) {
+		//	libv::ui::PanelLine line;
+		//	line.style("settings.entry.panel");
+		//line.tooltip(entry.description());
+
+		libv::ui::Label label;
+		label.style("settings.entry.lbl");
+		label.text(entry.name());
+		grid.add(std::move(label));
+
+		libv::ui::InputField input;
+		input.style("settings.entry.value.text");
+
+		entry.subscribe_and_call(ownerPtr, [input](const ConfigEntry<std::string>::Change& event) mutable {
+			input.text(event.entry.load());
+			// !!! Event loop abortion logic, or nah,
+			//  		as no change will be called if text matches old value
+			//			^ second half is not true, make it true
+		});
+		input.event().change.connect_system([&entry, input]() {
+			entry.store(input.text());
+		});
+		grid.add(std::move(input));
+	}
+
+	struct OptionProxy {
+		const void* ownerPtr;
+		ConfigEntry<int>& entry;
+		libv::ui::PanelLine row;
+
+		OptionProxy(const void* ownerPtr, ConfigEntry<int>& entry, libv::ui::PanelLine&& row) :
+			ownerPtr(ownerPtr), entry(entry), row(std::move(row)) {
+		}
+
+		void operator()(std::string name, int value) {
+			libv::ui::Button btn;
+			btn.style("settings.entry.value.option.button");
+			btn.text(std::move(name));
+
+			// !!! Do not sub per option entry, sub per config entry, or this would be super simple hack
+			entry.subscribe_and_call(ownerPtr, [btn, value](const ConfigEntry<int>::Change& event) mutable {
+				// !!! instead of style state change, radio button / group select will be a better solution
+				btn.style_state(libv::ui::StyleState::select, value == event.entry.load());
+				// !!! Event loop abortion logic, or nah,
+				//  		as no change will be called if text matches old value
+				//			^ second half is not true, make it true
+			});
+			btn.event().submit.connect_system([e = &entry, btn, value]() {
+				e->store(value);
+			});
+
+			row.add(std::move(btn));
+		}
+	};
+
+	[[nodiscard]] OptionProxy options(ConfigEntry<int>& entry) {
+		//	libv::ui::PanelLine line;
+		//	line.style("settings.entry.panel");
+		//line.tooltip(entry.description());
+
+		libv::ui::Label label;
+		label.style("settings.entry.lbl");
+		label.text(entry.name());
+		grid.add(std::move(label));
+
+		libv::ui::PanelLine row;
+		row.style("settings.entry.value.option.row");
+		grid.add(row);
+
+		return OptionProxy{ownerPtr, entry, std::move(row)};
+	}
+
+	void restart_group() {
+		grid = libv::ui::PanelGrid{"grid"};
+		grid.style("settings.grid");
+		main.add(grid);
+	}
+
+	[[nodiscard]] libv::ui::Component build() {
 		{
 			libv::ui::PanelLine ctrl;
+			ctrl.style("settings.ctrl_line");
+
 			{
 				libv::ui::Button btn;
 				btn.style("settings.ctrl");
@@ -95,12 +198,21 @@ struct SettingsBuilder {
 				ctrl.add(std::move(gap));
 
 			} {
+//				libv::ui::Button btn;
+//				btn.style("settings.ctrl");
+//				btn.text("Reset to Default");
+////				btn.event().submit.connect_system([](libv::ui::Button& source) {
+////					source.event().global.fire<SwitchPrimaryScene>(createSceneMainMenu(gameClient));
+////				});
+//				ctrl.add(std::move(btn));
+
+			} {
 				libv::ui::Button btn;
 				btn.style("settings.ctrl");
 				btn.text("Apply");
-				btn.event().submit.connect_system([](libv::ui::Button& source) {
+//				btn.event().submit.connect_system([](libv::ui::Button& source) {
 //					source.event().global.fire<SwitchPrimaryScene>(createSceneMainMenu(gameClient));
-				});
+//				});
 				ctrl.add(std::move(btn));
 
 			} {
@@ -115,156 +227,64 @@ struct SettingsBuilder {
 
 			main.add(std::move(ctrl));
 		}
-	}
 
-	void toggle(ConfigEntry<bool>& entry, std::string name, std::string description) {
-	//	libv::ui::PanelLine line;
-	//	line.style("settings.entry.panel");
-	////	line.tooltip(std::move(description));
-	//	(void) description;
-
-	//	libv::ui::CheckBox cbox;
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(name);
-		grid.add(std::move(label));
-
-		libv::ui::Button btn;
-		btn.style("settings.entry.value.toggle");
-		watcher.watch(entry, [btn](ConfigEntry<bool>& entry_) mutable {
-			btn.text(entry_() ? "On" : "Off");
-		});
-		btn.event().submit.connect_system([&entry]() {
-			entry(!entry());
-		});
-		grid.add(std::move(btn));
-	}
-
-	void number(ConfigEntry<int>& entry, std::string name, std::string description) {
-	//	libv::ui::PanelLine line;
-	//	line.style("settings.entry.panel");
-	////	line.tooltip(std::move(description));
-	//	(void) description;
-
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(std::move(name));
-		grid.add(std::move(label));
-
-		libv::ui::InputField input;
-		input.style("settings.entry.value.number");
-		watcher.watch(entry, [input](ConfigEntry<int>& entry_) mutable {
-			input.text(std::to_string(entry_()));
-		});
-		input.event().change.connect_system([&entry, input]() {
-			entry(libv::parse_number_or_throw<int>(input.text()));
-		});
-		grid.add(std::move(input));
-	}
-
-	void text(ConfigEntry<std::string>& entry, std::string name, std::string description) {
-	//	libv::ui::PanelLine line;
-	//	line.style("settings.entry.panel");
-	////	line.tooltip(std::move(description));
-	//	(void) description;
-
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(std::move(name));
-		grid.add(std::move(label));
-
-		libv::ui::InputField input;
-		input.style("settings.entry.value.text");
-		watcher.watch(entry, [input](ConfigEntry<std::string>& entry_) mutable {
-			input.text(entry_());
-			// !!! Event loop abortion logic, or nah, as no change will be called if text matches old value
-			//			^ second half is not true, make it true
-		});
-		input.event().change.connect_system([&entry, input]() {
-			entry(input.text());
-		});
-		grid.add(std::move(input));
-	}
-
-	struct OptionProxy {
-		ConfigWatcher& watcher;
-		ConfigEntry<int>& entry;
-		libv::ui::PanelLine row;
-
-		void operator()(std::string name, int value) {
-			libv::ui::Button btn;
-			btn.style("settings.entry.value.option.btn");
-			btn.text(std::move(name));
-
-			watcher.watch(entry, [btn, value](ConfigEntry<int>& entry_) mutable {
-//				if (entry_() == value)
-				// !!! Event loop abortion logic, or nah, as no change will be called if text matches old value
-				//			^ second half is not true, make it true
-			});
-			btn.event().submit.connect_system([e = &entry, btn]() {
-//				entry(btn.text());
-			});
-
-			row.add(std::move(btn));
-		}
-	};
-
-	OptionProxy options(ConfigEntry<int>& entry, std::string name, std::string description) {
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(std::move(name));
-		grid.add(std::move(label));
-
-		libv::ui::PanelLine row;
-		row.style("settings.entry.value.option.row");
-		grid.add(row);
-
-		return OptionProxy{watcher, entry, std::move(row)};
-	}
-
-	libv::ui::Component build() {
 		return main;
 	}
 };
 
 
 libv::ui::Component createSceneSettings(GameClient& gameClient) {
-	ConfigWatcher watcher(gameClient.nexus());
-
-	const auto& config = gameClient.settings();
-
 	libv::ui::PanelAnchor layers{"layers"};
 
+	auto config = gameClient.config();
+
+	// Layers's ptr is used to subscribe/unsubscribe guard any subcomponent event handler
+	const auto ownerPtr = layers.ptr();
+	layers.event().detach.connect_system([config, ownerPtr] {
+		config->unsubscribe(ownerPtr);
+	});
+
 	{
-		SettingsBuilder settings{watcher, gameClient};
+		SettingsBuilder builder{ownerPtr, gameClient};
 
-		settings.text(config->profile.player_name, "Player Name", "Display name of the player in multiplayer sessions");
-		settings.toggle(config->graphics.msaa_enable, "MSAA", "Enable/Disable MSAA");
-		settings.number(config->graphics.msaa_sample, "MSAA Sample", "Number of MSAA samples");
+		builder.text(config->profile.player_name);
 
-		auto test_setting3 = settings.options(config->graphics.test_setting, "Test Setting 3", "Test Setting description");
+		builder.toggle(config->graphics.vsync_enable);
+		auto test_setting3 = builder.options(config->graphics.msaa_samples);
 		test_setting3("Off", 1);
 		test_setting3("2", 2);
 		test_setting3("4", 4);
 		test_setting3("8", 8);
 		test_setting3("16", 16);
 
-		auto test_setting0 = settings.options(config->graphics.test_setting, "Test Setting 0", "Test Setting description");
+		builder.number(config->graphics.test_setting);
+
+		auto test_setting0 = builder.options(config->graphics.test_setting);
 		test_setting0("Low", 0);
 		test_setting0("Medium", 1);
 
-		auto test_setting1 = settings.options(config->graphics.test_setting, "Test Setting 1", "Test Setting description");
+		auto test_setting1 = builder.options(config->graphics.test_setting);
 		test_setting1("Low", 0);
 		test_setting1("Medium", 1);
 		test_setting1("High", 2);
 
-		auto test_setting2 = settings.options(config->graphics.test_setting, "Test Setting 2", "Test Setting description");
+		auto test_setting2 = builder.options(config->graphics.test_setting);
 		test_setting2("Low", 0);
 		test_setting2("Medium", 1);
 		test_setting2("High", 2);
 		test_setting2("Ultra", 2);
 
-		layers.add(settings.build());
+
+
+		builder.restart_group();
+
+//		builder.page("Development") {
+			builder.toggle(config->development.logging_trace_ui);
+			builder.toggle(config->development.always_on_top);
+//		}
+
+
+		layers.add(builder.build());
 	}
 
 	return layers;

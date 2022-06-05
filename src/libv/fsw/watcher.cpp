@@ -8,7 +8,6 @@
 // libv
 #include <libv/algo/erase_if_unstable.hpp>
 #include <libv/algo/linear_find.hpp>
-#include <libv/utility/generic_path.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 
 
@@ -31,19 +30,19 @@ std::ostream& operator<<(std::ostream& os, const Action& action) {
 
 std::ostream& operator<<(std::ostream& os, const Event& event) {
 	if (event.action == Action::create)
-		return os << "Created " << libv::generic_path(event.path);
+		return os << "Created " << event.path.generic_string();
 
 	if (event.action == Action::remove)
-		return os << "Removed " << libv::generic_path(event.path);
+		return os << "Removed " << event.path.generic_string();
 
 	if (event.action == Action::modify)
-		return os << "Modified " << libv::generic_path(event.path);
+		return os << "Modified " << event.path.generic_string();
 
 	if (event.action == Action::rename)
-		return os << "Moved " << libv::generic_path(event.path) << " from " << libv::generic_path(event.old_path);
+		return os << "Moved " << event.path.generic_string() << " from " << event.old_path.generic_string();
 
 //	if (event.action == Action::exists)
-//		return os << "Exists " << libv::generic_path(event.path);
+//		return os << "Exists " << event.path.generic_string();
 
 	return os << "Unknown event";
 }

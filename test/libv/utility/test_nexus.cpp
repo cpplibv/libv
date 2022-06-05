@@ -55,11 +55,11 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 	const void* slot = reinterpret_cast<void*>(0x22222222);
 	const void* signal_unused = reinterpret_cast<void*>(0x33333333);
 
-	nexus.connect<EventType>(                queue.callback("global"));
+	nexus.connect_global<EventType>(queue.callback("global"));
 	CHECK(queue.num_alive_callback() == 1);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 1);
-	nexus.connect<EventType>(slot,          queue.callback("slot"));
+	nexus.connect_global<EventType>(slot, queue.callback("slot"));
 	CHECK(queue.num_alive_callback() == 2);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 2);
@@ -67,7 +67,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 	CHECK(queue.num_alive_callback() == 3);
 	CHECK(nexus.num_channel() == 2);
 	CHECK(nexus.num_tracked() == 3);
-	nexus.connect<EventType>(signal, slot, queue.callback("both"));
+	nexus.connect_channel<EventType>(signal, slot, queue.callback("both"));
 	CHECK(queue.num_alive_callback() == 4);
 	CHECK(nexus.num_channel() == 2);
 	CHECK(nexus.num_tracked() == 3);
@@ -79,7 +79,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 	// 3 Object is tracked: null (global), slot and signal
 
 	SECTION("broadcast") {
-		nexus.broadcast<EventType>(1);
+		nexus.broadcast_global<EventType>(1);
 		CHECK(queue.consume() == "global1, slot1");
 
 		nexus.broadcast_channel<EventType>(signal, 2);
@@ -104,7 +104,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "global5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -123,7 +123,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "global5, slot5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -137,7 +137,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "global5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -151,7 +151,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "global5, slot5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -173,7 +173,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -192,7 +192,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 3);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -211,7 +211,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 3);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "slot5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -229,19 +229,19 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 	const void* slot = reinterpret_cast<void*>(0x22222222);
 	const void* signal_unused = reinterpret_cast<void*>(0x33333333);
 
-	nexus.connect<EventType>(                queue.callback("globalA"));
+	nexus.connect_global<EventType>(queue.callback("globalA"));
 	CHECK(queue.num_alive_callback() == 1);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 1);
-	nexus.connect<EventType>(                queue.callback("globalB"));
+	nexus.connect_global<EventType>(queue.callback("globalB"));
 	CHECK(queue.num_alive_callback() == 2);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 1);
-	nexus.connect<EventType>(slot,          queue.callback("slotA"));
+	nexus.connect_global<EventType>(slot, queue.callback("slotA"));
 	CHECK(queue.num_alive_callback() == 3);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 2);
-	nexus.connect<EventType>(slot,          queue.callback("slotB"));
+	nexus.connect_global<EventType>(slot, queue.callback("slotB"));
 	CHECK(queue.num_alive_callback() == 4);
 	CHECK(nexus.num_channel() == 1);
 	CHECK(nexus.num_tracked() == 2);
@@ -253,17 +253,17 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 	CHECK(queue.num_alive_callback() == 6);
 	CHECK(nexus.num_channel() == 2);
 	CHECK(nexus.num_tracked() == 3);
-	nexus.connect<EventType>(signal, slot, queue.callback("bothA"));
+	nexus.connect_channel<EventType>(signal, slot, queue.callback("bothA"));
 	CHECK(queue.num_alive_callback() == 7);
 	CHECK(nexus.num_channel() == 2);
 	CHECK(nexus.num_tracked() == 3);
-	nexus.connect<EventType>(signal, slot, queue.callback("bothB"));
+	nexus.connect_channel<EventType>(signal, slot, queue.callback("bothB"));
 	CHECK(queue.num_alive_callback() == 8);
 	CHECK(nexus.num_channel() == 2);
 	CHECK(nexus.num_tracked() == 3);
 
 	SECTION("broadcast") {
-		nexus.broadcast<EventType>(1);
+		nexus.broadcast_global<EventType>(1);
 		CHECK(queue.consume() == "globalA1, globalB1, slotA1, slotB1");
 
 		nexus.broadcast_channel<EventType>(signal, 2);
@@ -288,7 +288,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "globalA5, globalB5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -307,7 +307,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "globalA5, globalB5, slotA5, slotB5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -321,7 +321,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "globalA5, globalB5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -335,7 +335,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "globalA5, globalB5, slotA5, slotB5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -357,7 +357,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 2);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -376,7 +376,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 1);
 		CHECK(nexus.num_tracked() == 3);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
@@ -395,7 +395,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_channel() == 2);
 		CHECK(nexus.num_tracked() == 3);
 
-		nexus.broadcast<EventType>(5);
+		nexus.broadcast_global<EventType>(5);
 		CHECK(queue.consume() == "slotB5, slotA5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);

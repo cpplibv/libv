@@ -1,17 +1,16 @@
-// Project: libv, File: app/star/game/fwd.hpp
+// Project: libv, File: app/star/version.cpp
 
-#pragma once
+// hpp
+#include <star/version.hpp>
 
 
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ClientConfigT;
-template <typename ConfigT> class Config;
-using ClientConfig = Config<ClientConfigT>;
-
-class GameClient;
+BuildInfo build{
+		"v0.2.1"
+};
 
 // -------------------------------------------------------------------------------------------------
 

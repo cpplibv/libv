@@ -124,10 +124,15 @@ ui.style("settings.title") {
 	--background = "green",
 }
 
+ui.style("settings.ctrl_line") {
+	spacing = 8,
+	orientation = "right",
+}
+
 ui.style("settings.ctrl") {
 	size = "D, D",
 	font_size = 20,
-	padding = {18, 6},
+	padding = {28, 6},
 	font = fonts.title,
 	font_color = {1, 1, 1, 1},
 	margin = {0, 0, 0, 20},
@@ -152,6 +157,14 @@ ui.style("settings.ctrl") {
 		font_color = {0.5, 0.5, 0.5, 1},
 		background = {type = "border_padding_pattern", color_border = {0.4, 0.4, 0.4, 0.6}, color_pattern = {0.4, 0.4, 0.4, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 	},
+	--state("important disable") {
+	--
+	--},
+	--
+	--DERIVED_PROPERTIES...
+	--state.above("select") {...}
+	--state("select", "override:hover") {...}
+	--state("select") {...}
 }
 
 ui.style("settings.grid") {
@@ -173,7 +186,7 @@ ui.style("settings.entry.lbl") {
 
 ui.style("settings.entry.value") {
 	size = "1r, D",
-	padding = {4, 2},
+	padding = {4, 4},
 	anchor = "left",
 	align_horizontal = "center",
 	align_vertical = "center",
@@ -200,6 +213,32 @@ ui.style("settings.entry.value.option.row") {
 ui.style("settings.entry.value.option.button") {
 	--size = "D, D",
 	--background = "yellow",
+	--background = IMPLICIT;
+	--background = inherit,
+	--background = inherit("settings.entry.value"),
+	--background = inherit("settings.entry.value", "active, select"),
+
+	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+
+	state("select") {
+		--background = "green",
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+
+	--state_override("select") {
+	--
+	--},
+	--state("select") {
+	--	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--	background = "green",
+	--},
+	--inherit("background", "settings.entry.value"),
+
+	--state("!select") {
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--	background = "blue",
+	--},
 }
 
 -- =================================================================================================

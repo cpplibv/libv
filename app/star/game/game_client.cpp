@@ -3,6 +3,7 @@
 // hpp
 #include <star/game/game_client.hpp>
 // libv
+#include <libv/mt/worker_thread.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
@@ -10,9 +11,11 @@
 //#include <libv/ctrl/feature_register.hpp>
 //#include <libv/ui/event/event_overlay.hpp>
 //#include <libv/ui/event_hub.hpp>
-//#include <libv/utility/read_file.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/write_file.hpp>
 // pro
-#include <star/game/client_config.hpp>
+#include <star/game/config/client_config.hpp>
+#include <star/game/config/config.hpp>
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scene_main_menu.hpp>
@@ -27,13 +30,23 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 struct ImplGameClient {
-	std::shared_ptr<ClientConfig> settings_;
+//	libv::mt::worker_thread scheduler_{"scheduler"};
+	libv::Nexus2 nexus_;
+
+	std::shared_ptr<ClientConfig> config_;
+//	Config<ClientConfigGroup> config_;
+//	ConfigManager configManager{scheduler_, nexus_};
+//	Config<ClientConfig> config_;
+//	std::shared_ptr<ClientConfig> config_;
+//	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
+
+//	auto nexus = libv::Nexus2();
+//	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
 
 	libv::ui::UI ui;
 
 	GameClientFrame frame;
 
-	libv::Nexus nexus_;
 //	libv::ctrl::Controls controls;
 
 //	Renderer renderer{ui};
@@ -42,16 +55,15 @@ struct ImplGameClient {
 //
 //	User user;
 
-	inline ImplGameClient(std::shared_ptr<ClientConfig>&& settings, libv::ui::Settings&& ui_settings) :
-			settings_(std::move(settings)),
+	inline ImplGameClient(libv::ui::Settings&& ui_settings, const std::filesystem::path& configFilepath) :
+			config_(make_config<ClientConfig>(nexus_, configFilepath)),
 			ui(ui_settings) {}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-GameClient::GameClient(const std::filesystem::path& settingsFilepath) :
+GameClient::GameClient(const std::filesystem::path& configFilepath) :
 	self(std::make_unique<ImplGameClient>(
-			std::make_shared<ClientConfig>(),
 			[] {
 				libv::ui::Settings settings;
 				// TODO P1: Internalize used UI resources under star, currently: app/star/../../res/
@@ -65,10 +77,9 @@ GameClient::GameClient(const std::filesystem::path& settingsFilepath) :
 
 				settings.track_style_scripts = true;
 				return settings;
-			}()
+			}(),
+			configFilepath
 	)) {
-
-//	settings->loadJSON(libv::read_file_or_throw(settingsFilepath));
 
 	register_nexus();
 //	CameraControl::register_controls(controls);
@@ -81,12 +92,13 @@ GameClient::GameClient(const std::filesystem::path& settingsFilepath) :
 //		// TODO P1: A more seamless integration of UI and Controls would be nice
 //		controls.ignore_events(event.controls_intercepted());
 //	});
-//
+
+	self->frame.onContextUpdate.output([this](const auto&) {
+		update();
+	});
 //	controls.attach(self->frame);
 	self->ui.attach(self->frame);
 
-//	ui.load_style_script(libv::read_file_or_throw("style.lua"));
-//	ui.load_style_script(libv::read_file_and_track_or_throw("style.lua"));
 	self->ui.load_style_script_file("style.lua");
 
 	init_ui();
@@ -102,7 +114,7 @@ void GameClient::register_nexus() {
 //		user.name = event.name;
 //		nexus_.broadcast<mc::OnNameChange>();
 //	});
-	self->nexus_.connect<RequestClientExit>(this, [this](const RequestClientExit&) {
+	self->nexus_.connect_global<RequestClientExit>(this, [this](const RequestClientExit&) {
 		self->frame.closeDefault();
 	});
 }
@@ -123,17 +135,21 @@ void GameClient::init_ui() {
 //	});
 }
 
+void GameClient::update() {
+	self->config_->update();
+}
+
 void GameClient::run() {
 	self->frame.show();
 	self->frame.join();
 }
 
-libv::Nexus& GameClient::nexus() noexcept {
+libv::Nexus2& GameClient::nexus() noexcept {
 	return self->nexus_;
 }
 
-const std::shared_ptr<ClientConfig>& GameClient::settings() const noexcept {
-	return self->settings_;
+std::shared_ptr<ClientConfig> GameClient::config() const noexcept {
+	return self->config_;
 }
 
 // -------------------------------------------------------------------------------------------------

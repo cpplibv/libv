@@ -138,19 +138,19 @@ SpaceCanvas::SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, Gam
 	postProcessing.vignetteIntensity(0.15f);
 
 	game_session.nexus.connect<mc::ChangeControlledFaction>(this, [this] {
-		// !!!
+		// TODO P1: app.space:
 		controlVar.reset();
 	});
 }
 
 SpaceCanvas::~SpaceCanvas() {
-	// !!!
+	// TODO P1: app.space:
 	game_session.nexus.disconnect_all(this);
 }
 
 void SpaceCanvas::enableControls(libv::ctrl::Controls& controls) {
 	if (!controlVar)
-		// !!!
+		// TODO P1: app.space:
 		controlVar.emplace(
 				*this,
 				playout,
@@ -201,7 +201,7 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 
 //		CanvasControl::update(*this, delta_time);
 		if (!controlVar)
-			// !!!
+			// TODO P1: app.space:
 			controlVar.emplace(
 					*this,
 					playout,

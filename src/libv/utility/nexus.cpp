@@ -126,7 +126,7 @@ void Nexus::aux_disconnect_all(track_ptr owner) {
 // === Nexus 2 =====================================================================================
 
 struct ChannelKey {
-	Nexus2::track_ptr signal_owner;
+	Nexus2::track_ptr channel_owner;
 	Nexus2::key_type type;
 
 	[[nodiscard]] constexpr inline bool operator==(const ChannelKey&) const noexcept = default;
@@ -136,7 +136,7 @@ struct ChannelKey {
 
 } // namespace libv
 
-LIBV_MAKE_HASHABLE(::libv::ChannelKey, t.signal_owner, t.type);
+LIBV_MAKE_HASHABLE(::libv::ChannelKey, t.channel_owner, t.type);
 
 namespace libv {
 
@@ -168,12 +168,12 @@ Nexus2::~Nexus2() {
 	// For the sake of forward declared ptr
 }
 
-void Nexus2::aux_connect(track_ptr signal_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func) {
-	const auto channel_key = ChannelKey{signal_owner, event_type};
+void Nexus2::aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func) {
+	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto lock = std::unique_lock(self->mutex);
 
-	auto& memberships_of_channel = self->memberships[signal_owner];
+	auto& memberships_of_channel = self->memberships[channel_owner];
 	if (!libv::linear_contains(memberships_of_channel, channel_key))
 		memberships_of_channel.emplace_back(channel_key);
 
@@ -184,8 +184,16 @@ void Nexus2::aux_connect(track_ptr signal_owner, track_ptr slot_owner, key_type 
 	self->channels[channel_key].emplace_back(slot_owner, std::move(func));
 }
 
-void Nexus2::aux_broadcast(track_ptr signal_owner, key_type event_type, const void* event_ptr) const {
-	const auto channel_key = ChannelKey{signal_owner, event_type};
+void Nexus2::aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func, const void* event_ptr) {
+	// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
+	//			this could be solved by relying on the unordered_map value stability, but there are plans to move
+	//			to a different hash container
+	aux_connect(channel_owner, slot_owner, event_type, func);
+	func(event_ptr);
+}
+
+void Nexus2::aux_broadcast(track_ptr channel_owner, key_type event_type, const void* event_ptr) const {
+	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto lock = std::unique_lock(self->mutex);
 
@@ -206,15 +214,15 @@ void Nexus2::aux_disconnect_all(track_ptr owner) {
 		const auto ch_it = self->channels.find(channel_key);
 		assert(ch_it != self->channels.end() && "Internal consistency violation"); // memberships indicated, but channels is missing a member (The find check on memberships would have early exited otherwise)
 
-		const auto is_signal_in_channel = channel_key.signal_owner == owner;
+		const auto is_channel_owner_in_channel = channel_key.channel_owner == owner;
 
-		if (is_signal_in_channel) {
+		if (is_channel_owner_in_channel) {
 			for (const auto& target : ch_it->second) {
 				const auto ms_slot_it = self->memberships.find(target.slot_owner);
 				assert(ms_slot_it != self->memberships.end() && "Internal consistency violation"); // memberships indicated, but channels is missing a member (The find check on memberships would have early exited otherwise)
 
 				if (target.slot_owner == owner)
-					// Skip attempting to remove signal's membership, outer loop will take care of it
+					// Skip attempting to remove channel's membership, outer loop will take care of it
 					// This skip is necessary to not violate membership invariants with erase
 					// Also erase could invalidate the erase_if_unstable iterator
 					continue;
@@ -231,7 +239,7 @@ void Nexus2::aux_disconnect_all(track_ptr owner) {
 
 			if (ch_it->second.empty()) {
 				self->channels.erase(ch_it);
-				const auto ms_slot_it = self->memberships.find(channel_key.signal_owner);
+				const auto ms_slot_it = self->memberships.find(channel_key.channel_owner);
 				assert(ms_slot_it != self->memberships.end() && "Internal consistency violation");
 
 				libv::erase_unstable(ms_slot_it->second, channel_key);
@@ -244,12 +252,12 @@ void Nexus2::aux_disconnect_all(track_ptr owner) {
 	self->memberships.erase(ms_it);
 }
 
-void Nexus2::aux_disconnect_channel(track_ptr signal_owner, key_type event_type) {
-	const auto channel_key = ChannelKey{signal_owner, event_type};
+void Nexus2::aux_disconnect_channel(track_ptr channel_owner, key_type event_type) {
+	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto lock = std::unique_lock(self->mutex);
 
-	const auto ms_it = self->memberships.find(signal_owner);
+	const auto ms_it = self->memberships.find(channel_owner);
 	if (ms_it == self->memberships.end())
 		return; // Could happen
 
@@ -272,23 +280,23 @@ void Nexus2::aux_disconnect_channel(track_ptr signal_owner, key_type event_type)
 		self->memberships.erase(ms_it);
 }
 
-void Nexus2::aux_disconnect_channel_all(track_ptr signal_owner) {
+void Nexus2::aux_disconnect_channel_all(track_ptr channel_owner) {
 	auto lock = std::unique_lock(self->mutex);
 
-	const auto ms_it = self->memberships.find(signal_owner);
+	const auto ms_it = self->memberships.find(channel_owner);
 	if (ms_it == self->memberships.end())
 		return; // Could happen
 
 	libv::erase_if_unstable(ms_it->second, [&](const ChannelKey& channel_key) {
-		if (channel_key.signal_owner != signal_owner)
-			return false; // Skip memberships where owner is not the signal
+		if (channel_key.channel_owner != channel_owner)
+			return false; // Skip memberships where owner is not the channel
 
 		const auto ch_it = self->channels.find(channel_key);
 		assert(ch_it != self->channels.end() && "Internal consistency violation"); // memberships indicated, but channels is missing a member (The find check on memberships would have early exited otherwise)
 
 		for (const auto& target : ch_it->second) {
-			if (target.slot_owner == signal_owner)
-				// Skip attempting to remove signal's membership, outer loop will take care of it
+			if (target.slot_owner == channel_owner)
+				// Skip attempting to remove channel_owner's membership, outer loop will take care of it
 				// This skip is necessary to not violate membership invariants with erase
 				// Also erase could invalidate the erase_if_unstable iterator
 				continue;
@@ -327,17 +335,17 @@ void Nexus2::aux_disconnect_slot(track_ptr slot_owner, key_type event_type) {
 
 		if (ch_it->second.empty()) {
 			self->channels.erase(ch_it);
-			const auto ms_slot_it = self->memberships.find(channel_key.signal_owner);
+			const auto ms_slot_it = self->memberships.find(channel_key.channel_owner);
 			assert(ms_slot_it != self->memberships.end() && "Internal consistency violation");
 
 			libv::erase_unstable(ms_slot_it->second, channel_key);
 			if (ms_slot_it->second.empty())
 				self->memberships.erase(ms_slot_it);
 
-			return true; // Channel became empty, remove membership even if it was the signal
+			return true; // Channel became empty, remove membership even if it was the channel
 		}
 
-		return channel_key.signal_owner != slot_owner; // If it was a slot in the channel, remove membership
+		return channel_key.channel_owner != slot_owner; // If it was a slot in the channel, remove membership
 	});
 
 	if (ms_it->second.empty())
@@ -359,17 +367,17 @@ void Nexus2::aux_disconnect_slot_all(track_ptr slot_owner) {
 
 		if (ch_it->second.empty()) {
 			self->channels.erase(ch_it);
-			const auto ms_slot_it = self->memberships.find(channel_key.signal_owner);
+			const auto ms_slot_it = self->memberships.find(channel_key.channel_owner);
 			assert(ms_slot_it != self->memberships.end() && "Internal consistency violation");
 
 			libv::erase_unstable(ms_slot_it->second, channel_key);
 			if (ms_slot_it->second.empty())
 				self->memberships.erase(ms_slot_it);
 
-			return true; // Channel became empty, remove membership even if it was the signal
+			return true; // Channel became empty, remove membership even if it was the channel
 		}
 
-		return channel_key.signal_owner != slot_owner; // If it was a slot in the channel, remove membership
+		return channel_key.channel_owner != slot_owner; // If it was a slot in the channel, remove membership
 	});
 
 	if (ms_it->second.empty())

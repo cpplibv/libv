@@ -18,10 +18,14 @@ namespace mt {
 class impl_worker_thread;
 
 class worker_thread {
-	std::unique_ptr<impl_worker_thread> self;
+	std::shared_ptr<impl_worker_thread> self;
 
 public:
 	explicit worker_thread(std::string name = "unnamed");
+	inline worker_thread(const worker_thread&) noexcept = default;
+	inline worker_thread& operator=(const worker_thread&) & noexcept = default;
+	inline worker_thread(worker_thread&&) noexcept = default;
+	inline worker_thread& operator=(worker_thread&&) & noexcept = default;
 	~worker_thread() noexcept;
 
 public:
