@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/meta/force_inline.hpp>
 #include <libv/utility/type_uid.hpp>
 // std
 #include <bit>
@@ -21,7 +22,7 @@ namespace libv {
 //		https://quick-bench.com/q/-8xyfuQaWaG5-mYHGuhXoSL0I3w
 
 template <typename T>
-[[nodiscard]] inline libv::type_uid type_key() noexcept {
+[[nodiscard]] LIBV_FORCE_INLINE libv::type_uid type_key() noexcept {
 	return std::bit_cast<libv::type_uid>(std::type_index(typeid(T)));
 }
 
