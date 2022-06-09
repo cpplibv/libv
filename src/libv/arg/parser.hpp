@@ -88,9 +88,8 @@ public:
 
 namespace detail { // ------------------------------------------------------------------------------
 
-template <typename T,
-		typename = std::enable_if_t<std::is_integral_v<T>>>
-		// This could be is_arithmetic_v once Clang/GCC implements from_chars to floating point types
+template <typename T>
+		requires std::is_arithmetic_v<T>
 constexpr inline void parser_function(T& value, std::string_view str, OutcomeArgumentParse& outcome) {
 	std::from_chars_result result = std::from_chars<T>(str.begin(), str.end(), value);
 	std::error_code ec = std::make_error_code(result.ec);
@@ -105,34 +104,6 @@ constexpr inline void parser_function(T& value, std::string_view str, OutcomeArg
 
 	if (ec)
 		outcome.error("Invalid argument: " + ec.message() + " starting from \"" + result.ptr + "\"");
-}
-
-// This could be removed once Clang/GCC implements from_chars to floating point types
-inline void parser_function(float& value, std::string_view str, OutcomeArgumentParse& outcome) {
-	std::size_t pos = 0;
-	try {
-		value = std::stof(std::string(str), &pos);
-	} catch (const std::invalid_argument& e) {
-		// no conversion could be performed
-		outcome.error(std::string("Invalid argument: ") + e.what() + " starting at " + (str.begin() + pos));
-	} catch (const std::out_of_range& e) {
-		// the converted value would fall out of the range of the result type or if the underlying function set errno
-		outcome.error(std::string("Out of range: ") + e.what() + " starting at " + (str.begin() + pos));
-	}
-}
-
-// This could be removed once Clang/GCC implements from_chars to floating point types
-inline void parser_function(double& value, std::string_view str, OutcomeArgumentParse& outcome) {
-	std::size_t pos = 0;
-	try {
-		value = std::stod(std::string(str), &pos);
-	} catch (const std::invalid_argument& e) {
-		// no conversion could be performed
-		outcome.error(std::string("Invalid argument: ") + e.what() + " starting at " + (str.begin() + pos));
-	} catch (const std::out_of_range& e) {
-		// the converted value would fall out of the range of the result type or if the underlying function set errno
-		outcome.error(std::string("Out of range: ") + e.what() + " starting at " + (str.begin() + pos));
-	}
 }
 
 inline void parser_function(std::string& value, std::string_view str, OutcomeArgumentParse& outcome) {

@@ -4,6 +4,7 @@
 #include <catch/catch.hpp>
 // std
 #include <cstdint>
+#include <utility>
 // pro
 #include <libv/algo/bisect.hpp>
 

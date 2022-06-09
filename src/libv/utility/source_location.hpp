@@ -31,7 +31,7 @@ struct with_source_location {
 
 	// Implicit constructor to be used for conversion
 	template <typename CT>
-	with_source_location(CT&& value, source_location location = source_location::current()) :
+	explicit(false) with_source_location(CT&& value, source_location location = source_location::current()) :
 		value(std::forward<CT>(value)),
 		location(location) { }
 };

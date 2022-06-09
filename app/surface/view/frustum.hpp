@@ -21,14 +21,14 @@ public:
 		return dist + dot(normal, point);
 	}
 
-	void setNormalAndPoint(libv::vec3f normal, libv::vec3f point = {0, 0, 0}) {
+	constexpr inline void setNormalAndPoint(libv::vec3f normal, libv::vec3f point = {0, 0, 0}) {
 		this->normal = normal;
 		this->normal.normalize();
 
 		dist = -dot(normal, point);
 	}
 
-	void set3Points(libv::vec3f p1, libv::vec3f p2, libv::vec3f p3) {
+	constexpr inline void set3Points(libv::vec3f p1, libv::vec3f p2, libv::vec3f p3) {
 		const auto aux1 = p1 - p2;
 		const auto aux2 = p3 - p2;
 

@@ -8,6 +8,7 @@
 #include <libv/utility/approx.hpp>
 // std
 #include <cmath>
+#include <functional> // For clamp
 
 
 namespace surface {

@@ -38,7 +38,8 @@ public:
 	void normalize();
 
 public:
-	[[nodiscard]] friend bool operator<(const Combination& lhs, const Combination& rhs) noexcept;
+//	[[nodiscard]] friend bool operator<(const Combination& lhs, const Combination& rhs) noexcept;
+	friend bool operator<(const Combination& lhs, const Combination& rhs) noexcept;
 	[[nodiscard]] bool operator==(const Combination& other) const noexcept = default;
 
 public:

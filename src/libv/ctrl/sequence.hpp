@@ -86,10 +86,11 @@ public:
 
 public:
 	void normalize();
-	validation_result validate() const noexcept;
+	[[nodiscard]] validation_result validate() const noexcept;
 
 public:
-	[[nodiscard]] friend bool operator<(const Sequence& lhs, const Sequence& rhs) noexcept;
+//	[[nodiscard]] friend bool operator<(const Sequence& lhs, const Sequence& rhs) noexcept;
+	friend bool operator<(const Sequence& lhs, const Sequence& rhs) noexcept;
 	[[nodiscard]] bool operator==(const Sequence& other) const noexcept = default;
 
 public:

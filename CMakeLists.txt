@@ -33,9 +33,7 @@ message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 # TODO ---------------------------------------------------------------------------------------------
 
 # TODO P2: wish: debug symbol automated turn on/off
-# TODO P2: wish: use cmake copy function instead of "cp"
 # TODO P3: wish: add support for skipping library build/links via directly amending the sources of a dependency (only for DEV build)
-# TODO P3: wish: Use the correct OpenGL linking cmake build-in options
 # TODO P4: wish: inheritance for wish_create_executable and create_library
 # TODO P5: wish: modernize based on (GLOB will stay tho): https://www.youtube.com/watch?v=bsXLMQ6WgIk
 # TODO P5: wish: flag or build options to turn on/off sanitizes
@@ -98,7 +96,10 @@ wish_warning(
 	# GNU -Wsuggest-final-methods # in signal 50+ function
 	# GNU -Wsuggest-final-types # in signal 1 type
 
-	# GNU VERSION_GREATER 10.0 -Wxyz
+	# With GCC 12.1 some false positives warnings appeared and some ignore system header includes
+	GNU VERSION_GREATER 12.0 -Wno-array-bounds
+	GNU VERSION_GREATER 12.0 -Wno-stringop-overread
+	GNU VERSION_GREATER 12.0 -Wno-stringop-overflow
 
 	# Warnings that I don't care about
 	Clang -Wno-comment
@@ -407,7 +408,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG d141cdbeb0fb422a3fb7173b285fd38e0d1772dc #8.0.1
+	GIT_TAG 8.1.1
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF

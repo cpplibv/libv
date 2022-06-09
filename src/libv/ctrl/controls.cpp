@@ -1089,7 +1089,7 @@ void Controls::scale_joystick_analog(JoystickID joystickID, scale_type_2D scale)
 	self->joysticks[joystickID].scale_analog = scale;
 }
 void Controls::scale_joystick_analog(scale_type scale_xy) noexcept {
-	scale_joystick_analog({scale_xy});
+	scale_joystick_analog(scale_type_2D{scale_xy, scale_xy});
 }
 void Controls::scale_joystick_analog(scale_type scale_x, scale_type scale_y) noexcept {
 	scale_joystick_analog({scale_x, scale_y});

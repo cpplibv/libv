@@ -11,20 +11,24 @@
 
 // -------------------------------------------------------------------------------------------------
 
+
 using approx = libv::quat_t<libv::approx<float, -4>>;
 using approx_f = libv::approx<float, -4>;
 using approx_vec3 = libv::vec3_t<libv::approx<float, -4>>;
 using approx_vec4 = libv::vec4_t<libv::approx<float, -4>>;
 
+namespace libv {
 template <typename K>
-[[nodiscard]] constexpr inline bool operator==(const approx& lhs, const libv::quat_t<K>& rhs) noexcept {
+[[nodiscard]] constexpr inline bool operator==(const ::approx& lhs, const libv::quat_t<K>& rhs) noexcept {
 	return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w;
 }
+} // namespace libv
 
 template <typename T>
 [[nodiscard]] constexpr inline approx make_approx(T quat) noexcept {
 	return approx(quat.w, quat.x, quat.y, quat.z);
 }
+
 
 // -------------------------------------------------------------------------------------------------
 

@@ -345,7 +345,7 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOf
 	const auto table = convertTable(object);
 
 	HeatMap result;
-	result.name = table["name"];
+	result.name = table["name"].get<std::string>();
 	result.heightSensitivity = table["heightSensitivity"];
 //	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
 	result.rootNode = convertNodeTree(table.get<sol::object>("nodes"), seedOffset);
@@ -387,7 +387,7 @@ VeggieType SurfaceLuaBinding::convertVeggieType(const sol::object& object, const
 	const auto table = convertTable(object);
 
 	VeggieType result;
-	result.name = table["name"];
+	result.name = table["name"].get<std::string>();
 
 	const auto model = table.get<std::string_view>("model");
 	const auto mapping = libv::linear_find_optional(spriteMapping, model, &SpriteMappingEntry::name);
@@ -409,7 +409,7 @@ Biome SurfaceLuaBinding::convertBiome(const sol::object& object, const std::vect
 	const auto table = convertTable(object);
 
 	Biome result;
-	result.name = table["name"];
+	result.name = table["name"].get<std::string>();;
 	result.coord = table["coord"];
 	result.handover = table["handover"] == sol::type::nil ? Limit<float>{0.35f, 0.25f} : convertLimit<float>(table.get<sol::object>("handover"));
 	result.takeover = table["takeover"] == sol::type::nil ? Limit<float>{0.45f, 0.6f} : convertLimit<float>(table.get<sol::object>("takeover"));

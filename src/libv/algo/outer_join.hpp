@@ -4,6 +4,7 @@
 
 // std
 #include <algorithm>
+#include <functional>
 
 
 namespace libv {

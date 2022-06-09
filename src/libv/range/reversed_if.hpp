@@ -19,7 +19,7 @@ namespace detail {
 // TODO P5: move reverse_if into new range lib view namespace
 
 template <typename Iter>
-struct reversed_if_iterator : std::iterator<std::bidirectional_iterator_tag, typename Iter::value_type> {
+struct reversed_if_iterator {
 private:
 	Iter iter;
 	bool reversed;
@@ -27,6 +27,8 @@ private:
 public:
 	reversed_if_iterator(const Iter& iter, bool reversed) : iter(iter), reversed(reversed) { }
 
+	using iterator_category = std::bidirectional_iterator_tag;
+	using difference_type = ptrdiff_t;
 	using this_type = reversed_if_iterator<Iter>;
 	using value_type = typename Iter::value_type;
 	using pointer = typename Iter::pointer;

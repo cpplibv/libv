@@ -31,7 +31,7 @@ std::string EventDrop::toPrettyString() const {
 
 std::string EventKey::toPrettyString() const {
 	return fmt::format("Key: key = {} ({}), scancode = {}, action = {} ({})",
-			libv::input::to_string(keycode), libv::to_value(keycode), scancode, libv::input::to_string(action), libv::to_value(action));
+			libv::input::to_string(keycode), libv::to_value(keycode), libv::to_value(scancode), libv::input::to_string(action), libv::to_value(action));
 }
 
 std::string EventMouseButton::toPrettyString() const {

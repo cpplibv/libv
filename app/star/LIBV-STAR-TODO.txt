@@ -6,6 +6,24 @@ Star - System integration demo
 
 
 
+wish: debug/dev/release artifact paths
+
+CMAKE_BUILD_TYPE
+
+
+
+OpenGL 4.5 Shall be the new baseline
+libv.gl: trace/debug log the capabilities (take care of that one that causes an error in 3.3 that would need 4.2)
+
+
+Build all with GCC 12 and cleanup warnings
+
+
+
+
+
+
+
 app.star: Settings page back clear the focus while apply will rotate it to next
 
 
@@ -15,6 +33,35 @@ options
 	store/load/save/track
 
 app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
+
+
+options: store/load/save/track/delayed_save
+// !!! exception, handle, save, write, auto-save
+
+
+
+
+
+
+
+
+
+ClientConfig config;
+ConfigManager manager;
+
+manager.watch(config.graphics.msaa_enable, [](const auto& var) {
+	var
+
+
+
+
+
+
+
+
+
+
+
 
 app.star: Self-Updater
 

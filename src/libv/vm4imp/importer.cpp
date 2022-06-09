@@ -112,9 +112,11 @@ public:
 			const auto loadTexture = [&](const auto& stack, TextureType type, const auto& name) {
 				for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXTURE(stack, n), ai_str); ++n) {
 //					materials[i].properties.emplace(fmt::format("texture_{}_{:02}_path", name, n), std::string(ai_str.C_Str()));
+					static constexpr const auto slash_fwd = "/"; // static constexpr vars to suppress a false positive warning in GCC 12.1
+					static constexpr const auto slash_bwd = "\\";
 					materials[i].textures.emplace_back(
 							type,
-							boost::algorithm::replace_all_copy(std::string(ai_str.C_Str()), "\\", "/"),
+							boost::algorithm::replace_all_copy(std::string(ai_str.C_Str()), slash_bwd, slash_fwd),
 							0
 					);
 				}

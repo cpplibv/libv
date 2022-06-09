@@ -356,6 +356,8 @@ private:
 		// 	std::replace(generic_file_path_tmp.begin(), generic_file_path_tmp.end(), '\\', '/');
 		// }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 		const auto entry = fmt::format(fmt::runtime(this->format),
 				fmt::arg("message", message),
 				fmt::arg("module", module),
@@ -372,6 +374,7 @@ private:
 				// fmt::arg("time", std::chrono::steady_clock::now()),
 				fmt::arg("thread_id", thread_number())
 		);
+#pragma GCC diagnostic pop
 
 		for (auto& output : outputs)
 			*output << entry << std::flush;
