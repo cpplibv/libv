@@ -12,6 +12,7 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/log.hpp>
 #include <libv/gl/shader_object.hpp>
 
 

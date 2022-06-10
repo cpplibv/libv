@@ -411,25 +411,6 @@ void SurfaceCanvas::render(libv::glr::Queue& glr) {
 			}
 
 			renderer.sprite.bakeSprites(renderer.resource_context.loader, glr, renderer.resource_context.uniform_stream);
-
-			const auto& gl = glr.out_of_order_gl();
-			log_surface.info("{:46} [{:>10} ]", "CurrentAvailableVideoMemory",        gl.getCurrentAvailableVideoMemory());
-			log_surface.info("{:46} [{:>10} ]", "MaxColorAttachments",                gl.getMaxColorAttachments());
-			log_surface.info("{:46} [{:>10} ]", "MaxSamples",                         gl.getMaxSamples());
-			log_surface.info("{:46} [{:>10} ]", "MaxSamplesInteger",                  gl.getMaxSamplesInteger());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnits",               gl.getMaxTextureImageUnits());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsCompute",        gl.getMaxTextureImageUnitsCompute());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsFragment",       gl.getMaxTextureImageUnitsFragment());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsGeometry",       gl.getMaxTextureImageUnitsGeometry());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsTessControl",    gl.getMaxTextureImageUnitsTessControl());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsTessEvaluation", gl.getMaxTextureImageUnitsTessEvaluation());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureImageUnitsVertex",         gl.getMaxTextureImageUnitsVertex());
-			log_surface.info("{:46} [{:>10} ]", "MaxTextureSize",                     gl.getMaxTextureSize());
-			log_surface.info("{:46} [{:>10} ]", "MaxUniformBlockSize",                gl.getMaxUniformBlockSize());
-			log_surface.info("{:46} [{:>10} ]", "MaxUniformBufferBindings",           gl.getMaxUniformBufferBindings());
-			log_surface.info("{:46} [{:>10} ]", "MaxVertexAttribs",                   gl.getMaxVertexAttribs());
-			log_surface.info("{:46} [{:>10} ]", "MaxVertexUniformComponents",         gl.getMaxVertexUniformComponents());
-			log_surface.info("{:46} [{:>10} ]", "UniformBufferOffsetAlignment",       gl.getUniformBufferOffsetAlignment());
 		}
 
 		//build mesh

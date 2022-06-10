@@ -36,16 +36,6 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-const float PI = 3.14159265358979323846f;
-inline float rad(float degrees) {
-	return degrees / 180.0f * PI;
-}
-inline float deg(float radians) {
-	return radians / PI * 180.0f;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 class AccessArrayBuffer;
 class AccessBuffer;
 class AccessFramebuffer;
@@ -509,6 +499,9 @@ private:
 	bool debug = false;
 	bool trace = false;
 
+	int versionMajor;
+	int versionMinor;
+
 public:
 	BlendEquationSetter blendEquation;
 	BlendFunctionSetter blendFunction;
@@ -532,43 +525,7 @@ private:
 	Framebuffer framebufferDraw_{0};
 
 private:
-	void init() {
-		glewExperimental = true;
-
-		if (GLenum err = glewInit() != GLEW_OK) {
-			log_gl.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", glewGetErrorString(err));
-			return;
-		}
-
-		log_gl.debug("GL Vendor     {}", glGetString(GL_VENDOR));
-		log_gl.debug("GL Renderer   {}", glGetString(GL_RENDERER));
-		log_gl.debug("GL Version    {}", glGetString(GL_VERSION));
-
-		// Disable row alignment for texture and pixel operations
-		// Otherwise a default 4 byte alignment is required for pixels row starts (which is broken on R8G8B8 formats if the width is not multiple of 4)
-		// For more information:
-		//      https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
-		//      https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_layout
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
-		checkGL();
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		checkGL();
-
-//		glDisable(GL_FRAMEBUFFER_SRGB);
-//		glEnable(GL_FRAMEBUFFER_SRGB);
-
-		// Fetch OpenGL context current state
-		capability.blend.init();
-		capability.cullFace.init();
-		capability.depthTest.init();
-		capability.multisample.init();
-		capability.rasterizerDiscard.init();
-		capability.scissorTest.init();
-		capability.stencilTest.init();
-		capability.textureCubeMapSeamless.init();
-
-		capability.textureCubeMapSeamless.enable();
-	}
+	void init();
 
 public:
 	GL() {
@@ -579,13 +536,18 @@ public:
 	}
 
 public:
-	inline libv::mat4f mvp() const {
+	[[nodiscard]] inline bool versionOrGreater(int major, int minor) const noexcept {
+		return versionMajor > major || (versionMajor == major && versionMinor >= minor);
+	}
+
+public:
+	[[nodiscard]] inline libv::mat4f mvp() const {
 		return projection * view * model;
 	}
-	inline libv::vec3f eye() const {
+	[[nodiscard]] inline libv::vec3f eye() const {
 		return libv::vec::xyz(view.top().inverse_copy()[3]);
 	}
-	inline libv::mat4f getMatrixTexture() const {
+	[[nodiscard]] inline libv::mat4f getMatrixTexture() const {
 		return libv::mat4f{
 				0.5f, 0.0f, 0.0f, 0.0f,
 				0.0f, 0.5f, 0.0f, 0.0f,
@@ -674,7 +636,7 @@ public:
 		return get<GLint>(GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS);
 	}
 	[[nodiscard]] inline GLint getMaxTextureImageUnitsCompute() const {
-		return get<GLint>(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS);
+		return versionOrGreater(4, 3) ? get<GLint>(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS) : -1;
 	}
 	[[nodiscard]] inline GLint getMaxTextureImageUnitsTessControl() const {
 		return get<GLint>(GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS);
@@ -686,7 +648,7 @@ public:
 		return get<GLint>(GL_MAX_TEXTURE_IMAGE_UNITS);
 	}
 	[[nodiscard]] inline GLint getCurrentAvailableVideoMemory() const {
-		GLint availableKB[4]{0, 0, 0, 0};
+		GLint availableKB[4]{-1, -1, -1, -1};
 
 		if (GLEW_NVX_gpu_memory_info)
 			glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, availableKB);
@@ -709,56 +671,7 @@ public:
 	}
 
 private:
-	static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-			const GLchar* message, const void* userData) {
-
-		(void) length;
-		auto& self = *static_cast<const GL*>(userData);
-
-		const auto source_str = [&] {
-			switch (source) {
-			case GL_DEBUG_SOURCE_API:             return "API";
-			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Window System";
-			case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Shader Compiler";
-			case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Third Party";
-			case GL_DEBUG_SOURCE_APPLICATION:     return "Application";
-			case GL_DEBUG_SOURCE_OTHER:           return "Other";
-			default:                              return "?";
-			}
-		}();
-
-		const auto type_str = [&] {
-			switch (type) {
-			case GL_DEBUG_TYPE_ERROR:               return "Error";
-			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Deprecated Behaviour";
-			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Undefined Behaviour";
-			case GL_DEBUG_TYPE_PORTABILITY:         return "Portability";
-			case GL_DEBUG_TYPE_PERFORMANCE:         return "Performance";
-			case GL_DEBUG_TYPE_MARKER:              return "Marker";
-			case GL_DEBUG_TYPE_PUSH_GROUP:          return "Push Group";
-			case GL_DEBUG_TYPE_POP_GROUP:           return "Pop Group";
-			case GL_DEBUG_TYPE_OTHER:               return "Other";
-			default:                                return "?";
-			}
-		}();
-
-		const auto severity_str = [&] {
-			switch (severity) {
-			case GL_DEBUG_SEVERITY_HIGH:         return "high";
-			case GL_DEBUG_SEVERITY_MEDIUM:       return "medium";
-			case GL_DEBUG_SEVERITY_LOW:          return "low";
-			case GL_DEBUG_SEVERITY_NOTIFICATION: return "notification";
-			default:                             return "?";
-			}
-		}();
-
-		if (type == GL_DEBUG_TYPE_ERROR && self.debug)
-			log_gl.error("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
-					source_str, source, type_str, type, id, severity_str, severity, message);
-		else if (self.trace)
-			log_gl.trace("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
-					source_str, source, type_str, type, id, severity_str, severity, message);
-	};
+	static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userData);
 
 public:
 	void enableTrace() {
