@@ -7,6 +7,7 @@
 #include <libv/math/vec.hpp>
 #include <libv/serial/serial.hpp>
 // std
+#include <cstdint>
 #include <vector>
 // pro
 #include <libv/vm4/material.hpp>
@@ -101,12 +102,12 @@ struct LOD {
 };
 
 struct Model {
-	int32_t format = 20220324; /// VM4 format version identifier
+	int32_t format_version = 20220324; /// VM4 format version identifier
 
 //	int64_t hash; /// Pre-calculated hash value of the Model, useful to detect changes
 //	binary<32> hash; /// Pre-calculated hash value of the Model, useful to detect changes
 //	libv::Hash256 hash; /// Pre-calculated hash value of the Model, useful to detect changes
-	int32_t version = 0; /// Incremental informal version number, identical version does not mean identical model
+	int32_t model_version = 0; /// Incremental informal version number, identical version does not mean identical model
 //	std::chrono::system_clock::time_point import_time;
 	std::string name;
 
@@ -135,9 +136,9 @@ struct Model {
 	std::vector<uint32_t> indices;
 
 	template <typename Archive> void serialize(Archive& ar) {
-		ar(LIBV_NVP(format));
+		ar(LIBV_NVP(format_version));
 	//	ar(LIBV_NVP(hash));
-		ar(LIBV_NVP(version));
+		ar(LIBV_NVP(model_version));
 	//	ar(LIBV_NVP(import_time));
 		ar(LIBV_NVP(name));
 

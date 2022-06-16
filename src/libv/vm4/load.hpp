@@ -3,10 +3,12 @@
 #pragma once
 
 // std
-#include <optional>
-//#include <span>
+#include <span>
+#include <string_view>
+//#include <optional>
 // pro
-#include <libv/vm4/model.hpp>
+#include <libv/vm4/fwd.hpp>
+//#include <libv/vm4/model.hpp>
 
 
 namespace libv {
@@ -19,9 +21,9 @@ namespace vm4 {
 //	Model model;
 //};
 
-Model load_or_throw(const std::string& data);
-//Model load_or_throw(std::span<std::byte> data);
-//std::optional<Model> load_optional(std::span<std::byte> data);
+[[nodiscard]] Model load_or_throw(std::string_view data);
+[[nodiscard]] Model load_or_throw(std::span<const std::byte> data);
+//[[nodiscard]] std::optional<Model> load_optional(std::span<std::byte> data);
 
 // -------------------------------------------------------------------------------------------------
 
