@@ -23,10 +23,7 @@ struct EventScrollArea : BaseEvent {
 
 template <typename ComponentT>
 struct EventHostScrollArea : EventHostGeneral<ComponentT> {
-	BasicEventProxy<ComponentT, EventScrollArea> area;
-
-	explicit inline EventHostScrollArea(ComponentT& core) : EventHostGeneral<ComponentT>(core),
-		area(core) {}
+	BasicEventProxy<ComponentT, EventScrollArea> area{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

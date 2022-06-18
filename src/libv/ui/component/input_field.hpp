@@ -47,14 +47,9 @@ struct EventSelect : BaseEvent {
 
 template <typename ComponentT>
 struct EventHostEditable : EventHostSubmittable<ComponentT> {
-	BasicEventProxy<ComponentT, EventCaret> caret;
-	BasicEventProxy<ComponentT, EventChange> change;
-	BasicEventProxy<ComponentT, EventSelect> select;
-
-	explicit inline EventHostEditable(ComponentT& core) : EventHostSubmittable<ComponentT>(core),
-		caret(core),
-		change(core),
-		select(core) {}
+	BasicEventProxy<ComponentT, EventCaret> caret{this->owner};
+	BasicEventProxy<ComponentT, EventChange> change{this->owner};
+	BasicEventProxy<ComponentT, EventSelect> select{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -62,60 +62,35 @@ struct EventHostGlobal {
 	using component_type = ComponentT;
 
 public:
-	BasicEventProxyGlobal<ComponentT> global;
+	ComponentT& owner;
 
 public:
-	explicit inline EventHostGlobal(ComponentT& owner) noexcept :
-		global(owner) {}
+	BasicEventProxyGlobal<ComponentT> global{owner};
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename ComponentT>
 struct EventHostGeneral : EventHostGlobal<ComponentT> {
-	using component_type = ComponentT;
+	BasicEventProxy<ComponentT, EventChar> char_{this->owner};
+	BasicEventProxy<ComponentT, EventKey> key{this->owner};
 
-public:
-	BasicEventProxy<ComponentT, EventChar> char_;
-	BasicEventProxy<ComponentT, EventKey> key;
+	BasicEventProxy<ComponentT, EventMouseButton> mouse_button{this->owner};
+	BasicEventProxy<ComponentT, EventMouseMovement> mouse_movement{this->owner};
+	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll{this->owner};
 
-	BasicEventProxy<ComponentT, EventMouseButton> mouse_button;
-	BasicEventProxy<ComponentT, EventMouseMovement> mouse_movement;
-	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll;
+	BasicEventProxy<ComponentT, EventAttach> attach{this->owner};
+	BasicEventProxy<ComponentT, EventDetach> detach{this->owner};
 
-	BasicEventProxy<ComponentT, EventAttach> attach;
-	BasicEventProxy<ComponentT, EventDetach> detach;
-
-	BasicEventProxy<ComponentT, EventEnable> enable;
-	BasicEventProxy<ComponentT, EventFocus> focus;
-
-public:
-	explicit inline EventHostGeneral(ComponentT& owner) noexcept :
-		EventHostGlobal<ComponentT>(owner),
-		char_(owner),
-		key(owner),
-		mouse_button(owner),
-		mouse_movement(owner),
-		mouse_scroll(owner),
-		attach(owner),
-		detach(owner),
-		enable(owner),
-		focus(owner) {}
+	BasicEventProxy<ComponentT, EventEnable> enable{this->owner};
+	BasicEventProxy<ComponentT, EventFocus> focus{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename ComponentT>
 struct EventHostSubmittable : EventHostGeneral<ComponentT> {
-	using component_type = ComponentT;
-
-public:
-	BasicEventProxy<ComponentT, EventSubmit> submit;
-
-public:
-	explicit inline EventHostSubmittable(ComponentT& owner) :
-		EventHostGeneral<ComponentT>(owner),
-		submit(owner) {}
+	BasicEventProxy<ComponentT, EventSubmit> submit{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

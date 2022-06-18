@@ -25,10 +25,7 @@ struct EventPanelCardChange : BaseEvent {
 
 template <typename ComponentT>
 struct EventHostPanelCard : EventHostGeneral<ComponentT> {
-	BasicEventProxy<ComponentT, EventPanelCardChange> cardChange;
-
-	explicit inline EventHostPanelCard(ComponentT& core) : EventHostGeneral<ComponentT>(core),
-			cardChange(core) {}
+	BasicEventProxy<ComponentT, EventPanelCardChange> cardChange{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

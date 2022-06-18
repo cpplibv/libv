@@ -27,10 +27,7 @@ struct EventScrollChange : BaseEvent {
 
 template <typename ComponentT>
 struct EventHostScroll : EventHostGeneral<ComponentT> {
-	BasicEventProxy<ComponentT, EventScrollChange> change;
-
-	EventHostScroll(ComponentT& core) : EventHostGeneral<ComponentT>(core),
-		change(core) {}
+	BasicEventProxy<ComponentT, EventScrollChange> change{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -19,10 +19,7 @@ struct EventPanelStatusExpired : BaseEvent {
 
 template <typename ComponentT>
 struct EventHostPanelStatus : EventHostGeneral<ComponentT> {
-	BasicEventProxy<ComponentT, EventPanelStatusExpired> expire;
-
-	explicit inline EventHostPanelStatus(ComponentT& core) : EventHostGeneral<ComponentT>(core),
-		expire(core) {}
+	BasicEventProxy<ComponentT, EventPanelStatusExpired> expire{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------
