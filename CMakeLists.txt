@@ -608,6 +608,15 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME sqlite3
+	GIT_REPOSITORY https://github.com/VaderY/sqlite3-cmake.git
+	GIT_TAG a2cb89394d4c18c9055f07eb02663e8625ccf967
+	CMAKE_ARGS
+		-DBUILD_SHELL=OFF
+	LINK sqlite3
+)
+
+wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
 	GIT_TAG e6bde7819c60c453b720b5de8c7c5ee9ffd9805a
@@ -1252,6 +1261,12 @@ wish_create_executable(
 	TARGET sandbox_libv_sml
 	SOURCE sandbox/libv_sml_main.cpp
 	LINK   libv_log libv_state
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_sqlite3
+	SOURCE sandbox/libv_sqlite3_main.cpp
+	LINK   libv_utility ext_fmt ext_sqlite3
 )
 
 #wish_create_executable(
