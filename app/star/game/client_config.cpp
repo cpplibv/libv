@@ -88,7 +88,7 @@ namespace star {
 //				self() = deserialize<libv::archive::JSON, T>(std::move(config_file.data));
 //				app::log_app.trace("Loaded config {} in {:5.1f}ms", file_path_str, timer.timef_ms().count());
 //
-//			} catch (const cereal::Exception& e) {
+//			} catch (const vide::Exception& e) {
 //				app::log_app.error("Failed to deserialize config: {}. Regenerating default config.", e.what());
 //			}
 //		}

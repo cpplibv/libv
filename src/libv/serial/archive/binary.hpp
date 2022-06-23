@@ -5,8 +5,8 @@
 // fwd
 #include <libv/serial/archive/binary_fwd.hpp>
 // ext
-#include <cereal/cereal.hpp>
-#include <cereal/concept.hpp>
+#include <vide/vide.hpp>
+#include <vide/concept.hpp>
 // libv
 #include <libv/meta/lnv.hpp>
 #include <libv/utility/bytes/input_bytes.hpp>
@@ -35,10 +35,10 @@ inline void swap_bytes(std::byte* data) {
 
 template <typename CRTP = void>
 class BasicBinaryInput :
-		public cereal::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP> {
+		public vide::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, vide::AllowEmptyClassElision | vide::IgnoreNVP> {
 public:
 	using ArchiveType = libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>;
-	using Base = cereal::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>;
+	using Base = vide::InputArchive<libv::meta::lnv_t<CRTP, BasicBinaryInput<void>>, vide::AllowEmptyClassElision | vide::IgnoreNVP>;
 
 private:
 	libv::input_bytes input_stream;
@@ -69,7 +69,7 @@ public:
 		input_it += size; // (readSize would yield same result)
 
 		if (readSize != size)
-			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
+			throw vide::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
 
 		if constexpr (!is_network_endian())
 			for (std::size_t i = 0; i < size; i += DataSize)
@@ -81,16 +81,16 @@ public:
 	using Base::process_as;
 
 	template <class As, typename T>
-	inline void process_as(As& as, cereal::NameValuePair<T>& t) {
+	inline void process_as(As& as, vide::NameValuePair<T>& t) {
 		as(t.value);
 	}
 
 	template <class As, typename T>
-	inline void process_as(As& as, cereal::SizeTag<T>& t) {
+	inline void process_as(As& as, vide::SizeTag<T>& t) {
 		as(t.size);
 	}
 
-	template <class As, cereal::arithmetic T>
+	template <class As, vide::arithmetic T>
 	inline void process_as(As&, T& t) {
 		static_assert(!std::is_floating_point_v<T> || std::numeric_limits<T>::is_iec559,
 				"Portable binary only supports IEEE 754 standardized floating point");
@@ -99,7 +99,7 @@ public:
 	}
 
 	template <class As, class T>
-	inline void process_as(As&, cereal::BinaryData<T>& t) {
+	inline void process_as(As&, vide::BinaryData<T>& t) {
 		using TT = std::remove_pointer_t<T>;
 
 		static_assert(!std::is_floating_point_v<TT> || std::numeric_limits<TT>::is_iec559,
@@ -113,10 +113,10 @@ public:
 
 template <typename CRTP = void>
 class BasicBinaryOutput :
-		public cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP> {
+		public vide::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, vide::AllowEmptyClassElision | vide::IgnoreNVP> {
 public:
 	using ArchiveType = libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>;
-	using Base = cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, cereal::AllowEmptyClassElision | cereal::IgnoreNVP>;
+	using Base = vide::OutputArchive<libv::meta::lnv_t<CRTP, BasicBinaryOutput<void>>, vide::AllowEmptyClassElision | vide::IgnoreNVP>;
 
 private:
 	libv::output_bytes output_stream;
@@ -146,7 +146,7 @@ public:
 //		std::size_t writtenSize = 0;
 
 		if (output_stream.size() < output_it + size)
-			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Output stream only has " + std::to_string(output_stream.size() - output_it) + " byte storage left");
+			throw vide::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Output stream only has " + std::to_string(output_stream.size() - output_it) + " byte storage left");
 
 		if constexpr (!is_network_endian() && DataSize != 1) {
 			for (std::size_t i = 0; i < size; i += DataSize) {
@@ -163,7 +163,7 @@ public:
 		}
 
 //		if (writtenSize != size)
-//			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
+//			throw vide::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
 	}
 
 	// --- process_as remapping ------------------------------------------------------------------------
@@ -171,16 +171,16 @@ public:
 	using Base::process_as;
 
 	template <class As, typename T>
-	inline void process_as(As& as, const cereal::NameValuePair<T>& t) {
+	inline void process_as(As& as, const vide::NameValuePair<T>& t) {
 		as(t.value);
 	}
 
 	template <class As, typename T>
-	inline void process_as(As& as, const cereal::SizeTag<T>& t) {
+	inline void process_as(As& as, const vide::SizeTag<T>& t) {
 		as(t.size);
 	}
 
-	template <class As, cereal::arithmetic T>
+	template <class As, vide::arithmetic T>
 	inline void process_as(As&, const T& t) {
 		static_assert(!std::is_floating_point_v<T> || std::numeric_limits<T>::is_iec559,
 				"Portable binary only supports IEEE 754 standardized floating point");
@@ -189,7 +189,7 @@ public:
 	}
 
 	template <class As, class T>
-	inline void process_as(As&, const cereal::BinaryData<T>& t) {
+	inline void process_as(As&, const vide::BinaryData<T>& t) {
 		using TT = std::remove_pointer_t<T>;
 
 		static_assert(!std::is_floating_point_v<TT> || std::numeric_limits<TT>::is_iec559,
@@ -205,5 +205,5 @@ public:
 } // namespace libv
 
 // register archives for polymorphic support
-CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicBinaryOutput<>)
-CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicBinaryInput<>)
+VIDE_REGISTER_ARCHIVE(::libv::archive::BasicBinaryOutput<>)
+VIDE_REGISTER_ARCHIVE(::libv::archive::BasicBinaryInput<>)

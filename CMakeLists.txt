@@ -312,17 +312,6 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME cereal
-	GIT_REPOSITORY https://github.com/VaderY/cereal.git
-	GIT_TAG b03f237713a7e4aab18c7d9150fb3c9a5e92ea3a
-#	GIT_REPOSITORY /e/dev/cpp/forks/cereal
-#	GIT_TAG dev
-	CMAKE_ARGS
-		-DJUST_INSTALL_CEREAL=ON
-	DEFINE CEREAL_XML_STRING_VALUE="root"
-)
-
-wish_create_external(
 	NAME clip
 	GIT_REPOSITORY https://github.com/dacap/clip.git
 	GIT_TAG 3c8f05b5d71a4d5ea7125f074323307293332a92
@@ -636,6 +625,16 @@ wish_create_external(
 		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/jc_voronoi/src/get_jc_voronoi/src/jc_voronoi.h ${PATH_EXT}/jc_voronoi/include/jc_voronoi/jc_voronoi.h
 )
 
+wish_create_external(
+	NAME vide
+	GIT_REPOSITORY https://github.com/cpplibv/vide.git
+	GIT_TAG 40f6709e0a7b0d88d519c0d85d7e2c9d1a807325
+#	GIT_REPOSITORY /e/dev/cpp/forks/vide
+#	GIT_TAG dev
+	CMAKE_ARGS
+		-DJUST_INSTALL_VIDE=ON
+)
+
 wish_end_group()
 
 # === Targets ======================================================================================
@@ -819,7 +818,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_serial INTERFACE
-	LINK   ext_cereal
+	LINK   ext_vide
 #	LINK   ext_boost # Remove
 	LINK   libv_utility # For byte streams that might be removed in the future
 )
@@ -1240,9 +1239,9 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET sandbox_libv_serialize_cereal
-	SOURCE sandbox/libv_serialize_cereal_main.cpp
-	LINK   ext_boost ext_cereal libv_serial
+	TARGET sandbox_libv_serialize_vide
+	SOURCE sandbox/libv_serialize_vide_main.cpp
+	LINK   ext_boost ext_vide libv_serial
 )
 
 wish_create_executable(

@@ -5,7 +5,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-namespace cereal {
+namespace vide {
 
 class JSONInputArchive;
 class JSONOutputArchive;
@@ -13,7 +13,7 @@ class JSONOutputArchive;
 class XMLInputArchive;
 class XMLOutputArchive;
 
-} // namespace cereal
+} // namespace vide
 
 // -------------------------------------------------------------------------------------------------
 
@@ -25,16 +25,16 @@ class BinaryOutput;
 class BinaryInput;
 
 class JSON;
-using JSONInput = cereal::JSONInputArchive;
-using JSONOutput = cereal::JSONOutputArchive;
+using JSONInput = vide::JSONInputArchive;
+using JSONOutput = vide::JSONOutputArchive;
 
 class JSONAny;
 class JSONAnyInput;
 class JSONAnyOutput;
 
 class XML;
-using XMLInput = cereal::XMLInputArchive;
-using XMLOutput = cereal::XMLOutputArchive;
+using XMLInput = vide::XMLInputArchive;
+using XMLOutput = vide::XMLOutputArchive;
 
 // -------------------------------------------------------------------------------------------------
 

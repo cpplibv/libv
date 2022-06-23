@@ -5,8 +5,8 @@
 // fwd
 #include <libv/serial/archive/json_any_fwd.hpp>
 // ext
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
+#include <vide/archives/json.hpp>
+#include <vide/vide.hpp>
 // libv
 #include <libv/utility/bytes/input_bytes.hpp>
 #include <libv/utility/bytes/output_bytes.hpp>
@@ -34,7 +34,7 @@ struct JSONAnyInputTempStream {
 /// Not efficient temporary implementation that uses an additional string stream to bypass std / cereal stream limitations
 /// Remove when possible
 template <typename CRTP = void>
-class BasicJSONAnyInput : private detail::JSONAnyInputTempStream, public cereal::JSONInputArchive {
+class BasicJSONAnyInput : private detail::JSONAnyInputTempStream, public vide::JSONInputArchive {
 private:
 	static std::string read_all_from_input_stream(libv::input_bytes& input_stream) {
 		std::string result;
@@ -65,15 +65,15 @@ public:
 /// Not efficient temporary implementation that uses an additional string stream to bypass std / cereal stream limitations
 /// Remove when possible
 template <typename CRTP = void>
-class BasicJSONAnyOutput : public cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicJSONAnyOutput<void>>, cereal::TextArchive> {
+class BasicJSONAnyOutput : public vide::OutputArchive<libv::meta::lnv_t<CRTP, BasicJSONAnyOutput<void>>, vide::TextArchive> {
 public:
 	using ArchiveType = libv::meta::lnv_t<CRTP, BasicJSONAnyOutput<void>>;
-	using Options = cereal::JSONOutputArchive::Options;
+	using Options = vide::JSONOutputArchive::Options;
 
 private:
 	libv::output_bytes output_stream;
 	std::ostringstream temp_ss_stream;
-	std::optional<cereal::JSONOutputArchive> impl;
+	std::optional<vide::JSONOutputArchive> impl;
 
 public:
 	explicit inline BasicJSONAnyOutput(libv::output_bytes output_stream, const Options& options = Options::Default()) :
@@ -109,5 +109,5 @@ public:
 } // namespace archive
 } // namespace libv
 
-CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyInput<>)
-CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyOutput<>)
+VIDE_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyInput<>)
+VIDE_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyOutput<>)

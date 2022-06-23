@@ -3,7 +3,7 @@
 #pragma once
 
 // ext
-#include <cereal/macros.hpp>
+#include <vide/macros.hpp>
 // pro
 #include <libv/serial/enable.hpp>
 #include <libv/serial/nvp.hpp>
@@ -12,6 +12,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_SERIAL_EXTENSION_NAMESPACE cereal
+#define LIBV_SERIAL_EXTENSION_NAMESPACE vide
 
 // -------------------------------------------------------------------------------------------------

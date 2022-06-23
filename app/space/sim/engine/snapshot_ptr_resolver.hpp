@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <cereal/cereal.hpp>
-#include <cereal/concept.hpp>
+#include <vide/vide.hpp>
+#include <vide/concept.hpp>
 // libv
 #include <libv/utility/entity/entity_ptr_fwd.hpp>
 // pro
@@ -18,7 +18,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-class SnapshotPtrResolverArchive : public cereal::OutputArchive<SnapshotPtrResolverArchive, cereal::IgnoreNVP> {
+class SnapshotPtrResolverArchive : public vide::OutputArchive<SnapshotPtrResolverArchive, vide::IgnoreNVP> {
 private:
 //	Universe& universe;
 	const Universe& universe;
@@ -49,21 +49,21 @@ public:
 	using OutputArchive::process_as;
 
 	template <typename As, typename T>
-	inline void process_as(As& as, const cereal::NameValuePair<T>& var) {
+	inline void process_as(As& as, const vide::NameValuePair<T>& var) {
 		as(var.value);
 	}
 
 	template <typename As, typename T>
-	inline void process_as(As&, const cereal::SizeTag<T>&) {
+	inline void process_as(As&, const vide::SizeTag<T>&) {
 		// Visitation is no-op, type serializers will call into the archive
 	}
 
 	template <typename As, typename T>
-	inline void process_as(As&, const cereal::BinaryData<T>&) {
+	inline void process_as(As&, const vide::BinaryData<T>&) {
 		// Visitation is no-op, type serializers will call into the archive
 	}
 
-	template <typename As, cereal::arithmetic T>
+	template <typename As, vide::arithmetic T>
 	inline void process_as(As&, const T&) {
 		// Visitation is no-op, type serializers will call into the archive
 	}

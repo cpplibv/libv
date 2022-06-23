@@ -3,7 +3,7 @@
 #pragma once
 
 // ext
-#include <cereal/binary_data.hpp>
+#include <vide/binary_data.hpp>
 
 
 namespace libv {
@@ -11,8 +11,8 @@ namespace serial {
 
 // -------------------------------------------------------------------------------------------------
 
-using cereal::BinaryData;
-using cereal::binary_data;
+using vide::BinaryData;
+using vide::binary_data;
 
 // -------------------------------------------------------------------------------------------------
 

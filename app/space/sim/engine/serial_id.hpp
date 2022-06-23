@@ -35,7 +35,7 @@ namespace space {
 ///		}
 template <typename T>
 class SerialID {
-	friend cereal::access;
+	friend vide::access;
 
 public:
 	using id_type = decltype(std::declval<T&>().id);

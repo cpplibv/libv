@@ -1,10 +1,10 @@
 // Project: libv, File: sandbox/libv_serialize_cereal_main.cpp
 
 // ext
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/archives/xml.hpp>
+#include <vide/archives/binary.hpp>
+#include <vide/archives/json.hpp>
+#include <vide/archives/portable_binary.hpp>
+#include <vide/archives/xml.hpp>
 // libv
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/memberwise.hpp>
@@ -151,7 +151,7 @@ int main() {
 		std::stringstream ss(std::ios::in | std::ios::out | std::ios::binary);
 
 		{
-			cereal::PortableBinaryOutputArchive oar(ss);
+			vide::PortableBinaryOutputArchive oar(ss);
 			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
@@ -160,7 +160,7 @@ int main() {
 		std::cout << std::endl;
 
 		{
-			cereal::PortableBinaryInputArchive iar(ss);
+			vide::PortableBinaryInputArchive iar(ss);
 			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
@@ -171,7 +171,7 @@ int main() {
 		std::stringstream ss;
 
 		{
-			cereal::BinaryOutputArchive oar(ss);
+			vide::BinaryOutputArchive oar(ss);
 			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
@@ -180,7 +180,7 @@ int main() {
 		std::cout << std::endl;
 
 		{
-			cereal::BinaryInputArchive iar(ss);
+			vide::BinaryInputArchive iar(ss);
 			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
@@ -191,7 +191,7 @@ int main() {
 		std::stringstream ss;
 
 		{
-			cereal::JSONOutputArchive oar(ss);
+			vide::JSONOutputArchive oar(ss);
 			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
@@ -200,7 +200,7 @@ int main() {
 		std::cout << std::endl;
 
 		{
-			cereal::JSONInputArchive iar(ss);
+			vide::JSONInputArchive iar(ss);
 			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
@@ -211,7 +211,7 @@ int main() {
 		std::stringstream ss;
 
 		{
-			cereal::XMLOutputArchive oar(ss);
+			vide::XMLOutputArchive oar(ss);
 			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
@@ -220,7 +220,7 @@ int main() {
 		std::cout << std::endl;
 
 		{
-			cereal::XMLInputArchive iar(ss);
+			vide::XMLInputArchive iar(ss);
 			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}

@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <cereal/archives/xml.hpp>
-#include <cereal/cereal.hpp>
+#include <vide/archives/xml.hpp>
+#include <vide/vide.hpp>
 
 
 namespace libv {
@@ -12,8 +12,8 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-using XMLInput = cereal::XMLInputArchive;
-using XMLOutput = cereal::XMLOutputArchive;
+using XMLInput = vide::XMLInputArchive;
+using XMLOutput = vide::XMLOutputArchive;
 
 struct XML {
 	using input = XMLInput;

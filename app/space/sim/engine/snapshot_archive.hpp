@@ -3,7 +3,7 @@
 #pragma once
 
 // ext
-#include <cereal/archives/proxy_archive.hpp>
+#include <vide/archives/proxy_archive.hpp>
 // std
 #include <utility>
 // pro
@@ -25,8 +25,8 @@ class SimulationContext;
 /// \Usage
 /// 		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
 template <typename Archive>
-class SnapshotArchive : public cereal::ProxyArchive<SnapshotArchive<Archive>, Archive> {
-	using Base = cereal::ProxyArchive<SnapshotArchive<Archive>, Archive>;
+class SnapshotArchive : public vide::ProxyArchive<SnapshotArchive<Archive>, Archive> {
+	using Base = vide::ProxyArchive<SnapshotArchive<Archive>, Archive>;
 
 public:
 	SimulationContext& simulationContext;

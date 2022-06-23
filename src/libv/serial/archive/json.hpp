@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
+#include <vide/archives/json.hpp>
+#include <vide/vide.hpp>
 
 
 namespace libv {
@@ -12,8 +12,8 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-using JSONInput = cereal::JSONInputArchive;
-using JSONOutput = cereal::JSONOutputArchive;
+using JSONInput = vide::JSONInputArchive;
+using JSONOutput = vide::JSONOutputArchive;
 
 struct JSON {
 	using input = JSONInput;

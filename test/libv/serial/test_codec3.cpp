@@ -302,7 +302,7 @@ TEST_CASE("Codec3 encode/decode multiple object", "[libv.serial.codec]") {
 	CHECK(decode_handler_call == 2);
 
 	// Try over-read
-	CHECK_THROWS_AS(codec.decode(iar, [&](const auto&) {}), cereal::Exception);
+	CHECK_THROWS_AS(codec.decode(iar, [&](const auto&) {}), vide::Exception);
 }
 
 TEST_CASE("Codec3 encode/decode multiple object JSON", "[libv.serial.codec]") {
@@ -349,5 +349,5 @@ R"({
 
 	// Try over-read
 	// Currently the JSON archive restart when they reach the end, so no over-read exception
-	//	CHECK_THROWS_AS(codec.decode(iar, [&](const auto&) {}), cereal::Exception);
+	//	CHECK_THROWS_AS(codec.decode(iar, [&](const auto&) {}), vide::Exception);
 }

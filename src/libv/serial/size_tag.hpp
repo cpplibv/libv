@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <cereal/size_tag.hpp>
-#include <cereal/macros.hpp>
+#include <vide/size_tag.hpp>
+#include <vide/macros.hpp>
 
 
 namespace libv {
@@ -13,12 +13,12 @@ namespace serial {
 // -------------------------------------------------------------------------------------------------
 
 //template <typename T>
-//using SizeTag = cereal::SizeTag<T>;
+//using SizeTag = vide::SizeTag<T>;
 
-using cereal::SizeTag;
-using cereal::make_size_tag;
+using vide::SizeTag;
+using vide::make_size_tag;
 
-using cereal::size_type;
+using vide::size_type;
 
 // -------------------------------------------------------------------------------------------------
 
