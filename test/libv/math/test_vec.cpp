@@ -1,9 +1,15 @@
 // Project: libv.math, File: test/libv/math/test_vec.cpp
 
-#include <libv/math/vec.hpp>
-
+// hpp
 #include <catch/catch.hpp>
+// ext
+#include <fmt/format.h>
+// libv
+#include <libv/math/constants.hpp>
+// std
 #include <string>
+// pro
+#include <libv/math/vec.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -36,7 +42,7 @@ struct CtorCounter {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("unionValue") {
+TEST_CASE("unionValue", "[libv.math.vec]") {
 	libv::vec4f vec(0, 1, 2, 3);
 
 	CHECK(0.f == vec.x);
@@ -66,7 +72,7 @@ TEST_CASE("unionValue") {
 	CHECK((4 * sizeof (float)) == sizeof (vec));
 }
 
-TEST_CASE("unionAddress") {
+TEST_CASE("unionAddress", "[libv.math.vec]") {
 	libv::vec4_t<double> vec(0, 1, 2, 3);
 
 	CHECK(&vec.x == &vec.data()[0]);
@@ -93,7 +99,7 @@ TEST_CASE("unionAddress") {
 	CHECK((4 * sizeof (double)) == sizeof (vec));
 }
 
-TEST_CASE("dimMacro") {
+TEST_CASE("dimMacro", "[libv.math.vec]") {
 	libv::vec2ui veca2(1, 2);
 	libv::vec3ui veca3(1, 2, 3);
 	libv::vec4ui veca4(1, 2, 3, 4);
@@ -110,7 +116,7 @@ TEST_CASE("dimMacro") {
 	CHECK(veca4 == libv::vec4ul(2, 4, 6, 8));
 }
 
-TEST_CASE("ctor") {
+TEST_CASE("ctor", "[libv.math.vec]") {
 	libv::vec2f vec2d;
 	libv::vec2f vec20(1, 2);
 	libv::vec2f vec21(vec20);
@@ -148,7 +154,7 @@ TEST_CASE("ctor") {
 	CHECK(vec47 == libv::vec4f(1, 2, 3, 4));
 }
 
-TEST_CASE("nonMemberOperator") {
+TEST_CASE("nonMemberOperator", "[libv.math.vec]") {
 	libv::vec3d vec0(1.5, 4.2, 3.14);
 
 	libv::vec3d vec1 = vec0 / 2;
@@ -163,7 +169,7 @@ TEST_CASE("nonMemberOperator") {
 	CHECK(libv::vec3d(0.75, 2.1, 1.57) == vec2);
 }
 
-TEST_CASE("normalize") {
+TEST_CASE("normalize", "[libv.math.vec]") {
 	libv::vec2d vec0(15, 15);
 
 	CHECK(vec0 > 2);
@@ -174,7 +180,7 @@ TEST_CASE("normalize") {
 	CHECK(1 == Approx(vec0.normalize_copy().length()));
 }
 
-TEST_CASE("Custom getter functions") {
+TEST_CASE("Custom getter functions", "[libv.math.vec]") {
 	libv::vec4i vec0(1, 2, 3, 4);
 
 	CHECK(libv::vec::xy(vec0) == libv::vec2i(1, 2));
@@ -193,7 +199,7 @@ TEST_CASE("Custom getter functions") {
 	CHECK(vec0[3] == 4);
 }
 
-TEST_CASE("Freestanding one dim getter functions") {
+TEST_CASE("Freestanding one dim getter functions", "[libv.math.vec]") {
 	libv::vec4i vec0(1, 2, 3, 4);
 
 	CHECK(vec0.x == 1);
@@ -208,7 +214,7 @@ TEST_CASE("Freestanding one dim getter functions") {
 	CHECK(x(vec0) == 50);
 }
 
-TEST_CASE("Copy ctor from different type") {
+TEST_CASE("Copy ctor from different type", "[libv.math.vec]") {
 	struct Source {
 		int value;
 	};
@@ -224,14 +230,14 @@ TEST_CASE("Copy ctor from different type") {
 	CHECK(v1 == v0);
 }
 
-TEST_CASE("Non trivially destructible type") {
+TEST_CASE("Non trivially destructible type", "[libv.math.vec]") {
 	libv::vec_t<2, std::string> v0("x", "y");
 
 	CHECK(v0[0] == "x");
 	CHECK(v0[1] == "y");
 }
 
-TEST_CASE("operator=") {
+TEST_CASE("operator=", "[libv.math.vec]") {
 	struct Source {
 		int value;
 	};
@@ -251,7 +257,7 @@ TEST_CASE("operator=") {
 	CHECK(v2 == libv::vec_t<2, Source>({4}, {5}));
 }
 
-TEST_CASE("copy / move assignment") {
+TEST_CASE("copy / move assignment", "[libv.math.vec]") {
 	using A = CtorCounter<class Tag>;
 
 	{
@@ -272,7 +278,7 @@ TEST_CASE("copy / move assignment") {
 	CHECK(A::dtor == 9);
 }
 
-TEST_CASE("copy / move ctor") {
+TEST_CASE("copy / move ctor", "[libv.math.vec]") {
 	using A = CtorCounter<class Tag>;
 
 	{
@@ -308,7 +314,7 @@ TEST_CASE("copy / move ctor") {
 	A::reset();
 }
 
-TEST_CASE("copy / move assignment with non trivial payload") {
+TEST_CASE("copy / move assignment with non trivial payload", "[libv.math.vec]") {
 	class Tag;
 	using A = CtorCounter<Tag>;
 	struct Payload {
@@ -334,7 +340,7 @@ TEST_CASE("copy / move assignment with non trivial payload") {
 	CHECK(A::dtor == 9);
 }
 
-TEST_CASE("copy / move ctor with non trivial payload") {
+TEST_CASE("copy / move ctor with non trivial payload", "[libv.math.vec]") {
 	class Tag;
 	using A = CtorCounter<Tag>;
 	struct Payload {
@@ -375,7 +381,7 @@ TEST_CASE("copy / move ctor with non trivial payload") {
 	A::reset();
 }
 
-TEST_CASE("operator*=") {
+TEST_CASE("operator*=", "[libv.math.vec]") {
 	libv::vec_t<2, int> v0(1, 2);
 
 	libv::vec_t<2, int> v1(1, 1);
@@ -393,7 +399,7 @@ TEST_CASE("operator*=") {
 	CHECK(v0 == libv::vec2i(1, 6));
 }
 
-TEST_CASE("length") {
+TEST_CASE("length", "[libv.math.vec]") {
 	libv::vec_t<2, float> v0(0, 10);
 	libv::vec_t<2, float> v1(10, 10);
 
@@ -403,7 +409,7 @@ TEST_CASE("length") {
 	CHECK(200.0f == Approx(v1.length_sq()));
 }
 
-TEST_CASE("operator*(vec, vec)") {
+TEST_CASE("operator*(vec, vec)", "[libv.math.vec]") {
 	libv::vec_t<2, int> v0(1, 2);
 
 	libv::vec_t<2, int> v1(1, 1);
@@ -427,7 +433,7 @@ TEST_CASE("operator*(vec, vec)") {
 	CHECK((v0 - v4) == libv::vec2i(-2, 2));
 }
 
-TEST_CASE("operator*(vec, vec) with different types") {
+TEST_CASE("operator*(vec, vec) with different types", "[libv.math.vec]") {
 	libv::vec_t<2, int64_t> v0(1, 2);
 
 	libv::vec_t<2, int32_t> v1(1, 1);
@@ -451,7 +457,7 @@ TEST_CASE("operator*(vec, vec) with different types") {
 	CHECK(r3 == libv::vec2l(-2, 2));
 }
 
-TEST_CASE("operator*(vec, skalar)") {
+TEST_CASE("operator*(vec, skalar)", "[libv.math.vec]") {
 	libv::vec_t<2, int> v0(4, 8);
 
 	int v1 = 2;
@@ -473,7 +479,7 @@ TEST_CASE("operator*(vec, skalar)") {
 	CHECK(r3 == libv::vec2i(2, 1));
 }
 
-TEST_CASE("operator*(vec, skalar) with different types") {
+TEST_CASE("operator*(vec, skalar) with different types", "[libv.math.vec]") {
 	libv::vec_t<2, int32_t> v0(4, 8);
 
 	int64_t v1 = 2;
@@ -495,7 +501,7 @@ TEST_CASE("operator*(vec, skalar) with different types") {
 	CHECK(r3 == libv::vec2l(2, 1));
 }
 
-TEST_CASE("operator+") {
+TEST_CASE("operator+", "[libv.math.vec]") {
 	libv::vec_t<2, int> v0(+4, +8);
 	libv::vec_t<2, int> v1(-4, +8);
 	libv::vec_t<2, int> v2(-4, -8);
@@ -516,4 +522,47 @@ TEST_CASE("operator+") {
 	CHECK(r11 == libv::vec2i(+4, -8));
 	CHECK(r20 == libv::vec2i(-4, -8));
 	CHECK(r21 == libv::vec2i(+4, +8));
+}
+
+// =================================================================================================
+
+// TODO P2: libv.math: Move formatter to the vec.hpp header
+// TODO P2: libv.math: Implement vec_t top / nested level formatting, support recursion
+// TODO P2: libv.math: Implement quat_t formatter
+template <std::size_t N, typename T>
+struct fmt::formatter<libv::vec_t<N, T>> : fmt::formatter<T> {
+	template <typename FormatContext>
+	auto format(const libv::vec_t<N, T>& vec, FormatContext& ctx) {
+		auto out = ctx.out();
+
+		for (std::size_t i = 0; i < N; ++i) {
+			if (i != 0)
+				out = fmt::format_to(out, " ");
+			out = formatter<T>::format(vec[i], ctx);
+			ctx.advance_to(out);
+		}
+
+		return out;
+	}
+};
+
+TEST_CASE("Test math.vec formatter", "[libv.math.vec]") {
+	libv::vec3f v0(42.0f, libv::pi, -0.3f);
+	libv::vec3f v1(0, 1, 2);
+
+	CHECK(fmt::format("{}", v0) == "42 3.1415927 -0.3");
+	CHECK(fmt::format("{:07.3f}", v0) == "042.000 003.142 -00.300");
+	CHECK(fmt::format("{:<6}", v0) == "42     3.1415927 -0.3  ");
+	CHECK(fmt::format("{:^6}", v0) == "  42   3.1415927  -0.3 ");
+	CHECK(fmt::format("{:>6}", v0) == "    42 3.1415927   -0.3");
+
+	CHECK(fmt::format("{}", v1) == "0 1 2");
+
+//	CHECK(fmt::format("{:,}", v0) == "42, 3.1415927, -0.3");
+//	CHECK(fmt::format("{:,:07.3f}", v0) == "042.000, 003.142, -00.300");
+//	CHECK(fmt::format("{:,:<6}", v0) == "42    , 3.1415927, -0.3  ");
+//	CHECK(fmt::format("{:,:^6}", v0) == "  42  , 3.1415927,  -0.3 ");
+//	CHECK(fmt::format("{:,:>6}", v0) == "    42, 3.1415927,   -0.3");
+//
+//	CHECK(fmt::format("{:,}", v1) == "0, 1, 2");
 }
