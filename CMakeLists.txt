@@ -21,6 +21,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 string(TOLOWER ${CMAKE_BUILD_TYPE} WISH_BUILD_TYPE_LOWER)
 
+set(CMAKE_BUILD_TYPE ${WISH_BUILD_TYPE_LOWER})
 set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;DEV" CACHE STRING "" FORCE)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -109,7 +110,7 @@ wish_warning(
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+	if(CMAKE_BUILD_TYPE STREQUAL "debug")
 		# add_compile_options(-fsanitize=address)
 		# add_compile_options(-fsanitize=kernel-address)
 		# add_compile_options(-fsanitize=leak)
@@ -146,14 +147,14 @@ else()
 	message(STATUS "Generating external project configurations")
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+if(CMAKE_BUILD_TYPE STREQUAL "debug")
 	add_compile_options(-Og)
 	add_compile_options(-ggdb3)
 
-elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
+elseif(CMAKE_BUILD_TYPE STREQUAL "dev")
 	add_compile_options(-O3)
 
-elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+elseif(CMAKE_BUILD_TYPE STREQUAL "release")
 	add_compile_options(-O3)
 	add_compile_options(-flto)
 	SET(CMAKE_AR "gcc-ar")
@@ -172,21 +173,19 @@ add_compile_options(-std=c++23)
 
 # Tooling ------------------------------------------------------------------------------------------
 
-# Sparing tooling from supporting requires, for now.
-add_definitions("-D\"WISH_REQUIRES(...)=requires (__VA_ARGS__)\"")
 #wish_add_ide_definition("WISH_REQUIRES(...)" " ")
-add_definitions("-D\"IDE_IGNORE(...)=__VA_ARGS__\"")
+#add_definitions("-D\"IDE_IGNORE(...)=__VA_ARGS__\"")
 
-add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
-add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
-add_definitions(-DWISH_TIME_LONG="${WISH_TIME_LONG}")
-add_definitions(-DWISH_TIME_SHORT="${WISH_TIME_SHORT}")
+#add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
+#add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
+#add_definitions(-DWISH_TIME_LONG="${WISH_TIME_LONG}")
+#add_definitions(-DWISH_TIME_SHORT="${WISH_TIME_SHORT}")
 
 # Definitions --------------------------------------------------------------------------------------
 
 # Macro - Git
-add_definitions(-DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}")
-add_definitions(-DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
+#add_definitions(-DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}")
+#add_definitions(-DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
 # Macro - Libv
 string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
 add_definitions(-DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF})

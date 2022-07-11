@@ -3,10 +3,7 @@
 #pragma once
 
 // std
-#include <concepts>
 #include <type_traits>
-// libv
-#include <libv/meta/lnv.hpp>
 
 
 namespace libv {
@@ -15,50 +12,70 @@ namespace libv {
 
 /// Two dimensional mathematical vector concept. Types with x, y member variables
 /// @param Type - The Type to be tested
-/// @param Element - Optional parameter to specify the Element's Type
-/// @example Concept usage:\code
-/// template <typename V> WISH_REQUIRES(Vec2<V>) void function(V& vec) {}\endcode
-/// @example Concept usage with Element type specified:\code
-/// template <typename V> WISH_REQUIRES(Vec2<V, float>) void function(V& vec) {}\endcode
-template <typename Vector, typename Element = void>
+template <typename Vector>
 concept Vec2 = requires(Vector vec) {
-	requires std::is_same_v<decltype(vec.x), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.y), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires sizeof(vec) == 2 * sizeof(libv::meta::lnv_t<Element, decltype(vec.x)>);
+	requires std::is_same_v<decltype(vec.x), decltype(vec.y)>;
+	requires sizeof(vec) == 2 * sizeof(decltype(vec.x));
+	requires &vec.x < &vec.y;
+};
+
+/// Two dimensional mathematical vector concept. Types with x, y member variables
+/// @param Type - The Type to be tested
+/// @param Element - Specify the Element's Type
+template <typename Vector, typename Element>
+concept Vec2Type = requires(Vector vec) {
+	requires std::is_same_v<decltype(vec.x), Element>;
+	requires std::is_same_v<decltype(vec.y), Element>;
+	requires sizeof(vec) == 2 * sizeof(Element);
 	requires &vec.x < &vec.y;
 };
 
 /// Three dimensional mathematical vector concept. Types with x, y, z member variables
 /// @param Type - The Type to be tested
-/// @param Element - Optional parameter to specify the Element's Type
-/// @example Concept usage:\code
-/// template <typename V> WISH_REQUIRES(Vec3<V>) void function(V& vec) {}\endcode
-/// @example Concept usage with Element type specified:\code
-/// template <typename V> WISH_REQUIRES(Vec3<V, float>) void function(V& vec) {}\endcode
-template <typename Vector, typename Element = void>
+template <typename Vector>
 concept Vec3 = requires(Vector vec) {
-	requires std::is_same_v<decltype(vec.x), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.y), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.z), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires sizeof(vec) == 3 * sizeof(libv::meta::lnv_t<Element, decltype(vec.x)>);
+	requires std::is_same_v<decltype(vec.x), decltype(vec.y)>;
+	requires std::is_same_v<decltype(vec.x), decltype(vec.z)>;
+	requires sizeof(vec) == 3 * sizeof(decltype(vec.x));
+	requires &vec.x < &vec.y;
+	requires &vec.y < &vec.z;
+};
+
+/// Three dimensional mathematical vector concept. Types with x, y, z member variables
+/// @param Type - The Type to be tested
+/// @param Element - Specify the Element's Type
+template <typename Vector, typename Element>
+concept Vec3Type = requires(Vector vec) {
+	requires std::is_same_v<decltype(vec.x), Element>;
+	requires std::is_same_v<decltype(vec.y), Element>;
+	requires std::is_same_v<decltype(vec.z), Element>;
+	requires sizeof(vec) == 3 * sizeof(Element);
 	requires &vec.x < &vec.y;
 	requires &vec.y < &vec.z;
 };
 
 /// Four dimensional mathematical vector concept. Types with x, y, z, w as member variables
 /// @param Type - The Type to be tested
-/// @param Element - Optional parameter to specify the Element's Type
-/// @example Concept usage:\code
-/// template <typename V> WISH_REQUIRES(Vec4<V>) void function(V& vec) {}\endcode
-/// @example Concept usage with Element type specified:\code
-/// template <typename V> WISH_REQUIRES(Vec4<V, float>) void function(V& vec) {}\endcode
-template <typename Vector, typename Element = void>
+template <typename Vector>
 concept Vec4 = requires(Vector vec) {
-	requires std::is_same_v<decltype(vec.x), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.y), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.z), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires std::is_same_v<decltype(vec.w), libv::meta::lnv_t<Element, decltype(vec.x)>>;
-	requires sizeof(vec) == 4 * sizeof(libv::meta::lnv_t<Element, decltype(vec.x)>);
+	requires std::is_same_v<decltype(vec.x), decltype(vec.y)>;
+	requires std::is_same_v<decltype(vec.x), decltype(vec.z)>;
+	requires std::is_same_v<decltype(vec.x), decltype(vec.w)>;
+	requires sizeof(vec) == 4 * sizeof(decltype(vec.x));
+	requires &vec.x < &vec.y;
+	requires &vec.y < &vec.z;
+	requires &vec.z < &vec.w;
+};
+
+/// Four dimensional mathematical vector concept. Types with x, y, z, w as member variables
+/// @param Type - The Type to be tested
+/// @param Element - Specify the Element's Type
+template <typename Vector, typename Element>
+concept Vec4Type = requires(Vector vec) {
+	requires std::is_same_v<decltype(vec.x), Element>;
+	requires std::is_same_v<decltype(vec.y), Element>;
+	requires std::is_same_v<decltype(vec.z), Element>;
+	requires sizeof(vec) == 4 * sizeof(Element);
 	requires &vec.x < &vec.y;
 	requires &vec.y < &vec.z;
 	requires &vec.z < &vec.w;
@@ -69,11 +86,7 @@ concept Vec4 = requires(Vector vec) {
 ///// N dimensional mathematical vector concept. Types with x, y as member variables but without z or w as members
 ///// @param Type - The Type to be tested
 ///// @param Dimension - Number of dimension in the vec
-///// @param Element - Optional parameter to specify the Element's Type
-///// @example Concept usage:\code
-///// template <typename V, CONCEPT_REQUIRES_(Vec<V, 3>())> void function(V& vec) {}\endcode
-///// @example Concept usage with Element type specified:\code
-///// template <typename V, CONCEPT_REQUIRES_(Vec<V, 3, float>())> void function(V& vec) {}\endcode
+///// @param Element - Specify the Element's Type
 //template <typename Vector, std::size_t N, typename Element = void>
 //concept Vec = requires(Vector vec) {
 //		requires std::is_void_v<Element> || std::is_same_v<decltype(vec[0]), Element>;

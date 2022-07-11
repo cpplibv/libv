@@ -47,7 +47,7 @@ private:
 			stride_end_(ranges::next(ranges::begin(cv.base()), n_, end_)) {}
 
 		constexpr adaptor(const adaptor<false>& that)
-				WISH_REQUIRES(Const) :
+				requires (Const) :
 			n_(that.n_),
 			end_(that.end_),
 			stride_end_(that.stride_end_) {}
@@ -75,7 +75,7 @@ private:
 	}
 
 	constexpr adaptor<true> begin_adaptor() const
-			WISH_REQUIRES(ranges::random_access_range<const Rng>) {
+			requires (ranges::random_access_range<const Rng>) {
 		return adaptor<true>{*this};
 	}
 
@@ -91,12 +91,12 @@ public:
 		n_((RANGES_EXPECT(0 < n), n)) { }
 
 	constexpr ranges::range_size_type_t<Rng> size() const
-			WISH_REQUIRES(ranges::sized_range<const Rng>) {
+			requires (ranges::sized_range<const Rng>) {
 		return static_cast<ranges::range_size_type_t<Rng>>(std::min(n_, ranges::distance(this->base())));
 	}
 
 	constexpr ranges::range_size_type_t<Rng> size()
-			WISH_REQUIRES(ranges::sized_range<Rng>) {
+			requires (ranges::sized_range<Rng>) {
 		return static_cast<ranges::range_size_type_t<Rng>>(std::min(n_, ranges::distance(this->base())));
 	}
 };

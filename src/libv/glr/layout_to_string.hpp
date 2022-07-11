@@ -26,7 +26,7 @@ namespace detail {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-	WISH_REQUIRES(requires { {T::name()} -> std::convertible_to<std::string_view>; })
+	requires (requires { {T::name()} -> std::convertible_to<std::string_view>; })
 inline void stream_struct_name(std::ostream& os) {
 	os << T::name();
 }

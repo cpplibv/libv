@@ -101,7 +101,7 @@ public:
 	}
 
 	template <typename Access, typename Init>
-			WISH_REQUIRES(std::is_invocable_v<Init, ContextUI&>)
+			requires (std::is_invocable_v<Init, ContextUI&>)
 	void property(Access&& access, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
 //		static_assert(Access yields PropertyA);
 //		static_assert(Init invoke with ContextUI& result can be assigned to property);
@@ -162,7 +162,7 @@ public:
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>
-			WISH_REQUIRES(std::is_invocable_v<Init, ContextUI&>)
+			requires (std::is_invocable_v<Init, ContextUI&>)
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
 //		static_assert(Access yields Property<void|T>);
 //		static_assert(Set is callable with invoke result of Get + driver);

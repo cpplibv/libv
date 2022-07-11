@@ -217,7 +217,7 @@ template <typename T> struct AlignSTD140<libv::vec3_t<T>> {
 };
 
 // 4) array of scalars or vectors
-template <typename T, std::size_t S> WISH_REQUIRES(is_glsl_scalar_v<T>) struct AlignSTD140<std::array<T, S>> {
+template <typename T, std::size_t S> requires is_glsl_scalar_v<T> struct AlignSTD140<std::array<T, S>> {
 	static constexpr uint32_t align = libv::align(AlignSTD140<T>::align, AlignSTD140<libv::vec4f>::align);
 	static constexpr uint32_t size = S * libv::align(AlignSTD140<T>::size, AlignSTD140<libv::vec4f>::size);
 };

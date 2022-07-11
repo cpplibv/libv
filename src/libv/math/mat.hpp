@@ -103,24 +103,24 @@ public:
 	}
 
 	constexpr inline mat_t& rotate(const radian<T> angle, const libv::vec3_t<T>& axis) noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
+			requires (Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mx() = glm::rotate(mx(), angle.value, to_glm(axis));
 		return *this;
 	}
 	[[nodiscard]] constexpr inline mat_t rotate_copy(const radian<T> angle, const libv::vec3_t<T>& axis) const noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
+			requires (Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mat_t result;
 		result = glm::rotate(mx(), angle.value, to_glm(axis));
 		return result;
 	}
 
 	constexpr inline mat_t& rotate(const T angle, const libv::vec3_t<T>& axis) noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
+			requires (Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mx() = glm::rotate(mx(), angle, to_glm(axis));
 		return *this;
 	}
 	[[nodiscard]] constexpr inline mat_t rotate_copy(const T angle, const libv::vec3_t<T>& axis) const noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
+			requires (Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mat_t result;
 		result = glm::rotate(mx(), angle, to_glm(axis));
 		return result;
@@ -229,7 +229,7 @@ public:
 	}
 
 	[[nodiscard]] static constexpr inline mat_t texture() noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4) {
+			requires (Column == 4 && Row == 4) {
 		return mat_t(
 				0.5, 0.0, 0.0, 0.0,
 				0.0, 0.5, 0.0, 0.0,

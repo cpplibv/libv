@@ -43,7 +43,7 @@ struct II {
 	std::string_view description;
 };
 
-IDE_IGNORE(template <typename Enum> II(Enum, const char*, const char*, const char*, const char*) -> II<Enum>;)
+template <typename Enum> II(Enum, const char*, const char*, const char*, const char*) -> II<Enum>;
 
 // -------------------------------------------------------------------------------------------------
 

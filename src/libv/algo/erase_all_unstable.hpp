@@ -14,7 +14,7 @@ namespace libv {
 
 ///
 template <typename Container, typename Value>
-//	WISH_REQUIRES(std::equality_comparable<const typename Container::value_type&, const Value&>)
+//	requires (std::equality_comparable<const typename Container::value_type&, const Value&>)
 constexpr inline void erase_all_unstable(Container& container, const Value& value) noexcept {
 	auto it = container.begin();
 	auto last = container.end();
