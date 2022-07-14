@@ -3,40 +3,22 @@
 cmake_minimum_required(VERSION 3.20)
 project(libv)
 
-include(ExternalProject)
-include(cmake/wish_create.cmake)
-include(cmake/wish_date.cmake)
-include(cmake/wish_git.cmake)
-include(cmake/wish_util.cmake)
-include(cmake/wish_warning.cmake)
-
-# --------------------------------------------------------------------------------------------------
-
-#set(CMAKE_VERBOSE_MAKEFILE off)
+#set(CMAKE_VERBOSE_MAKEFILE on)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE RELEASE)
-endif()
-string(TOLOWER ${CMAKE_BUILD_TYPE} WISH_BUILD_TYPE_LOWER)
+include(cmake/wish.cmake)
 
-set(CMAKE_BUILD_TYPE ${WISH_BUILD_TYPE_LOWER})
-set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;DEV" CACHE STRING "" FORCE)
+# --------------------------------------------------------------------------------------------------
+
+wish_configurations(DEFAULT Release Dev Debug)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "CXX compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
-message(STATUS "Git branch: ${WISH_GIT_BRANCH}")
-message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
-
-# TODO ---------------------------------------------------------------------------------------------
-
-# TODO P3: wish: add support for skipping library build/links via directly amending the sources of a dependency (only for DEV build)
-# TODO P4: wish: inheritance for wish_create_executable and create_library
-# TODO P5: wish: modernize based on (GLOB will stay tho): https://www.youtube.com/watch?v=bsXLMQ6WgIk
-# TODO P5: wish: flag or build options to turn on/off sanitizes
+#message(STATUS "Git branch: ${WISH_GIT_BRANCH}")
+#message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # Paths --------------------------------------------------------------------------------------------
 
@@ -44,11 +26,19 @@ set(PATH_EXT_IDE ext)
 set(PATH_EXT     ${CMAKE_SOURCE_DIR}/ext)
 set(PATH_EXT_SRC ${CMAKE_SOURCE_DIR}/ext_src)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${WISH_BUILD_TYPE_LOWER})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${WISH_BUILD_TYPE_LOWER})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${WISH_BUILD_TYPE_LOWER})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
 
-# Warning flags ------------------------------------------------------------------------------------
+# --- Options --------------------------------------------------------------------------------------
+
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+wish_force_colored_output(${FORCE_COLORED_OUTPUT})
+
+option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
+wish_skip_external_configures(${SKIP_EXTERNAL_CONFIGURES})
+
+# --- Flags ----------------------------------------------------------------------------------------
 
 wish_warning(
 	MSVC /Wall
@@ -96,7 +86,7 @@ wish_warning(
 	# GNU -Wsuggest-final-methods # in signal 50+ function
 	# GNU -Wsuggest-final-types # in signal 1 type
 
-	# With GCC 12.1 some false positives warnings appeared and some ignore system header includes
+	# With GCC 12.1 some false positives warnings appeared and some do ignore the system header includes
 	GNU VERSION_GREATER 12.0 -Wno-array-bounds
 	GNU VERSION_GREATER 12.0 -Wno-stringop-overread
 	GNU VERSION_GREATER 12.0 -Wno-stringop-overflow
@@ -108,94 +98,20 @@ wish_warning(
 	# GNU -Werror
 )
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	if(CMAKE_BUILD_TYPE STREQUAL "debug")
-		# add_compile_options(-fsanitize=address)
-		# add_compile_options(-fsanitize=kernel-address)
-		# add_compile_options(-fsanitize=leak)
-		# add_compile_options(-fsanitize=thread)
-		# add_compile_options(-fsanitize=undefined)
-		# link_libraries(asan)
-		# link_libraries(ubsan)
-	endif()
+wish_compiler_flags(
+	GNU -fcoroutines
+	GNU -m64
+	GNU -std=c++23
+)
 
-	add_compile_options(-fcoroutines)
-endif()
-
-# Flags --------------------------------------------------------------------------------------------
-
-option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
-if (${FORCE_COLORED_OUTPUT})
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-		message(STATUS "Force colored output: GCC")
-		add_compile_options(-fdiagnostics-color=always)
-	elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		message(STATUS "Force colored output: Clang")
-		add_compile_options(-fcolor-diagnostics)
-	endif()
-else()
-	message(STATUS "Force colored output: False")
-endif()
-
-option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
-if(${SKIP_EXTERNAL_CONFIGURES})
-	wish_disable_configure_externals()
-	message(STATUS "Skipping external project configurations")
-else()
-	wish_enable_configure_externals()
-	message(STATUS "Generating external project configurations")
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "debug")
-	add_compile_options(-Og)
-	add_compile_options(-ggdb3)
-
-elseif(CMAKE_BUILD_TYPE STREQUAL "dev")
-	add_compile_options(-O3)
-
-elseif(CMAKE_BUILD_TYPE STREQUAL "release")
-	add_compile_options(-O3)
-	add_compile_options(-flto)
-	SET(CMAKE_AR "gcc-ar")
-	SET(CMAKE_NM "gcc-nm")
-	SET(CMAKE_RANLIB "gcc-ranlib")
-#	add_definitions(-DNDEBUG)
-	wish_static_link_std()
-
-else()
-	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
-endif()
-
-add_compile_options(-m64)
-add_compile_options(-std=c++23)
-#set(CMAKE_CXX_STANDARD 23) # This stupid thing uses -std=gnu++23
-
-# Tooling ------------------------------------------------------------------------------------------
-
-#wish_add_ide_definition("WISH_REQUIRES(...)" " ")
-#add_definitions("-D\"IDE_IGNORE(...)=__VA_ARGS__\"")
-
-#add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
-#add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
-#add_definitions(-DWISH_TIME_LONG="${WISH_TIME_LONG}")
-#add_definitions(-DWISH_TIME_SHORT="${WISH_TIME_SHORT}")
-
-# Definitions --------------------------------------------------------------------------------------
-
-# Macro - Git
-#add_definitions(-DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}")
-#add_definitions(-DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
-# Macro - Libv
-string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
-add_definitions(-DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF})
-add_definitions(-DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/")
+wish_optimization_flags()
 
 # Includes Directories -----------------------------------------------------------------------------
 
 include_directories(app)
 include_directories(src)
 
-# === Package ======================================================================================
+# === External ====================================================================================
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -203,9 +119,7 @@ find_package(Threads REQUIRED)
 
 find_package(OpenGL REQUIRED)
 
-# === External =====================================================================================
-
-wish_create_group(GROUP_EXTERNAL_PROJECT) # External -----------------------------------------------
+wish_group(group_external ext) # --- External -----------------------------------------------------
 
 wish_create_external(
 	NAME assimp
@@ -294,19 +208,12 @@ wish_create_library(
 
 wish_create_external(
 	NAME catch
-	GIT_REPOSITORY https://github.com/philsquared/Catch.git
-	GIT_TAG v2.2.3
-	SKIP_CONFIGURE_AND_BUILD
-	INSTALL_COMMAND
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/catch/include/catch/
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/catch/src/get_catch/single_include/ ${PATH_EXT}/catch/include/catch/
-#	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-#	GIT_TAG 7d0b205564567359ced799af93bbf7b1f051110
-#	CMAKE_ARGS
-#			-DCATCH_BUILD_TESTING=OFF
-#			-DCATCH_ENABLE_WERROR=OFF
-#			-DCATCH_INSTALL_DOCS=OFF
-#			-DCATCH_INSTALL_HELPERS=OFF
+	GIT_REPOSITORY https://github.com/catchorg/Catch2
+	GIT_TAG v3.0.1
+	CMAKE_ARGS
+        -DCATCH_INSTALL_DOCS=OFF
+        -DCATCH_INSTALL_EXTRAS=OFF
+	LINK Catch2Main Catch2
 )
 
 wish_create_external(
@@ -404,31 +311,6 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME openssl
-	GIT_REPOSITORY https://github.com/openssl/openssl
-	GIT_TAG OpenSSL_1_1_1k
-
-	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND bash -c [=[[[ `uname -s` == MSYS_NT* ]] && source shell mingw64 && ./config no-tests no-shared || ./config no-tests no-shared]=]
-			# Bash is used for Windows cmd to not fail by trying to execute the config.com
-			# Windows MSYS_NT system would fail inside openssl configure, so switch to msys2's mingw64 shell
-			# The && CONFIG and || CONFIG pattern is used because cmake eats the semicolon
-	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # OpenSSL is 'make' based
-	INSTALL_COMMAND
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/include/openssl/
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/lib/
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/openssl/src/get_openssl/include/openssl/ ${PATH_EXT}/openssl/include/openssl/
-		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libssl.a ${PATH_EXT}/openssl/lib/libssl.a
-		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/libcrypto.a
-
-#	LINK ssl
-#	LINK wsock32 ws2_32
-
-	LINK crypto
-	LINK $<IF:$<BOOL:${WIN32}>, crypt32, >
-)
-
-wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG f686ad46a3a9801ffa78063202250c68276330cb
@@ -507,6 +389,31 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME openssl
+	GIT_REPOSITORY https://github.com/openssl/openssl
+	GIT_TAG OpenSSL_1_1_1k
+
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND bash -c [=[[[ `uname -s` == MSYS_NT* ]] && source shell mingw64 && ./config no-tests no-shared || ./config no-tests no-shared]=]
+			# Bash is used for Windows cmd to not fail by trying to execute the config.com
+			# Windows MSYS_NT system would fail inside openssl configure, so switch to msys2's mingw64 shell
+			# The && CONFIG and || CONFIG pattern is used because cmake eats the semicolon
+	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # OpenSSL is 'make' based
+	INSTALL_COMMAND
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/include/openssl/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/lib/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/openssl/src/get_openssl/include/openssl/ ${PATH_EXT}/openssl/include/openssl/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libssl.a ${PATH_EXT}/openssl/lib/libssl.a
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/libcrypto.a
+
+#	LINK ssl
+#	LINK wsock32 ws2_32
+
+	LINK crypto
+	LINK $<IF:$<BOOL:${WIN32}>, crypt32, >
+)
+
+wish_create_external(
 	NAME immer
 	GIT_REPOSITORY https://github.com/arximboldi/immer.git
 	GIT_TAG 559ab37543a7076f9cfe9002720b0d5ad6ffc12a
@@ -514,15 +421,14 @@ wish_create_external(
 
 wish_create_external(
 	NAME lua
-	GIT_REPOSITORY https://github.com/LuaDist/lua.git
-	GIT_TAG 5.3.2
-#	Segfault and issues with requires with:
-#	GIT_REPOSITORY https://github.com/bensanmorris/lua.git
-#	GIT_TAG b58e02325cb13f4902676f195e02d9320c65dd01 # v5.4.3
+	GIT_REPOSITORY https://github.com/walterschell/Lua.git
+	GIT_TAG 14f98e5fdcde3ccd7ea9188181dd7e50660a2999 # v5.4.4
 	CMAKE_ARGS
-		-DBUILD_SHARED_LIBS=OFF
-	LINK lua
-	LINK $<IF:$<BOOL:${UNIX}>, dl, >
+		-DLUA_ENABLE_SHARED=OFF
+		-DLUA_BUILD_BINARY=OFF
+		-DLUA_BUILD_COMPILER=OFF
+		-DLUA_SUPPORT_DL=OFF
+	LINK lua_static
 )
 
 wish_create_external(
@@ -571,17 +477,14 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME sol
+	NAME sol2
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG v3.2.3
-	SKIP_CONFIGURE_AND_BUILD
-	INSTALL_COMMAND
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/sol/include/sol/
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/sol/src/get_sol/include/sol/ ${PATH_EXT}/sol/include/sol/
+	GIT_TAG v3.3.0
+	CMAKE_ARGS
+#		-DSOL2_BUILD_LUA=ON
+#		-DSOL2_LUA_VERSION="5.4.4"
+		-DSOL2_DOCS=OFF
 	LINK ext_lua
-#	DEFINE SOL_USE_BOOST=1
-	DEFINE SOL_CXX17_FEATURES=1
-	DEFINE SOL_CXX20_FEATURES=1
 )
 
 wish_create_external(
@@ -633,11 +536,10 @@ wish_create_external(
 		-DJUST_INSTALL_VIDE=ON
 )
 
-wish_end_group()
 
-# === Targets ======================================================================================
+# === Targets =====================================================================================
 
-wish_create_group(GROUP_GENERATOR) # Generators ---------------------------------------------------
+wish_group(group_generator generator) # --- Generator ---------------------------------------------
 
 wish_generator(
 	TARGET  enum
@@ -650,6 +552,10 @@ wish_generator(
 	COMMAND codegen
 	OUTPUT  REPLACE ".in.lua" ".hpp"
 	OUTPUT  REPLACE ".in.lua" ".cpp"
+# TODO P2: Enable header only and split gen
+#	OUTPUT  REPLACE ".in.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".cpp"
 )
 
 #wish_generator(
@@ -661,8 +567,7 @@ wish_generator(
 #	OUTPUT  REGEX REPLACE "\\.hpp\\.in\\.lua$" ".cpp"
 #)
 
-wish_end_group()
-wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
+wish_group(group_library lib) # --- Library -------------------------------------------------------
 
 wish_create_library(
 	TARGET libv_algo STATIC
@@ -752,7 +657,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_lua STATIC
 	SOURCE src/libv/lua/*.cpp
-	LINK   ext_sol ext_lua ext_fmt libv_math
+	LINK   ext_sol2 ext_lua ext_fmt libv_math
 )
 
 wish_create_library(
@@ -876,8 +781,7 @@ wish_create_library(
 	LINK   libv_log libv_vm4 ext_assimp
 )
 
-wish_end_group()
-wish_create_group(GROUP_APPLICATION) # APPLICATION -------------------------------------------------
+wish_group(group_application app) # --- Application -----------------------------------------------
 
 wish_create_executable(
 	TARGET codegen
@@ -1046,8 +950,7 @@ wish_create_executable(
 	LINK   libv_lua
 )
 
-wish_end_group()
-wish_create_group(GROUP_EXAMPLE) # Example ---------------------------------------------------------
+wish_group(group_example example) # --- Example ---------------------------------------------------
 
 wish_create_executable(
 	TARGET example_libv_ctrl_camera
@@ -1061,8 +964,7 @@ wish_create_executable(
 	LINK   libv_ctrl
 )
 
-wish_end_group()
-wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
+wish_group(group_sandbox sandbox) # --- Sandbox ---------------------------------------------------
 
 wish_create_executable(
 	TARGET sandbox_libv_coro
@@ -1290,171 +1192,140 @@ wish_create_executable(
 	LINK   libv_log libv_vm4imp libv_utility libv_algo
 )
 
-wish_end_group()
-
-# Tests --------------------------------------------------------------------------------------------
-
-# TODO P5: This should be an object library, but ran into troubles with target_link_libraries against object library,
-#			maybe an addition layer of interface would solve the problem
-#			check on cmake, there might have been an update that improves this front
-wish_create_library(
-	TARGET obj_test_runner STATIC
-	SOURCE test/runner.cpp
-	LINK   ext_catch ext_fmt ext_boost
-)
-
-wish_create_group(GROUP_UNIT_TEST)
+wish_group(group_test test) # --- Test ------------------------------------------------------------
 
 wish_create_executable(
 	TARGET test_libv_algo
 	SOURCE test/libv/algorithm/*.cpp
-	LINK   obj_test_runner libv_algo ext_range
+	LINK   ext_catch libv_algo ext_range
 )
 
 wish_create_executable(
 	TARGET test_libv_arg
 	SOURCE test/libv/arg/*.cpp
-	LINK   obj_test_runner libv_arg
+	LINK   ext_catch libv_arg
 )
 
 wish_create_executable(
 	TARGET test_libv_color
 	SOURCE test/libv/color/*.cpp
-	LINK   obj_test_runner libv_color libv_utility libv_math
+	LINK   ext_catch libv_color libv_utility libv_math
 )
 
 wish_create_executable(
 	TARGET test_libv_container
 	SOURCE test/libv/container/*.cpp
-	LINK   obj_test_runner libv_container
+	LINK   ext_catch libv_container
 )
 
 wish_create_executable(
 	TARGET test_libv_ctrl
 	SOURCE test/libv/ctrl/*.cpp
-	LINK   obj_test_runner libv_ctrl
+	LINK   ext_catch libv_ctrl
 )
 
 wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
-	LINK   obj_test_runner libv_ecs libv_range
+	LINK   ext_catch libv_ecs libv_range
 )
 
 wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
-	LINK   obj_test_runner libv_frame
+	LINK   ext_catch libv_frame
 )
 
 wish_create_executable(
 	TARGET test_libv_fsw
 	SOURCE test/libv/fsw/*.cpp
-	LINK   obj_test_runner libv_fsw ext_boost
+	LINK   ext_catch libv_fsw ext_boost
 )
 
 wish_create_executable(
 	TARGET test_libv_input
 	SOURCE test/libv/input/*.cpp
-	LINK   obj_test_runner libv_input libv_utility ext_glfw
+	LINK   ext_catch libv_input libv_utility ext_glfw
 )
 
 wish_create_executable(
 	TARGET test_libv_glr
 	SOURCE test/libv/glr/*.cpp
-	LINK   obj_test_runner libv_glr libv_math libv_meta
+	LINK   ext_catch libv_glr libv_math libv_meta
 )
 
 wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
-	LINK   obj_test_runner libv_log
+	LINK   ext_catch libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_lua
 	SOURCE test/libv/lua/*.cpp
-	LINK   obj_test_runner libv_lua libv_parse
+	LINK   ext_catch libv_lua libv_parse
 )
 
 wish_create_executable(
 	TARGET test_libv_math
 	SOURCE test/libv/math/*.cpp
-	LINK   obj_test_runner libv_math
+	LINK   ext_catch libv_math
 )
 
 wish_create_executable(
 	TARGET test_libv_mt
 	SOURCE test/libv/mt/*.cpp
-	LINK   obj_test_runner libv_mt
+	LINK   ext_catch libv_mt
 )
 
 wish_create_executable(
 	TARGET test_libv_net
 	SOURCE test/libv/net/*.cpp
-	LINK   obj_test_runner libv_net
+	LINK   ext_catch libv_net
 )
 
 wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE test/libv/parse/*.cpp
-	LINK   obj_test_runner libv_parse
+	LINK   ext_catch libv_parse
 )
 
 wish_create_executable(
 	TARGET test_libv_range
 	SOURCE test/libv/range/*.cpp
-	LINK   obj_test_runner libv_range
+	LINK   ext_catch libv_range
 )
 
 wish_create_executable(
 	TARGET test_libv_rev
 	SOURCE test/libv/rev/*.cpp
-	LINK   obj_test_runner libv_rev
+	LINK   ext_catch libv_rev
 )
 
 wish_create_executable(
 	TARGET test_libv_serial
 	SOURCE test/libv/serial/*.cpp
-	LINK   obj_test_runner libv_serial
+	LINK   ext_catch libv_serial
 )
 
 wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE test/libv/sig/*.cpp
-	LINK   obj_test_runner libv_sig
+	LINK   ext_catch libv_sig
 )
 
 wish_create_executable(
 	TARGET test_libv_utility
 	SOURCE test/libv/utility/*.cpp
-	LINK   obj_test_runner libv_utility
+	LINK   ext_catch libv_utility
 )
 
 wish_create_executable(
 	TARGET test_libv_ui
 	SOURCE test/libv/ui/*.cpp
-	LINK   obj_test_runner libv_ui
+	LINK   ext_catch libv_ui
 )
 
-wish_end_group()
-
-# groups -------------------------------------------------------------------------------------------
-
-add_custom_target(group_application DEPENDS ${GROUP_APPLICATION})
-add_custom_target(group_example     DEPENDS ${GROUP_EXAMPLE})
-add_custom_target(group_externals   DEPENDS ${GROUP_EXTERNAL_PROJECT})
-add_custom_target(group_generator   DEPENDS ${GROUP_GENERATOR})
-add_custom_target(group_library     DEPENDS ${GROUP_LIBRARY})
-add_custom_target(group_sandbox     DEPENDS ${GROUP_SANDBOX})
-add_custom_target(group_unit_test   DEPENDS ${GROUP_UNIT_TEST})
-
-add_custom_target(app       DEPENDS group_application)
-add_custom_target(example   DEPENDS group_example)
-add_custom_target(ext       DEPENDS group_externals)
-add_custom_target(generator DEPENDS group_generator)
-add_custom_target(lib       DEPENDS group_library)
-add_custom_target(sandbox   DEPENDS group_sandbox)
-add_custom_target(test      DEPENDS group_unit_test)
+# -------------------------------------------------------------------------------------------------
 
 wish_create_ide_target()

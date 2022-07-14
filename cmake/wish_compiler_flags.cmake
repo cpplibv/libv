@@ -1,20 +1,11 @@
 #
 
+include_guard(GLOBAL)
+
 # --- Warning -----------------------------------------------------------------------------------
 
-# @Usage
-#	wish_warning(
-#		MSVC /Wall
-#
-#		Clang -Weverything
-#		Clang -Wmissing-override
-#
-#		GNU -Wall
-#		GNU -Wextra
-#		GNU -Wpedantic
-#		GNU VERSION_GREATER 7.0 -Wduplicated-branches
-#	)
-function(wish_warning)
+function(_aux_wish_collect_compiler_flags output)
+	set(result)
 
 	set(compilers MSVC Clang GNU)
 	set(conditions VERSION_LESS VERSION_GREATER VERSION_EQUAL VERSION_LESS_EQUAL VERSION_GREATER_EQUAL)
@@ -23,8 +14,6 @@ function(wish_warning)
 	set(cursor_condition)
 	set(cursor_condition_version)
 	set(i 0)
-
-	set(warnings)
 
 	list(LENGTH ARGN argc)
 	while(i LESS argc)
@@ -50,11 +39,39 @@ function(wish_warning)
 			if(CMAKE_CXX_COMPILER_ID MATCHES ${cursor_compiler_id})
 				if(CMAKE_CXX_COMPILER_VERSION ${cursor_condition} ${cursor_condition_version})
 					add_compile_options(${arg})
-					set(warnings "${warnings}${arg} ")
+					set(result "${result}${arg} ")
 				endif()
 			endif()
 		endif()
 	endwhile()
 
-	message(STATUS "Warnings: ${warnings}")
+	set(${output} ${result} PARENT_SCOPE)
 endfunction()
+
+# -------------------------------------------------------------------------------------------------
+
+# @Usage
+#	wish_warning(
+#		MSVC  /Wall
+#		Clang -Weverything
+#		GNU   -Wall
+#		GNU   -Wextra
+#		GNU VERSION_GREATER 7.0 -Wduplicated-branches
+#	)
+function(wish_warning)
+	_aux_wish_collect_compiler_flags(flags ${ARGV})
+	message(STATUS "Warning flags: ${flags}")
+endfunction()
+
+# -------------------------------------------------------------------------------------------------
+
+# @Usage
+#	wish_compiler_flags(
+#		GNU VERSION_LESS 13.0 -fcoroutines
+#	)
+function(wish_compiler_flags versioned_flag_list)
+	_aux_wish_collect_compiler_flags(flags ${ARGV})
+	message(STATUS "Compiler flags: ${flags}")
+endfunction()
+
+# -------------------------------------------------------------------------------------------------

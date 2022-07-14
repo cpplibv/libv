@@ -10,6 +10,16 @@ Star - System integration demo
 
 
 
+wish_generator(
+	TARGET  codegen
+	COMMAND codegen
+	OUTPUT  REPLACE ".in.lua" ".hpp"
+	OUTPUT  REPLACE ".in.lua" ".cpp"
+#	OUTPUT  REPLACE ".in.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".cpp"
+)
+
 
 
 

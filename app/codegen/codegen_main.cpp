@@ -7,21 +7,26 @@
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 // ext
+#include <sol/state.hpp>
 #include <fmt/format.h>
-#include <range/v3/view/reverse.hpp>
+//#include <range/v3/view/reverse.hpp>
 // std
 #include <filesystem>
+#include <fstream>
+#include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view codegen_version = "v3.1.1";
+static constexpr std::string_view codegen_version = "v4.0.0";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -49,7 +54,7 @@ public:
 		std::vector<MemberEntry> members;
 		std::vector<std::shared_ptr<ClazzEntry>> member_classes;
 
-		std::vector<std::function<void(const ClazzEntry&)>> generators;
+//		std::vector<std::function<void(const ClazzEntry&)>> generators;
 
 		ClazzEntry(std::string identifier, bool struct_) :
 			identifier(std::move(identifier)),
@@ -135,6 +140,10 @@ public:
 
 	template <typename Out>
 	void generate_cpp_class(const ClazzEntry& clazz, Out& out, int depth = 0) {
+//		if (clazz.generators_cpp.empty())
+		if (class_hooks_cpp.empty())
+			return;
+
 //		std::string ident(depth, '\t');
 
 //		out("{}{} {} {{\n", ident, clazz.struct_ ? "struct" : "class", clazz.identifier);
@@ -188,10 +197,11 @@ public:
 			out("// Input file: {}\n", input_file);
 		out("\n");
 		out("#pragma once\n");
-		out("\n");
 
-		if (!includes_hpp.empty())
+		if (!includes_hpp.empty()) {
+			out("\n");
 			out("//\n");
+		}
 		for (const auto& in : includes_hpp)
 			out("#include <{}>\n", in);
 
@@ -215,8 +225,9 @@ public:
 
 		if (!namespaces.empty())
 			out("\n");
-		for (const auto& ns : namespaces | ranges::view::reverse)
-			out("}} // namespace {}\n", ns);
+
+		for (std::size_t i = namespaces.size(); i > 0; --i)
+			out("}} // namespace {}\n", namespaces[i - 1]);
 
 		return std::move(os).str();
 	}
@@ -235,9 +246,11 @@ public:
 		out("// Generator version: {}\n", codegen_version);
 		if (!input_file.empty())
 			out("// Input file: {}\n", input_file);
-		out("\n");
 
-		out("//\n");
+		if (!includes_cpp.empty()) {
+			out("\n");
+			out("//\n");
+		}
 		for (const auto& in : includes_cpp)
 			out("#include <{}>\n", in);
 
@@ -256,15 +269,16 @@ public:
 
 		if (!namespaces.empty())
 			out("\n");
-		for (const auto& ns : namespaces | ranges::view::reverse)
-			out("}} // namespace {}\n", ns);
+		for (std::size_t i = namespaces.size(); i > 0; --i)
+			out("}} // namespace {}\n", namespaces[i - 1]);
 
 		return std::move(os).str();
 	}
 };
 
 struct SourceGeneratorLua {
-	libv::lua::State lua;
+	sol::state lua;
+//	libv::lua::State lua;
 	SourceGenerator gen;
 
 	SourceGeneratorLua() {
@@ -411,9 +425,11 @@ int main(int argc, const char** argv) {
 	SourceGeneratorLua eb;
 
 	if (argc < 3) {
-		std::cerr << "Usage: enum <input_file> <output_file_hpp> <output_file_cpp>" << std::endl;
+		std::cerr << "Usage: codegen <input_file> <output_file_hpp> [<output_file_cpp>]" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	const auto header_only_mode = argc < 4;
 
 	const auto input_file = argv[1];
 //	const std::string output_file = argv[2];
@@ -424,11 +440,17 @@ int main(int argc, const char** argv) {
 //	const std::string output_file_cpp = output_file + ".cpp";
 
 	const std::string output_file_hpp = argv[2];
-	const std::string output_file_cpp = argv[3];
+	const std::string output_file_cpp = header_only_mode ? "" : argv[3];
 
 	std::cout << " input_file: " << input_file << "\n";
 
-	const auto generated_source = eb.generate(input_file, libv::read_file_or_throw(input_file));
+	const auto input_source = libv::read_file_ec(input_file);
+	if (input_source.ec) {
+		std::cerr << "Failed to read file: " << input_file << " - " << input_source.ec << ": " << input_source.ec.message();
+		return EXIT_FAILURE;
+	}
+
+	const auto generated_source = eb.generate(input_file, input_source.data);
 
 	// Try to read back the current content of the output file, to check if its changed
 	std::cout << "output_file: " << output_file_hpp << std::flush;
@@ -443,17 +465,19 @@ int main(int argc, const char** argv) {
 
 	std::cout << std::endl;
 
-	std::cout << "output_file: " << output_file_cpp << std::flush;
-	const auto current_source_cpp = libv::read_file_ec(output_file_cpp);
+	if (!header_only_mode) {
+		std::cout << "output_file: " << output_file_cpp << std::flush;
+		const auto current_source_cpp = libv::read_file_ec(output_file_cpp);
 
-	if (!current_source_cpp.ec && current_source_cpp.data == generated_source.second)
-		// Output file is already up-to-date, skip write to not invalidate timestamps on files
-		std::cout << " (up-to-date)";
-	else
-		// The output file is out-of-date, write out the fresh source
-		libv::write_file_or_throw(output_file_cpp, generated_source.second);
+		if (!current_source_cpp.ec && current_source_cpp.data == generated_source.second)
+			// Output file is already up-to-date, skip write to not invalidate timestamps on files
+			std::cout << " (up-to-date)";
+		else
+			// The output file is out-of-date, write out the fresh source
+			libv::write_file_or_throw(output_file_cpp, generated_source.second);
 
-	std::cout << std::endl;
+		std::cout << std::endl;
+	}
 
 	return EXIT_SUCCESS;
 }
