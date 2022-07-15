@@ -64,7 +64,7 @@ public:
 	void load_style_script_file(std::string path);
 
 public:
-	EventHostGlobal<Component> event();
+	EventHostUI<Component> event();
 
 public:
 	void event(const libv::input::EventChar& event);

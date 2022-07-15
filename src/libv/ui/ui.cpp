@@ -17,6 +17,7 @@
 #include <libv/utility/timer.hpp>
 // std
 #include <mutex>
+#include <optional>
 #include <ostream>
 #include <variant>
 #include <vector>
@@ -291,6 +292,8 @@ public:
 
 		auto glr = remote.queue();
 
+		auto events = EventHostUI<Component>{root};
+
 		{
 			// --- Frame state roll ---
 			timer.reset();
@@ -341,7 +344,9 @@ public:
 
 			// --- Update ---
 			try {
+				events.before_update.fire({});
 				AccessRoot::update(root.core());
+				events.after_update.fire({});
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during update in UI: {}", ex.what());
 			}
@@ -575,8 +580,8 @@ void UI::load_style_script_file(std::string path) {
 
 // -------------------------------------------------------------------------------------------------
 
-EventHostGlobal<Component> UI::event() {
-	return EventHostGlobal<Component>{self->root};
+EventHostUI<Component> UI::event() {
+	return EventHostUI<Component>{self->root};
 }
 
 // -------------------------------------------------------------------------------------------------

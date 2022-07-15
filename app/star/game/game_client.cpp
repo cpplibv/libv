@@ -25,6 +25,10 @@
 //#include <star/log.hpp>
 
 
+//#include <libv/ui/context/context_state.hpp>
+
+
+
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
@@ -93,9 +97,6 @@ GameClient::GameClient(const std::filesystem::path& configFilepath) :
 //		controls.ignore_events(event.controls_intercepted());
 //	});
 
-	self->frame.onContextUpdate.output([this](const auto&) {
-		update();
-	});
 //	controls.attach(self->frame);
 	self->ui.attach(self->frame);
 
@@ -106,7 +107,6 @@ GameClient::GameClient(const std::filesystem::path& configFilepath) :
 
 GameClient::~GameClient() {
 	unregister_nexus();
-	// For the sake of forward declared ptr
 }
 
 void GameClient::register_nexus() {
@@ -126,6 +126,9 @@ void GameClient::unregister_nexus() {
 void GameClient::init_ui() {
 	self->ui.add(SceneRoot());
 	self->ui.event().global.fire<SwitchPrimaryScene>(createSceneMainMenu(*this));
+	self->ui.event().before_update([this] {
+		self->config_->update();
+	});
 
 //	frame.onKey.output([&](const libv::input::EventKey& e) {
 //		if (e.keycode == libv::input::Keycode::F2 && e.action == libv::input::Action::press)
@@ -133,10 +136,6 @@ void GameClient::init_ui() {
 //				fmt::print("{}: {}\n", component.path(), to_string(component.flags()));
 //			});
 //	});
-}
-
-void GameClient::update() {
-	self->config_->update();
 }
 
 void GameClient::run() {

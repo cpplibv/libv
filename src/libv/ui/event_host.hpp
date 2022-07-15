@@ -71,6 +71,16 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <typename ComponentT>
+struct EventHostUI : EventHostGlobal<ComponentT> {
+	struct EventBeforeUpdate{};
+	BasicEventProxy<ComponentT, EventBeforeUpdate> before_update{this->owner};
+	struct EventAfterUpdate{};
+	BasicEventProxy<ComponentT, EventAfterUpdate> after_update{this->owner};
+};
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename ComponentT>
 struct EventHostGeneral : EventHostGlobal<ComponentT> {
 	BasicEventProxy<ComponentT, EventChar> char_{this->owner};
 	BasicEventProxy<ComponentT, EventKey> key{this->owner};

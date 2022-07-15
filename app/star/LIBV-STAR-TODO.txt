@@ -8,30 +8,7 @@ Star - System integration demo
 
 
 
-
-
-wish_generator(
-	TARGET  codegen
-	COMMAND codegen
-	OUTPUT  REPLACE ".in.lua" ".hpp"
-	OUTPUT  REPLACE ".in.lua" ".cpp"
-#	OUTPUT  REPLACE ".in.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".cpp"
-)
-
-
-
-
-
-
 Things that I dont like:
-	- ! the way config update is hooked up to main loop
-		ugly, not automated
-		make sure that this not happen:
-			polling causes ui update to be delayed with 1 frame if placed wrongly
-				button.press -> handle event -> render old data
-					-> config update -> broadcast events -> update components -> render new data
 	- dirtyFile bool
 	- update function (polling) (the way the dirty container is drained)
 	- poll_warmup_cooldown
@@ -88,6 +65,16 @@ star: Settings
 		libv.ui: toggle button
 
 
+wish_generator(
+	TARGET  codegen
+	COMMAND codegen
+	OUTPUT  REPLACE ".in.lua" ".hpp"
+	OUTPUT  REPLACE ".in.lua" ".cpp"
+#	OUTPUT  REPLACE ".in.lua" ".hpp"
+#	OUTPUT  REPLACE ".inh.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".hpp"
+#	OUTPUT  REPLACE ".ins.lua" ".cpp"
+)
 
 
 
