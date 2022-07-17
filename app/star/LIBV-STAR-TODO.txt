@@ -8,10 +8,6 @@ Star - System integration demo
 
 
 
-Things that I dont like:
-	- dirtyFile bool
-	- update function (polling) (the way the dirty container is drained)
-	- poll_warmup_cooldown
 
 config cleanup
 	includes
@@ -33,7 +29,7 @@ star: settings cleanup
 	comments
 star: event > broadcast > event loop abortion logic
 star: "save/apply" preview and commit changes
-
+star: Make save/apply buttons inactive if there is no change
 
 
 

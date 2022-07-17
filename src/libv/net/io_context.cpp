@@ -6,7 +6,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/io_context.hpp>
 // libv
-#include <libv/mt/number.hpp>
+#include <libv/mt/thread_number.hpp>
 // std
 #include <thread>
 #include <vector>

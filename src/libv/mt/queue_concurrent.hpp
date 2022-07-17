@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/concurrent_queue.hpp
+// Project: libv.mt, File: src/libv/mt/queue_concurrent.hpp
 
 #pragma once
 
@@ -16,7 +16,7 @@ namespace mt {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-class concurrent_queue {
+class queue_concurrent {
 	mutable std::mutex queue_m;
 	std::queue<T> queue;
 	mutable std::condition_variable_any received_cv;
@@ -25,8 +25,8 @@ class concurrent_queue {
 	const std::size_t limit = std::numeric_limits<std::size_t>::max();
 
 public:
-	inline explicit concurrent_queue() noexcept = default;
-	inline explicit concurrent_queue(std::size_t limit) noexcept : limit(limit) { }
+	inline explicit queue_concurrent() noexcept = default;
+	inline explicit queue_concurrent(std::size_t limit) noexcept : limit(limit) { }
 
 public:
 	template <typename... Args>

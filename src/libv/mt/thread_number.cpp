@@ -1,7 +1,7 @@
 // Project: libv.mt, File: src/libv/mt/number.cpp
 
 // hpp
-#include <libv/mt/number.hpp>
+#include <libv/mt/thread_number.hpp>
 // std
 #include <bit>
 #include <thread>

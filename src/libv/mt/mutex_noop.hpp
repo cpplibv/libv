@@ -2,6 +2,9 @@
 
 #pragma once
 
+// libv
+#include <libv/meta/force_inline.hpp>
+
 
 namespace libv {
 namespace mt {
@@ -9,17 +12,17 @@ namespace mt {
 // -------------------------------------------------------------------------------------------------
 
 struct mutex_noop {
-	constexpr inline void lock() noexcept {}
-	constexpr inline bool try_lock() noexcept {
+	constexpr LIBV_FORCE_INLINE void lock() noexcept {}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool try_lock() noexcept {
 		return true;
 	}
-	constexpr inline void unlock() noexcept {}
+	constexpr LIBV_FORCE_INLINE void unlock() noexcept {}
 
-	constexpr inline void lock_shared() noexcept {}
-	constexpr inline bool try_lock_shared() noexcept {
+	constexpr LIBV_FORCE_INLINE void lock_shared() noexcept {}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool try_lock_shared() noexcept {
 		return true;
 	}
-	constexpr inline void unlock_shared() noexcept {}
+	constexpr LIBV_FORCE_INLINE void unlock_shared() noexcept {}
 };
 
 // -------------------------------------------------------------------------------------------------

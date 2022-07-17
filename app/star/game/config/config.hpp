@@ -35,13 +35,16 @@ public:
 	BaseConfig(const libv::Nexus2& nexus, std::filesystem::path&& configFilepath);
 	virtual ~BaseConfig() = default;
 
-public:
-	void update();
-	void unsubscribe(const void* slotPtr);
-
 protected:
 	void create();
 	void destroy();
+
+public:
+	void update();
+	void unsubscribe(const void* slotPtr);
+	void requestSave();
+
+protected:
 	[[nodiscard]] libv::Nexus2& nexus() const;
 	void markAsDirty(BaseConfigEntry& entry);
 

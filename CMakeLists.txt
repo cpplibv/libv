@@ -554,6 +554,7 @@ wish_generator(
 	OUTPUT  REPLACE ".in.lua" ".cpp"
 # TODO P2: Enable header only and split gen
 #	OUTPUT  REPLACE ".in.lua" ".hpp"
+#	OUTPUT  REPLACE ".inh.lua" ".hpp"
 #	OUTPUT  REPLACE ".ins.lua" ".hpp"
 #	OUTPUT  REPLACE ".ins.lua" ".cpp"
 )

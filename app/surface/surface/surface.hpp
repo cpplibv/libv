@@ -5,7 +5,7 @@
 // libv
 #include <libv/container/sliding_window_2d.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/mt/concurrent_queue.hpp>
+#include <libv/mt/queue_concurrent.hpp>
 #include <libv/mt/worker_thread.hpp>
 // std
 #include <condition_variable>
@@ -32,8 +32,8 @@ struct SurfaceGenerationTask {
 	const std::shared_ptr<ChunkGen> chunkGen;
 
 	// (Thread-safe) Concurrent access with Surface:
-	libv::mt::concurrent_queue<std::weak_ptr<Chunk>> queuePending;
-	libv::mt::concurrent_queue<std::weak_ptr<Chunk>> queueReady;
+	libv::mt::queue_concurrent<std::weak_ptr<Chunk>> queuePending;
+	libv::mt::queue_concurrent<std::weak_ptr<Chunk>> queueReady;
 
 public:
 	SurfaceGenerationTask(std::stop_token&& stopToken, std::shared_ptr<const Config>&& config, const std::shared_ptr<ChunkGen>& chunkGen);

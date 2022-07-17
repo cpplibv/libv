@@ -125,7 +125,7 @@ std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_u
 void InternalShaderLoader::update_fs() {
 	auto old_tokens = std::vector<libv::fsw::Token>{};
 
-	while (auto internal_opt = queue_source_reload.pop_optional()) {
+	while (auto internal_opt = queue_source_reload.pop_front_optional()) {
 		auto& internal = *internal_opt;
 
 		++internal->load_version;
@@ -221,13 +221,13 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 
 	auto previous_program = gl.boundProgram();
 
-	while (auto internal_opt = queue_shader_failed_load.pop_optional()) {
+	while (auto internal_opt = queue_shader_failed_load.pop_front_optional()) {
 		// For those who failed to load: just assign the fallback
 		auto& internal = *internal_opt;
 		fallback_to_default(internal);
 	}
 
-	while (auto internal_opt = queue_shader_update.pop_optional()) {
+	while (auto internal_opt = queue_shader_update.pop_front_optional()) {
 		auto& internal = *internal_opt;
 
 		log_rev.info("Updating {} v{}", internal->name_, internal->load_version);

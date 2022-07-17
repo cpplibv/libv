@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/gl_fwd.hpp>
-#include <libv/mt/busy_queue.hpp>
+#include <libv/mt/queue_busy.hpp>
 #include <libv/mt/token_machine.hpp>
 //#include <libv/mt/worker_thread.hpp>
 #include <libv/mt/worker_thread_pool.hpp>
@@ -31,7 +31,7 @@ private:
 //	libv::mt::worker_thread_pool thread_cpu{2, "res/cpu"};
 	libv::mt::worker_thread_pool thread_fs{2, "res/fs"};
 	libv::mt::worker_thread_pool thread_cpu{4, "res/cpu"};
-	libv::mt::busy_queue<libv::unique_function<void()>> queue_res_;
+	libv::mt::queue_busy<libv::unique_function<void()>> queue_res_;
 
 public:
 	explicit inline InternalResourceManager(Settings&& settings) :

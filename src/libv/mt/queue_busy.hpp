@@ -16,10 +16,10 @@ namespace mt {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-class busy_queue {
-	std::queue<T> queue;
+class queue_busy {
 	mutable std::mutex mutex;
 	mutable std::condition_variable_any cv;
+	std::queue<T> queue;
 
 public:
 	template <typename... Args>
