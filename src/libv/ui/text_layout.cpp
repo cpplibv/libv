@@ -136,12 +136,12 @@ void TextLayout::erase(std::size_t position, std::size_t count) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), position))
-		return log_ui.error("Invalid position {}. Failed to erase {} character in string_ {}: \"{}\"", position, count, string_);
+		return log_ui.error("Invalid position {}. Failed to erase {} character in string: \"{}\"", position, count, string_);
 
 	const auto from = it;
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), count))
-		return log_ui.error("Invalid position {}. Failed to erase {} character in string_ {}: \"{}\"", position, count, string_);
+		return log_ui.error("Invalid position {}. Failed to erase {} character in string: \"{}\"", position, count, string_);
 
 	string_.erase(from, it);
 	dirty = true;
@@ -216,7 +216,7 @@ libv::vec2f TextLayout::getCharacterPosition(std::size_t characterIndex) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), characterIndex))
-		log_ui.warn("Invalid character index {}. Failed to get character position. Returning last character position of {}", characterIndex, length());
+		log_ui.warn("Invalid character index {}. Failed to get character position. Returning last character's position of {}", characterIndex, length());
 
 	if (it == string_.end())
 		return getCharacterPosition();

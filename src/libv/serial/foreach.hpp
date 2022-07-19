@@ -4,7 +4,7 @@
 
 // ext
 #include <vide/vide.hpp>
-
+#include <iostream>
 
 namespace libv {
 namespace serial {
@@ -24,11 +24,12 @@ public:
 
 private:
 	template <typename T>
-	inline void call_func(T&& var) {
-		if constexpr(std::is_invocable_v<F, decltype(var)>) {
-			if constexpr(allow_mutate)
+	inline void call_func(const T& var) {
+		if constexpr(allow_mutate) {
+			if constexpr(std::is_invocable_v<F, T&>)
 				func(const_cast<T&>(var));
-			else
+		} else {
+			if constexpr(std::is_invocable_v<F, const T&>)
 				func(var);
 		}
 	}

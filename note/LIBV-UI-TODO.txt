@@ -97,15 +97,6 @@ libv.ui: border fragment = chained/nested background fragments
 libv.ui: check on that "recent" modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
 
-libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
-		A simple const void* that can be passed to any function that can produce a event
-			(or in case of a stack a ui global stack of const void*)
-		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
-		if (label.ui().event_initiator_check_loop(&shared_state))
-		if (event.check_initiator_loop(&shared_state))
-			return;
-		Implement in: app.theme: control.slider.event().change
-
 
 
 
@@ -247,6 +238,7 @@ imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
 
 
 
+app.theme: use event_reentry_guard in control.slider.event().change
 app.theme: create theme exporter: json and atlas texture
 
 app.theme: connect the theme gen with a running app to live update
@@ -699,6 +691,25 @@ libv.ui.event: slot / signal flags could be unflagged if a disconnect leaves an 
 
 
 === PAPERS ========================================================================================
+
+libv.ui: UI re-entering event loop problem and solution:
+	Solution event_reentry_guard:
+		On every call execute 2 step:
+			- Test Target. If it fails abort early
+			- Lock Source
+
+	Example:
+		// In the ui -> model event handler:
+		const auto reentry_guard = input.event_reentry_guard(source_component.ptr(), &target_model);
+		if (!reentry_guard)
+			return;
+
+		// In the model -> ui event handler:
+		const auto reentry_guard = input.event_reentry_guard(&source_model, target_component.ptr());
+		if (!reentry_guard)
+			return;
+
+
 
 PAPER: libv.ui: Component styled states PAPER:
 		Possible states:

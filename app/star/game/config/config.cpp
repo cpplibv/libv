@@ -26,7 +26,7 @@ public:
 
 	std::mutex mutex;
 	std::filesystem::path configFilepath;
-	libv::polling_warmup_cooldown save_cooldown{std::chrono::seconds(5), std::chrono::seconds(30)};
+	libv::polling_warmup_cooldown save_cooldown{std::chrono::seconds(60), std::chrono::seconds(300)};
 
 	bool dirtyFile = false; /// Marks if file has to be re-saved
 	libv::mt::queue_unique_batch_st<BaseConfigEntry*> dirtyEntries; /// Marks config entries that are need to be updated
@@ -94,8 +94,13 @@ void BaseConfig::destroy() {
 void BaseConfig::update() {
 	auto lock = std::unique_lock(self->mutex);
 	if (self->dirtyEntries.empty()) {
-		if (self->save_cooldown.test())
-			self->saveFile();
+		if (!self->dirtyFile) {
+			if (self->save_cooldown.test())
+				self->saveFile();
+		} else {
+			if (self->save_cooldown.fire_and_test())
+				self->saveFile();
+		}
 
 	} else {
 		self->dirtyEntries.drain_and_clear([&](BaseConfigEntry* dirtyEntry) {
@@ -127,6 +132,11 @@ void BaseConfig::markAsDirty(BaseConfigEntry& entry) {
 	auto lock = std::unique_lock(self->mutex);
 	self->dirtyFile = true;
 	self->dirtyEntries.push_back(&entry);
+}
+
+void BaseConfig::markFileDirty() {
+	auto lock = std::unique_lock(self->mutex);
+	self->dirtyFile = true;
 }
 
 // -------------------------------------------------------------------------------------------------

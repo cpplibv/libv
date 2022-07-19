@@ -60,6 +60,11 @@ public:
 	ContextUI& operator=(ContextUI&&) = delete;
 
 public:
+	void reentry_lock(const void* anchor);
+	void reentry_unlock(const void* anchor) noexcept;
+	[[nodiscard]] bool reentry_test(const void* anchor) const noexcept;
+
+public:
 	[[nodiscard]] bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
 	void foreach_style(libv::function_ref<void(std::string_view name, Style& style)> func);

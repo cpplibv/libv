@@ -267,7 +267,7 @@ void Frame::requestAttention() {
 void Frame::setOpenGLProfile(Frame::OpenGLProfile profile) {
 	self->context.executeAsync([this, profile] {
 		std::lock_guard lock(self->frameState_m);
-		log_frame.trace("Set frame OpenGLProfile of {} to {}", self->title, libv::to_value(profile));
+		log_frame.trace("Set frame OpenGLProfile of {} to {}", self->title, to_string(profile));
 		self->openGLProfile = profile;
 		if (self->window)
 			cmdFrameRecreate();

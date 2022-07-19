@@ -10,8 +10,10 @@
 #include <libv/math/vec.hpp>
 #include <libv/sig/signal.hpp>
 // std
+#include <cassert>
 #include <memory>
 #include <string>
+#include <string_view>
 // pro
 #include <libv/frame/events.hpp>
 
@@ -44,6 +46,24 @@ class GLFWwindow;
 
 namespace libv {
 namespace frame {
+
+// -------------------------------------------------------------------------------------------------
+
+enum class OpenGLProfile : int {
+	any = 0,
+	core = 0x00032001,
+	compat = 0x00032002,
+};
+
+[[nodiscard]] constexpr inline std::string_view to_string(OpenGLProfile profile) noexcept {
+	switch (profile) {
+	case OpenGLProfile::any: return "Any";
+	case OpenGLProfile::compat: return "Compat";
+	case OpenGLProfile::core: return "Core";
+	}
+	assert(false && "Invalid OpenGLProfile enum value");
+	return "<<Invalid-OpenGLProfile-enum-value>>"; // [[unreachable]]
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -85,11 +105,7 @@ public: // ---------------------------------------------------------------------
 		fullscreen_windowed,
 	};
 
-	enum class OpenGLProfile : int {
-		any = 0,
-		core = 0x00032001,
-		compat = 0x00032002,
-	};
+	using OpenGLProfile = libv::frame::OpenGLProfile;
 
 	enum class OpenGLRefreshRate : int {
 		dont_care = -1,

@@ -192,6 +192,9 @@ ui.style("settings.entry.value") {
 	align_vertical = "center",
 	font_color = {1, 1, 1, 1},
 	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+	state("error") {
+		background = {type = "border_padding_pattern", color_border = {1.0, 0.3, 0.3, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.1}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
 }
 
 ui.style("settings.entry.value.number") {
@@ -222,7 +225,7 @@ ui.style("settings.entry.value.option.button") {
 
 	state("select") {
 		--background = "green",
-		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 	},
 

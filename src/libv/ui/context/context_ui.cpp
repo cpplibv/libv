@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/context/context_ui.hpp>
 // libv
+#include <libv/algo/erase_unstable.hpp>
 #include <libv/gl/load_image.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
@@ -14,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 // pro
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -38,6 +40,8 @@ class ImplContextUI {
 public:
 	ContextEvent event;
 	ContextMouse mouse;
+
+	std::vector<const void*> locked_reentry_anchors;
 
 	std::shared_ptr<Font2D> fallback_font;
 	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;
@@ -156,6 +160,21 @@ ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 
 ContextUI::~ContextUI() {
 	// For the sake of forward declared ptr
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ContextUI::reentry_lock(const void* anchor) {
+	self->locked_reentry_anchors.emplace_back(anchor);
+}
+
+void ContextUI::reentry_unlock(const void* anchor) noexcept {
+	libv::erase_unstable(self->locked_reentry_anchors, anchor);
+}
+
+bool ContextUI::reentry_test(const void* anchor) const noexcept {
+	const auto it = std::ranges::find(self->locked_reentry_anchors, anchor);
+	return it == self->locked_reentry_anchors.end();
 }
 
 // -------------------------------------------------------------------------------------------------

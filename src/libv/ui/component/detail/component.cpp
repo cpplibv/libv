@@ -69,6 +69,12 @@ Component::~Component() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+ReentryGuard Component::event_reentry_guard(const void* source, const void* target) const noexcept {
+	return ReentryGuard{ptr_->context(), source, target};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Flag_t Component::flags() const noexcept {
 	return ptr_->flags;
 }

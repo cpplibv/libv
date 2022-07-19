@@ -12,7 +12,7 @@ namespace star {
 
 struct ConfigGroupProfile : BaseConfigGroup {
 	ConfigEntry<std::string> profile_name{config, "Profile0", "Profile Name", "Profile name of the local configurations"};
-	ConfigEntry<std::string> player_name {config, "Player", "Player Name", "Display name of the player in multiplayer sessions"};
+	ConfigEntry<std::string> player_name {config, "Player0000", "Player Name", "Display name of the player in multiplayer sessions"};
 
 	template <typename Archive> void serialize(Archive& ar) {
 		ar.nvp("profile_name", profile_name);
@@ -38,8 +38,6 @@ struct ConfigGroupGraphics : BaseConfigGroup {
 	ConfigEntry<bool> vsync_enable           {config, true, "VSync Enable", "Enable/Disable VSync"};
 	ConfigEntry<int> msaa_samples            {config, 4, "MSAA Samples", "Number of MSAA samples"};
 
-	ConfigEntry<int> test_setting            {config, 4, "test_setting", "test_setting desc"};
-
 	template <typename Archive> void serialize(Archive& ar) {
 		ar.nvp("window_size_x", window_size_x);
 		ar.nvp("window_size_y", window_size_y);
@@ -51,8 +49,6 @@ struct ConfigGroupGraphics : BaseConfigGroup {
 
 		ar.nvp("vsync_enable", vsync_enable);
 		ar.nvp("msaa_samples", msaa_samples);
-
-		ar.nvp("test_setting", test_setting);
 	}
 };
 
@@ -69,17 +65,25 @@ struct ConfigGroupSounds : BaseConfigGroup {
 };
 
 struct ConfigGroupDevelopment : BaseConfigGroup {
+
 	ConfigEntry<bool> logging_trace_ui{config, false, "Logging: UI Trace", "Enable/Disable UI Trace logging"};
 	ConfigEntry<bool> always_on_top{config, false, "Always On Top", "Enable/Disable always on top window setting on start"};
+
+	ConfigEntry<int> test_setting            {config, 1, "test_setting", "test_setting desc"};
+	ConfigEntry<std::string> test_setting_str{config, "Test string default content", "test_setting_str", "test_setting str desc"};
 
 	template <typename Archive> void serialize(Archive& ar) {
 		ar.nvp("logging_trace_ui", logging_trace_ui);
 		ar.nvp("always_on_top", always_on_top);
+		ar.nvp("test_setting", test_setting);
+		ar.nvp("test_setting_str", test_setting_str);
 	}
 };
 
+// ---
+
 class ClientConfigT : public BaseConfig {
-	int32_t config_version = 1;
+	int32_t config_version = 2;
 
 public:
 	ConfigGroupProfile profile{*this};
@@ -90,8 +94,15 @@ public:
 	ConfigGroupDevelopment development{*this};
 
 	template <typename Archive> void serialize(Archive& ar) {
-		ar.nvp("config_version", config_version);
-//		const auto version_guard = ar.scope_version(config_version);
+		if constexpr (Archive::is_output)
+			ar.nvp("config_version", config_version);
+		else {
+			int32_t _input_version;
+			ar.nvp("config_version", _input_version);
+		}
+		// ar.version_constant("config_version", config_version);
+		// ar.constant("config_version", config_version);
+//		const auto version_guard = ar.scope_version("config_version", config_version);
 
 		ar.nvp("profile", profile);
 		ar.nvp("gameplay", gameplay);

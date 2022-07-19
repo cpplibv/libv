@@ -47,6 +47,7 @@ public:
 protected:
 	[[nodiscard]] libv::Nexus2& nexus() const;
 	void markAsDirty(BaseConfigEntry& entry);
+	void markFileDirty();
 
 private:
 	[[nodiscard]] virtual std::string saveJSON() const = 0;
@@ -125,8 +126,8 @@ private:
 public:
 	inline ConfigEntry(BaseConfig& config, T value_, std::string name, std::string description) :
 		BaseConfigEntry(config, std::move(name), std::move(description)),
-		value_(std::move(value_)),
-		valueDefault_(value_) {}
+		value_(value_),
+		valueDefault_(std::move(value_)) {}
 
 private:
 	friend libv::serial::access;
@@ -138,7 +139,7 @@ private:
 	}
 
 public:
-	[[nodiscard]] inline T load() const noexcept {
+	[[nodiscard]] inline const T& value() const noexcept {
 		auto lock = std::unique_lock(mutex);
 		return value_;
 	}
@@ -147,7 +148,7 @@ public:
 		return valueDefault_;
 	}
 
-	inline void store(T v) noexcept {
+	void store(T v) noexcept {
 		{
 			auto lock = std::unique_lock(mutex);
 			valueNext_ = std::move(v);
@@ -156,6 +157,16 @@ public:
 				return;
 		}
 		config.markAsDirty(*this);
+	}
+
+	void store_and_update(T v) noexcept {
+		{
+			auto lock = std::unique_lock(mutex);
+			value_ = std::move(v);
+		}
+//		config.markAsDirty(*this);
+		config.markFileDirty();
+		config.nexus().broadcast_channel<Change>(this, Change{*this});
 	}
 
 	virtual void update() override {

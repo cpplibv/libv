@@ -11,6 +11,7 @@
 // pro
 #include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/component/detail/flag.hpp>
+#include <libv/ui/event/detail/event_reentry_guard.hpp>
 #include <libv/ui/event_host.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
@@ -48,6 +49,10 @@ public:
 	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
 		return EventHostGeneral<Component>{*this};
 	}
+
+	/// Reentry-locks the source and reentry-tests the target.
+	/// ReentryGuard evaluates to true if entry is allowed (without causing a reentry)
+	[[nodiscard]] ReentryGuard event_reentry_guard(const void* source, const void* target) const noexcept;
 
 public:
 	[[nodiscard]] inline CoreComponent& core() noexcept {

@@ -545,6 +545,10 @@ void InputField::text(std::string value) {
 	self().markInvalidLayout(true, false);
 	self().flagAuto(Flag::pendingRender);
 	self().fire(EventChange{});
+	if (self().caret > self().text_.length()) {
+		self().caret = static_cast<uint32_t>(self().text_.length());
+		self().fire(EventCaret{});
+	}
 }
 
 const std::string& InputField::text() const noexcept {

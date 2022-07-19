@@ -9,11 +9,9 @@ Star - System integration demo
 
 
 
-config cleanup
-	includes
-	markers
-	comments
-	visibility
+cleanup
+	config.cpp
+		update became weird again
 
 
 
@@ -21,20 +19,21 @@ config cleanup
 
 
 
-
-
-star: settings cleanup
-	includes
-	markers
-	comments
-star: event > broadcast > event loop abortion logic
-star: "save/apply" preview and commit changes
-star: Make save/apply buttons inactive if there is no change
+star: Settings
+	grouping / separators / paging
+	UI
+		libv.ui: radio button / radio group
+		libv.ui: toggle button
+	tooltips with description
 
 
 
 
-customization of behaviour:
+
+star: "save/apply" preview and commit changes, or maybe the auto-save is fine as it is
+	star: Make save/apply buttons inactive if there is no change
+
+config: customization of behaviour:
 	on_corrupt_file::exit
 	on_corrupt_file::exit_and_alert
 	on_corrupt_file::prompt_user
@@ -50,15 +49,6 @@ customization of behaviour:
 
 	on_entry_change::auto_save(5s, 30s)
 	on_entry_change::do_nothing
-
-star: Settings
-	reset to default
-	grouping / separators / paging
-	tooltips with description
-
-	UI
-		libv.ui: radio button / radio group
-		libv.ui: toggle button
 
 
 wish_generator(
@@ -87,7 +77,7 @@ libv.ui: .add<Component>() syntax on containers
 		const auto& c = container.add_ns<Component>("name", "style", args...)
 		const auto& c = container.add_s<Component>("style", args...)
 
-libv.ui: Solve the issue with inheriting state selectors
+libv.ui: Solve the issue with inheriting state selectors in styles
 
 libv.ui: Warn whenever a UI component out lives the UI object itself
 
