@@ -94,25 +94,25 @@ public:
 	inline ~InputID() = default;
 
 public:
-	explicit constexpr inline InputID(Keycode keycode) noexcept :
+	explicit(false) constexpr inline InputID(Keycode keycode) noexcept :
 		InputID(SourceType::keycode, libv::to_value(keycode)) { }
 
-	explicit constexpr inline InputID(Codepoint codepoint) noexcept :
+	explicit(false) constexpr inline InputID(Codepoint codepoint) noexcept :
 		InputID(SourceType::codepoint, libv::to_value(codepoint)) { }
 
-	explicit constexpr inline InputID(Scancode scancode) noexcept :
+	explicit(false) constexpr inline InputID(Scancode scancode) noexcept :
 		InputID(SourceType::scancode, libv::to_value(scancode)) { }
 
-	explicit constexpr inline InputID(Modifier modifier) noexcept :
+	explicit(false) constexpr inline InputID(Modifier modifier) noexcept :
 		InputID(SourceType::modifier, libv::to_value(modifier)) { }
 
-	explicit constexpr inline InputID(MouseButton button) noexcept :
+	explicit(false) constexpr inline InputID(MouseButton button) noexcept :
 		InputID(SourceType::mouseButton, libv::to_value(button)) { }
 
-	explicit constexpr inline InputID(MouseScroll scroll) noexcept :
+	explicit(false) constexpr inline InputID(MouseScroll scroll) noexcept :
 		InputID(SourceType::mouseScroll, libv::to_value(scroll)) { }
 
-	explicit constexpr inline InputID(MouseMovement movement) noexcept :
+	explicit(false) constexpr inline InputID(MouseMovement movement) noexcept :
 		InputID(SourceType::mouseMovement, libv::to_value(movement)) { }
 
 	explicit constexpr inline InputID(GamepadID gamepad, GamepadButton button) noexcept :

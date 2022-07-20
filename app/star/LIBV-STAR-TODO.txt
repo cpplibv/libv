@@ -16,14 +16,14 @@ cleanup
 
 
 
+libv.ui: radio button / radio group
+libv.ui: toggle button
+libv.ui: tooltips
 
 
 
-star: Settings
+app.star: Settings
 	grouping / separators / paging
-	UI
-		libv.ui: radio button / radio group
-		libv.ui: toggle button
 	tooltips with description
 
 
@@ -91,10 +91,7 @@ libv.ui: Warn whenever a UI component out lives the UI object itself
 app.star: Settings page back clear the focus while apply will rotate it to next
 app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 
-
-
-
-
+app.star: Better scene selector / navigation
 
 app.star: Self-Updater
 

@@ -246,6 +246,56 @@ ui.style("settings.entry.value.option.button") {
 
 -- =================================================================================================
 
+ui.style("controls.visual.line") {
+	align_horizontal = "center";
+	align_vertical = "center";
+}
+
+ui.style("controls.visual.board") {
+	--background = {type = "border", color = {0.5, 0.6, 0.0, 0.8}, texture = "light_border.png"},
+	size = "D, D",
+}
+
+ui.style("controls.visual.key") {
+	font = fonts.packed,
+	font_color = "white",
+	font_size = 12,
+	align_horizontal = "center";
+	align_vertical = "center";
+
+
+	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+	state("hover") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover, active") {
+		background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+
+	--state("select") {
+	--	--background = "green",
+	--	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--},
+
+	--state_override("select") {
+	--
+	--},
+	--state("select") {
+	--	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--	background = "green",
+	--},
+	--inherit("background", "settings.entry.value"),
+
+	--state("!select") {
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--	background = "blue",
+	--},
+}
+
+
+-- =================================================================================================
+
 --ui.style("star") {
 --	font = "consola.ttf",
 --	font_color = "rgba(0.0, 0.0, 0.0, 1.0)",

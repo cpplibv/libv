@@ -12,6 +12,7 @@
 // pro
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client.hpp>
+#include <star/game/scene/scene_controls.hpp>
 #include <star/game/scene/scene_root.hpp>
 #include <star/game/scene/scene_settings.hpp>
 #include <star/version.hpp>
@@ -81,6 +82,14 @@ libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
 					btn.text("Settings");
 					btn.event().submit.connect([&gameClient](libv::ui::Button& source) {
 						source.event().global.fire<SwitchPrimaryScene>(createSceneSettings(gameClient));
+					});
+					menu_box.add(std::move(btn));
+				} {
+					libv::ui::Button btn;
+					btn.style("main-menu.menu.entry");
+					btn.text("Controls");
+					btn.event().submit.connect([&gameClient](libv::ui::Button& source) {
+						source.event().global.fire<SwitchPrimaryScene>(createSceneControls(gameClient));
 					});
 					menu_box.add(std::move(btn));
 				} {

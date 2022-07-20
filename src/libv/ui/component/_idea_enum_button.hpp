@@ -66,6 +66,7 @@ private:
 
 public:
 	void value(Enum value);
+	void value(Enum value, std::string text);
 	[[nodiscard]] Enum value() const noexcept;
 
 	void next_value() noexcept;
@@ -77,7 +78,6 @@ public:
 template <typename Enum>
 class CoreEnumButton : CoreButton {
 	Enum value;
-
 };
 
 // -------------------------------------------------------------------------------------------------

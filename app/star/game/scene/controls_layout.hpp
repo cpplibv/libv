@@ -11,26 +11,25 @@
 
 
 // libv
-#include <libv/glr/procedural/cube.hpp>
-#include <libv/glr/procedural/grid.hpp>
-#include <libv/glr/procedural/ignore.hpp>
-#include <libv/glr/procedural/sphere.hpp>
-#include <libv/glr/queue.hpp>
+//#include <libv/glr/procedural/cube.hpp>
+//#include <libv/glr/procedural/grid.hpp>
+//#include <libv/glr/procedural/ignore.hpp>
+//#include <libv/glr/procedural/sphere.hpp>
+//#include <libv/glr/queue.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/math/bezier.hpp>
 #include <libv/math/bezier_curve.hpp>
 // pro
-#include <vm4_viewer/attribute.hpp>
-#include <vm4_viewer/log.hpp>
-#include <vm4_viewer/ui/keyboard.hpp>
+//#include <vm4_viewer/attribute.hpp>
+//#include <vm4_viewer/log.hpp>
+//#include <vm4_viewer/ui/keyboard.hpp>
 
 
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/binding.hpp>
 
 
-namespace app {
-namespace ui {
+namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -109,6 +108,10 @@ namespace ui {
 //}
 
 
+struct Analog {
+	// ...
+};
+
 struct Button {
 	libv::ctrl::InputID input;
 	libv::vec2f position;
@@ -162,55 +165,43 @@ struct Mouse {
 };
 
 struct Keyboard {
-//	std::vector<Button> buttons;
-	libv::glr::Mesh& mesh;
+	std::vector<Button> buttons;
+	libv::vec2f size;
+//	libv::glr::Mesh& mesh;
 
-	// TODO P5: implement the 4 physical layout of the keyboard
-	enum class physical_layout {
-		layout_a, /// Long backspace, Single lined enter
-		layout_b, /// Long backspace, Top bitten two lined enter
-		layout_c, /// Short backspace, Bottom bitten two lined enter
-		merged, /// TODO P5: Whatever is currently implemented
-	};
+//	// TODO P5: implement the 4 physical layout of the keyboard
+//	enum class physical_layout {
+//		layout_a, /// Long backspace, Single lined enter
+//		layout_b, /// Long backspace, Top bitten two lined enter
+//		layout_c, /// Short backspace, Bottom bitten two lined enter
+//		merged, /// TODO P5: Whatever is currently implemented
+//	};
 
-	void foo() {
-		auto pos = mesh.attribute(attribute_position);
-		auto index = mesh.index();
+	explicit Keyboard(float unit = 1.0f, float gap = 0.15f) :
+		Keyboard(unit, gap, gap * 2.f) {
+	}
 
-		int i = 0;
-		const auto add = [&](libv::ctrl::Keycode, libv::vec2f position, libv::vec2f size) {
-			pos(position.x, position.y, 0);
-			pos(position.x + size.x, position.y, 0);
-			pos(position.x + size.x, position.y, 0);
-			pos(position.x + size.x, position.y + size.y, 0);
-			pos(position.x + size.x, position.y + size.y, 0);
-			pos(position.x, position.y + size.y, 0);
-			pos(position.x, position.y + size.y, 0);
-			pos(position.x, position.y, 0);
+	explicit Keyboard(float unit, float gap, float big_gap_value) {
+		using vec2 = libv::vec2f;
 
-			index.line(i, i + 1); i += 2;
-			index.line(i, i + 1); i += 2;
-			index.line(i, i + 1); i += 2;
-			index.line(i, i + 1); i += 2;
+		const auto big_gap = big_gap_value - gap; // minus gap to simplify calculations
 
-	//		buttons.emplace_back(std::forward<Args>(args)...);
+		size.x = 22 * (unit + gap) + 2.f * big_gap - gap;
+		size.y = 6 * (unit + gap) + big_gap - gap;
+
+		auto pen = vec2{};
+
+		const auto add = [&](libv::ctrl::Keycode key, vec2 position, vec2 size) {
+			buttons.emplace_back(libv::ctrl::InputID(key), position, size);
 		};
 
-		using vec = libv::vec2f;
-
-		const auto unit = 1.0f;
-		const auto gap = 0.15f;
-		const auto big_gap = gap * 3 - gap;
-
-		auto pen = vec{};
-
 		const auto place_in_row = [&](auto keycode, auto size_x) {
-			add(keycode, pen, vec(size_x, unit));
+			add(keycode, pen, vec2(size_x, unit));
 			pen.x += size_x + gap;
 		};
 
 		const auto place_in_2row = [&](auto keycode, auto size_x) {
-			add(keycode, pen, vec(size_x, unit * 2 + gap));
+			add(keycode, pen, vec2(size_x, unit * 2 + gap));
 			pen.x += size_x + gap;
 		};
 
@@ -220,7 +211,8 @@ struct Keyboard {
 		};
 
 		// Bottom row modifier size, based on space alignment with num4
-		const auto brm_size = (4 * unit + 3 * gap - 1 * unit - 2 * gap) / 2.0f; // Ctrl+Win+Alt matches Backtick,num1,num2,num3
+		// Ctrl + Win + Alt matches Backtick + 1 + 2 + 3
+		const auto brm_size = (4 * unit + 3 * gap - 1 * unit - 2 * gap) / 2.0f;
 
 		//
 		// Layout
@@ -358,12 +350,12 @@ struct Keyboard {
 		place_in_row(libv::ctrl::Keycode::F2, unit);
 		place_in_row(libv::ctrl::Keycode::F3, unit);
 		place_in_row(libv::ctrl::Keycode::F4, unit);
-		pen.x += (5 * unit + 6 * gap - 4 * unit - 3 * gap) / 2.0f - gap; // F4 aligned with num5, F9 aligned with minus
+		pen.x += (5 * unit + 6 * gap - 4 * unit - 3 * gap) / 2.0f - gap; // F4 aligned with Num5, F9 aligned with minus
 		place_in_row(libv::ctrl::Keycode::F5, unit);
 		place_in_row(libv::ctrl::Keycode::F6, unit);
 		place_in_row(libv::ctrl::Keycode::F7, unit);
 		place_in_row(libv::ctrl::Keycode::F8, unit);
-		pen.x += (5 * unit + 6 * gap - 4 * unit - 3 * gap) / 2.0f - gap; // F4 aligned with num5, F9 aligned with minus
+		pen.x += (5 * unit + 6 * gap - 4 * unit - 3 * gap) / 2.0f - gap; // F4 aligned with Num5, F9 aligned with minus
 		place_in_row(libv::ctrl::Keycode::F9, unit);
 		place_in_row(libv::ctrl::Keycode::F10, unit);
 		place_in_row(libv::ctrl::Keycode::F11, unit);
@@ -395,5 +387,4 @@ struct InputSet {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
-} // namespace app
+} // namespace star
