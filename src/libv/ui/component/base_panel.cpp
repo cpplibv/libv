@@ -149,11 +149,11 @@ void BasePanel::background(Background value) {
 	AccessProperty::manual(self(), self().property.background, std::move(value));
 }
 
-// -------------------------------------------------------------------------------------------------
-
 [[nodiscard]] const Background& BasePanel::background() const noexcept {
 	return self().property.background();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void BasePanel::add(Component component) {
 	self().add(std::move(component));

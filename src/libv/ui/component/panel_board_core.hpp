@@ -1,14 +1,10 @@
-// Project: libv.ui, File: src/libv/ui/component/base_panel_core.hpp
-
-#pragma once
+// Project: libv.ui, File: src/libv/ui/component/panel_board_core.hpp
 
 // hpp
-#include <libv/ui/component/base_panel.hpp>
-// std
-#include <vector>
+#include <libv/ui/component/panel_board.hpp>
 // pro
-#include <libv/ui/component/detail/component.hpp>
 #include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/property/background.hpp>
 
 
@@ -17,33 +13,37 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreBasePanel : public CoreComponent {
-public:
-	friend BasePanel;
-	[[nodiscard]] inline auto handler() { return BasePanel{this}; }
+class CorePanelBoard : public CoreComponent {
+	friend PanelBoard;
+	[[nodiscard]] inline auto handler() { return PanelBoard{this}; }
 
 private:
 	struct Properties {
 		PropertyR<Background> background;
 	} property;
 
-	template <typename T> static void access_properties(T& ctx);
+	struct ChildProperties {
+	};
 
-protected:
-	std::vector<Component> children;
+	template <typename T> static void access_properties(T& ctx);
+	template <typename T> static void access_child_properties(T& ctx);
+
+private:
+	struct Child {
+		Component component;
+		libv::vec2f position;
+		libv::vec2f size;
+	};
+	std::vector<Child> children;
 
 public:
 	using CoreComponent::CoreComponent;
 
-public:
-	void add(Component component);
-	void add_front(Component component);
-	void remove(Component& component);
-	void remove(std::string_view component_name);
-	void clear();
-
-protected:
-	virtual void doStyle(ContextStyle& ctx) override;
+private:
+	virtual void doStyle(ContextStyle& context) override;
+	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
+	virtual void doLayout2(const ContextLayout2& le) override;
 	virtual void doRender(Renderer& r) override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
@@ -54,13 +54,18 @@ protected:
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-void CoreBasePanel::access_properties(T& ctx) {
+void CorePanelBoard::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.background; },
 			Background::none(),
 			pgr::appearance, pnm::background,
 			"Background"
 	);
+}
+
+template <typename T>
+void CorePanelBoard::access_child_properties(T& ctx) {
+	(void) ctx;
 }
 
 // -------------------------------------------------------------------------------------------------
