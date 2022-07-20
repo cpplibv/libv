@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: AlignHorizontal
-// Generator version: enum v2.5.0
+// Generator version: enum v2.5.1
 // Input file: src/libv/ui/property/align_horizontal.hpp.in.lua
 
 #pragma once
@@ -93,13 +93,6 @@ private:
 			true,  // justify
 			true,  // justify_all
 	};
-
-public:
-	[[nodiscard]] constexpr inline bool justified() const noexcept {
-		return table_justified[static_cast<underlying_type>(enum_value_)];
-	}
-
-private:
 	static constexpr float table_rate[] = {
 			1.0f, // right
 			0.5f, // center
@@ -109,6 +102,9 @@ private:
 	};
 
 public:
+	[[nodiscard]] constexpr inline bool justified() const noexcept {
+		return table_justified[static_cast<underlying_type>(enum_value_)];
+	}
 	[[nodiscard]] constexpr inline float rate() const noexcept {
 		return table_rate[static_cast<underlying_type>(enum_value_)];
 	}

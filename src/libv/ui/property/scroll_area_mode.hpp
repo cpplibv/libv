@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: ScrollAreaMode
-// Generator version: enum v2.5.0
+// Generator version: enum v2.5.1
 // Input file: src/libv/ui/property/scroll_area_mode.hpp.in.lua
 
 #pragma once

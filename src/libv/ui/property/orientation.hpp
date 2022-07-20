@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: Orientation
-// Generator version: enum v2.5.0
+// Generator version: enum v2.5.1
 // Input file: src/libv/ui/property/orientation.hpp.in.lua
 
 #pragma once

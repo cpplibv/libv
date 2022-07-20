@@ -9,8 +9,10 @@
 #include <range/v3/view/reverse.hpp>
 #include <range/v3/view/transform.hpp>
 // std
+#include <algorithm>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -19,7 +21,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v2.5.0";
+static constexpr std::string_view enum_gen_version = "v2.5.1";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -262,9 +264,11 @@ public:
 
 		// TODO P1: parse (with and without: aliases, case sensitivity, ignore whitespace and/or signs (like: .-_), ignore all whitespace and-or (even mid word ones too)
 
-		for (const auto& [property_name, property] : properties) {
+		if (!properties.empty()) {
 			out("\n");
 			out("private:\n");
+		}
+		for (const auto& [property_name, property] : properties) {
 			out("	static constexpr {} table_{}[] = {{\n", property.type, property_name);
 
 			const auto longest_prop_value = std::ranges::max(enum_entries | ranges::v3::view::transform([&](const Value& v) { return property.values.at(v.identifier).size(); }));
@@ -272,8 +276,13 @@ public:
 			for (const auto& enum_entry : enum_entries)
 				out("			{:{}} // {}\n", property.values.at(enum_entry.identifier) + ',', longest_prop_value + 1, enum_entry.identifier);
 			out("	}};\n");
+		}
+
+		if (!properties.empty()) {
 			out("\n");
 			out("public:\n");
+		}
+		for (const auto& [property_name, property] : properties) {
 			out("	[[nodiscard]] constexpr inline {} {}() const noexcept {{\n", property.type, property_name);
 			out("		return table_{}[static_cast<underlying_type>(enum_value_)];\n", property_name);
 			out("	}}\n");
