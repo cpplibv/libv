@@ -615,7 +615,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 
 libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
 	const auto result = doLayout1(layout_env);
-	log_ui.trace("Layout dynamic {:>11}, {}", result, path());
+	log_ui.trace("Dynamic            {: :>4}, {}", xy(result), path());
 	return result;
 }
 
@@ -624,7 +624,7 @@ void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, in
 		// Float positions can't change under a float region component
 		return;
 
-	log_ui.trace("MScan  {:>11}, {:>11}, A {}", xy(layout_position_), xy(layout_size_), path());
+	log_ui.trace("MScan   {: :>4}, {: :>4}, A {}", xy(layout_position_), xy(layout_size_), path());
 
 	doForeachChildren([parentFloatPosition = floatPosition, parentDepth = depth](Component& child) {
 		// Scan children and mouse update if needed
@@ -682,8 +682,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 	if (changedBounds || flags.match_any(Flag::pendingLayoutSelf)) {
 		// Layout self and the children with the derived class
 		doLayout2(layout_env);
-		log_ui.trace("Layout {:>11}, {:>11}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
-
+		log_ui.trace("Layout  {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 	} else if (flags.match_any(Flag::pendingLayoutChild)) {
 		// No need to re-layout this component, layout the children only
 		doForeachChildren([&layout_env, changedFloatPosition](Component& child) {
@@ -692,7 +691,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 					get_core(child)->layout_size()
 			));
 		});
-		log_ui.trace("   |   {:>11}, {:>11}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
+		log_ui.trace("    |   {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 	}
 
 	flags.reset(Flag::pendingLayout);

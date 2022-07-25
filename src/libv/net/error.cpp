@@ -4,7 +4,7 @@
 #include <libv/net/error.hpp>
 // ext
 #include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <fmt/ostream.h> // For std::error_code
 #include <boost/asio/error.hpp>
 // std
 #include <system_error>

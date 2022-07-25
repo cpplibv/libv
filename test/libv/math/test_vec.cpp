@@ -7,6 +7,7 @@
 // libv
 #include <libv/math/constants.hpp>
 // std
+#include <algorithm>
 #include <string>
 // pro
 #include <libv/math/vec.hpp>
@@ -532,43 +533,39 @@ TEST_CASE("operator+", "[libv.math.vec]") {
 
 // =================================================================================================
 
-// TODO P2: libv.math: Move formatter to the vec.hpp header
-// TODO P2: libv.math: Implement vec_t top / nested level formatting, support recursion
-// TODO P2: libv.math: Implement quat_t formatter
-template <std::size_t N, typename T>
-struct fmt::formatter<libv::vec_t<N, T>> : fmt::formatter<T> {
-	template <typename FormatContext>
-	auto format(const libv::vec_t<N, T>& vec, FormatContext& ctx) {
-		auto out = ctx.out();
-
-		for (std::size_t i = 0; i < N; ++i) {
-			if (i != 0)
-				out = fmt::format_to(out, " ");
-			out = formatter<T>::format(vec[i], ctx);
-			ctx.advance_to(out);
-		}
-
-		return out;
-	}
-};
-
 TEST_CASE("Test math.vec formatter", "[libv.math.vec]") {
 	libv::vec3f v0(42.0f, libv::pi, -0.3f);
 	libv::vec3f v1(0, 1, 2);
 
 	CHECK(fmt::format("{}", v0) == "42 3.1415927 -0.3");
-	CHECK(fmt::format("{:07.3f}", v0) == "042.000 003.142 -00.300");
-	CHECK(fmt::format("{:<6}", v0) == "42     3.1415927 -0.3  ");
-	CHECK(fmt::format("{:^6}", v0) == "  42   3.1415927  -0.3 ");
-	CHECK(fmt::format("{:>6}", v0) == "    42 3.1415927   -0.3");
-
+	CHECK(fmt::format("{:}", v0) == "423.1415927-0.3");
+	CHECK(fmt::format("{: }", v0) == "42 3.1415927 -0.3");
+	CHECK(fmt::format("{::}", v0) == "423.1415927-0.3");
+	CHECK(fmt::format("{: :}", v0) == "42 3.1415927 -0.3");
 	CHECK(fmt::format("{}", v1) == "0 1 2");
+	CHECK(fmt::format("{:}", v1) == "012");
+	CHECK(fmt::format("{: }", v1) == "0 1 2");
+	CHECK(fmt::format("{::}", v1) == "012");
+	CHECK(fmt::format("{: :}", v1) == "0 1 2");
 
-//	CHECK(fmt::format("{:,}", v0) == "42, 3.1415927, -0.3");
-//	CHECK(fmt::format("{:,:07.3f}", v0) == "042.000, 003.142, -00.300");
-//	CHECK(fmt::format("{:,:<6}", v0) == "42    , 3.1415927, -0.3  ");
-//	CHECK(fmt::format("{:,:^6}", v0) == "  42  , 3.1415927,  -0.3 ");
-//	CHECK(fmt::format("{:,:>6}", v0) == "    42, 3.1415927,   -0.3");
-//
-//	CHECK(fmt::format("{:,}", v1) == "0, 1, 2");
+	CHECK(fmt::format("{:, }", v0) == "42, 3.1415927, -0.3");
+	CHECK(fmt::format("{:, }", v1) == "0, 1, 2");
+
+	CHECK(fmt::format("{::07.3f}", v0) == "042.000003.142-00.300");
+	CHECK(fmt::format("{::<6}", v0) == "42    3.1415927-0.3  ");
+	CHECK(fmt::format("{::^6}", v0) == "  42  3.1415927 -0.3 ");
+	CHECK(fmt::format("{::>6}", v0) == "    423.1415927  -0.3");
+
+	CHECK(fmt::format("{: :07.3f}", v0) == "042.000 003.142 -00.300");
+	CHECK(fmt::format("{: :<6}", v0) == "42     3.1415927 -0.3  ");
+	CHECK(fmt::format("{: :^6}", v0) == "  42   3.1415927  -0.3 ");
+	CHECK(fmt::format("{: :>6}", v0) == "    42 3.1415927   -0.3");
+
+	CHECK(fmt::format("{:, :07.3f}", v0) == "042.000, 003.142, -00.300");
+	CHECK(fmt::format("{:, :<6}", v0) == "42    , 3.1415927, -0.3  ");
+	CHECK(fmt::format("{:, :^6}", v0) == "  42  , 3.1415927,  -0.3 ");
+	CHECK(fmt::format("{:, :>6}", v0) == "    42, 3.1415927,   -0.3");
+
+	libv::vec3_t<libv::vec2_t<int>> v2({0, 1}, {2, 3}, {4, 5});
+	CHECK(fmt::format("{:|:,:02}", v2) == "00,01|02,03|04,05");
 }

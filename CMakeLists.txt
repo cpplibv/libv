@@ -633,6 +633,10 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_fwd INTERFACE
+)
+
+wish_create_library(
 	TARGET libv_hash STATIC
 	SOURCE src/libv/hash/*.cpp
 	LINK   ext_boost libv_utility
@@ -667,6 +671,7 @@ wish_create_library(
 	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
 	LINK   ext_boost # For gradient small_vector
 	LINK   ext_fmt
+	LINK   libv_fwd
 )
 
 wish_create_library(
@@ -1243,6 +1248,12 @@ wish_create_executable(
 	TARGET test_libv_fsw
 	SOURCE test/libv/fsw/*.cpp
 	LINK   ext_catch libv_fsw ext_boost
+)
+
+wish_create_executable(
+	TARGET test_libv_fwd
+	SOURCE test/libv/fwd/*.cpp
+	LINK   ext_catch libv_fwd ext_fmt
 )
 
 wish_create_executable(

@@ -306,3 +306,4 @@ Bloom Paper
 Full screen triangle: https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
 sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
 
+std::format / fmt custom types: https://www.cppstories.com/2022/custom-stdformat-cpp20/

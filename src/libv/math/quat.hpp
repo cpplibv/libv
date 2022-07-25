@@ -4,6 +4,8 @@
 
 // hpp
 #include <libv/math/quat_fwd.hpp>
+// ext
+#include <libv/fwd/ext/fmt_fwd.hpp>
 // libv
 #include <libv/math/constants.hpp>
 #include <libv/math/mat.hpp>
@@ -13,7 +15,6 @@
 #include <libv/meta/uninitialized.hpp>
 // std
 #include <cmath>
-#include <ostream>
 
 
 namespace libv {
@@ -472,13 +473,74 @@ public:
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool operator!=(const quat_t& other) const noexcept = default;
 
 	// operator<<(ostream, vec) --------------------------------------------------------------------
-public:
-	friend inline std::ostream& operator<<(std::ostream& os, const quat_t& q)
-			requires requires (std::ostream& o, const T& m) { o << m; } {
+
+	template <typename OStream>
+			requires requires (OStream& o, const T& m) { o << m; }
+	friend inline OStream& operator<<(OStream& os, const quat_t& q) {
 		return os << q.w << ' ' << q.x << ' ' << q.y << ' ' << q.z;
 	}
 };
 
+// format ------------------------------------------------------------------------------------------
+} // namespace libv
+
+template <typename T>
+struct fmt::formatter<libv::quat_t<T>, char, void> : public fmt::formatter<T, char, void> {
+	const char* sep_begin = " ";
+	const char* sep_end = sep_begin + 1;
+
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		const auto specified = ctx.begin() != ctx.end();
+		const auto begin = ctx.begin();
+		auto end = begin;
+		for (; end != ctx.end() && *end != '}'; ++end);
+
+		if (!specified)
+			return formatter<T, char, void>::parse(ctx);
+
+		auto it_colon = begin;
+		for (; it_colon != end && *it_colon != ':'; ++it_colon);
+		if (it_colon == end) {
+			sep_begin = &*begin;
+			sep_end = &*end;
+			ctx.advance_to(end);
+			return formatter<T, char, void>::parse(ctx);
+		}
+
+		sep_begin = &*begin;
+		sep_end = &*it_colon;
+		ctx.advance_to(it_colon + 1);
+		return formatter<T, char, void>::parse(ctx);
+	}
+
+	template <typename FormatContext>
+	auto format(const libv::quat_t<T>& quat, FormatContext& ctx) const {
+		auto out = ctx.out();
+
+		out = formatter<T, char, void>::format(quat.w, ctx);
+		for (auto s = sep_begin; s != sep_end; ++s)
+			*out++ = *s;
+		ctx.advance_to(out);
+
+		out = formatter<T, char, void>::format(quat.x, ctx);
+		for (auto s = sep_begin; s != sep_end; ++s)
+			*out++ = *s;
+		ctx.advance_to(out);
+
+		out = formatter<T, char, void>::format(quat.y, ctx);
+		for (auto s = sep_begin; s != sep_end; ++s)
+			*out++ = *s;
+		ctx.advance_to(out);
+
+		out = formatter<T, char, void>::format(quat.z, ctx);
+		ctx.advance_to(out);
+
+		return out;
+	}
+};
+
+namespace libv {
 // =================================================================================================
 
 template <typename T>

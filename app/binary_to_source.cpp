@@ -2,7 +2,7 @@
 
 // ext
 #include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <fmt/ostream.h> // For std::error_code
 // libv
 #include <libv/utility/concat.hpp>
 #include <libv/utility/read_file.hpp>

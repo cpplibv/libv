@@ -182,7 +182,7 @@ public:
 	void aux_debug(Node& node, int depth = 0) noexcept {
 		if (depth != 0) {
 			if (node.region_nodes.empty())
-				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]", std::string((depth - 1) * 4, ' ') +
+				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{: :>4} TR:{: :>4}]", std::string((depth - 1) * 4, ' ') +
 						node.target->path(),
 						libv::to_underlying(node.order),
 						node.enabled ? "Y" : " ",
@@ -192,7 +192,7 @@ public:
 						node.global_offset() + node.cornerTR
 				);
 			else
-				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}] -> {}", std::string((depth - 1) * 4, ' ') +
+				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{: :>4} TR:{: :>4}] -> {}", std::string((depth - 1) * 4, ' ') +
 						node.target->path(),
 						libv::to_underlying(node.order),
 						node.enabled ? "Y" : " ",

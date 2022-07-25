@@ -4,13 +4,14 @@
 
 // fwd
 #include <libv/math/vec_fwd.hpp>
+// ext
+#include <libv/fwd/ext/fmt_fwd.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/meta/force_inline.hpp>
 #include <libv/meta/uninitialized.hpp>
 // std
 #include <cmath>
-#include <ostream> // Remove include after https://github.com/fmtlib/fmt/issues/2449 is resolved
 // pro
 #include <libv/math/vec_concept.hpp>
 
@@ -460,18 +461,9 @@ struct vec_t : vec_base_t<N, T> {
 
 	// operator<<(ostream, vec) --------------------------------------------------------------------
 
-	// --- WORKAROUND ---
-	// Workaround until https://github.com/fmtlib/fmt/issues/2449 is not resolved
-	// Also remove the ostream include
-	// --- BEGIN ---
-	friend inline std::ostream& operator<<(std::ostream& os, const vec_t& vec)
-			requires requires (std::ostream& o, const T& m) { o << m; } {
-	// --- CORRECT ---
-	//	template <typename OStream>
-	//		requires requires (OStream& o, const T& m) { o << m; }
-	//	friend inline OStream& operator<<(OStream& os, const vec_t& vec) {
-	// --- END ---
-
+	template <typename OStream>
+			requires requires (OStream& o, const T& m) { o << m; }
+	friend inline OStream& operator<<(OStream& os, const vec_t& vec) {
 		for (std::size_t i = 0; i < N; ++i) {
 			if (i != 0)
 				os << ' ';
@@ -481,6 +473,58 @@ struct vec_t : vec_base_t<N, T> {
 	}
 };
 
+// format ------------------------------------------------------------------------------------------
+} // namespace libv
+
+template <std::size_t N, typename T>
+struct fmt::formatter<libv::vec_t<N, T>, char, void> : public fmt::formatter<T, char, void> {
+	const char* sep_begin = " ";
+	const char* sep_end = sep_begin + 1;
+
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		const auto specified = ctx.begin() != ctx.end();
+		const auto begin = ctx.begin();
+		auto end = begin;
+		for (; end != ctx.end() && *end != '}'; ++end);
+
+		if (!specified)
+			return formatter<T, char, void>::parse(ctx);
+
+		auto it_colon = begin;
+		for (; it_colon != end && *it_colon != ':'; ++it_colon);
+		if (it_colon == end) {
+			sep_begin = &*begin;
+			sep_end = &*end;
+			ctx.advance_to(end);
+			return formatter<T, char, void>::parse(ctx);
+		}
+
+		sep_begin = &*begin;
+		sep_end = &*it_colon;
+		ctx.advance_to(it_colon + 1);
+		return formatter<T, char, void>::parse(ctx);
+	}
+
+	template <typename FormatContext>
+	auto format(const libv::vec_t<N, T>& vec, FormatContext& ctx) const {
+		auto out = ctx.out();
+
+		for (std::size_t i = 0; i < N; ++i) {
+			if (i != 0) {
+				for (auto s = sep_begin; s != sep_end; ++s)
+					*out++ = *s;
+				ctx.advance_to(out);
+			}
+			out = formatter<T, char, void>::format(vec[i], ctx);
+			ctx.advance_to(out);
+		}
+
+		return out;
+	}
+};
+
+namespace libv {
 // operator*(vec, vec) -----------------------------------------------------------------------------
 
 template <std::size_t N, typename T, typename K>

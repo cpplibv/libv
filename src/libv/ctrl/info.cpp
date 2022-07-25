@@ -4,7 +4,7 @@
 #include <libv/ctrl/info.hpp>
 // ext
 #include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <fmt/ostream.h> // For the actual ostream overloads
 // libv
 #include <libv/utility/utf8.hpp>
 // std

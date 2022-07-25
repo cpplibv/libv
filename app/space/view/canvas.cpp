@@ -4,7 +4,6 @@
 #include <space/view/canvas.hpp>
 // ext
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>

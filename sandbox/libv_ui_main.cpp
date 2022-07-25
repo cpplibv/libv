@@ -691,7 +691,7 @@ public:
 //		libv::ui::PanelLine mouse_stack;
 //		foreach_mouse_over([](const auto& arg) {
 //			libv::ui::Label lbl;
-//			lbl.text(fmt::format("{}: {:<60} [{:>9}-{:>9}]", arg.order, arg.component.path(), arg.cornerBL, arg.cornerTR));
+//			lbl.text(fmt::format("{}: {:<60} [{: :>4}-{: :>4}]", arg.order, arg.component.path(), arg.cornerBL, arg.cornerTR));
 //			mouse_stack.add(lbl);
 //		});
 //

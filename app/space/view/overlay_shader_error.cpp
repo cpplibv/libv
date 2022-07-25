@@ -5,7 +5,7 @@
 // ext
 #include <fmt/chrono.h>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <fmt/ostream.h> // For std::error_code
 // libv
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/resource/shader_load_event.hpp>

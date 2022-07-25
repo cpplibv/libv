@@ -2,6 +2,8 @@
 
 // hpp
 #include <catch2/catch_test_macros.hpp>
+// ext
+#include <fmt/format.h>
 // libv
 #include <libv/utility/approx.hpp>
 // pro
@@ -278,4 +280,35 @@ TEST_CASE("quat from_vectors", "[libv.math.quat]") {
 	const auto d1 = libv::vec3f{5, 1, 2};
 	CHECK(approx_vec3{d1.normalize_copy()} == libv::quatf::from_unit_vectors(s1.normalize_copy(), d1.normalize_copy()) * s1.normalize_copy());
 	CHECK(approx_vec3{d1.normalize_copy()} == libv::quatf::from_non_unit_vectors(s1, d1) * s1.normalize_copy());
+}
+
+// =================================================================================================
+
+TEST_CASE("Test math.quat formatter", "[libv.math.quat]") {
+	libv::quatf v0(0, 42.0f, libv::pi, -0.3f);
+	libv::quatf v1(0, 1, 2, 3);
+
+	CHECK(fmt::format("{}", v1) == "0 1 2 3");
+	CHECK(fmt::format("{}", v0) == "0 42 3.1415927 -0.3");
+	CHECK(fmt::format("{:}", v0) == "0423.1415927-0.3");
+	CHECK(fmt::format("{: }", v0) == "0 42 3.1415927 -0.3");
+	CHECK(fmt::format("{::}", v0) == "0423.1415927-0.3");
+	CHECK(fmt::format("{: :}", v0) == "0 42 3.1415927 -0.3");
+
+	CHECK(fmt::format("{:, }", v0) == "0, 42, 3.1415927, -0.3");
+
+	CHECK(fmt::format("{::07.3f}", v0) == "000.000042.000003.142-00.300");
+	CHECK(fmt::format("{::<6}", v0) == "0     42    3.1415927-0.3  ");
+	CHECK(fmt::format("{::^6}", v0) == "  0     42  3.1415927 -0.3 ");
+	CHECK(fmt::format("{::>6}", v0) == "     0    423.1415927  -0.3");
+
+	CHECK(fmt::format("{: :07.3f}", v0) == "000.000 042.000 003.142 -00.300");
+	CHECK(fmt::format("{: :<6}", v0) == "0      42     3.1415927 -0.3  ");
+	CHECK(fmt::format("{: :^6}", v0) == "  0      42   3.1415927  -0.3 ");
+	CHECK(fmt::format("{: :>6}", v0) == "     0     42 3.1415927   -0.3");
+
+	CHECK(fmt::format("{:, :07.3f}", v0) == "000.000, 042.000, 003.142, -00.300");
+	CHECK(fmt::format("{:, :<6}", v0) == "0     , 42    , 3.1415927, -0.3  ");
+	CHECK(fmt::format("{:, :^6}", v0) == "  0   ,   42  , 3.1415927,  -0.3 ");
+	CHECK(fmt::format("{:, :>6}", v0) == "     0,     42, 3.1415927,   -0.3");
 }
