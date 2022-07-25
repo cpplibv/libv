@@ -1,7 +1,7 @@
 // Project: libv.math, File: test/libv/math/test_vec_concept.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>

@@ -1,7 +1,7 @@
 // Project: libv.fsw, File: test/libv/fsw/test_fsw.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <condition_variable>
 #include <fstream>

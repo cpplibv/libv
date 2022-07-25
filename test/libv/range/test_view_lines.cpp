@@ -1,7 +1,7 @@
 // Project: libv.range, File: test/libv/range/test_view_lines.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <range/v3/algorithm/equal.hpp>
 // std

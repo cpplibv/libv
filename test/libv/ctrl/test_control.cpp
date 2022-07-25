@@ -1,7 +1,7 @@
 // Project: libv.ctrl, File: test/libv/ctrl/test_control.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/input/event.hpp>
 #include <libv/input/input.hpp>

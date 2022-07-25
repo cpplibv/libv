@@ -1,7 +1,7 @@
 // Project: libv.ctrl, File: test/libv/ctrl/test_match.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/ctrl/input_id.hpp>
 

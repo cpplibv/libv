@@ -1,7 +1,7 @@
 // Project: libv.net, File: test/libv/net/test_mtcp_he.cpp
 
 // test
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <boost/asio/error.hpp>
 // libv
 #include <libv/log/log.hpp>

@@ -1,7 +1,7 @@
 // Project: libv.parse, File: test/libv/ui/parse/test_parse_align.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/property/align.hpp>

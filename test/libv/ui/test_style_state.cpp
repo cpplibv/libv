@@ -1,7 +1,7 @@
 // Project: libv.ui, File: test/libv/ui/test_style_state.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/ui/style_state.hpp>
 

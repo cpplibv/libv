@@ -1,7 +1,7 @@
 // Project: libv.ui, File: test/libv/ui/test_style.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/style.hpp>

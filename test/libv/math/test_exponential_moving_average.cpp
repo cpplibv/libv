@@ -1,7 +1,7 @@
 // Project: libv.math, File: test/libv/math/test_exponential_moving_average.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/math/exponential_moving_average.hpp>
 #include <libv/utility/approx.hpp>

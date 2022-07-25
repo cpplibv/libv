@@ -665,6 +665,8 @@ wish_create_library(
 	TARGET libv_math INTERFACE
 #	SOURCE src/libv/math/*.cpp
 	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
+	LINK   ext_boost # For gradient small_vector
+	LINK   ext_fmt
 )
 
 wish_create_library(
@@ -1270,7 +1272,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET test_libv_math
 	SOURCE test/libv/math/*.cpp
-	LINK   ext_catch libv_math
+	LINK   ext_catch libv_math libv_utility
 )
 
 wish_create_executable(
@@ -1294,7 +1296,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET test_libv_range
 	SOURCE test/libv/range/*.cpp
-	LINK   ext_catch libv_range
+	LINK   ext_catch ext_fmt libv_range
 )
 
 wish_create_executable(
@@ -1316,15 +1318,15 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET test_libv_utility
-	SOURCE test/libv/utility/*.cpp
-	LINK   ext_catch libv_utility
-)
-
-wish_create_executable(
 	TARGET test_libv_ui
 	SOURCE test/libv/ui/*.cpp
 	LINK   ext_catch libv_ui
+)
+
+wish_create_executable(
+	TARGET test_libv_utility
+	SOURCE test/libv/utility/*.cpp
+	LINK   ext_catch ext_fmt libv_utility
 )
 
 # -------------------------------------------------------------------------------------------------

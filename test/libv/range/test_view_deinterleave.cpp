@@ -1,7 +1,7 @@
 // Project: libv.range, File: test/libv/range/test_view_deinterleave.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <range/v3/view/empty.hpp>
 #include <range/v3/view/indices.hpp>
@@ -102,10 +102,10 @@ TEST_CASE("view deinterleave outer range iterator difference", "[libv.range.view
 
 	auto left_it = view.begin();
 
-	for (std::size_t left = 0; left < 10; ++left) {
+	for (int left = 0; left < 10; ++left) {
 		auto right_it = left_it;
 
-		for (std::size_t right = left; right < 10; ++right) {
+		for (int right = left; right < 10; ++right) {
 			CHECK(std::distance(left_it, right_it) == right - left);
 			right_it++;
 		}
@@ -119,10 +119,10 @@ TEST_CASE("view deinterleave inner range iterator difference", "[libv.range.view
 	for (const auto& row : view) {
 		auto left_it = row.begin();
 
-		for (std::size_t left = 0; left < 10; ++left) {
+		for (int left = 0; left < 10; ++left) {
 			auto right_it = left_it;
 
-			for (std::size_t right = left; right < 10; ++right) {
+			for (int right = left; right < 10; ++right) {
 				CHECK(std::distance(left_it, right_it) == right - left);
 				right_it++;
 			}
@@ -136,15 +136,15 @@ TEST_CASE("view deinterleave random access", "[libv.range.view_deinterleave]") {
 
 	REQUIRE(view.size() == 10);
 
-	for (std::size_t i = 0; i < 5; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		REQUIRE(view[i].size() == 10);
 	}
 
-	for (std::size_t i = 5; i < 10; ++i)
+	for (int i = 5; i < 10; ++i)
 		REQUIRE(view[i].size() == 9);
 
-	for (std::size_t x = 0; x < 10; ++x) {
-		for (std::size_t y = 0; y < (x < 5 ? 10 : 9); ++y) {
+	for (int x = 0; x < 10; ++x) {
+		for (int y = 0; y < (x < 5 ? 10 : 9); ++y) {
 			CHECK(view[x][y] == y * 10 + x);
 		}
 	}

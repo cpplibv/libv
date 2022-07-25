@@ -1,7 +1,7 @@
 // Project: libv.ui, File: test/libv/ui/test_event_mouse.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <range/v3/algorithm/equal.hpp>
 // std

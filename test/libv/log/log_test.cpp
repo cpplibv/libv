@@ -1,7 +1,7 @@
 // Project: libv.log, File: test/libv/log/log_test.cpp
 
 // test
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // hpp
 #include <libv/log/log.hpp>
 // libv

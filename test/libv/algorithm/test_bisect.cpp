@@ -1,7 +1,7 @@
 // Project: libv, File: test/libv/algorithm/test_bisect.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <cstdint>
 #include <utility>

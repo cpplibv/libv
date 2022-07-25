@@ -1,7 +1,7 @@
 // Project: libv, File: test/libv/algorithm/test_pack_rect_bin.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <libv/algo/pack_rect_bin.hpp>
 // libv
 #include <libv/utility/approx.hpp>

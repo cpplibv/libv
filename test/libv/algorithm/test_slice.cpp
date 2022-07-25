@@ -1,7 +1,7 @@
 // Project: libv, File: test/libv/algorithm/test_slice.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/algo/slice.hpp>
 

@@ -1,6 +1,6 @@
 // Project: libv.math, File: test/libv/math/convert_test.cpp
 
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <libv/math/fixed_point.hpp>
 

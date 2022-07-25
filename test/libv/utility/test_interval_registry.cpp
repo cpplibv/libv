@@ -1,7 +1,7 @@
 // Project: libv.utility, File: test/libv/utility/test_interval_registry.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include <libv/utility/interval_registry.hpp>
 

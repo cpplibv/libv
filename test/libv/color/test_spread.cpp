@@ -1,7 +1,7 @@
 // Project: libv.color, File: test/libv/color/test_spread.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/utility/approx.hpp>

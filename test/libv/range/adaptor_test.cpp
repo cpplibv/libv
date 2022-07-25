@@ -1,6 +1,6 @@
 // Project: libv.range, File: test/libv/range/adaptor_test.cpp
 
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <libv/range/reversed_if.hpp>
 #include <iostream>

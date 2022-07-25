@@ -1,7 +1,7 @@
 // Project: libv, File: test/libv/algorithm/test_erase_all_unstable.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <range/v3/algorithm/equal.hpp>
 // std

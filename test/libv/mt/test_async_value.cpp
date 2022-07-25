@@ -1,7 +1,7 @@
 // Project: libv.mt, File: test/libv/mt/test_async_value.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <chrono>
 #include <thread>

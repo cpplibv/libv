@@ -1,7 +1,7 @@
 // Project: libv.glr, File: test/libv/glr/test_layout_std140.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>

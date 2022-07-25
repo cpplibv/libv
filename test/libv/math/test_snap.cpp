@@ -1,7 +1,7 @@
 // Project: libv.math, File: test/libv/math/test_snap.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/utility/approx.hpp>
 // pro

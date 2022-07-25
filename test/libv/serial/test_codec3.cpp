@@ -1,7 +1,7 @@
 // Project: libv.serial, File: test/libv/serial/test_codec3.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/archive/json_any.hpp>

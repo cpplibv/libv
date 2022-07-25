@@ -1,6 +1,6 @@
 // Project: libv.parse, File: test/libv/parse/test_bool.cpp
 
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <libv/parse/bool.hpp>
 #include <libv/utility/approx.hpp>

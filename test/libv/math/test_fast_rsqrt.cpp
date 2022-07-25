@@ -2,7 +2,7 @@
 
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <cmath>
 // pro

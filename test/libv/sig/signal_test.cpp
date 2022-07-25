@@ -1,6 +1,6 @@
 // Project: libv.sig, File: test/libv/sig/signal_test.cpp
 
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "signal_test_util.hpp"
 #include <libv/sig/signal.hpp>

@@ -1,7 +1,7 @@
 // Project: libv.ui, File: test/libv/ui/test_layout_line.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // pro
 #include "test_layout_utility.hpp"
 #include <libv/ui/component/panel_line.hpp>

@@ -1,7 +1,7 @@
 // Project: libv.ctrl, File: test/libv/ctrl/test_enum.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/utility/to_underlying.hpp>
 // pro

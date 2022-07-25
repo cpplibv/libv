@@ -1,7 +1,7 @@
 // Project: libv.arg, File: test/libv/arg/test_arg.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <array>
 #include <iostream>

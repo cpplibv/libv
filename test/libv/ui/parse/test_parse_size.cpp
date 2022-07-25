@@ -1,7 +1,7 @@
 // Project: libv.parse, File: test/libv/ui/parse/test_parse_size.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // std
 #include <sstream>
 // pro

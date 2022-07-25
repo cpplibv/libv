@@ -1,7 +1,7 @@
 // Project: libv.math, File: test/libv/math/test_vec.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <fmt/format.h>
 // libv
@@ -10,6 +10,7 @@
 #include <string>
 // pro
 #include <libv/math/vec.hpp>
+#include <libv/utility/approx.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -39,6 +40,11 @@ struct CtorCounter {
 	CtorCounter& operator=(CtorCounter&&) & { ++move_assign; return *this; }
 	~CtorCounter() { ++dtor; }
 };
+
+//template <std::size_t N, typename T>
+//libv::vec_t<N, libv::approx<T>> approx(libv::vec_t<N, T> vec) {
+//	return vec.template cast<libv::approx<T>>();
+//}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -177,7 +183,7 @@ TEST_CASE("normalize", "[libv.math.vec]") {
 	CHECK(2 < vec0);
 	CHECK(2 > vec0.normalize_copy());
 
-	CHECK(1 == Approx(vec0.normalize_copy().length()));
+	CHECK(1 == libv::approx(vec0.normalize_copy().length()));
 }
 
 TEST_CASE("Custom getter functions", "[libv.math.vec]") {
@@ -403,10 +409,10 @@ TEST_CASE("length", "[libv.math.vec]") {
 	libv::vec_t<2, float> v0(0, 10);
 	libv::vec_t<2, float> v1(10, 10);
 
-	CHECK(10.0f == Approx(v0.length()));
-	CHECK(100.0f == Approx(v0.length_sq()));
-	CHECK(14.1421f == Approx(v1.length()));
-	CHECK(200.0f == Approx(v1.length_sq()));
+	CHECK(10.0f == libv::approx(v0.length()));
+	CHECK(100.0f == libv::approx(v0.length_sq()));
+	CHECK(14.14214f == libv::approx(v1.length()));
+	CHECK(200.0f == libv::approx(v1.length_sq()));
 }
 
 TEST_CASE("operator*(vec, vec)", "[libv.math.vec]") {

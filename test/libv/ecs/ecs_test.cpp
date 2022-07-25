@@ -1,6 +1,6 @@
 // Project: libv.ecs, File: test/libv/ecs/ecs_test.cpp
 
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <libv/ecs/system.hpp>
 

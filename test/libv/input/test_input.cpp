@@ -1,7 +1,7 @@
 // Project: libv.input, File: test/libv/input/test_input.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/utility/to_underlying.hpp>
 // ext

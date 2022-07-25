@@ -1,7 +1,7 @@
 // Project: libv.lua, File: test/libv/lua/test_import.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 //#include <libv/math/vec.hpp>

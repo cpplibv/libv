@@ -5,6 +5,7 @@
 // libv
 #include <libv/utility/float_equal.hpp>
 // std
+#include <algorithm> // For std::clamp
 #include <cmath>
 #include <utility>
 

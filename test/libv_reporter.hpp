@@ -10,7 +10,7 @@
 #include <string_view>
 #include <unordered_set>
 // pro
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 
 // NOTE: This file is a mess. Its a test driver; No time, don't care.

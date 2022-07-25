@@ -1,7 +1,7 @@
 // Project: libv.utility, File: test/libv/utility/flag_enum.cpp
 
 // hpp
-#include <catch/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 // ext
 #include <fmt/ostream.h>
 // pro
