@@ -35,6 +35,20 @@ void RendererSurface::addChunk(int generation, const std::shared_ptr<surface::Ch
 	buildMesh(chunkRenderData.mesh, chunk);
 }
 
+// Can do strips
+// O - - - O - - - O - - - O - - - O
+// |     / |     / |     / |     / |
+// |   /   |   /   |   /   |   /   |
+// | /     | /     | /     | /     |
+// O - - - O - - - O - - - O - - - O
+//
+// Cannot do strips, but yields less artifacts
+// O - - - O - - - O - - - O - - - O
+// |     / | \     |     / | \     |
+// |   /   |   \   |   /   |   \   |
+// | /     |     \ | /     |     \ |
+// O - - - O - - - O - - - O - - - O
+
 void RendererSurface::buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<surface::Chunk>& chunk) {
 	libv::Timer timer;
 
@@ -47,21 +61,40 @@ void RendererSurface::buildMesh(libv::glr::Mesh& mesh, const std::shared_ptr<sur
 
 	auto& cachedIndices = stripIndices[chunk->height.size().cast<int32_t>()];
 	if (cachedIndices.empty()) {
-		libv::glr::VertexIndex vi = 0;
 		const auto rowSize = chunk->height.size_y();
-		for (size_t i = 0; i < rowSize - 1; ++i) {
-			cachedIndices.emplace_back(vi);
+		const auto rowSizeVi = static_cast<libv::glr::VertexIndex>(rowSize);
+
+		for (size_t y = 0; y < rowSize - 1; ++y) {
 			const auto colSize = chunk->height.size_x();
 			const auto colSizeVi = static_cast<libv::glr::VertexIndex>(colSize);
+			bool cross = y % 2 == 0;
 
-			for (size_t j = 0; j < colSize; ++j) {
-				cachedIndices.emplace_back(vi);
-				cachedIndices.emplace_back(vi + colSizeVi);
-				vi += 1;
+			for (size_t x = 0; x < colSize - 1; ++x) {
+				const auto vi = y * rowSizeVi + x;
+
+				const auto BL = vi;
+				const auto BR = vi + 1;
+				const auto TL = vi + colSizeVi;
+				const auto TR = vi + colSizeVi + 1;
+
+				cross = !cross;
+				if (cross) {
+					cachedIndices.emplace_back(BL);
+					cachedIndices.emplace_back(BR);
+					cachedIndices.emplace_back(TR);
+					cachedIndices.emplace_back(TR);
+					cachedIndices.emplace_back(TL);
+					cachedIndices.emplace_back(BL);
+				} else {
+					cachedIndices.emplace_back(TL);
+					cachedIndices.emplace_back(BL);
+					cachedIndices.emplace_back(BR);
+					cachedIndices.emplace_back(BR);
+					cachedIndices.emplace_back(TR);
+					cachedIndices.emplace_back(TL);
+				}
 			}
-			cachedIndices.emplace_back(vi + colSizeVi - 1);
 		}
-		vi += static_cast<libv::glr::VertexIndex>(rowSize);
 	}
 
 	position.set_from_range(chunk->height.span());

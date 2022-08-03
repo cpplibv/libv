@@ -59,7 +59,7 @@ private:
 		int generation = -1;
 		libv::vec3f pos;
 		libv::vec2f size;
-		libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+		libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	};
 
 private:
