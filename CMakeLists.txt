@@ -748,7 +748,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_sys STATIC
 	SOURCE src/libv/sys/*.cpp
-	LINK   libv_log ext_clip
+	LINK   libv_log ext_clip ext_fmt
 )
 
 wish_create_library(
@@ -1174,6 +1174,12 @@ wish_create_executable(
 	TARGET sandbox_libv_sqlite3
 	SOURCE sandbox/libv_sqlite3_main.cpp
 	LINK   libv_utility ext_fmt ext_sqlite3
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_sys
+	SOURCE sandbox/libv_sys_main.cpp
+	LINK   libv_sys
 )
 
 #wish_create_executable(
