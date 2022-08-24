@@ -21,24 +21,70 @@ inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 // Runner ------------------------------------------------------------------------------------------
 
-//	log_sandbox.debug("GL Vendor   {}", glGetString(GL_VENDOR));
-//	log_sandbox.debug("GL Renderer {}", glGetString(GL_RENDERER));
-//	log_sandbox.debug("GL Version  {}", glGetString(GL_VERSION));
-//
-//  const auto checkGLSupport = [](const char* ext) {
-//      log_sandbox.debug("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
-//  };
-//
-//	checkGLSupport("GL_VERSION_3_3");
-//	checkGLSupport("GL_VERSION_4_5");
-//	checkGLSupport("GL_ARB_direct_state_access");
-//	checkGLSupport("GL_ARB_draw_elements_base_vertex");
-//	checkGLSupport("GL_ARB_gpu_shader_fp64");
-//	checkGLSupport("GL_ARB_gpu_shader_int64");
-//	checkGLSupport("GL_ARB_sampler_objects");
-//	checkGLSupport("GL_ARB_vertex_attrib_64bit");
-//	checkGLSupport("GL_ARB_vertex_attrib_binding");
-//	checkGLSupport("GL_EXT_texture_compression_s3tc");
+void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+		const GLchar* message, const void* userData) {
+
+	(void) length;
+	(void) userData;
+
+	const auto source_str = [&] {
+		switch (source) {
+		case GL_DEBUG_SOURCE_API:             return "API";
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Window System";
+		case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Shader Compiler";
+		case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Third Party";
+		case GL_DEBUG_SOURCE_APPLICATION:     return "Application";
+		case GL_DEBUG_SOURCE_OTHER:           return "Other";
+		default:                              return "?";
+		}
+	}();
+
+	const auto type_str = [&] {
+		switch (type) {
+		case GL_DEBUG_TYPE_ERROR:               return "Error";
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Deprecated Behaviour";
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Undefined Behaviour";
+		case GL_DEBUG_TYPE_PORTABILITY:         return "Portability";
+		case GL_DEBUG_TYPE_PERFORMANCE:         return "Performance";
+		case GL_DEBUG_TYPE_MARKER:              return "Marker";
+		case GL_DEBUG_TYPE_PUSH_GROUP:          return "Push Group";
+		case GL_DEBUG_TYPE_POP_GROUP:           return "Pop Group";
+		case GL_DEBUG_TYPE_OTHER:               return "Other";
+		default:                                return "?";
+		}
+	}();
+
+	const auto severity_str = [&] {
+		switch (severity) {
+		case GL_DEBUG_SEVERITY_HIGH:         return "high";
+		case GL_DEBUG_SEVERITY_MEDIUM:       return "medium";
+		case GL_DEBUG_SEVERITY_LOW:          return "low";
+		case GL_DEBUG_SEVERITY_NOTIFICATION: return "notification";
+		default:                             return "?";
+		}
+	}();
+
+
+	if (type == GL_DEBUG_TYPE_ERROR)
+		log_sandbox.error("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
+				source_str, source, type_str, type, id, severity_str, severity, message);
+
+	const auto suppress_unimportant_messages = true;
+	if (suppress_unimportant_messages) {
+		if (id == 131218)
+			// Program/shader state performance warning: Vertex shader in program <X> is being recompiled based on GL state.
+			return;
+
+		if (id == 131185)
+			// Buffer detailed info: Buffer object <X> (...) will use VIDEO memory as the source for buffer object operations.
+			// Buffer detailed info: Buffer object <X> (...) has been mapped in HOST memory.
+			// Buffer detailed info: Buffer object <X> (...) stored in VIDEO memory has been updated.
+			return;
+	}
+
+	log_sandbox.trace("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
+			source_str, source, type_str, type, id, severity_str, severity, message);
+};
 
 auto running = std::atomic_bool{true};
 
@@ -149,6 +195,19 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	// -------------------------------------------------------------------------------------------------
 
 	glfwMakeContextCurrent(window);
+
+	// -------------------------------------------------------------------------------------------------
+
+	if (GLenum err = glewInit() != GLEW_OK) {
+		log_sandbox.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", glewGetErrorString(err));
+		return EXIT_FAILURE;
+	}
+
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(debugCallback, nullptr);
+
+	// -------------------------------------------------------------------------------------------------
+
 	glfwSetKeyCallback(window, [](GLFWwindow* window_, int key, int scancode, int action, int mods) {
 		auto& sandbox = *reinterpret_cast<Sandbox*>(glfwGetWindowUserPointer(window_));
 

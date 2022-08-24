@@ -891,6 +891,7 @@ inline void GL::bind(const VertexArray& object) noexcept {
 }
 
 inline void GL::unbindVertexArray() noexcept {
+	currentVertexArray.id = 0;
 	glBindVertexArray(0);
 	checkGL();
 }

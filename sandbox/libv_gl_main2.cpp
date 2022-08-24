@@ -146,9 +146,6 @@ struct Sandbox {
 	struct Vertex {
 		libv::vec3f position;
 		libv::vec2f uv;
-
-		Vertex(libv::vec3f position, libv::vec2f uv) :
-			position(position), uv(uv) { }
 	};
 
 	Sandbox() {

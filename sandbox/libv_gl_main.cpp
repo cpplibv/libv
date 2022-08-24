@@ -31,9 +31,9 @@ struct Sandbox {
 
 	libv::gl::GL gl;
 
-	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition;
-	libv::gl::AttributeFixLocation<libv::vec4f> attributeColor;
-	libv::gl::AttributeFixLocation<libv::vec2f> attributeTex0;
+	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition{0};
+	libv::gl::AttributeFixLocation<libv::vec4f> attributeColor{2};
+	libv::gl::AttributeFixLocation<libv::vec2f> attributeTex0{8};
 
 	libv::gl::Shader shaderTest0Frag;
 	libv::gl::Shader shaderTest0Vert;
@@ -70,9 +70,6 @@ struct Sandbox {
 		libv::vec3f position;
 		libv::vec4f color;
 		libv::vec2f uv;
-
-		Vertex(libv::vec3f position, libv::vec4f color, libv::vec2f uv) :
-			position(position), color(color), uv(uv) { }
 	};
 
 	Sandbox() {
@@ -92,7 +89,7 @@ struct Sandbox {
 			Vertex{libv::vec3f(-1.f, +1.f, 0.f), libv::vec4f(0.f, 0.f, 1.f, 1.f), libv::vec2f(0.f, 1.f)}
 		};
 
-		unsigned int dataIndices[]{0, 1, 2, 0, 2, 3};
+		uint32_t dataIndices[]{0, 1, 2, 0, 2, 3};
 
 		uint8_t dataTexture[]{
 			255, 0, 0, 255,
@@ -107,10 +104,6 @@ struct Sandbox {
 		uint32_t dataTextureSkyY0[]{255, 2130739199, 2130739199, 2130739199};
 		uint32_t dataTextureSkyZ1[]{255, 2139095039, 2139095039, 2139095039};
 		uint32_t dataTextureSkyZ0[]{255, 2139029759, 2139029759, 2139029759};
-
-		attributePosition = 0;
-		attributeColor = 2;
-		attributeTex0 = 8;
 
 		gl(shaderTest0Frag).create(libv::gl::ShaderType::Fragment);
 		gl(shaderTest0Frag).compile(libv::read_file_or_throw("res/shader/test0.fs"));
@@ -150,10 +143,27 @@ struct Sandbox {
 
 		gl(bufferVertexData).create();
 		gl(bufferVertexData).bind();
-		gl(bufferVertexData).data(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
+//		gl(bufferVertexData).data(&dataVertex[0], sizeof(dataVertex[0]) * std::size(dataVertex), libv::gl::BufferUsage::StaticDraw);
+		const auto vertexDataSize = sizeof(dataVertex[0]) * std::size(dataVertex);
+		gl(bufferVertexData).data(nullptr, vertexDataSize, libv::gl::BufferUsage::StaticDraw);
+		auto* vramVertexData = gl(bufferVertexData).map(libv::gl::BufferAccessFull::Write);
+//		auto* vramVertexData = gl(bufferVertexData).mapRange(
+//				0,
+//				vertexDataSize,
+//				libv::gl::BufferAccess::Write |
+//				libv::gl::BufferAccess::InvalidateBuffer |
+//				libv::gl::BufferAccess::Unsynchronized);
+		if (!vramVertexData)
+			throw std::runtime_error("Failed to map buffer data");
+		std::memcpy(vramVertexData, dataVertex, vertexDataSize);
+		auto vramSuccess = gl(bufferVertexData).unmap();
+		if (!vramSuccess)
+			throw std::runtime_error("Failed to unmap buffer data");
+
 		gl(bufferVertexIndices).create();
 		gl(bufferVertexIndices).bind();
-		gl(bufferVertexIndices).data(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
+//		gl(bufferVertexIndices).data(&dataIndices[0], sizeof(dataIndices[0]) * std::size(dataIndices), libv::gl::BufferUsage::StaticDraw);
+		gl(bufferVertexIndices).data(dataIndices, libv::gl::BufferUsage::StaticDraw);
 
 		gl(vertexArray).create();
 		gl(vertexArray).bind();
@@ -201,8 +211,8 @@ struct Sandbox {
 		gl(textureSky).destroy();
 
 		gl(vertexArray).destroy();
-//		gl(bufferVertexData).destroy();
-//		gl(bufferVertexIndices).destroy();
+		gl(bufferVertexData).destroy();
+		gl(bufferVertexIndices).destroy();
 	}
 
 	void update(const std::chrono::duration<float> deltaTime) {

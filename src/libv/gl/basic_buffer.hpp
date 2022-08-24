@@ -24,7 +24,7 @@ protected:
 	Object& object;
 
 public:
-	BasicAccessBuffer(Object& object) :
+	explicit BasicAccessBuffer(Object& object) :
 		object(object) { }
 
 public:
@@ -71,7 +71,7 @@ public:
 
 	template <typename Range>
 	inline void data(const Range& data, BufferUsage usage) noexcept {
-		this->data(data.data(), data.size() * sizeof(typename Range::value_type), usage);
+		this->data(std::data(data), std::size(data) * sizeof(data[0]), usage);
 	}
 
 	inline void subData(const void* ptr, GLintptr offset, GLsizeiptr length) noexcept {
@@ -82,12 +82,42 @@ public:
 
 	template <typename Range>
 	inline void subData(const Range& data, GLintptr offset) noexcept {
-		this->subData(data.data(), offset, data.size() * sizeof(typename Range::value_type));
+		this->subData(std::data(data), offset, std::size(data) * sizeof(data[0]));
 	}
 
 	inline void getSubData(void* ptr, GLintptr offset, GLsizeiptr length) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glGetBufferSubData(Target, offset, length, ptr);
+		checkGL();
+	}
+
+public:
+	/// OpenGL 4.5, DSA
+	inline void* map(BufferAccessFull access) noexcept {
+		auto ptr = glMapNamedBuffer(object.id, libv::to_underlying(access));
+		checkGL();
+		return ptr;
+	}
+
+	/// OpenGL 4.5, DSA
+	inline void* mapRange(GLintptr offset, GLsizeiptr length , BufferAccess access) noexcept {
+		auto ptr = glMapNamedBufferRange(object.id, offset, length, libv::to_underlying(access));
+		checkGL();
+		return ptr;
+	}
+
+	/// OpenGL 4.5, DSA
+	/// \Returns true unless the data store contents have become corrupt during the time the data store was mapped
+	[[nodiscard]] inline bool unmap() noexcept {
+		auto valid = glUnmapNamedBuffer(object.id);
+		checkGL();
+		return valid;
+	}
+
+	/// OpenGL 4.5, DSA
+	/// - must previously have been mapped with the GL_MAP_FLUSH_EXPLICIT_BIT flag
+	inline void flushMappedRange(GLintptr offset, GLsizeiptr length) noexcept {
+		glFlushMappedNamedBufferRange(object.id, offset, length);
 		checkGL();
 	}
 };

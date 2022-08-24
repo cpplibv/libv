@@ -33,12 +33,34 @@ enum class BufferBit : GLenum {
 };
 
 [[nodiscard]] constexpr inline BufferBit operator|(BufferBit lhs, BufferBit rhs) noexcept {
-	return static_cast<BufferBit>(libv::to_value(lhs) | libv::to_value(rhs));
+	return static_cast<BufferBit>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
 }
 
 [[nodiscard]] constexpr inline BufferBit operator&(BufferBit lhs, BufferBit rhs) noexcept {
-	return static_cast<BufferBit>(libv::to_value(lhs) & libv::to_value(rhs));
+	return static_cast<BufferBit>(libv::to_underlying(lhs) & libv::to_underlying(rhs));
 }
+
+enum class BufferAccess : GLenum {
+	Read = 0x0001, /// GL_MAP_READ_BIT
+	Write = 0x0002, /// GL_MAP_WRITE_BIT
+
+	Persistent = 0x0040, /// GL_MAP_PERSISTENT_BIT
+	Coherent = 0x0080, /// GL_MAP_COHERENT_BIT
+	InvalidateRange = 0x0004, /// GL_MAP_INVALIDATE_RANGE_BIT
+	InvalidateBuffer = 0x0008, /// GL_MAP_INVALIDATE_BUFFER_BIT
+	FlushExplicit = 0x0010, /// GL_MAP_FLUSH_EXPLICIT_BIT
+	Unsynchronized = 0x0020, /// GL_MAP_UNSYNCHRONIZED_BIT
+};
+
+[[nodiscard]] constexpr inline BufferAccess operator|(BufferAccess lhs, BufferAccess rhs) noexcept {
+	return static_cast<BufferAccess>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
+}
+
+enum class BufferAccessFull : GLenum {
+	Read = 0x88B8, /// GL_READ_ONLY
+	Write = 0x88B9, /// GL_WRITE_ONLY
+	ReadWrite = 0x88BA, /// GL_READ_WRITE
+};
 
 enum class BufferUsage : GLenum {
 	StreamDraw = 0x88E0, /// GL_STREAM_DRAW
@@ -561,27 +583,27 @@ enum class FormatSized : GLenum {
 }
 
 struct Format {
-	GLenum format = to_value(FormatSized::RGBA8);
+	GLenum format = to_underlying(FormatSized::RGBA8);
 	FormatBase base = FormatBase::RGBA;
 
 	constexpr inline Format() noexcept = default;
 	constexpr inline Format(FormatBase format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(format) { }
 	constexpr inline Format(FormatCompressed format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
 	constexpr inline Format(FormatSized format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
 	constexpr inline Format(FormatDepth format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
 	constexpr inline Format(FormatDepthStencil format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
 	constexpr inline Format(FormatStencil format) noexcept :
-		format(to_value(format)),
+		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
 };
 
@@ -689,7 +711,7 @@ enum class AttributeType : GLenum {
 template <typename T>
 [[nodiscard]] constexpr inline AttributeType toAttributeType() noexcept {
 //		if constexpr (std::is_same_v<T, bool>)
-//			return to_value(AttributeType::INT);
+//			return to_underlying(AttributeType::INT);
 	// Bool cannot be just mapped for int, what about the sizes?
 
 	if constexpr (std::is_same_v<T, uint32_t>)

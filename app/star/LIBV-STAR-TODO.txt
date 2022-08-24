@@ -9,6 +9,111 @@ Star - System integration demo
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.ui: Font subpixel options: OFF RGB BGR
+
+«»
+
+try to remove friends from core-s
+	I think visibility can be public, only core inheritance would
+	need it to be different, and even that is not /that/ important
+
+try to remove handler() from core-s
+		handler could be removed with context knowing the handler type
+			OR
+		by having a single typedef in the core to the handler
+			and doing the pointer ctor itself
+!
+
+
+
+
+
+struct TextBuilder {
+	std::shared_ptr<Font2D> font_;
+	FontSize fontSize_ = FontSize{12};
+	AlignHorizontal align_horizontal_ = AlignHorizontal::center;
+	AlignVertical align_vertical_ = AlignVertical::center;
+	bool dirty = true;
+};
+
+class TextFragment : TextLayoutData {
+private:
+	bool dirty = true;
+	libv::vec2f limit_;
+
+	std::string string_;
+
+	libv::vec2f content_bounding_pos_;
+	libv::vec2f content_bounding_size_;
+};
+
+
+
+
+
+
+
+
+
+
+
+libv.ui: Alternatives
+		https://github.dev/cycfi/elements
+			Composition and properties are based on a decorator pattern
+		https://github.com/cnjinhao/nana
+
+
+--- Observations from elements ---
+
+composition:
+	elements achieves good composition by a decorator pattern
+	in case of composite components (like slider) it uses memory local storage
+		with virtual functions to access parts
+		virtual & rail
+
+elements have no property system, everything is composed via a decorator pattern
+
+
+
+--- ---
+
+
+
+TextLayoutProperties
+
+
+r.text( pass only text layout data
+		move it into its own header
+
+
+
 cleanup
 	config.cpp
 		update became weird again
