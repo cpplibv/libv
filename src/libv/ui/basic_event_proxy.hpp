@@ -22,38 +22,38 @@ namespace ui {
 
 namespace detail { // ------------------------------------------------------------------------------
 
-template <typename ComponentT, typename EventT, typename Func>
-[[nodiscard]] std::function<bool(void*, const void*)> internal_callback(Func&& func) {
+template <typename ComponentT, typename EventT, bool IsSystem, typename Func>
+[[nodiscard]] std::function<void(void*, const void*)> internal_callback(Func&& func) {
 	static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
 
 	if constexpr (std::is_invocable_r_v<void, Func, ComponentT&, const EventT&>) {
 		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
 			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
-			f(handler, *static_cast<const EventT*>(event_ptr));
-			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
+			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+				f(handler, *static_cast<const EventT*>(event_ptr));
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func, const EventT&>) {
 		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
 			(void) signal_ptr; // Callback is not interested in the component
-			f(*static_cast<const EventT*>(event_ptr));
-			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
+			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+				f(*static_cast<const EventT*>(event_ptr));
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func, ComponentT&>) {
 		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
 			(void) event_ptr; // Callback is not interested in the event
 			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
-			f(handler);
-			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
+			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+				f(handler);
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func>) {
 		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
 			(void) signal_ptr; // Callback is not interested in the component
 			(void) event_ptr; // Callback is not interested in the event
-			f();
-			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
+			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+				f();
 		};
 
 	} else {
@@ -115,8 +115,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				false, // front
-				false, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename F>
@@ -131,8 +130,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				true, // front
-				false, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename F>
@@ -147,8 +145,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				false, // front
-				true, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
 	template <typename F>
@@ -163,26 +160,23 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				true, // front
-				true, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
 	template <typename F>
 	inline F& connect_system_out_ref(F&& func) {
-		static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
-
 		struct Target {
 			F f;
 
-			bool operator()(void* signal_ptr, const void* event_ptr) {
+			void operator()(void* signal_ptr, const void* event_ptr) {
 				(void) signal_ptr; // Callback is not interested in the component
 				(void) event_ptr; // Callback is not interested in the event
+				// NOTE: Its a system event, no need to check propagation
 				f();
-				return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
 			}
 		};
 
-		auto callback = std::function<bool(void*, const void*)>{Target{std::forward<F>(func)}};
+		auto callback = std::function<void(void*, const void*)>{Target{std::forward<F>(func)}};
 		auto& target = callback.template target<Target>()->f;
 
 		detail::internal_connect(
@@ -190,7 +184,6 @@ public:
 				this->component,
 				libv::type_key<EventT>(),
 				false, // front
-				true, // system
 				std::move(callback));
 
 		return target;
@@ -238,8 +231,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				false, // front
-				false, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
@@ -253,8 +245,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				true, // front
-				false, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
@@ -268,8 +259,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				false, // front
-				true, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
@@ -283,8 +273,7 @@ public:
 				slot,
 				libv::type_key<EventT>(),
 				true, // front
-				true, // system
-				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
+				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
 	template <typename EventT>

@@ -35,8 +35,8 @@ public:
 	~ContextEvent();
 
 public:
-	void connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func);
-	void connect_global(ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func);
+	void connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& func);
+	void connect_global(ptr slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& func);
 
 	void disconnect_signal(ptr signal);
 	void disconnect_slot(ptr slot);

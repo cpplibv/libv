@@ -24,8 +24,7 @@ public:
 	struct Target {
 		ptr slot;
 		libv::type_uid event_type;
-		bool is_system; /// Callback is not ignorable
-		std::function<bool(void*, const void*)> callback;
+		std::function<void(void*, const void*)> callback;
 	};
 
 public:
@@ -43,26 +42,26 @@ ContextEvent::~ContextEvent() {
 	// For the sake of forward declared ptr
 }
 
-void ContextEvent::connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+void ContextEvent::connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 
 	self->slots[slot].emplace_back(signal);
 	auto& targets = self->signals[signal];
 	if (front)
-		targets.emplace(targets.begin(), slot, event_type, system, std::move(func));
+		targets.emplace(targets.begin(), slot, event_type, std::move(func));
 	else
-		targets.emplace_back(slot, event_type, system, std::move(func));
+		targets.emplace_back(slot, event_type, std::move(func));
 }
 
-void ContextEvent::connect_global(ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+void ContextEvent::connect_global(ptr slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 
 	self->slots[slot].emplace_back(nullptr);
 	auto& targets = self->signals[nullptr];
 	if (front)
-		targets.emplace(targets.begin(), slot, event_type, system, std::move(func));
+		targets.emplace(targets.begin(), slot, event_type, std::move(func));
 	else
-		targets.emplace_back(slot, event_type, system, std::move(func));
+		targets.emplace_back(slot, event_type, std::move(func));
 }
 
 void ContextEvent::fire(ptr signal, libv::type_uid event_type, const void* event_ptr) {
@@ -74,11 +73,9 @@ void ContextEvent::fire(ptr signal, libv::type_uid event_type, const void* event
 		return;
 	}
 
-	bool stopped = false;
 	for (const ImplContextEvent::Target& target : it->second)
 		if (target.event_type == event_type)
-			if (target.is_system || !stopped)
-				stopped |= target.callback(&*signal, event_ptr);
+			target.callback(signal, event_ptr);
 }
 
 void ContextEvent::fire_global(libv::type_uid event_type, const void* event_ptr) {
@@ -88,12 +85,10 @@ void ContextEvent::fire_global(libv::type_uid event_type, const void* event_ptr)
 	if (it == self->signals.end())
 		return;
 
-	bool stopped = false;
 	for (const ImplContextEvent::Target& target : it->second)
 		if (target.event_type == event_type)
-			if (target.is_system || !stopped)
-				// For global events the slot is used as component in the callbacks (as there is no real signal)
-				stopped |= target.callback(&*target.slot, event_ptr);
+			// For global events the slot is used as component in the callbacks (as there is no real signal)
+			target.callback(target.slot, event_ptr);
 }
 
 void ContextEvent::disconnect_signal(ptr signal) {

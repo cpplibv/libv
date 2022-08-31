@@ -17,8 +17,8 @@ namespace ui {
 
 namespace detail {
 
-void internal_connect(Component& signal, Component& slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback);
-void internal_connect_global(Component& slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback);
+void internal_connect(Component& signal, Component& slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& callback);
+void internal_connect_global(Component& slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& callback);
 void internal_disconnect(CoreComponent* component);
 void internal_fire(Component& signal, libv::type_uid event_type, const void* event_ptr);
 void internal_fire(CoreComponent* signal, libv::type_uid event_type, const void* event_ptr);

@@ -15,20 +15,20 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-void internal_connect(Component& signal, Component& slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback) {
+void internal_connect(Component& signal, Component& slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& callback) {
 	auto signal_c = get_core(signal);
 	auto slot_c = get_core(slot);
 
 	signal_c->flagDirect(Flag::signal);
 	slot_c->flagDirect(Flag::slot);
 
-	slot_c->context().event.connect(signal_c, slot_c, event_type, front, system, std::move(callback));
+	slot_c->context().event.connect(signal_c, slot_c, event_type, front, std::move(callback));
 }
 
-void internal_connect_global(Component& slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback) {
+void internal_connect_global(Component& slot, libv::type_uid event_type, bool front, std::function<void(void*, const void*)>&& callback) {
 	auto slot_c = get_core(slot);
 	slot_c->flagDirect(Flag::slot);
-	slot_c->context().event.connect_global(slot_c, event_type, front, system, std::move(callback));
+	slot_c->context().event.connect_global(slot_c, event_type, front, std::move(callback));
 }
 
 void internal_disconnect(CoreComponent* component) {
