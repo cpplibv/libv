@@ -402,3 +402,46 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(queue.consume() == "bothB6, bothA6");
 	}
 }
+
+TEST_CASE("Test Nexus connect ordering and front", "[libv.utility.nexus]") {
+	using EventType = int;
+
+	libv::Nexus2 nexus;
+	MockCallbackStream queue{", "};
+
+	SECTION("B B B") {
+		nexus.connect_global<EventType>(queue.callback("A"));
+		nexus.connect_global<EventType>(queue.callback("B"));
+		nexus.connect_global<EventType>(queue.callback("C"));
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "A1, B1, C1");
+	}
+
+	SECTION("F F F") {
+		nexus.connect_global_front<EventType>(queue.callback("A"));
+		nexus.connect_global_front<EventType>(queue.callback("B"));
+		nexus.connect_global_front<EventType>(queue.callback("C"));
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "C1, B1, A1");
+	}
+
+	SECTION("B F B") {
+		nexus.connect_global<EventType>(queue.callback("A"));
+		nexus.connect_global_front<EventType>(queue.callback("B"));
+		nexus.connect_global<EventType>(queue.callback("C"));
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "B1, A1, C1");
+	}
+
+	SECTION("F B F") {
+		nexus.connect_global_front<EventType>(queue.callback("A"));
+		nexus.connect_global<EventType>(queue.callback("B"));
+		nexus.connect_global_front<EventType>(queue.callback("C"));
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "C1, A1, B1");
+	}
+}

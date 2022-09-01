@@ -108,8 +108,10 @@ public:
 	~Nexus2();
 
 private:
-	void aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func);
-	void aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func, const void* event_ptr);
+	void aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func);
+	void aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr);
+	void aux_connect_front(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func);
+	void aux_connect_front_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr);
 	void aux_broadcast(track_ptr channel_owner, key_type event_type, const void* event_ptr) const;
 	void aux_disconnect_all(track_ptr owner);
 	void aux_disconnect_channel(track_ptr channel_owner, key_type event_type);
@@ -139,6 +141,16 @@ public:
 	}
 
 	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_global_front(Func&& func) {
+		aux_connect_front(nullptr, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)));
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_global_front(track_ptr slot_owner, Func&& func) {
+		aux_connect_front(nullptr, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)));
+	}
+
+	template <typename Event, typename Func>
 	LIBV_FORCE_INLINE void connect_global_and_call(Func&& func, const Event& event) {
 		aux_connect_and_call(nullptr, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
 	}
@@ -146,6 +158,16 @@ public:
 	template <typename Event, typename Func>
 	LIBV_FORCE_INLINE void connect_global_and_call(track_ptr slot_owner, Func&& func, const Event& event) {
 		aux_connect_and_call(nullptr, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_global_front_and_call(Func&& func, const Event& event) {
+		aux_connect_front_and_call(nullptr, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_global_front_and_call(track_ptr slot_owner, Func&& func, const Event& event) {
+		aux_connect_front_and_call(nullptr, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
 	}
 
 	template <typename Event, typename Func>
@@ -159,6 +181,16 @@ public:
 	}
 
 	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_channel_front(track_ptr channel_owner, Func&& func) {
+		aux_connect_front(channel_owner, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)));
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_channel_front(track_ptr channel_owner, track_ptr slot_owner, Func&& func) {
+		aux_connect_front(channel_owner, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)));
+	}
+
+	template <typename Event, typename Func>
 	LIBV_FORCE_INLINE void connect_channel_and_call(track_ptr channel_owner, Func&& func, const Event& event) {
 		aux_connect_and_call(channel_owner, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
 	}
@@ -166,6 +198,16 @@ public:
 	template <typename Event, typename Func>
 	LIBV_FORCE_INLINE void connect_channel_and_call(track_ptr channel_owner, track_ptr slot_owner, Func&& func, const Event& event) {
 		aux_connect_and_call(channel_owner, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_channel_front_and_call(track_ptr channel_owner, Func&& func, const Event& event) {
+		aux_connect_front_and_call(channel_owner, nullptr, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
+	}
+
+	template <typename Event, typename Func>
+	LIBV_FORCE_INLINE void connect_channel_front_and_call(track_ptr channel_owner, track_ptr slot_owner, Func&& func, const Event& event) {
+		aux_connect_front_and_call(channel_owner, slot_owner, libv::type_key<Event>(), aux_make_callback<Event>(std::forward<Func>(func)), &event);
 	}
 
 	template <typename Event>

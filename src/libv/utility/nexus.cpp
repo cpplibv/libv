@@ -132,18 +132,13 @@ struct ChannelKey {
 	[[nodiscard]] constexpr inline bool operator==(const ChannelKey&) const noexcept = default;
 };
 
-// -------------------------------------------------------------------------------------------------
-
-} // namespace libv
+} // namespace libv --------------------------------------------------------------------------------
 
 LIBV_MAKE_HASHABLE(::libv::ChannelKey, t.channel_owner, t.type);
 
-namespace libv {
+namespace libv { // --------------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------------------------------
-
-class ImplNexus2 {
-public:
+struct ImplNexus2 {
 	using track_ptr = Nexus2::track_ptr;
 	using key_type = Nexus2::key_type;
 
@@ -152,7 +147,6 @@ public:
 		std::function<void(const void*)> callback;
 	};
 
-public:
 	std::recursive_mutex mutex;
 	std::unordered_map<ChannelKey, std::vector<Target>> channels;
 	std::unordered_map<track_ptr, std::vector<ChannelKey>> memberships;
@@ -168,27 +162,55 @@ Nexus2::~Nexus2() {
 	// For the sake of forward declared ptr
 }
 
-void Nexus2::aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func) {
+std::vector<ImplNexus2::Target>& aux_create_channel(ImplNexus2& self, ImplNexus2::track_ptr channel_owner, ImplNexus2::track_ptr slot_owner, ImplNexus2::key_type event_type) {
 	const auto channel_key = ChannelKey{channel_owner, event_type};
 
-	auto lock = std::unique_lock(self->mutex);
-
-	auto& memberships_of_channel = self->memberships[channel_owner];
+	auto& memberships_of_channel = self.memberships[channel_owner];
 	if (!libv::linear_contains(memberships_of_channel, channel_key))
 		memberships_of_channel.emplace_back(channel_key);
 
-	auto& memberships_of_slot = self->memberships[slot_owner];
+	auto& memberships_of_slot = self.memberships[slot_owner];
 	if (!libv::linear_contains(memberships_of_slot, channel_key))
 		memberships_of_slot.emplace_back(channel_key);
 
-	self->channels[channel_key].emplace_back(slot_owner, std::move(func));
+	return self.channels[channel_key];
 }
 
-void Nexus2::aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)> func, const void* event_ptr) {
-	// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
-	//			this could be solved by relying on the unordered_map value stability, but there are plans to move
-	//			to a different hash container
-	aux_connect(channel_owner, slot_owner, event_type, func);
+void Nexus2::aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func) {
+	auto lock = std::unique_lock(self->mutex);
+	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+	channel.emplace_back(slot_owner, std::move(func));
+}
+
+void Nexus2::aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr) {
+	{
+		auto lock = std::unique_lock(self->mutex);
+		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+		// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
+		//			this could be solved by relying on the unordered_map value stability, but there are plans to move
+		//			to a different hash container
+		channel.emplace_back(slot_owner, func);
+	}
+
+	func(event_ptr);
+}
+
+void Nexus2::aux_connect_front(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func) {
+	auto lock = std::unique_lock(self->mutex);
+	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+	channel.emplace(channel.begin(), slot_owner, std::move(func));
+}
+
+void Nexus2::aux_connect_front_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr) {
+	{
+		auto lock = std::unique_lock(self->mutex);
+		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+		// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
+		//			this could be solved by relying on the unordered_map value stability, but there are plans to move
+		//			to a different hash container
+		channel.emplace(channel.begin(), slot_owner, func);
+	}
+
 	func(event_ptr);
 }
 
