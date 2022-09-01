@@ -9,7 +9,7 @@ namespace libv {
 
 struct uninitialized_t {};
 
-static constexpr uninitialized_t uninitialized{};
+constexpr inline uninitialized_t uninitialized{};
 
 // -------------------------------------------------------------------------------------------------
 

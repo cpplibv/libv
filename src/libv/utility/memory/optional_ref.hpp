@@ -14,7 +14,7 @@ namespace libv {
 template <typename T>
 using optional_ref = T*;
 
-static constexpr inline std::nullptr_t opt_ref_none = nullptr;
+constexpr inline std::nullptr_t opt_ref_none = nullptr;
 
 template <typename T>
 constexpr inline optional_ref<T> make_optional_ref(T* var) {

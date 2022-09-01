@@ -15,8 +15,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr float ROOT2 = 1.4142135623730950488f;
-static constexpr float ROOT3 = 1.7320508075688772935f;
+constexpr inline float ROOT2 = 1.4142135623730950488f;
+constexpr inline float ROOT3 = 1.7320508075688772935f;
 
 template <typename S>
 struct SIMD_DISPATCH {
