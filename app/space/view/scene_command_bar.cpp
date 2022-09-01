@@ -16,7 +16,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
+libv::ui::Component SceneCommandBar::create(libv::Nexus2& nexus) {
 	libv::ui::PanelLine cmd_bar("cmd-bar");
 	cmd_bar.style("space.hud-bar.cmd.panel");
 
@@ -25,7 +25,7 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 		clear_fleets.style("space.hud-bar.cmd.btn");
 		clear_fleets.text("Clear Fleets");
 		clear_fleets.event().submit.connect([&nexus]() {
-			nexus.broadcast(mc::RequestClearFleets{});
+			nexus.broadcast_global(mc::RequestClearFleets{});
 		});
 		cmd_bar.add(std::move(clear_fleets));
 
@@ -33,7 +33,7 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 		clear_planets.style("space.hud-bar.cmd.btn");
 		clear_planets.text("Clear Planets");
 		clear_planets.event().submit.connect([&nexus]() {
-			nexus.broadcast(mc::RequestClearPlanets{});
+			nexus.broadcast_global(mc::RequestClearPlanets{});
 		});
 		cmd_bar.add(std::move(clear_planets));
 
@@ -41,7 +41,7 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 		clear_fleets_long.style("space.hud-bar.cmd.btn");
 		clear_fleets_long.text("Clear Fleets With Longer Label");
 		clear_fleets_long.event().submit.connect([&nexus]() {
-			nexus.broadcast(mc::RequestClearFleets{});
+			nexus.broadcast_global(mc::RequestClearFleets{});
 		});
 		cmd_bar.add(std::move(clear_fleets_long));
 
@@ -49,7 +49,7 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 		shuffle.style("space.hud-bar.cmd.btn");
 		shuffle.text("Shuffle");
 		shuffle.event().submit.connect([&nexus]() {
-			nexus.broadcast(mc::RequestShuffle{});
+			nexus.broadcast_global(mc::RequestShuffle{});
 		});
 		cmd_bar.add(std::move(shuffle));
 

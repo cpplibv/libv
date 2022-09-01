@@ -136,7 +136,7 @@ SpaceCanvas::SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, Gam
 //	screen_picker = camera.picker(?, ?); // <<< ?
 	postProcessing.vignetteIntensity(0.15f);
 
-	game_session.nexus.connect<mc::ChangeControlledFaction>(this, [this] {
+	game_session.nexus.connect_global<mc::ChangeControlledFaction>(this, [this] {
 		// TODO P1: app.space:
 		controlVar.reset();
 	});

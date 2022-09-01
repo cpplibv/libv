@@ -19,7 +19,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneMenuBar::create(libv::Nexus& nexus, User& user) {
+libv::ui::Component SceneMenuBar::create(libv::Nexus2& nexus, User& user) {
 	libv::ui::PanelLine mp_bar("mp-bar");
 	libv::ui::attach_state<SceneMenuBar>(mp_bar)(nexus, user).init(mp_bar);
 	return mp_bar;
@@ -60,10 +60,10 @@ libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar) {
 		btn_host.text("Host");
 		btn_host.event().submit.connect([this, in_name] {
 			if (server_active) {
-				nexus.broadcast(mc::RequestDestroyServer{});
+				nexus.broadcast_global(mc::RequestDestroyServer{});
 			} else {
-				nexus.broadcast(mc::RequestNameChange{in_name.text()});
-				nexus.broadcast(mc::RequestCreateServer{uint16_t{25080}});
+				nexus.broadcast_global(mc::RequestNameChange{in_name.text()});
+				nexus.broadcast_global(mc::RequestCreateServer{uint16_t{25080}});
 			}
 		});
 		mp_bar.add(btn_host);
@@ -76,40 +76,40 @@ libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar) {
 		btn_join.text("Join");
 		btn_join.event().submit.connect([this, in_name, in_server_address] {
 			if (client_active) {
-				nexus.broadcast(mc::RequestDestroyClient{});
+				nexus.broadcast_global(mc::RequestDestroyClient{});
 			} else {
-				nexus.broadcast(mc::RequestNameChange{in_name.text()});
-				nexus.broadcast(mc::RequestCreateClient{in_server_address.text(), uint16_t{25080}});
+				nexus.broadcast_global(mc::RequestNameChange{in_name.text()});
+				nexus.broadcast_global(mc::RequestCreateClient{in_server_address.text(), uint16_t{25080}});
 			}
 		});
 		mp_bar.add(btn_join);
 
 		mp_bar.add(in_server_address);
 
-//		nexus.connect<mc::OnNameChange>(this, [this] mutable {
+//		nexus.connect_global<mc::OnNameChange>(this, [this] mutable {
 //			in_name.text(user.name);
 //		});
-		nexus.connect<mc::OnCreateClient>(this, [this] mutable {
+		nexus.connect_global<mc::OnCreateClient>(this, [this] mutable {
 			client_active = true;
 			server_active = false;
 			lbl_state.text("Running as Client [" + user.name + "]");
 			btn_host.text("Host");
 			btn_join.text("Disconnect");
 		});
-		nexus.connect<mc::OnCreateServer>(this, [this] mutable {
+		nexus.connect_global<mc::OnCreateServer>(this, [this] mutable {
 			client_active = false;
 			server_active = true;
 			lbl_state.text("Running as Server [" + user.name + "]");
 			btn_host.text("Shutdown");
 			btn_join.text("Join");
 		});
-		nexus.connect<mc::OnDestroyClient>(this, [this] mutable {
+		nexus.connect_global<mc::OnDestroyClient>(this, [this] mutable {
 			client_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");
 			btn_join.text("Join");
 		});
-		nexus.connect<mc::OnDestroyServer>(this, [this] mutable {
+		nexus.connect_global<mc::OnDestroyServer>(this, [this] mutable {
 			server_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");

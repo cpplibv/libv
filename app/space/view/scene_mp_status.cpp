@@ -15,14 +15,14 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneMPStatus::create(libv::Nexus& nexus) {
+libv::ui::Component SceneMPStatus::create(libv::Nexus2& nexus) {
 	libv::ui::PanelLine bar("mp-status");
 	bar.style("space.hud-bar.lobby.panel");
 	libv::ui::attach_state<SceneMPStatus>(bar)(bar, nexus);
 	return bar;
 }
 
-SceneMPStatus::SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus& nexus) :
+SceneMPStatus::SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus2& nexus) :
 		bar(std::move(bar)),
 		nexus(nexus) {
 	{
@@ -40,7 +40,7 @@ SceneMPStatus::~SceneMPStatus() {
 }
 
 void SceneMPStatus::register_nexus() {
-	nexus.connect<Lobby::OnClientJoin>(this, [this](const Lobby::OnClientJoin& event) {
+	nexus.connect_global<Lobby::OnClientJoin>(this, [this](const Lobby::OnClientJoin& event) {
 		libv::ui::Label label;
 		label.style("space.hud-bar.lobby.name");
 		label.text(event.client->name);
@@ -48,7 +48,7 @@ void SceneMPStatus::register_nexus() {
 		bar.add(std::move(label));
 	});
 
-	nexus.connect<Lobby::OnClientLeave>(this, [this](const Lobby::OnClientLeave& event) {
+	nexus.connect_global<Lobby::OnClientLeave>(this, [this](const Lobby::OnClientLeave& event) {
 		auto it = entries.find(event.client->userID);
 		if (it == entries.end()) {
 			// <<< P5: Log error

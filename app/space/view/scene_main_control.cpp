@@ -78,9 +78,9 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 //			proxy_ar(LIBV_NVP_FORCED("universe", ctx.game_session->universe));
 
-			ctx.nexus.broadcast<mc::ClearControlledFaction>(); // TODO P1: app.space:
+			ctx.nexus.broadcast_global<mc::ClearControlledFaction>(); // TODO P1: app.space:
 			ctx.game_session->playout.loadSimulationSnapshot(iar, SnapshotType::local);
-			ctx.nexus.broadcast<mc::ChangeControlledFaction>(); // TODO P1: app.space:
+			ctx.nexus.broadcast_global<mc::ChangeControlledFaction>(); // TODO P1: app.space:
 		}
 
 		log_space.info("Loaded: {} ({} byte)", "universe.sav", save_data.size());

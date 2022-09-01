@@ -18,10 +18,10 @@ namespace space {
 class GameThread {
 private:
 	libv::ui::UI& ui;
-	libv::Nexus& nexus;
+	libv::Nexus2& nexus;
 
 public:
-	GameThread(libv::ui::UI& ui, libv::Nexus& nexus);
+	GameThread(libv::ui::UI& ui, libv::Nexus2& nexus);
 
 public:
 	void execute(std::function<void()> task);
@@ -30,7 +30,7 @@ public:
 	template <typename T>
 	void broadcast_on_thread(T&& event) {
 		execute([&n = nexus, e = std::forward<T>(event)] mutable {
-			n.broadcast(std::forward<T>(e));
+			n.broadcast_global(std::forward<T>(e));
 		});
 	}
 };

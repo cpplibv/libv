@@ -28,7 +28,7 @@ class GameInstance {
 public:
 	SpaceFrame frame;
 
-	libv::Nexus nexus;
+	libv::Nexus2 nexus;
 	libv::ctrl::Controls controls;
 
 	libv::ui::UI ui;

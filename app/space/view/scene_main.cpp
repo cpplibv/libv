@@ -22,7 +22,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-SceneMain::SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus& nexus, libv::ctrl::Controls& controls, User& user) :
+SceneMain::SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus2& nexus, libv::ctrl::Controls& controls, User& user) :
 	nexus(nexus),
 	controls(controls),
 	renderer(renderer),
@@ -47,27 +47,27 @@ SceneMain::~SceneMain() {
 }
 
 void SceneMain::register_nexus() {
-	nexus.connect<mc::RequestCreateClient>(this, [this](const mc::RequestCreateClient& event) {
+	nexus.connect_global<mc::RequestCreateClient>(this, [this](const mc::RequestCreateClient& event) {
 		openMPClient(event.server_address, event.server_port);
-		nexus.broadcast<mc::OnCreateClient>();
+		nexus.broadcast_global<mc::OnCreateClient>();
 	});
 
-	nexus.connect<mc::RequestCreateServer>(this, [this](const mc::RequestCreateServer& event) {
+	nexus.connect_global<mc::RequestCreateServer>(this, [this](const mc::RequestCreateServer& event) {
 		openMPServer(event.server_port);
-		nexus.broadcast<mc::OnCreateServer>();
+		nexus.broadcast_global<mc::OnCreateServer>();
 	});
 
-	nexus.connect<mc::RequestDestroyClient>(this, [this] {
+	nexus.connect_global<mc::RequestDestroyClient>(this, [this] {
 		openSP();
-		nexus.broadcast<mc::OnDestroyClient>();
+		nexus.broadcast_global<mc::OnDestroyClient>();
 	});
 
-	nexus.connect<mc::RequestDestroyServer>(this, [this] {
+	nexus.connect_global<mc::RequestDestroyServer>(this, [this] {
 		openSP();
-		nexus.broadcast<mc::OnDestroyServer>();
+		nexus.broadcast_global<mc::OnDestroyServer>();
 	});
 
-//	nexus.connect<mc::RequestHelpControls>(this, [this] {
+//	nexus.connect_global<mc::RequestHelpControls>(this, [this] {
 //		main_layers.add(OverlayHelpControls::create(nexus, controls));
 //	});
 }

@@ -91,9 +91,9 @@ GameInstance::~GameInstance() {
 }
 
 void GameInstance::register_nexus() {
-	nexus.connect<mc::RequestNameChange>(this, [this](const mc::RequestNameChange& event) {
+	nexus.connect_global<mc::RequestNameChange>(this, [this](const mc::RequestNameChange& event) {
 		user.name = event.name;
-		nexus.broadcast<mc::OnNameChange>();
+		nexus.broadcast_global<mc::OnNameChange>();
 	});
 }
 
