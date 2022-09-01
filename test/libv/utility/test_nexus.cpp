@@ -361,7 +361,7 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(queue.consume() == "");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
-		CHECK(queue.consume() == "bothB6, bothA6");
+		CHECK(queue.consume() == "bothA6, bothB6");
 	}
 
 	SECTION("disconnect_channel nullptr") {
@@ -396,15 +396,17 @@ TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 		CHECK(nexus.num_tracked() == 3);
 
 		nexus.broadcast_global<EventType>(5);
-		CHECK(queue.consume() == "slotB5, slotA5");
+		CHECK(queue.consume() == "slotA5, slotB5");
 
 		nexus.broadcast_channel<EventType>(signal, 6);
-		CHECK(queue.consume() == "bothB6, bothA6");
+		CHECK(queue.consume() == "bothA6, bothB6");
 	}
 }
 
 TEST_CASE("Test Nexus connect ordering and front", "[libv.utility.nexus]") {
 	using EventType = int;
+
+	const void* slot = reinterpret_cast<void*>(0x22222222);
 
 	libv::Nexus2 nexus;
 	MockCallbackStream queue{", "};
@@ -443,5 +445,129 @@ TEST_CASE("Test Nexus connect ordering and front", "[libv.utility.nexus]") {
 
 		nexus.broadcast_global<EventType>(1);
 		CHECK(queue.consume() == "C1, A1, B1");
+	}
+
+	// ---
+
+	SECTION("disconnect ordering 1") {
+		nexus.connect_global_front<EventType>(slot, queue.callback("A"));
+		nexus.connect_global_front<EventType>(queue.callback("B"));
+		nexus.connect_global_front<EventType>(queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, C1, B1");
+	}
+
+	SECTION("disconnect ordering 2") {
+		nexus.connect_global_front<EventType>(queue.callback("A"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("B"));
+		nexus.connect_global_front<EventType>(queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, C1, A1");
+	}
+
+	SECTION("disconnect ordering 3") {
+		nexus.connect_global_front<EventType>(queue.callback("A"));
+		nexus.connect_global_front<EventType>(queue.callback("B"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, B1, A1");
+	}
+
+	// ---
+
+	SECTION("disconnect multi ordering 1") {
+		nexus.connect_global_front<EventType>(slot, queue.callback("A"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("B"));
+		nexus.connect_global_front<EventType>(queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, C1");
+	}
+
+	SECTION("disconnect multi ordering 2") {
+		nexus.connect_global_front<EventType>(queue.callback("A"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("B"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, A1");
+	}
+
+	SECTION("disconnect multi ordering 3") {
+		nexus.connect_global_front<EventType>(slot, queue.callback("A"));
+		nexus.connect_global_front<EventType>(queue.callback("B"));
+		nexus.connect_global_front<EventType>(slot, queue.callback("C"));
+		nexus.connect_global_front<EventType>(queue.callback("D"));
+
+		SECTION("disconnect_slot") {
+			nexus.disconnect_slot<EventType>(slot);
+		}
+		SECTION("disconnect_slot_all") {
+			nexus.disconnect_slot_all(slot);
+		}
+		SECTION("disconnect_all") {
+			nexus.disconnect_all(slot);
+		}
+
+		nexus.broadcast_global<EventType>(1);
+		CHECK(queue.consume() == "D1, B1");
 	}
 }

@@ -3,27 +3,13 @@
 // hpp
 #include <libv/utility/nexus.hpp>
 // libv
-#include <libv/algo/erase_all_unstable.hpp>
-#include <libv/algo/erase_unstable.hpp>
-#include <libv/algo/linear_contains.hpp>
-// std
-#include <cassert>
-#include <functional>
-#include <mutex>
-#include <unordered_map>
-#include <vector>
-
-// hpp
-#include <libv/utility/nexus.hpp>
-// libv
-#include <libv/algo/erase_all_unstable.hpp>
 #include <libv/algo/erase_if_unstable.hpp>
+#include <libv/algo/erase_stable.hpp>
 #include <libv/algo/erase_unstable.hpp>
 #include <libv/algo/linear_contains.hpp>
 #include <libv/utility/hash.hpp>
 // std
 #include <cassert>
-#include <functional>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
@@ -96,7 +82,7 @@ void Nexus::aux_disconnect(track_ptr owner, key_type event_type) {
 		return;
 	}
 
-	libv::erase_all_unstable(ch_it->second, owner, &ImplNexus::Target::owner);
+	libv::erase_all_stable(ch_it->second, owner, &ImplNexus::Target::owner);
 	if (ch_it->second.empty())
 		self->channels.erase(ch_it);
 }
@@ -115,7 +101,7 @@ void Nexus::aux_disconnect_all(track_ptr owner) {
 			continue;
 		}
 
-		libv::erase_all_unstable(ch_it->second, owner, &ImplNexus::Target::owner);
+		libv::erase_all_stable(ch_it->second, owner, &ImplNexus::Target::owner);
 		if (ch_it->second.empty())
 			self->channels.erase(ch_it);
 	}
@@ -230,7 +216,7 @@ void Nexus2::aux_disconnect_all(track_ptr owner) {
 
 	const auto ms_it = self->memberships.find(owner);
 	if (ms_it == self->memberships.end())
-		return; // Could happen
+		return; // Could happen when conditional subscription and unconditional unsubscription is used, Sounds reasonable, Therefore it is allowed
 
 	for (const auto& channel_key : ms_it->second) {
 		const auto ch_it = self->channels.find(channel_key);
@@ -257,7 +243,7 @@ void Nexus2::aux_disconnect_all(track_ptr owner) {
 			self->channels.erase(ch_it);
 
 		} else {
-			libv::erase_all_unstable(ch_it->second, owner, &ImplNexus2::Target::slot_owner);
+			libv::erase_all_stable(ch_it->second, owner, &ImplNexus2::Target::slot_owner);
 
 			if (ch_it->second.empty()) {
 				self->channels.erase(ch_it);
@@ -281,7 +267,7 @@ void Nexus2::aux_disconnect_channel(track_ptr channel_owner, key_type event_type
 
 	const auto ms_it = self->memberships.find(channel_owner);
 	if (ms_it == self->memberships.end())
-		return; // Could happen
+		return; // Could happen when conditional subscription and unconditional unsubscription is used, Sounds reasonable, Therefore it is allowed
 
 	const auto ch_it = self->channels.find(channel_key);
 	assert(ch_it != self->channels.end() && "Internal consistency violation"); // memberships indicated, but channels is missing a member (The find check on memberships would have early exited otherwise)
@@ -307,7 +293,7 @@ void Nexus2::aux_disconnect_channel_all(track_ptr channel_owner) {
 
 	const auto ms_it = self->memberships.find(channel_owner);
 	if (ms_it == self->memberships.end())
-		return; // Could happen
+		return; // Could happen when conditional subscription and unconditional unsubscription is used, Sounds reasonable, Therefore it is allowed
 
 	libv::erase_if_unstable(ms_it->second, [&](const ChannelKey& channel_key) {
 		if (channel_key.channel_owner != channel_owner)
@@ -344,7 +330,7 @@ void Nexus2::aux_disconnect_slot(track_ptr slot_owner, key_type event_type) {
 
 	const auto ms_it = self->memberships.find(slot_owner);
 	if (ms_it == self->memberships.end())
-		return; // Could happen
+		return; // Could happen when conditional subscription and unconditional unsubscription is used, Sounds reasonable, Therefore it is allowed
 
 	libv::erase_if_unstable(ms_it->second, [&](const ChannelKey& channel_key) {
 		if (channel_key.type != event_type)
@@ -353,7 +339,7 @@ void Nexus2::aux_disconnect_slot(track_ptr slot_owner, key_type event_type) {
 		const auto ch_it = self->channels.find(channel_key);
 		assert(ch_it != self->channels.end() && "Internal consistency violation");
 
-		libv::erase_all_unstable(ch_it->second, slot_owner, &ImplNexus2::Target::slot_owner);
+		libv::erase_all_stable(ch_it->second, slot_owner, &ImplNexus2::Target::slot_owner);
 
 		if (ch_it->second.empty()) {
 			self->channels.erase(ch_it);
@@ -379,13 +365,13 @@ void Nexus2::aux_disconnect_slot_all(track_ptr slot_owner) {
 
 	const auto ms_it = self->memberships.find(slot_owner);
 	if (ms_it == self->memberships.end())
-		return; // Could happen
+		return; // Could happen when conditional subscription and unconditional unsubscription is used, Sounds reasonable, Therefore it is allowed
 
 	libv::erase_if_unstable(ms_it->second, [&](const ChannelKey& channel_key) {
 		const auto ch_it = self->channels.find(channel_key);
 		assert(ch_it != self->channels.end() && "Internal consistency violation");
 
-		libv::erase_all_unstable(ch_it->second, slot_owner, &ImplNexus2::Target::slot_owner);
+		libv::erase_all_stable(ch_it->second, slot_owner, &ImplNexus2::Target::slot_owner);
 
 		if (ch_it->second.empty()) {
 			self->channels.erase(ch_it);

@@ -5,8 +5,8 @@
 // fwd
 #include <libv/utility/nexus_fwd.hpp>
 // libv
-#include <libv/utility/type_key.hpp>
 #include <libv/meta/force_inline.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -232,24 +232,29 @@ public:
 		aux_broadcast(channel_owner, libv::type_key<Event>(), &event);
 	}
 
+	/// Disconnect every callback (of any type) associated with \c owner (both as a channel or a slot)
 	LIBV_FORCE_INLINE void disconnect_all(track_ptr owner) {
 		aux_disconnect_all(owner);
 	}
 
+	/// Disconnect every callback of type \c Event where \c channel_owner is the channel
 	template <typename Event>
 	LIBV_FORCE_INLINE void disconnect_channel(track_ptr channel_owner) {
 		aux_disconnect_channel(channel_owner, libv::type_key<Event>());
 	}
 
+	/// Disconnect every callback (of any type) where \c channel_owner is the channel
 	LIBV_FORCE_INLINE void disconnect_channel_all(track_ptr channel_owner) {
 		aux_disconnect_channel_all(channel_owner);
 	}
 
+	/// Disconnect every callback of type \c Event where \c slot_owner is the slot
 	template <typename Event>
 	LIBV_FORCE_INLINE void disconnect_slot(track_ptr slot_owner) {
 		aux_disconnect_slot(slot_owner, libv::type_key<Event>());
 	}
 
+	/// Disconnect every callback (of any type) where \c slot_owner is the slot
 	LIBV_FORCE_INLINE void disconnect_slot_all(track_ptr slot_owner) {
 		aux_disconnect_slot_all(slot_owner);
 	}
