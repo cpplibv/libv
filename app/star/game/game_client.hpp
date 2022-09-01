@@ -36,7 +36,7 @@ public:
 	void run();
 
 public:
-	[[nodiscard]] libv::Nexus2& nexus() noexcept;
+	[[nodiscard]] libv::Nexus& nexus() noexcept;
 	[[nodiscard]] std::shared_ptr<ClientConfig> config() const noexcept;
 };
 

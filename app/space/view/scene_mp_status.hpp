@@ -23,11 +23,11 @@ private:
 	libv::ui::PanelLine bar;
 	std::map<UserID, libv::ui::Component> entries;
 
-	libv::Nexus2& nexus;
+	libv::Nexus& nexus;
 
 public:
-	static libv::ui::Component create(libv::Nexus2& nexus);
-	explicit SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus2& nexus);
+	static libv::ui::Component create(libv::Nexus& nexus);
+	explicit SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus& nexus);
 	~SceneMPStatus();
 
 private:

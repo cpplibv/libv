@@ -32,7 +32,7 @@ protected:
 	std::shared_ptr<ImplConfig> self;
 
 public:
-	BaseConfig(const libv::Nexus2& nexus, std::filesystem::path&& configFilepath);
+	BaseConfig(const libv::Nexus& nexus, std::filesystem::path&& configFilepath);
 	virtual ~BaseConfig() = default;
 
 protected:
@@ -45,7 +45,7 @@ public:
 	void requestSave();
 
 protected:
-	[[nodiscard]] libv::Nexus2& nexus() const;
+	[[nodiscard]] libv::Nexus& nexus() const;
 	void markAsDirty(BaseConfigEntry& entry);
 	void markFileDirty();
 
@@ -60,7 +60,7 @@ private:
 template <typename ConfigT>
 class Config : public ConfigT {
 public:
-	Config(const libv::Nexus2& nexus, std::filesystem::path configFilepath) :
+	Config(const libv::Nexus& nexus, std::filesystem::path configFilepath) :
 		ConfigT(nexus, std::move(configFilepath)) {
 		this->create();
 	}
@@ -71,7 +71,7 @@ public:
 };
 
 template <typename Config>
-[[nodiscard]] inline std::shared_ptr<Config> make_config(const libv::Nexus2& nexus, std::filesystem::path configFilepath) {
+[[nodiscard]] inline std::shared_ptr<Config> make_config(const libv::Nexus& nexus, std::filesystem::path configFilepath) {
 	return std::make_shared<Config>(nexus, std::move(configFilepath));
 }
 

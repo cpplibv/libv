@@ -13,7 +13,7 @@ namespace space {
 
 class SceneCommandBar {
 public:
-	static libv::ui::Component create(libv::Nexus2& nexus);
+	static libv::ui::Component create(libv::Nexus& nexus);
 };
 
 // -------------------------------------------------------------------------------------------------

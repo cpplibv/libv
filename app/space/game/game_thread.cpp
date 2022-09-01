@@ -11,7 +11,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-GameThread::GameThread(libv::ui::UI& ui, libv::Nexus2& nexus) :
+GameThread::GameThread(libv::ui::UI& ui, libv::Nexus& nexus) :
 	ui(ui),
 	nexus(nexus) {
 }

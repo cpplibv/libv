@@ -24,24 +24,24 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplNexus2;
+class ImplNexus;
 
 /// Handler type
-class Nexus2 {
+class Nexus {
 public:
 	using track_ptr = const void*;
 	using key_type = libv::type_uid;
 
 private:
-	std::shared_ptr<ImplNexus2> self;
+	std::shared_ptr<ImplNexus> self;
 
 public:
-	Nexus2();
-	inline Nexus2(const Nexus2&) noexcept = default;
-	inline Nexus2& operator=(const Nexus2&) & noexcept = default;
-	inline Nexus2(Nexus2&&) noexcept = default;
-	inline Nexus2& operator=(Nexus2&&) & noexcept = default;
-	inline ~Nexus2() = default;
+	Nexus();
+	inline Nexus(const Nexus&) noexcept = default;
+	inline Nexus& operator=(const Nexus&) & noexcept = default;
+	inline Nexus(Nexus&&) noexcept = default;
+	inline Nexus& operator=(Nexus&&) & noexcept = default;
+	inline ~Nexus() = default;
 
 private:
 	void aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func);

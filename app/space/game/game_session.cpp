@@ -21,7 +21,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-GameSession::GameSession(libv::Nexus2& nexus) :
+GameSession::GameSession(libv::Nexus& nexus) :
 		nexus(nexus),
 //			universe(UniverseGenerationSettings{}),
 //			universe(*simulation.universe),
@@ -30,7 +30,7 @@ GameSession::GameSession(libv::Nexus2& nexus) :
 	register_nexus();
 }
 
-GameSession::GameSession(libv::Nexus2& nexus, NetworkClient& network_client) :
+GameSession::GameSession(libv::Nexus& nexus, NetworkClient& network_client) :
 		nexus(nexus),
 //			universe(UniverseGenerationSettings{}),
 //			universe(*simulation.universe),
@@ -39,7 +39,7 @@ GameSession::GameSession(libv::Nexus2& nexus, NetworkClient& network_client) :
 	register_nexus();
 }
 
-GameSession::GameSession(libv::Nexus2& nexus, NetworkServer& network_server) :
+GameSession::GameSession(libv::Nexus& nexus, NetworkServer& network_server) :
 		nexus(nexus),
 //			universe(UniverseGenerationSettings{}),
 //			universe(*simulation.universe),
@@ -88,7 +88,7 @@ void GameSession::update(libv::time_duration delta_time) {
 
 class SinglePlayer : public GameSession {
 public:
-	explicit SinglePlayer(GameThread& game_thread, libv::Nexus2& nexus) :
+	explicit SinglePlayer(GameThread& game_thread, libv::Nexus& nexus) :
 		GameSession(nexus) {
 		(void) game_thread;
 	}
@@ -104,7 +104,7 @@ private:
 	NetworkClient client;
 
 public:
-	MultiPlayerClient(GameThread& game_thread, libv::Nexus2& nexus, std::string server_address, uint16_t server_port, User& user) :
+	MultiPlayerClient(GameThread& game_thread, libv::Nexus& nexus, std::string server_address, uint16_t server_port, User& user) :
 		GameSession(nexus, client),
 		// <<< network client reference is passed before its init ran, (should not be an issue now, but not nice)
 		//client(std::move(server_address), server_port, game_thread, playout, universe, user) {
@@ -122,7 +122,7 @@ private:
 	NetworkServer server;
 
 public:
-	MultiPlayerServer(GameThread& game_thread, libv::Nexus2& nexus, uint16_t port, User& user) :
+	MultiPlayerServer(GameThread& game_thread, libv::Nexus& nexus, uint16_t port, User& user) :
 		GameSession(nexus, server),
 		// <<< network server reference is passed before its init ran, (should not be an issue now, but not nice)
 		//server(port, game_thread, playout, universe, user) {
@@ -139,7 +139,7 @@ public:
 //	NetworkServer server;
 //
 //public:
-//	MultiPlayerHeadless(GameInstance& game, libv::Nexus2& nexus, uint16_t port) :
+//	MultiPlayerHeadless(GameInstance& game, libv::Nexus& nexus, uint16_t port) :
 //		GameSession(nexus, server),
 //		// <<< network client reference is passed before it init ran, (should not be an issue now, but not nice)
 //		server(port, playout) {
@@ -160,15 +160,15 @@ public:
 
 // =================================================================================================
 
-std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus2& nexus) {
+std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus& nexus) {
 	return std::make_shared<SinglePlayer>(game_thread, nexus);
 }
 
-std::shared_ptr<GameSession> createMultiPlayerClient(GameThread& game_thread, libv::Nexus2& nexus, std::string server_address, uint16_t server_port, User& user) {
+std::shared_ptr<GameSession> createMultiPlayerClient(GameThread& game_thread, libv::Nexus& nexus, std::string server_address, uint16_t server_port, User& user) {
 	return std::make_shared<MultiPlayerClient>(game_thread, nexus, std::move(server_address), server_port, user);
 }
 
-std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, libv::Nexus2& nexus, uint16_t port, User& user) {
+std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, libv::Nexus& nexus, uint16_t port, User& user) {
 	return std::make_shared<MultiPlayerServer>(game_thread, nexus, port, user);
 }
 

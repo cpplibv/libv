@@ -22,7 +22,7 @@ class SceneMain {
 	friend SceneMainControl;
 
 private:
-	libv::Nexus2& nexus;
+	libv::Nexus& nexus;
 	libv::ctrl::Controls& controls;
 	Renderer& renderer;
 	User& user;
@@ -35,7 +35,7 @@ private:
 //	std::optional<libv::ui::Component> game_scene;
 
 public:
-	SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus2& nexus, libv::ctrl::Controls& controls, User& user);
+	SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus& nexus, libv::ctrl::Controls& controls, User& user);
 	~SceneMain();
 
 private:

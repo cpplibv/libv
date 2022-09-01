@@ -15,14 +15,14 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneMPStatus::create(libv::Nexus2& nexus) {
+libv::ui::Component SceneMPStatus::create(libv::Nexus& nexus) {
 	libv::ui::PanelLine bar("mp-status");
 	bar.style("space.hud-bar.lobby.panel");
 	libv::ui::attach_state<SceneMPStatus>(bar)(bar, nexus);
 	return bar;
 }
 
-SceneMPStatus::SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus2& nexus) :
+SceneMPStatus::SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus& nexus) :
 		bar(std::move(bar)),
 		nexus(nexus) {
 	{

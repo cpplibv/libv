@@ -22,7 +22,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 struct SceneMenuBar {
-	libv::Nexus2& nexus;
+	libv::Nexus& nexus;
 	User& user;
 
 	//	enum class State {
@@ -42,7 +42,7 @@ struct SceneMenuBar {
 //	libv::ui::Component root;
 
 public:
-	static libv::ui::Component create(libv::Nexus2& nexus, User& user);
+	static libv::ui::Component create(libv::Nexus& nexus, User& user);
 	~SceneMenuBar();
 	libv::ui::Component init(libv::ui::PanelLine& mp_bar);
 };

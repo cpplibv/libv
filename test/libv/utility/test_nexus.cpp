@@ -48,7 +48,7 @@ public:
 TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 	using EventType = int;
 
-	libv::Nexus2 nexus;
+	libv::Nexus nexus;
 	MockCallbackStream queue{", "};
 
 	const void* signal = reinterpret_cast<void*>(0x11111111);
@@ -222,7 +222,7 @@ TEST_CASE("Test Nexus lifecycle", "[libv.utility.nexus]") {
 TEST_CASE("Test Nexus multi connect", "[libv.utility.nexus]") {
 	using EventType = int;
 
-	libv::Nexus2 nexus;
+	libv::Nexus nexus;
 	MockCallbackStream queue{", "};
 
 	const void* signal = reinterpret_cast<void*>(0x11111111);
@@ -408,7 +408,7 @@ TEST_CASE("Test Nexus connect ordering and front", "[libv.utility.nexus]") {
 
 	const void* slot = reinterpret_cast<void*>(0x22222222);
 
-	libv::Nexus2 nexus;
+	libv::Nexus nexus;
 	MockCallbackStream queue{", "};
 
 	SECTION("B B B") {

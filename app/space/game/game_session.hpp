@@ -26,7 +26,7 @@ namespace space {
 
 class GameSession {
 public:
-	libv::Nexus2& nexus;
+	libv::Nexus& nexus;
 
 	Playout playout;
 	Player player;
@@ -35,9 +35,9 @@ public:
 //	PlayerController playerController;
 
 public:
-	explicit GameSession(libv::Nexus2& nexus);
-	GameSession(libv::Nexus2& nexus, NetworkClient& network_client);
-	GameSession(libv::Nexus2& nexus, NetworkServer& network_server);
+	explicit GameSession(libv::Nexus& nexus);
+	GameSession(libv::Nexus& nexus, NetworkClient& network_client);
+	GameSession(libv::Nexus& nexus, NetworkServer& network_server);
 	virtual ~GameSession();
 
 private:
@@ -48,9 +48,9 @@ public:
 	void update(libv::time_duration delta_time);
 };
 
-std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus2& nexus);
-std::shared_ptr<GameSession> createMultiPlayerClient(GameThread& game_thread, libv::Nexus2& nexus, std::string server_address, uint16_t server_port, User& user);
-std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, libv::Nexus2& nexus, uint16_t port, User& user);
+std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus& nexus);
+std::shared_ptr<GameSession> createMultiPlayerClient(GameThread& game_thread, libv::Nexus& nexus, std::string server_address, uint16_t server_port, User& user);
+std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, libv::Nexus& nexus, uint16_t port, User& user);
 
 // -------------------------------------------------------------------------------------------------
 

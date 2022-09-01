@@ -16,7 +16,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneCommandBar::create(libv::Nexus2& nexus) {
+libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 	libv::ui::PanelLine cmd_bar("cmd-bar");
 	cmd_bar.style("space.hud-bar.cmd.panel");
 

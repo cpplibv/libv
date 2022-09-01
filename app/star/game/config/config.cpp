@@ -22,7 +22,7 @@ namespace star {
 class ImplConfig {
 public:
 	BaseConfig& config;
-	libv::Nexus2 nexus;
+	libv::Nexus nexus;
 
 	std::mutex mutex;
 	std::filesystem::path configFilepath;
@@ -32,7 +32,7 @@ public:
 	libv::mt::queue_unique_batch_st<BaseConfigEntry*> dirtyEntries; /// Marks config entries that are need to be updated
 
 public:
-	explicit ImplConfig(BaseConfig& config, libv::Nexus2 nexus, std::filesystem::path configFilepath_) :
+	explicit ImplConfig(BaseConfig& config, libv::Nexus nexus, std::filesystem::path configFilepath_) :
 		config(config),
 		nexus(std::move(nexus)),
 		configFilepath(std::move(configFilepath_)) {
@@ -78,7 +78,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-BaseConfig::BaseConfig(const libv::Nexus2& nexus, std::filesystem::path&& configFilepath) :
+BaseConfig::BaseConfig(const libv::Nexus& nexus, std::filesystem::path&& configFilepath) :
 	self(std::make_shared<ImplConfig>(*this, nexus, std::move(configFilepath))) {
 }
 
@@ -124,7 +124,7 @@ void BaseConfig::requestSave() {
 	self->save_cooldown.force_ready();
 }
 
-libv::Nexus2& BaseConfig::nexus() const {
+libv::Nexus& BaseConfig::nexus() const {
 	return self->nexus;
 }
 

@@ -22,7 +22,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-SceneMain::SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus2& nexus, libv::ctrl::Controls& controls, User& user) :
+SceneMain::SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thread, libv::Nexus& nexus, libv::ctrl::Controls& controls, User& user) :
 	nexus(nexus),
 	controls(controls),
 	renderer(renderer),

@@ -18,10 +18,10 @@ namespace space {
 class GameThread {
 private:
 	libv::ui::UI& ui;
-	libv::Nexus2& nexus;
+	libv::Nexus& nexus;
 
 public:
-	GameThread(libv::ui::UI& ui, libv::Nexus2& nexus);
+	GameThread(libv::ui::UI& ui, libv::Nexus& nexus);
 
 public:
 	void execute(std::function<void()> task);

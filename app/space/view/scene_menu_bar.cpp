@@ -19,7 +19,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneMenuBar::create(libv::Nexus2& nexus, User& user) {
+libv::ui::Component SceneMenuBar::create(libv::Nexus& nexus, User& user) {
 	libv::ui::PanelLine mp_bar("mp-bar");
 	libv::ui::attach_state<SceneMenuBar>(mp_bar)(nexus, user).init(mp_bar);
 	return mp_bar;

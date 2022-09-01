@@ -35,7 +35,7 @@ namespace star {
 
 struct ImplGameClient {
 //	libv::mt::worker_thread scheduler_{"scheduler"};
-	libv::Nexus2 nexus_;
+	libv::Nexus nexus_;
 
 	std::shared_ptr<ClientConfig> config_;
 //	Config<ClientConfigGroup> config_;
@@ -44,7 +44,7 @@ struct ImplGameClient {
 //	std::shared_ptr<ClientConfig> config_;
 //	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
 
-//	auto nexus = libv::Nexus2();
+//	auto nexus = libv::Nexus();
 //	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
 
 	libv::ui::UI ui;
@@ -143,7 +143,7 @@ void GameClient::run() {
 	self->frame.join();
 }
 
-libv::Nexus2& GameClient::nexus() noexcept {
+libv::Nexus& GameClient::nexus() noexcept {
 	return self->nexus_;
 }
 
