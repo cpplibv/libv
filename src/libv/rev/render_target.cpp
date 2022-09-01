@@ -77,6 +77,9 @@ int RenderTarget::sampleCount() const noexcept {
 }
 
 void RenderTarget::size(libv::vec2i framebufferSize) noexcept {
+	if (self->framebufferSize == framebufferSize)
+		return;
+
 	self->framebufferSize = framebufferSize;
 
 	self->destroyMSFramebuffer();

@@ -39,6 +39,9 @@ PostProcessing::~PostProcessing() {
 }
 
 void PostProcessing::size(libv::vec2i framebufferSize) noexcept {
+	if (self->framebufferSize == framebufferSize)
+		return;
+
 	self->framebufferSize = framebufferSize;
 
 	const auto mipCountOld = static_cast<int>(self->bloomMips.size());
