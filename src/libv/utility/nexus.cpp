@@ -20,7 +20,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 struct ChannelKey {
-	Nexus::track_ptr channel_owner;
+	Nexus::channel_ptr channel_owner;
 	Nexus::key_type type;
 
 	[[nodiscard]] constexpr inline bool operator==(const ChannelKey&) const noexcept = default;
@@ -33,17 +33,19 @@ LIBV_MAKE_HASHABLE(::libv::ChannelKey, t.channel_owner, t.type);
 namespace libv { // --------------------------------------------------------------------------------
 
 struct ImplNexus {
-	using track_ptr = Nexus::track_ptr;
+	using channel_ptr = Nexus::channel_ptr;
+	using slot_ptr = Nexus::slot_ptr;
+	using channel_or_slot_ptr = Nexus::channel_or_slot_ptr;
 	using key_type = Nexus::key_type;
 
 	struct Target {
-		track_ptr slot_owner;
-		std::function<void(const void*)> callback;
+		slot_ptr slot_owner;
+		std::function<void(channel_ptr, const void*)> callback;
 	};
 
 	std::recursive_mutex mutex;
 	std::unordered_map<ChannelKey, std::vector<Target>> channels;
-	std::unordered_map<track_ptr, std::vector<ChannelKey>> memberships;
+	std::unordered_map<channel_or_slot_ptr, std::vector<ChannelKey>> memberships;
 	// NOTE: unordered_map's iterator stability is relayed upon during multiple .erase(it) calls
 };
 
@@ -52,7 +54,7 @@ struct ImplNexus {
 Nexus::Nexus() :
 	self(std::make_shared<ImplNexus>()) { }
 
-std::vector<ImplNexus::Target>& aux_create_channel(ImplNexus& self, ImplNexus::track_ptr channel_owner, ImplNexus::track_ptr slot_owner, ImplNexus::key_type event_type) {
+std::vector<ImplNexus::Target>& aux_create_channel(ImplNexus& self, ImplNexus::channel_ptr channel_owner, ImplNexus::slot_ptr slot_owner, ImplNexus::key_type event_type) {
 	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto& memberships_of_channel = self.memberships[channel_owner];
@@ -66,13 +68,13 @@ std::vector<ImplNexus::Target>& aux_create_channel(ImplNexus& self, ImplNexus::t
 	return self.channels[channel_key];
 }
 
-void Nexus::aux_connect(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func) {
+void Nexus::aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
 	channel.emplace_back(slot_owner, std::move(func));
 }
 
-void Nexus::aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr) {
+void Nexus::aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
 	{
 		auto lock = std::unique_lock(self->mutex);
 		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
@@ -82,16 +84,16 @@ void Nexus::aux_connect_and_call(track_ptr channel_owner, track_ptr slot_owner, 
 		channel.emplace_back(slot_owner, func);
 	}
 
-	func(event_ptr);
+	func(channel_owner, event_ptr);
 }
 
-void Nexus::aux_connect_front(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func) {
+void Nexus::aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
 	channel.emplace(channel.begin(), slot_owner, std::move(func));
 }
 
-void Nexus::aux_connect_front_and_call(track_ptr channel_owner, track_ptr slot_owner, key_type event_type, std::function<void(const void*)>&& func, const void* event_ptr) {
+void Nexus::aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
 	{
 		auto lock = std::unique_lock(self->mutex);
 		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
@@ -101,10 +103,10 @@ void Nexus::aux_connect_front_and_call(track_ptr channel_owner, track_ptr slot_o
 		channel.emplace(channel.begin(), slot_owner, func);
 	}
 
-	func(event_ptr);
+	func(channel_owner, event_ptr);
 }
 
-void Nexus::aux_broadcast(track_ptr channel_owner, key_type event_type, const void* event_ptr) const {
+void Nexus::aux_broadcast(channel_ptr channel_owner, key_type event_type, const void* event_ptr) const {
 	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto lock = std::unique_lock(self->mutex);
@@ -112,10 +114,10 @@ void Nexus::aux_broadcast(track_ptr channel_owner, key_type event_type, const vo
 	const auto it = self->channels.find(channel_key);
 	if (it != self->channels.end())
 		for (const auto& target : it->second)
-			target.callback(event_ptr);
+			target.callback(channel_owner, event_ptr);
 }
 
-void Nexus::aux_disconnect_all(track_ptr owner) {
+void Nexus::aux_disconnect_all(channel_or_slot_ptr owner) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto ms_it = self->memberships.find(owner);
@@ -164,7 +166,7 @@ void Nexus::aux_disconnect_all(track_ptr owner) {
 	self->memberships.erase(ms_it);
 }
 
-void Nexus::aux_disconnect_channel(track_ptr channel_owner, key_type event_type) {
+void Nexus::aux_disconnect_channel(channel_ptr channel_owner, key_type event_type) {
 	const auto channel_key = ChannelKey{channel_owner, event_type};
 
 	auto lock = std::unique_lock(self->mutex);
@@ -192,7 +194,7 @@ void Nexus::aux_disconnect_channel(track_ptr channel_owner, key_type event_type)
 		self->memberships.erase(ms_it);
 }
 
-void Nexus::aux_disconnect_channel_all(track_ptr channel_owner) {
+void Nexus::aux_disconnect_channel_all(channel_ptr channel_owner) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto ms_it = self->memberships.find(channel_owner);
@@ -229,7 +231,7 @@ void Nexus::aux_disconnect_channel_all(track_ptr channel_owner) {
 		self->memberships.erase(ms_it);
 }
 
-void Nexus::aux_disconnect_slot(track_ptr slot_owner, key_type event_type) {
+void Nexus::aux_disconnect_slot(slot_ptr slot_owner, key_type event_type) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto ms_it = self->memberships.find(slot_owner);
@@ -264,7 +266,7 @@ void Nexus::aux_disconnect_slot(track_ptr slot_owner, key_type event_type) {
 		self->memberships.erase(ms_it);
 }
 
-void Nexus::aux_disconnect_slot_all(track_ptr slot_owner) {
+void Nexus::aux_disconnect_slot_all(slot_ptr slot_owner) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto ms_it = self->memberships.find(slot_owner);

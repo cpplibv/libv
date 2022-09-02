@@ -10,9 +10,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-#include <optional>
-
-
 class MockCallbackStream {
 	std::ostringstream ss;
 	std::string separator;
@@ -570,4 +567,41 @@ TEST_CASE("Test Nexus connect ordering and front", "[libv.utility.nexus]") {
 		nexus.broadcast_global<EventType>(1);
 		CHECK(queue.consume() == "D1, B1");
 	}
+}
+
+TEST_CASE("Test Nexus broadcasted arguments", "[libv.utility.nexus]") {
+	using EventType = int;
+
+	const int channelA = 0;
+	int channelB = 0;
+
+	libv::Nexus nexus;
+	int callCount = 0;
+
+	nexus.connect_channel<EventType>(&channelA, [&](const int*, const EventType&) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelA, [&](const EventType&) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelA, [&](const int*) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelA, [&]() { ++callCount; });
+	// These should fail to compile due to const correctness:
+	//	nexus.connect_channel<EventType>(&channelA, [&](const int*, EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelA, [&](EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelA, [&](int*, const EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelB, [&](int*, EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelA, [&](int*) { ++callCount; });
+	nexus.broadcast_channel<EventType>(&channelA, 1);
+	CHECK(std::exchange(callCount, 0) == 4);
+
+	nexus.connect_channel<EventType>(&channelB, [&](const int*, const EventType&) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelB, [&](int*, const EventType&) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelB, [&](const EventType&) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelB, [&](const int*) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelB, [&](int*) { ++callCount; });
+	nexus.connect_channel<EventType>(&channelB, [&]() { ++callCount; });
+	// These should fail to compile due to const correctness:
+	//	nexus.connect_channel<EventType>(&channelB, [&](const int*, EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelB, [&](int*, EventType&) { ++callCount; });
+	//	nexus.connect_channel<EventType>(&channelB, [&](EventType&) { ++callCount; });
+	nexus.broadcast_channel<EventType>(&channelB, 1);
+
+	CHECK(std::exchange(callCount, 0) == 6);
 }
