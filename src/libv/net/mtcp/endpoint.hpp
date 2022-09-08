@@ -2,9 +2,6 @@
 
 #pragma once
 
-// libv
-#include <libv/meta/reflection_access.hpp>
-#include <libv/serial/enable.hpp>
 // std
 #include <array>
 #include <cstdint>
@@ -21,9 +18,12 @@ struct Endpoint {
 	std::array<uint8_t, 4> address;
 	uint16_t port;
 
-	LIBV_REFLECTION_ACCESS(address);
-	LIBV_REFLECTION_ACCESS(port);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+public:
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar.nvp("address", address);
+		ar.nvp("port", port);
+	}
 
 public:
 	constexpr inline Endpoint() = default;
@@ -39,6 +39,11 @@ public:
 	constexpr inline Endpoint(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3, uint16_t port) noexcept :
 		address{a0, a1, a2, a3},
 		port(port) { }
+
+public:
+	[[nodiscard]] constexpr inline uint32_t address_ipv4_uint() const noexcept {
+		return address[3] << 24u | address[2] << 16u | address[1] << 8u | address[0] << 0;
+	}
 
 public:
 	constexpr inline void clear() noexcept {

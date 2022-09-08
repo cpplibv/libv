@@ -27,6 +27,25 @@ place.it: auto update could be assisted with the application main being in a dll
 place.it: HTTP server / REST api in C++: https://www.youtube.com/watch?v=uqPTzUdNLZk | https://github.com/kevinbcarpenter/restful-with-billions
 
 
+
+
+echo -n 'test' | socat - udp:127.0.0.1:16100
+echo -n 'test' | nc -u 127.0.0.1 16100
+
+
+
+Client A ---- Reg A ---> [Server]
+Client A <---- Ack ----- [Server]
+                         [Server] <--- Find A --- Client B
+                         [Server] ---- Here A --> Client B
+Client A <--- Here B --- [Server]
+Client A <--------------- Knock ----------------> Client B
+Client A <--------------- Connect --------------> Client B
+
+
+
+
+
 libv.update: Resource Client
 	Single file download: Partial download recovery IDEA of an alternative approach would be to only write out the progress meta data every X seconds
 

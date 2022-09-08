@@ -874,6 +874,14 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET natps
+	SOURCE app/natp/server/*.cpp
+	SOURCE app/natp/natp_server_main.cpp
+	LINK   libv_log libv_utility libv_arg libv_net
+	LINK   ext_boost
+)
+
+wish_create_executable(
 	TARGET mimp
 	SOURCE app/mimp/*.cpp
 	LINK   libv::vm4imp libv::lua
