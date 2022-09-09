@@ -113,6 +113,7 @@ function(wish_create_external)
 				-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
 			#GIT_SHALLOW 1 # shallow fetch is not possible as long as SHA tags are used
 			EXCLUDE_FROM_ALL 1
+			DOWNLOAD_EXTRACT_TIMESTAMP 1
 			${command_str_configure}
 			${command_str_build}
 			${arg_UNPARSED_ARGUMENTS}
