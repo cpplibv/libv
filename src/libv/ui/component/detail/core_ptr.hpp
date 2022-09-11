@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 
 
 namespace libv {
@@ -26,6 +26,14 @@ using core_cptr = const CoreComponent*;
 	// NOTE: Cast to first member (static_cast could be used, but reinterpret_cast allows incompleteness)
 	return *reinterpret_cast<const core_cptr*>(&component);
 }
+
+// -------------------------------------------------------------------------------------------------
+
+[[nodiscard]] libv::Nexus& get_nexus(const Component& component) noexcept;
+void mark_as_signal(Component& component) noexcept;
+void mark_as_slot(Component& component) noexcept;
+[[nodiscard]] bool is_marked_as_signal(const Component& component) noexcept;
+[[nodiscard]] bool is_marked_as_slot(const Component& component) noexcept;
 
 // -------------------------------------------------------------------------------------------------
 

@@ -17,6 +17,8 @@ std::string generate_component_name(const std::string_view type, std::size_t ind
 	return libv::concat(type, '-', index);
 }
 
+// =================================================================================================
+
 Component::Component(core_ptr ptr_) noexcept :
 	ptr_(std::move(ptr_)) {
 	assert(ptr_ != nullptr && "Internal error: Component core cannot be null on direct construction");

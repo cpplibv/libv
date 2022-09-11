@@ -8,6 +8,9 @@
 #include <libv/utility/type_key.hpp>
 // std
 #include <memory>
+// pro
+#include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_ui_link.hpp>
 
 
 namespace libv {
@@ -24,10 +27,6 @@ public:
 		contextUI(contextUI),
 		contextEvent(std::move(wp)) { }
 
-private:
-	void aux_broadcast(uintptr_t event_type, const void* event_ptr);
-	void aux_broadcast_in_ui_loop(uintptr_t event_type, const void* event_ptr);
-
 public:
 	/// Enters the UI context
 	/// Broadcasts the event synchronously
@@ -43,13 +42,24 @@ public:
 
 template <typename Event>
 inline void EventHub::broadcast(const Event& event) {
-	aux_broadcast(libv::type_key<Event>(), &event);
+	const auto sp = contextEvent.lock();
+	if (sp) {
+		auto* previous_context = has_current_thread_context() ? &current_thread_context() : nullptr;
+		current_thread_context(*contextUI);
+
+		sp->nexus.broadcast_global<Event>(event);
+
+		if (previous_context == nullptr)
+			clear_current_thread_context();
+		else
+			current_thread_context(*previous_context);
+	}
 }
 
-template <typename Event>
-inline void EventHub::broadcast_in_ui_loop(const Event& event) {
-	aux_broadcast_in_ui_loop(libv::type_key<Event>(), &event);
-}
+//template <typename Event>
+//inline void EventHub::broadcast_in_ui_loop(const Event& event) {
+////	aux_broadcast_in_ui_loop(libv::type_key<Event>(), &event);
+//}
 
 // -------------------------------------------------------------------------------------------------
 

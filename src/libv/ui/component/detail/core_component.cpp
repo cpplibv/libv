@@ -27,6 +27,28 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::Nexus& get_nexus(const Component& component) noexcept {
+	return get_core(component)->context().event.nexus;
+}
+
+void mark_as_signal(Component& component) noexcept {
+	get_core(component)->markAsSignal();
+}
+
+void mark_as_slot(Component& component) noexcept {
+	get_core(component)->markAsSlot();
+}
+
+bool is_marked_as_signal(const Component& component) noexcept {
+	return get_core(component)->isSignal();
+}
+
+bool is_marked_as_slot(const Component& component) noexcept {
+	return get_core(component)->isSlot();
+}
+
+// =================================================================================================
+
 CoreComponent::CoreComponent(std::string name) :
 	context_(&current_thread_context()),
 	name(std::move(name)) { }
@@ -549,7 +571,8 @@ void CoreComponent::detach() {
 
 	fire(EventDetach{});
 
-	detail::internal_disconnect(this);
+	if (flags.match_any(Flag::signal | Flag::slot))
+		context().event.nexus.disconnect_all(this);
 
 	doDetach();
 

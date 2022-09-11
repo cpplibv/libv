@@ -13,7 +13,7 @@
 #include <memory>
 #include <string_view>
 // pro
-#include <libv/ui/event/detail/internal_event_linkage.hpp>
+#include <libv/ui/context/context_event.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/style_fwd.hpp>
 
@@ -100,7 +100,7 @@ public:
 
 template <typename Event>
 inline void ContextUI::broadcast(const Event& event) {
-	detail::internal_fire_global(this->event, libv::type_key<Event>(), &event);
+	this->event.nexus.broadcast_global<Event>(event);
 }
 
 // -------------------------------------------------------------------------------------------------

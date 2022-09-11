@@ -17,7 +17,8 @@
 // pro
 #include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/component/detail/generate_name.hpp>
-#include <libv/ui/event/detail/internal_event_linkage.hpp>
+#include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
@@ -114,6 +115,13 @@ public:
 	}
 	[[nodiscard]] inline bool isSlot() const noexcept {
 		return flags.match_any(Flag::slot);
+	}
+
+	inline void markAsSignal() noexcept {
+		flags.set(Flag::signal);
+	}
+	inline void markAsSlot() noexcept {
+		flags.set(Flag::slot);
 	}
 
 	[[nodiscard]] inline libv::vec3f layout_position() const noexcept {
@@ -345,7 +353,8 @@ protected:
 
 template <typename Event>
 inline void CoreComponent::fire(const Event& event) {
-	detail::internal_fire(this, libv::type_key<Event>(), &event);
+	if (flags.match_any(Flag::signal))
+		context().event.nexus.broadcast_channel<Event>(this, event);
 }
 
 // -------------------------------------------------------------------------------------------------

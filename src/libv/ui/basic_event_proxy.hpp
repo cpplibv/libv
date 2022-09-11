@@ -6,13 +6,13 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/meta/always.hpp>
-#include <libv/utility/type_key.hpp>
+#include <libv/meta/force_inline.hpp>
+#include <libv/utility/nexus.hpp>
 // std
-#include <functional>
 #include <type_traits>
 // pro
+#include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/event/base_event.hpp>
-#include <libv/ui/event/detail/internal_event_linkage.hpp>
 
 
 namespace libv {
@@ -22,49 +22,94 @@ namespace ui {
 
 namespace detail { // ------------------------------------------------------------------------------
 
-template <typename ComponentT, typename EventT, bool IsSystem, typename Func>
-[[nodiscard]] std::function<void(void*, const void*)> internal_callback(Func&& func) {
+template <typename SignalComponentT, typename EventT, bool IsSystem, typename Func>
+[[nodiscard]] LIBV_FORCE_INLINE auto internal_callback(Func&& func) {
 	static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
 
-	if constexpr (std::is_invocable_r_v<void, Func, ComponentT&, const EventT&>) {
-		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
-			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
-			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
-				f(handler, *static_cast<const EventT*>(event_ptr));
+	if constexpr (std::is_invocable_v<Func, SignalComponentT&, const EventT&>)
+		return [f = std::forward<Func>(func)](CoreComponent* signal_ptr, const EventT& event) mutable {
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped()) {
+				auto handler = SignalComponentT{signal_ptr};
+				f(handler, event);
+			}
 		};
 
-	} else if constexpr (std::is_invocable_r_v<void, Func, const EventT&>) {
-		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
-			(void) signal_ptr; // Callback is not interested in the component
-			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
-				f(*static_cast<const EventT*>(event_ptr));
+	else if constexpr (std::is_invocable_v<Func, const EventT&>)
+		return [f = std::forward<Func>(func)](CoreComponent*, const EventT& event) mutable {
+			// Callback is not interested in the component
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped())
+				f(event);
 		};
 
-	} else if constexpr (std::is_invocable_r_v<void, Func, ComponentT&>) {
-		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
-			(void) event_ptr; // Callback is not interested in the event
-			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
-			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+	else if constexpr (std::is_invocable_v<Func, SignalComponentT&>)
+		return [f = std::forward<Func>(func)](CoreComponent* signal_ptr, const EventT& event) mutable {
+			// Callback is not interested in the event
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped()) {
+				auto handler = SignalComponentT{signal_ptr};
 				f(handler);
+			}
 		};
 
-	} else if constexpr (std::is_invocable_r_v<void, Func>) {
-		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
-			(void) signal_ptr; // Callback is not interested in the component
-			(void) event_ptr; // Callback is not interested in the event
-			if (IsSystem || (is_base_event && !static_cast<const BaseEvent*>(event_ptr)->propagation_stopped()))
+	else if constexpr (std::is_invocable_v<Func>)
+		return [f = std::forward<Func>(func)](CoreComponent*, const EventT& event) mutable {
+			// Callback is not interested in the channel or event
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped())
 				f();
 		};
 
-	} else {
+	else
 		static_assert(libv::meta::always_false_v<Func>,
-				"Callback function has invalid signature, either"
-				" (),"
-				" (Component&, const Event&),"
-				" (const Event&) or"
-				" (Component&) call operator should be accessible");
-		return {};
-	}
+				"Callback function has invalid signature, Expected either:"
+				"\n\tvoid(Component&, const Event&)"
+				"\n\tvoid(const Event&)"
+				"\n\tvoid(Component&)"
+				"\n\tvoid()");
+}
+
+template <typename SlotComponentT, typename EventT, bool IsSystem, typename Func>
+[[nodiscard]] LIBV_FORCE_INLINE auto internal_callback_global(CoreComponent* slot_ptr, Func&& func) {
+	static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
+
+	// For global events there is no signal component, so the slot component is mapped as fake one
+
+	if constexpr (std::is_invocable_v<Func, SlotComponentT&, const EventT&>)
+		return [slot_ptr, f = std::forward<Func>(func)](const EventT& event) mutable {
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped()) {
+				auto handler = SlotComponentT{slot_ptr};
+				f(handler, event);
+			}
+		};
+
+	else if constexpr (std::is_invocable_v<Func, const EventT&>)
+		return [f = std::forward<Func>(func)](const EventT& event) mutable {
+			// Callback is not interested in the component
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped())
+				f(event);
+		};
+
+	else if constexpr (std::is_invocable_v<Func, SlotComponentT&>)
+		return [slot_ptr, f = std::forward<Func>(func)](const EventT& event) mutable {
+			// Callback is not interested in the event
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped()) {
+				auto handler = SlotComponentT{slot_ptr};
+				f(handler);
+			}
+		};
+
+	else if constexpr (std::is_invocable_v<Func>)
+		return [f = std::forward<Func>(func)](CoreComponent*, const EventT& event) mutable {
+			// Callback is not interested in the channel or event
+			if (IsSystem || !is_base_event || !reinterpret_cast<const BaseEvent&>(event).propagation_stopped())
+				f();
+		};
+
+	else
+		static_assert(libv::meta::always_false_v<Func>,
+				"Callback function has invalid signature, Expected either:"
+				"\n\tvoid(Component&, const Event&)"
+				"\n\tvoid(const Event&)"
+				"\n\tvoid(Component&)"
+				"\n\tvoid()");
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -78,7 +123,7 @@ protected:
 	component_type& component;
 
 public:
-	explicit inline BaseBasicEventProxy(component_type& component) noexcept :
+	explicit LIBV_FORCE_INLINE BaseBasicEventProxy(component_type& component) noexcept :
 		component(component) { }
 };
 
@@ -94,72 +139,72 @@ public:
 
 public:
 	template <typename F>
-	inline void operator()(F&& func) {
+	LIBV_FORCE_INLINE void operator()(F&& func) {
 		connect(std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void operator()(Component& slot, F&& func) {
+	LIBV_FORCE_INLINE void operator()(Component& slot, F&& func) {
 		connect(slot, std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void connect(F&& func) {
+	LIBV_FORCE_INLINE void connect(F&& func) {
 		connect(this->component, std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void connect(Component& slot, F&& func) {
-		detail::internal_connect(
-				this->component,
-				slot,
-				libv::type_key<EventT>(),
-				false, // front
+	LIBV_FORCE_INLINE void connect(Component& slot, F&& func) {
+		mark_as_signal(this->component);
+		mark_as_slot(slot);
+		get_nexus(this->component).template connect_channel<EventT>(
+				get_core(this->component),
+				get_core(slot),
 				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename F>
-	inline void connect_front(F&& func) {
+	LIBV_FORCE_INLINE void connect_front(F&& func) {
 		connect_front(this->component, std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void connect_front(Component& slot, F&& func) {
-		detail::internal_connect(
-				this->component,
-				slot,
-				libv::type_key<EventT>(),
-				true, // front
+	LIBV_FORCE_INLINE void connect_front(Component& slot, F&& func) {
+		mark_as_signal(this->component);
+		mark_as_slot(slot);
+		get_nexus(this->component).template connect_channel_front<EventT>(
+				get_core(this->component),
+				get_core(slot),
 				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
 	}
 
 	template <typename F>
-	inline void connect_system(F&& func) {
+	LIBV_FORCE_INLINE void connect_system(F&& func) {
 		connect_system(this->component, std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void connect_system(Component& slot, F&& func) {
-		detail::internal_connect(
-				this->component,
-				slot,
-				libv::type_key<EventT>(),
-				false, // front
+	LIBV_FORCE_INLINE void connect_system(Component& slot, F&& func) {
+		mark_as_signal(this->component);
+		mark_as_slot(slot);
+		get_nexus(this->component).template connect_channel<EventT>(
+				get_core(this->component),
+				get_core(slot),
 				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
 	template <typename F>
-	inline void connect_system_front(F&& func) {
+	LIBV_FORCE_INLINE void connect_system_front(F&& func) {
 		connect_system_front(this->component, std::forward<F>(func));
 	}
 
 	template <typename F>
-	inline void connect_system_front(Component& slot, F&& func) {
-		detail::internal_connect(
-				this->component,
-				slot,
-				libv::type_key<EventT>(),
-				true, // front
+	LIBV_FORCE_INLINE void connect_system_front(Component& slot, F&& func) {
+		mark_as_signal(this->component);
+		mark_as_slot(slot);
+		get_nexus(this->component).template connect_channel_front<EventT>(
+				get_core(this->component),
+				get_core(slot),
 				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
@@ -168,33 +213,33 @@ public:
 		struct Target {
 			F f;
 
-			void operator()(void* signal_ptr, const void* event_ptr) {
+			void operator()(CoreComponent* signal_ptr, const EventT& event) {
 				(void) signal_ptr; // Callback is not interested in the component
-				(void) event_ptr; // Callback is not interested in the event
-				// NOTE: Its a system event, no need to check propagation
+				(void) event; // Callback is not interested in the event
+				// NOTE: It's a system event, no need to check propagation
 				f();
 			}
 		};
 
-		auto callback = std::function<void(void*, const void*)>{Target{std::forward<F>(func)}};
+		auto callback = std::function<void(CoreComponent*, const EventT&)>{Target{std::forward<F>(func)}};
 		auto& target = callback.template target<Target>()->f;
 
-		detail::internal_connect(
-				this->component,
-				this->component,
-				libv::type_key<EventT>(),
-				false, // front
+		mark_as_signal(this->component);
+		get_nexus(this->component).template connect_channel<EventT>(
+				get_core(this->component),
+				get_core(this->component),
 				std::move(callback));
 
 		return target;
 	}
 
-	inline void fire(const EventT& event) {
-		detail::internal_fire(this->component, libv::type_key<EventT>(), &event);
+	LIBV_FORCE_INLINE void fire(const EventT& event) {
+		if (is_marked_as_signal(this->component))
+			get_nexus(this->component).template broadcast_channel<EventT>(get_core(this->component), event);
 	}
 
 	template <typename... Args>
-	inline void fire(Args&&... args) {
+	LIBV_FORCE_INLINE void fire(Args&&... args) {
 		fire(EventT{std::forward<Args>(args)...});
 	}
 
@@ -211,78 +256,79 @@ public:
 
 public:
 	template <typename EventT, typename F>
-	inline void operator()(F&& func) {
+	LIBV_FORCE_INLINE void operator()(F&& func) {
 		connect<EventT>(std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void operator()(Component& slot, F&& func) {
+	LIBV_FORCE_INLINE void operator()(Component& slot, F&& func) {
 		connect<EventT>(slot, std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect(F&& func) {
+	LIBV_FORCE_INLINE void connect(F&& func) {
 		connect<EventT>(this->component, std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect(Component& slot, F&& func) {
-		detail::internal_connect_global(
-				slot,
-				libv::type_key<EventT>(),
-				false, // front
-				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
+	LIBV_FORCE_INLINE void connect(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, false>(slot_ptr, std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_front(F&& func) {
+	LIBV_FORCE_INLINE void connect_front(F&& func) {
 		connect_front<EventT>(this->component, std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_front(Component& slot, F&& func) {
-		detail::internal_connect_global(
-				slot,
-				libv::type_key<EventT>(),
-				true, // front
-				detail::internal_callback<ComponentT, EventT, false>(std::forward<F>(func)));
+	LIBV_FORCE_INLINE void connect_front(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global_front<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, false>(slot_ptr, std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_system(F&& func) {
+	LIBV_FORCE_INLINE void connect_system(F&& func) {
 		connect_system<EventT>(this->component, std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_system(Component& slot, F&& func) {
-		detail::internal_connect_global(
-				slot,
-				libv::type_key<EventT>(),
-				false, // front
-				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
+	LIBV_FORCE_INLINE void connect_system(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, true>(slot_ptr, std::forward<F>(func)));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_system_front(F&& func) {
+	LIBV_FORCE_INLINE void connect_system_front(F&& func) {
 		connect_system_front<EventT>(this->component, std::forward<F>(func));
 	}
 
 	template <typename EventT, typename F>
-	inline void connect_system_front(Component& slot, F&& func) {
-		detail::internal_connect_global(
-				slot,
-				libv::type_key<EventT>(),
-				true, // front
-				detail::internal_callback<ComponentT, EventT, true>(std::forward<F>(func)));
+	LIBV_FORCE_INLINE void connect_system_front(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global_front<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, true>(slot_ptr, std::forward<F>(func)));
 	}
 
 	template <typename EventT>
-	inline void fire(const EventT& event) {
-		detail::internal_fire_global(this->component, libv::type_key<EventT>(), &event);
+	LIBV_FORCE_INLINE void fire(const EventT& event) {
+		// NOTE: Always fire, global events cannot be checked on the slot side
+		get_nexus(this->component).template broadcast_global<EventT>(event);
 	}
 
 	template <typename EventT, typename... Args>
-	inline void fire(Args&&... args) {
+	LIBV_FORCE_INLINE void fire(Args&&... args) {
 		fire(EventT{std::forward<Args>(args)...});
 	}
 
