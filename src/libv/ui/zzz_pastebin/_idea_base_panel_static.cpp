@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/component/_idea_base_panel_static.cpp
 
 // hpp
-#include <libv/ui/component/_idea_base_panel_static.hpp>
+//#include <libv/ui/component/_idea_base_panel_static.hpp>
 // libv
 //#include <libv/algo/erase_if_stable.hpp>
 // pro
