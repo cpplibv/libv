@@ -21,7 +21,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v2.5.1";
+static constexpr std::string_view enum_gen_version = "v2.5.2";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -237,11 +237,11 @@ public:
 			out("public:\n");
 			out("	[[nodiscard]] constexpr inline enum_type next() noexcept {{\n");
 			out("		const underlying_type u = static_cast<underlying_type>(enum_value_);\n");
-			out("		return enum_type{{u == {} ? 0 : u + 1}};\n", enum_entries.size() - 1);
+			out("		return static_cast<enum_type>(u == {} ? 0 : u + 1);\n", enum_entries.size() - 1);
 			out("	}}\n");
 			out("	[[nodiscard]] constexpr inline enum_type prev() noexcept {{\n");
 			out("		const underlying_type u = static_cast<underlying_type>(enum_value_);\n");
-			out("		return enum_type{{u == 0 ? {} : u - 1}};\n", enum_entries.size() - 1);
+			out("		return static_cast<enum_type>(u == 0 ? {} : u - 1);\n", enum_entries.size() - 1);
 			out("	}}\n");
 		}
 

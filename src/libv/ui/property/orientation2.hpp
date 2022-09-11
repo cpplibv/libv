@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: Orientation2
-// Generator version: enum v2.5.1
+// Generator version: enum v2.5.2
 // Input file: src/libv/ui/property/orientation2.hpp.in.lua
 
 #pragma once
@@ -67,11 +67,11 @@ public:
 public:
 	[[nodiscard]] constexpr inline enum_type next() noexcept {
 		const underlying_type u = static_cast<underlying_type>(enum_value_);
-		return enum_type{u == 7 ? 0 : u + 1};
+		return static_cast<enum_type>(u == 7 ? 0 : u + 1);
 	}
 	[[nodiscard]] constexpr inline enum_type prev() noexcept {
 		const underlying_type u = static_cast<underlying_type>(enum_value_);
-		return enum_type{u == 0 ? 7 : u - 1};
+		return static_cast<enum_type>(u == 0 ? 7 : u - 1);
 	}
 
 private:

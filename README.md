@@ -8,7 +8,7 @@ Documentation is sparse, but for most cases the strict conventions and code qual
 ## Libraries
 
 Most of the libraries in the collection are design complete and can be considered stable, but the collection
-prioritizes research and velocity over stability.  
+prioritizes research and velocity over API stability.  
 
 | Library   | Status / API | Description                                                                |
 |:----------|--------------|:---------------------------------------------------------------------------|

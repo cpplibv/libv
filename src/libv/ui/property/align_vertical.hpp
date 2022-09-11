@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: AlignVertical
-// Generator version: enum v2.5.1
+// Generator version: enum v2.5.2
 // Input file: src/libv/ui/property/align_vertical.hpp.in.lua
 
 #pragma once
@@ -17,7 +17,7 @@ namespace libv::ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class AlignVertical : int32_t {
+enum class AlignVertical : int8_t {
 	top = 0,
 	center = 1,
 	bottom = 2,
@@ -30,7 +30,7 @@ enum class AlignVertical : int32_t {
 struct AlignVertical_type {
 public:
 	using enum_type = AlignVertical;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	enum_type enum_value_;
@@ -64,11 +64,11 @@ public:
 public:
 	[[nodiscard]] constexpr inline enum_type next() noexcept {
 		const underlying_type u = static_cast<underlying_type>(enum_value_);
-		return enum_type{u == 4 ? 0 : u + 1};
+		return static_cast<enum_type>(u == 4 ? 0 : u + 1);
 	}
 	[[nodiscard]] constexpr inline enum_type prev() noexcept {
 		const underlying_type u = static_cast<underlying_type>(enum_value_);
-		return enum_type{u == 0 ? 4 : u - 1};
+		return static_cast<enum_type>(u == 0 ? 4 : u - 1);
 	}
 
 private:
@@ -115,7 +115,7 @@ public:
 class AlignVertical_state {
 public:
 	using enum_type = AlignVertical;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	static constexpr enum_type table_enum_values[] = {
@@ -143,11 +143,11 @@ inline std::ostream& operator<<(std::ostream& os, const AlignVertical var) {
 	return os << AlignVertical_type(var).to_string();
 }
 
-[[nodiscard]] constexpr inline int32_t underlying(AlignVertical enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t underlying(AlignVertical enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
-[[nodiscard]] constexpr inline int32_t operator+(AlignVertical enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t operator+(AlignVertical enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
 
 [[nodiscard]] constexpr inline AlignVertical_type type(AlignVertical enum_value) noexcept {

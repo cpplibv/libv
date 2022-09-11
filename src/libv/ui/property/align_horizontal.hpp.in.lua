@@ -1,6 +1,6 @@
 -- Project: libv.ui, File: src/libv/ui/property/align_horizontal.hpp.in.lua, Author: Császár Mátyás [Vader]
 
-enum("AlignHorizontal", "int32_t")
+enum("AlignHorizontal", "int8_t")
 namespace("libv::ui")
 
 rate = property("rate", "float")
