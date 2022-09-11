@@ -138,12 +138,12 @@ float tonemapUchimura(float x, float P, float a, float m, float l, float c, floa
 }
 
 float tonemapUchimura(float x) {
-	const float P = 1.0;// max display brightness
-	const float a = 1.0;// contrast
-	const float m = 0.22;// linear section start
-	const float l = 0.4;// linear section length
-	const float c = 1.33;// black
-	const float b = 0.0;// pedestal
+	const float P = 1.0; // max display brightness
+	const float a = 1.0; // contrast
+	const float m = 0.22; // linear section start
+	const float l = 0.4; // linear section length
+	const float c = 1.33; // black
+	const float b = 0.0; // pedestal
 
 	return tonemapUchimura(x, P, a, m, l, c, b);
 }
@@ -169,12 +169,12 @@ vec3 tonemapUchimura(vec3 x, float P, float a, float m, float l, float c, float 
 }
 
 vec3 tonemapUchimura(vec3 x) {
-	const float P = 1.0;// max display brightness
-	const float a = 1.0;// contrast
-	const float m = 0.22;// linear section start
-	const float l = 0.4;// linear section length
-	const float c = 1.33;// black
-	const float b = 0.0;// pedestal
+	const float P = 1.0; // max display brightness
+	const float a = 1.0; // contrast
+	const float m = 0.22; // linear section start
+	const float l = 0.4; // linear section length
+	const float c = 1.33; // black
+	const float b = 0.0; // pedestal
 
 	return tonemapUchimura(x, P, a, m, l, c, b);
 }

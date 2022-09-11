@@ -3,7 +3,7 @@
 #include <lib/color_spaces.glsl>
 #include <lib/sample.glsl>
 #include <lib/gamma.glsl>
-#include <lib/tone_mapping.glsl>
+#include <lib/tonemap.glsl>
 
 in vec2 fragmentTexture0;
 
