@@ -51,23 +51,28 @@ using Root = PanelFull;
 class ImplUI {
 	struct Stat {
 		static constexpr std::chrono::milliseconds t_min{0};
-		static constexpr std::chrono::milliseconds t_max{1};
+		static constexpr std::chrono::milliseconds t_max{20};
+		static constexpr std::size_t resolution = 100;
 
-		libv::Histogram<100> attach1{t_min, t_max};
-		libv::Histogram<100> event{t_min, t_max};
-		libv::Histogram<100> loopTask{t_min, t_max};
-		libv::Histogram<100> attach2{t_min, t_max};
-		libv::Histogram<100> styleScan{t_min, t_max};
-		libv::Histogram<100> style{t_min, t_max};
-		libv::Histogram<100> layout{t_min, t_max};
-		libv::Histogram<100> mouse{t_min, t_max};
-		libv::Histogram<100> render{t_min, t_max};
-		libv::Histogram<100> detach{t_min, t_max};
+		libv::Histogram<resolution> attach1{t_min, t_max};
+		libv::Histogram<resolution> event{t_min, t_max};
+		libv::Histogram<resolution> loopTask{t_min, t_max};
+		libv::Histogram<resolution> attach2{t_min, t_max};
+		libv::Histogram<resolution> styleScan{t_min, t_max};
+		libv::Histogram<resolution> style{t_min, t_max};
+		libv::Histogram<resolution> layout{t_min, t_max};
+		libv::Histogram<resolution> mouse{t_min, t_max};
+		libv::Histogram<resolution> render{t_min, t_max};
+		libv::Histogram<resolution> renderExe{t_min, t_max};
+		libv::Histogram<resolution> detach{t_min, t_max};
 
-		libv::Histogram<100> frame{t_min, t_max};
+		libv::Histogram<resolution> frame{t_min, t_max};
 
 		friend std::ostream& operator<<(std::ostream& os, const Stat& var) {
-			os << "attach1:   " << var.attach1;
+			for (std::size_t i = 0; i <= resolution; ++i)
+				os << time_duration{t_max - t_min}.count() * static_cast<double>(i) / resolution << " ";
+
+			os << "\nattach1:   " << var.attach1;
 			os << "\nevent:     " << var.event;
 			os << "\nloopTask:  " << var.loopTask;
 			os << "\nattach2:   " << var.attach2;
@@ -76,6 +81,7 @@ class ImplUI {
 			os << "\nlayout:    " << var.layout;
 			os << "\nmouse:     " << var.mouse;
 			os << "\nrender:    " << var.render;
+			os << "\nrenderExe: " << var.renderExe;
 			os << "\ndetach:    " << var.detach;
 			os << "\n-------------------------------------------------------------------------------------";
 			os << "\nframe:     " << var.frame;
@@ -453,6 +459,7 @@ public:
 			// --- Execute Render Queue ---
 			remote.queue(std::move(glr));
 			remote.execute();
+			stat.renderExe.sample(timer.time_ns());
 
 			// --- Detach ---
 			try {

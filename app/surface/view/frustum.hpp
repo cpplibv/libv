@@ -55,6 +55,26 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+// "frustum from projection view matrix"
+//
+// https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
+//
+// comboMatrix = projection_matrix * Matrix4_Transpose(modelview_matrix)
+//
+//void extract_planes_from_projmat(
+//        const float mat[4][4],
+//        float left[4], float right[4],
+//        float bottom[4], float top[4],
+//        float near[4], float far[4])
+//{
+//    for (int i = 4; i--; ) left[i]   = mat[i][3] + mat[i][0];
+//    for (int i = 4; i--; ) right[i]  = mat[i][3] - mat[i][0];
+//    for (int i = 4; i--; ) bottom[i] = mat[i][3] + mat[i][1];
+//    for (int i = 4; i--; ) top[i]    = mat[i][3] - mat[i][1];
+//    for (int i = 4; i--; ) near[i]   = mat[i][3] + mat[i][2];
+//    for (int i = 4; i--; ) far[i]    = mat[i][3] - mat[i][2];
+//}
+
 struct Frustum {
 public:
 	enum class Position {

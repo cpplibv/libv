@@ -18,6 +18,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreImage : CoreComponent {
+public:
 	friend class Image;
 	[[nodiscard]] inline auto handler() { return Image{this}; }
 

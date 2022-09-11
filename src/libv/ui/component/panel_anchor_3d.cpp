@@ -22,6 +22,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelAnchor3D : public CoreBasePanel {
+public:
 	friend PanelAnchor3D;
 	[[nodiscard]] inline auto handler() { return PanelAnchor3D{this}; }
 

@@ -8,6 +8,20 @@
 
 
 
+Grass
+	https://www.youtube.com/watch?v=Y0Ko0kvwfgA
+	https://www.youtube.com/watch?v=jw00MbIJcrk
+	https://www.youtube.com/watch?v=PNvlqsXdQic
+
+	Procedural Grass in 'Ghost of Tsushima' - https://www.youtube.com/watch?v=Ibe1JBF5i5Y
+
+vegetation
+	when glsl generation is online, use compute shader to place vegetation (and handle instancing)
+	GDC - Between Tech and Art: The Vegetation of Horizon Zero Dawn - https://www.youtube.com/watch?v=wavnKZNSYqU
+
+
+
+
 kill sprite index VBO, reuse and share one index VBO (libv.glr mesh support to adopt VAO as index)
 
 remember last config

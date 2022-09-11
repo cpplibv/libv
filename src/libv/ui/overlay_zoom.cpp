@@ -79,6 +79,7 @@ void main() {
 // -------------------------------------------------------------------------------------------------
 
 class CoreOverlayZoom : public CoreComponent {
+public:
 	friend class OverlayZoom;
 	[[nodiscard]] inline auto handler() { return OverlayZoom{this}; }
 

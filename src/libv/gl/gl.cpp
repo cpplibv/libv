@@ -39,6 +39,7 @@ void GL::init() {
 		log_gl.debug("CurrentAvailableVideoMemory        [{:>8} ]", curr_mem);
 	else
 		log_gl.debug("CurrentAvailableVideoMemory        [{:>8} ]", "unknown");
+
 	log_gl.debug("MaxColorAttachments                [{:>8} ]", getMaxColorAttachments());
 	log_gl.debug("MaxSamples                         [{:>8} ]", getMaxSamples());
 	log_gl.debug("MaxSamplesInteger                  [{:>8} ]", getMaxSamplesInteger());
@@ -55,7 +56,11 @@ void GL::init() {
 	log_gl.debug("MaxVertexAttribs                   [{:>8} ]", getMaxVertexAttribs());
 	log_gl.debug("MaxVertexUniformComponents         [{:>8} ]", getMaxVertexUniformComponents());
 	log_gl.debug("UniformBufferOffsetAlignment       [{:>8} ]", getUniformBufferOffsetAlignment());
-	log_gl.debug("EXT_texture_filter_anisotropic     [{:>8} ]", GLEW_EXT_texture_filter_anisotropic ? "OK" : "MISSING");
+	log_gl.debug("EXT_texture_filter_anisotropic     [{:>8} ]", GLEW_EXT_texture_filter_anisotropic ? "PASS" : "MISSING");
+
+	log_gl.debug("MaxComputeWorkGroupCount           [{}]", getMaxComputeWorkGroupCount());
+	log_gl.debug("MaxComputeWorkGroupSize            [{}]", getMaxComputeWorkGroupSize());
+	log_gl.debug("MaxComputeWorkGroupInvocations     [{:>8} ]", getMaxComputeWorkGroupInvocations());
 
 	// Disable row alignment for texture and pixel operations
 	// Otherwise a default 4 byte alignment is required for pixels row starts (which is broken on R8G8B8 formats if the width is not multiple of 4)

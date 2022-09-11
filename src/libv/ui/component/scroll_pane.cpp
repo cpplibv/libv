@@ -24,6 +24,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreScrollArea : public CoreComponent {
+public:
 	friend ScrollArea;
 	[[nodiscard]] inline auto handler() { return ScrollArea{this}; }
 
@@ -377,6 +378,7 @@ void ScrollArea::area_position(libv::vec2f value) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 //class CoreScrollPane : public CoreComponent {
+//public:
 //	friend class ScrollPane;
 //	[[nodiscard]] inline auto handler() { return ScrollPane{this}; }
 //

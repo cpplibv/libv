@@ -786,6 +786,8 @@ place.it:
 	opengl.knowledge: ogldev.org - Great tutorial site
 	opengl.knowledge: open.gl - Great tutorial site
 	opengl.knowledge: opengl-tutorial.org - Great tutorial site
+	opengl.knowledge: 3dgep.com
+	opengl.knowledge: http://www.songho.ca/opengl/gl_projectionmatrix.html
 	opengl.tool: renderdoc.org - Renderdoc
 	regex.tool: regex101.com
 	regex.tool: regexr.com
@@ -1399,6 +1401,7 @@ libv.glr: strong type locations and indices with enum classes, also use libv::gl
 libv.glr: Fix uniform naming mess, Reduce the number of public members
 
 libv.glr: vm4 | non trivial
+libv.vm4: split vertex attribute into separate containers (this is also true for glr, based on usage this will result in better cache locality)
 libv.vm4: in model header include version
 libv.vm4: in model header include date
 libv.vm4: in model header include hash
@@ -1409,6 +1412,7 @@ libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate
 libv.gl: https://learnopengl.com/PBR/Lighting
 libv.glr: post-processing haze
 
+libv.glr: Make sure vertex attributes are split
 libv.glr: Shadow
 libv.glr: Cascaded shadow maps
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);

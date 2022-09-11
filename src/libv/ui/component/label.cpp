@@ -22,6 +22,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreLabel : CoreComponent {
+public:
 	friend Label;
 	[[nodiscard]] inline auto handler() { return Label{this}; }
 

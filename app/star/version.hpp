@@ -22,6 +22,14 @@ struct BuildInfo {
 //	... git_commit_number;
 //	... git_branch;
 //	... variant;
+//
+//	? uint8_t stage;
+//		Alpha
+//		Beta
+//		Release candidate
+//		Release
+//
+//		Stable
 };
 
 extern BuildInfo build;

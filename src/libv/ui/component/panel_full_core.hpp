@@ -12,6 +12,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelFull : public CoreBasePanel {
+public:
 	friend PanelFull;
 	[[nodiscard]] inline auto handler() { return PanelFull{this}; }
 

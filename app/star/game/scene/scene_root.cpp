@@ -13,6 +13,7 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 class CoreSceneRoot : public libv::ui::CorePanelAnchor {
+public:
 	friend SceneRoot;
 	[[nodiscard]] inline auto handler() { return SceneRoot{this}; }
 

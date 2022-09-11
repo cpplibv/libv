@@ -28,6 +28,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 //class CoreRadioButton : public CoreComponent {
+//public:
 //	friend class RadioButton;
 //	[[nodiscard]] inline auto handler() { return RadioButton{this}; }
 //

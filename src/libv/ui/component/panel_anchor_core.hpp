@@ -14,6 +14,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelAnchor : public CoreBasePanel {
+public:
 	friend PanelAnchor;
 	[[nodiscard]] inline auto handler() { return PanelAnchor{this}; }
 

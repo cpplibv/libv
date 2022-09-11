@@ -25,6 +25,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelCard : public CorePanelFull {
+public:
 	friend PanelCard;
 	[[nodiscard]] inline auto handler() { return PanelCard{this}; }
 

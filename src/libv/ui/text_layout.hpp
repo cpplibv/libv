@@ -22,11 +22,7 @@ namespace ui {
 
 class Font2D;
 
-//struct TextLayoutData_____ {
-//	std::span<libv::vec3f> positions;
-//	std::span<libv::vec2f> texture0s;
-//	std::span<uint32_t> indices;
-//};
+// -------------------------------------------------------------------------------------------------
 
 struct TextLayoutData {
 	std::vector<libv::vec3f> positions;

@@ -30,6 +30,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreInputField : public CoreComponent {
+public:
 	friend class InputField;
 	[[nodiscard]] inline auto handler() { return InputField{this}; }
 

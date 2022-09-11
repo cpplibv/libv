@@ -32,6 +32,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreScrollBar : public CoreComponent {
+public:
 	friend ScrollBar;
 	[[nodiscard]] inline auto handler() { return ScrollBar{this}; }
 

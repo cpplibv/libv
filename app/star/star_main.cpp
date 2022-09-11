@@ -2,6 +2,7 @@
 
 // libv
 #include <libv/arg/arg.hpp>
+#include <libv/sys/os_version.hpp>
 #include <libv/utility/last_write_time.hpp>
 //#include <libv/utility/read_file.hpp>
 // std
@@ -89,6 +90,7 @@ int main(int argc, const char** argv) {
 		star::log_star.info("Last modified {:%Y.%m.%d %H:%M:%S}", lwt);
 		star::log_star.info("Config file   {}", arg_config.value());
 //		star::log_star.info("Resource path {}", path_resource);
+		star::log_star.info("OS: {}", libv::sys::os_version());
 
 		// Run the game
 		auto game = star::GameClient(arg_config.value());

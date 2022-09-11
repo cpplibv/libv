@@ -69,10 +69,11 @@ read:
 	https://open.gl/feedback
 	https://ogldev.org/www/tutorial28/tutorial28.html
 
-
-place.it:
-	forward+ rendering with 2 pass: forward base + forward add ('base' only uses sun, 'add' does every other lighting as additive)
-	free high quality textures: https://quixel.com/megascans/free
+libv.rev / libv.vm4: Parallel model memory upload to GPU. Steps:
+		FS Thread: Read model header
+		GL Thread: Memory map buffers based on header information
+		FS Thread: Read model buffer contents directly into mapped GPU memory
+		GL Thread: Memory unmap, Finalize VAO
 
 libv.vm4: remove bitangent from the model format and calculate it on the fly as cross(normal, tangent) (or cross(normal, tangent))
 app.mimp: check last write time, and skip anything who doesn't needs to be updated unless the mimp version changed (more like the exe lwt changed)
@@ -160,7 +161,44 @@ libv.vm4: On load verify every indexing (nodeID materialID etc in range [maybe e
 place.it:
 	visual.ui: Age of empires 4 menu show/hide effect is cool
 
-libv.rev: Post processing
+	forward+ rendering with 2 pass: forward base + forward add ('base' only uses sun, 'add' does every other lighting as additive)
+	free high quality textures: https://quixel.com/megascans/free
+
+
+
+libv.rev: Post-processing
+	TODO: Order the post-processing steps:
+			Fog
+			Bloom
+			Exposure
+			White Balance
+			Contrast
+			Brightness
+			Color Filtering
+			Saturation
+			Tonemapping
+			Gamma
+			Debug Overlay: Color Blindness Simulation
+
+			? Haze
+			? Vignette
+			? Vignette Texture
+			? Bloom Texture
+			? SSAO
+			? SSR
+			? Grain
+			? Lens Flare
+			? Motion Blur
+			? Depth of Field
+			? Color Grading
+			? Channel Mixer
+
+			? Debug Views
+
+
+	libv.rev: Color correction https://www.youtube.com/watch?v=texTxhcfEkY
+			aka contrast + brightness + saturation + gamma
+	libv.rev: PP recap: https://www.youtube.com/watch?v=wbn5ULLtkHs
 
 	libv.rev: HDR: automatic exposure adjustment opengl
 	libv.rev: Post-processing exposure (I think it affects both bloom prefilter and combine input)
@@ -266,6 +304,9 @@ libv.rev: glsl_source_loader: Add query API, aka what would this include be reso
 		has to handling no match, query could result in no mapping
 
 
+--- Backlog ----------------------------------------------------------------------------------------
+
+libv.rev: Hi-Z culling with compute shader (not a burning issue for now)
 
 --- Paper collection -------------------------------------------------------------------------------
 
@@ -305,5 +346,7 @@ Bloom Paper
 
 Full screen triangle: https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
 sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
+
+Color blindness (8% affected): https://www.youtube.com/watch?v=HlWDlmeecg8 and the source code https://github.com/GarrettGunnell/Post-Processing
 
 std::format / fmt custom types: https://www.cppstories.com/2022/custom-stdformat-cpp20/

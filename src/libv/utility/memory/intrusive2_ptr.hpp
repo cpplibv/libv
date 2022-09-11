@@ -94,8 +94,7 @@ private:
 	T* ptr_ = nullptr;
 
 public:
-	constexpr inline intrusive2_ptr() noexcept {
-	}
+	constexpr inline intrusive2_ptr() noexcept = default;
 
 	explicit constexpr inline intrusive2_ptr(T* ptr) noexcept :
 		ptr_(ptr) {
@@ -213,8 +212,8 @@ public:
 	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(const intrusive2_ptr& rhs) const noexcept = default;
 //	[[nodiscard]] constexpr inline bool operator==(const T* rhs) const noexcept = default;
 //	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(const T* rhs) const noexcept = default;
-//	[[nodiscard]] constexpr inline bool operator==(nullptr_t) const noexcept = default;
-//	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(nullptr_t) const noexcept = default;
+//	[[nodiscard]] constexpr inline bool operator==(std::nullptr_t) const noexcept = default;
+//	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(std::nullptr_t) const noexcept = default;
 };
 
 // ---

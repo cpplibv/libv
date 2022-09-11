@@ -374,6 +374,8 @@ wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0c171ee87fcfe35a7e0e0445adef06f92e0b6a91
+	# TODO: Switch to latest gli:
+#	GIT_TAG 779b99ac6656e4d30c3b24e96e0136a59649a869
 	CMAKE_ARGS
 		-DGLI_TEST_ENABLE=OFF
 )

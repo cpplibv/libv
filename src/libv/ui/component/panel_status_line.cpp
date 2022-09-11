@@ -18,6 +18,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CorePanelStatusLine : public CorePanelLine {
+public:
 	friend PanelStatusLine;
 	[[nodiscard]] inline auto handler() { return PanelStatusLine{this}; }
 

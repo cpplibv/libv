@@ -99,7 +99,14 @@ libv.ui: check on that "recent" modification that i just did in ui.context_state
 
 
 
-
+libv.ui: Style (resource) async loading
+	if the style is used this frame: block
+	otherwise load styles (and related resources) based on their priority (optional manual number during style definition) in the background
+		resources with multiple priority uses the highest one
+	1000: Loading screen
+	 100: Main menu
+	   0: Default
+	-100: Rarely visited scenes
 
 libv.ui.property: scope / sheet / component type based style rules
 

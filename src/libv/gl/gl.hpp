@@ -575,7 +575,12 @@ private:
 		else if constexpr (std::is_same_v<GLdouble, T>)
 			glGetDoublev(param, &value);
 
-		else
+		else if constexpr (std::is_same_v<libv::vec3i, T>) {
+			glGetIntegeri_v(param, 0, &value.x);
+			glGetIntegeri_v(param, 1, &value.y);
+			glGetIntegeri_v(param, 2, &value.z);
+
+		} else
 			static_assert(libv::meta::always_false_v<T>, "Type T is not supported");
 
 		return value;
@@ -668,6 +673,16 @@ public:
 	}
 	[[nodiscard]] inline GLint getUniformBufferOffsetAlignment() const {
 		return get<GLint>(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT);
+	}
+
+	[[nodiscard]] inline libv::vec3i getMaxComputeWorkGroupCount() const {
+		return versionOrGreater(4, 3) ? get<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_COUNT) : libv::vec3i{-1};
+	}
+	[[nodiscard]] inline libv::vec3i getMaxComputeWorkGroupSize() const {
+		return versionOrGreater(4, 3) ? get<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_SIZE) : libv::vec3i{-1};
+	}
+	[[nodiscard]] inline GLint getMaxComputeWorkGroupInvocations() const {
+		return versionOrGreater(4, 3) ? get<GLint>(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS) : -1;
 	}
 
 private:

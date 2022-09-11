@@ -20,9 +20,7 @@
 // TODO P2: add swizzle custom getters back into member after measuring the impact, and consider the concept based swizzle too, so either both or only non-member
 //			Interesing presentation on vec: https://www.youtube.com/watch?v=8FoAxasNssA
 
-// NOTE: Use concepts to enable every operation based on underlying types | compile time hit not worth it
-// NOTE: Perfect forwarding is possible, but it seams like does not worth additional 600 line template
-
+// NOTE: Perfect forwarding and underlying capability SFINAE is possible, but not worth the compile-time hit
 
 // -------------------------------------------------------------------------------------------------
 

@@ -30,6 +30,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelGrid : public CoreBasePanel {
+public:
 	friend PanelGrid;
 	[[nodiscard]] inline auto handler() { return PanelGrid{this}; }
 

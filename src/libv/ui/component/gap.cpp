@@ -12,6 +12,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreGap : CoreComponent {
+public:
 	friend Gap;
 	[[nodiscard]] inline auto handler() { return Gap{this}; }
 

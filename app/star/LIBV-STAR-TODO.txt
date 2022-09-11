@@ -10,6 +10,54 @@ Star - System integration demo
 
 
 
+[[nodiscard]] libv::Nexus& get_nexus(const Component& component) noexcept;
+
+
+
+signal/slot flag set / query
+	void mark_as_signal(const Component& component) noexcept;
+	void mark_as_slot(const Component& component) noexcept;
+
+last of the old API
+
+global temp code
+
+libv::Nexus nexus; // !!!
+detail::nexus.***
+
+
+
+
+
+
+up next
+	ui normalize contexts
+	ui adopt nexus for events backend
+	radio group
+	style intrusive_ptr -> intrusive2_ptr
+	star adopt rad group
+	ui settings flag: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
+	ui bean system
+	ui scene switcher with the help of the bean system
+	star adopt bean system
+
+place.it:
+	post_processing
+		build a multistep composer with custom entry points
+		custom entry points source
+			read a file, macro "main" as a function name or the entry point function name
+			and chaim the calls together
+			have decent signature for it vec4(vec4)
+		custom entry points placement
+			step4_after_bloom
+			step5_before_bloom
+			step6_after_tonemapping
+			step7_before_tonemapping
+			step8_after_contrast
+			step9_before_contrast
+	tracked entities as "sleeping ones", not 2 but 3 update state
+		sleeping, awake, tracked
+		runs different code
 
 
 
@@ -30,13 +78,24 @@ Star - System integration demo
 
 
 
+RadioGroup
+	Who actually owns RadioGroup? Important for events
+		Or who actually owns the events of RadioGroup?
+
+ToggleButton has the extra text_ variable from Button
+ToggleButton properties setters are not matching the TextLayoutLite pattern
+ToggleButton toggle state?
+
+TextLayoutLite Property
+TextLayoutLite might is kinda broken or all over the place (getPositions and the rest of the API)
+TextLayoutProperties
 
 
 
 
 
 
-libv.ui: Font subpixel options: OFF RGB BGR
+
 
 «»
 
@@ -82,35 +141,27 @@ private:
 
 
 
-
+libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
+libv.ui: Font subpixel options: OFF RGB BGR
 
 libv.ui: Alternatives
 		https://github.dev/cycfi/elements
 			Composition and properties are based on a decorator pattern
 		https://github.com/cnjinhao/nana
 
+	--- Observations from elements ---
 
---- Observations from elements ---
+	composition:
+		elements achieves good composition by a decorator pattern
+		in case of composite components (like slider) it uses memory local storage
+			with virtual functions to access parts
+			virtual & rail
 
-composition:
-	elements achieves good composition by a decorator pattern
-	in case of composite components (like slider) it uses memory local storage
-		with virtual functions to access parts
-		virtual & rail
-
-elements have no property system, everything is composed via a decorator pattern
+	elements have no property system, everything is composed via a decorator pattern
 
 
 
 --- ---
-
-
-
-TextLayoutProperties
-
-
-r.text( pass only text layout data
-		move it into its own header
 
 
 
@@ -120,9 +171,11 @@ cleanup
 
 
 
+libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
 
-libv.ui: radio button / radio group
+
 libv.ui: toggle button
+libv.ui: radio button / radio group
 libv.ui: tooltips
 
 
@@ -130,6 +183,7 @@ libv.ui: tooltips
 app.star: Settings
 	grouping / separators / paging
 	tooltips with description
+
 
 
 

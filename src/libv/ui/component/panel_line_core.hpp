@@ -13,6 +13,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelLine : public CoreBasePanel {
+public:
 	friend PanelLine;
 	[[nodiscard]] inline auto handler() { return PanelLine{this}; }
 

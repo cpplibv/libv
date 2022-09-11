@@ -287,12 +287,16 @@ libv::vec3f formation(int shipIndex, int numShips) {
 void SpaceCanvas::render(libv::glr::Queue& glr) {
 	renderer.prepare_for_render(glr);
 
+	bool enablePostProcessing = true;
+
 	// NOTE: screen_picker update has to be placed around render, as canvas_size is only set after layout
 	// TODO P1: Move screen_picker update into a layout post hook so mouse event use the update value
 	screen_picker = camera.picker(canvas_size);
-	renderTarget.size(canvas_size.cast<int32_t>());
-	postProcessing.size(canvas_size.cast<int32_t>());
-	//
+
+	if (enablePostProcessing) {
+		renderTarget.size(canvas_size.cast<int32_t>());
+		postProcessing.size(canvas_size.cast<int32_t>());
+	}
 
 	const auto s_guard = glr.state.push_guard();
 
@@ -318,8 +322,10 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 	const auto eye = glr.eye();
 
-	// Set framebuffer to the post-processing target
-	glr.framebuffer_draw(renderTarget.framebuffer());
+	if (enablePostProcessing) {
+		// Set framebuffer to the post-processing target
+		glr.framebuffer_draw(renderTarget.framebuffer());
+	}
 
 	glr.clearColor();
 	glr.clearDepth();
@@ -412,8 +418,10 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 	// --- Post Processing ---
 
-	const auto& mainTexture = renderTarget.resolve(glr);
-	postProcessing.pass(glr, mainTexture);
+	if (enablePostProcessing) {
+		const auto& mainTexture = renderTarget.resolve(glr);
+		postProcessing.pass(glr, mainTexture);
+	}
 
 	// Post-Processing sets the framebuffer back to the default
 	// glr.framebuffer_draw_default();
@@ -458,9 +466,9 @@ void SpaceCanvas::render_opaque(libv::glr::Queue& glr, libv::vec3f eye, Galaxy& 
 		if (a > 0.02f) { // Skip barely and not visible texts
 			std::string fleetLabel;
 			if (!fleet.commands.empty()) {
-				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{}\nI:{}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, +fleet.commands.front().type, fleet.number_of_ships, fleet.distance_travelled);
+				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{: :3.2f}\nI:{}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, +fleet.commands.front().type, fleet.number_of_ships, fleet.distance_travelled);
 			} else {
-				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, fleet.number_of_ships, fleet.distance_travelled);
+				fleetLabel = fmt::format("Fleet {}\n{}\nOri:{: :3.2f}\n{}\n{}", +fleet.id, fleet.faction->name, fleet.orientation, fleet.number_of_ships, fleet.distance_travelled);
 			}
 			renderer.text.add_text(
 					fleet.position,

@@ -14,6 +14,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelBoard : public CoreComponent {
+public:
 	friend PanelBoard;
 	[[nodiscard]] inline auto handler() { return PanelBoard{this}; }
 

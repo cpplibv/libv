@@ -389,7 +389,6 @@ void TextLayout::layout() {
 	texture0s.reserve(string_.size() * 4);
 	indices.reserve(string_.size() * 6);
 	auto vi = 0; // Vertex Index
-	auto ii = 0; // Index 'Index'
 
 	const auto vertex = [&](auto pos, auto uv0) {
 		positions.emplace_back(pos, 0);
@@ -404,7 +403,6 @@ void TextLayout::layout() {
 		indices.emplace_back(vi - 4 + 2);
 		indices.emplace_back(vi - 4 + 3);
 		indices.emplace_back(vi - 4 + 0);
-		ii += 6;
 	};
 
 	// ---

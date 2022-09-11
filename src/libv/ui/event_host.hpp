@@ -49,11 +49,23 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct EventSubmit : BaseEvent { };
+struct EventSubmit : BaseEvent {
+private:
+	mutable bool submit_rejected_ = false;
+
+public:
+	constexpr inline void reject_submit() const noexcept {
+		submit_rejected_ = true;
+	}
+
+	[[nodiscard]] constexpr inline bool submit_rejected() const noexcept {
+		return submit_rejected_;
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 
-// NOTE: EventHost system has no/low run-time overhead
+// NOTE: EventHost system's convenience API has no/low run-time overhead
 // Creating a temporary host object with proxy members that point to the component can be optimized away
 // Proof: https://godbolt.org/z/vM5zhf3Yf
 
