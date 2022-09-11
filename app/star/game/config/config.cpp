@@ -48,7 +48,7 @@ public:
 
 			} catch (const std::exception& ex) {
 				// Failed to parse: reset to default and re-save
-				log_star.error("Failed to deserilize config. Reseting to default and resaving the config file\nConfig file {}. Content was:\n{}", configFilepath.generic_string(), configFileString.data);
+				log_star.error("Failed to deserilize config. Reseting to default and resaving the config file\nConfig file: {}\nError: {}\nContent was:\n{}", configFilepath.generic_string(), ex.what(), configFileString.data);
 				config.resetToDefault();
 				saveFile();
 			}

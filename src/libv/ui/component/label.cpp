@@ -50,7 +50,7 @@ public:
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-private:
+protected:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
@@ -112,8 +112,8 @@ void CoreLabel::access_properties(T& ctx) {
 			"Font size in pixel"
 	);
 	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().text(std::move(v)); },
-			[](const auto& c) { return c.handler().text(); },
+			T::handler_setter(&Label::text),
+			T::handler_getter(&Label::text),
 			pgr::behaviour, pnm::text,
 			"Displayed text"
 	);

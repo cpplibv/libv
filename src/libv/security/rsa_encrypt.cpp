@@ -48,7 +48,7 @@ std::string aux_rsa_encrypt(std::string_view message, std::string_view key_strin
 	auto it_src = 0uz;
 	auto it_dst = 0uz;
 
-	for (std::size_t i = 0 ; i < block_full_count ; ++i) {
+	for (std::size_t i = 0;i < block_full_count;++i) {
 		int result_code = encrypt_func(block_size_in, src + it_src, dst + it_dst, key, padding);
 		if (result_code < 0) {
 			result.clear();

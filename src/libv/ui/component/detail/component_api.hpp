@@ -34,6 +34,9 @@ protected:
 	using BaseAPI = ComponentAPI;
 
 public:
+	explicit inline ComponentAPI(std::nullptr_t) noexcept :
+		BaseT(nullptr) { }
+
 	explicit inline ComponentAPI(core_ptr ptr) noexcept :
 		BaseT(ptr) { }
 
@@ -44,6 +47,11 @@ public:
 	template <typename... Args>
 	explicit inline ComponentAPI(GenerateName_t = {}, Args&&... args) :
 		ComponentAPI(generate_component_name(HandlerT::component_type, nextID++), std::forward<Args>(args)...) { }
+
+public:
+	[[nodiscard]] static inline HandlerT from_core(core_ptr ptr) noexcept {
+		return HandlerT{ptr};
+	}
 
 protected:
 	[[nodiscard]] constexpr inline CoreT& self() noexcept {

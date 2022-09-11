@@ -29,11 +29,23 @@ using core_cptr = const CoreComponent*;
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T>
+	requires (!std::derived_from<T, Component>)
+[[nodiscard]] constexpr inline auto get_core(const T& component_like) noexcept {
+	return component_like.ptr();
+}
+
 [[nodiscard]] libv::Nexus& get_nexus(const Component& component) noexcept;
 void mark_as_signal(Component& component) noexcept;
 void mark_as_slot(Component& component) noexcept;
 [[nodiscard]] bool is_marked_as_signal(const Component& component) noexcept;
 [[nodiscard]] bool is_marked_as_slot(const Component& component) noexcept;
+
+[[nodiscard]] libv::Nexus& get_nexus(...) noexcept;
+inline void mark_as_signal(...) noexcept {}
+inline void mark_as_slot(...) noexcept {}
+[[nodiscard]] inline bool is_marked_as_signal(...) noexcept { return true; }
+[[nodiscard]] inline bool is_marked_as_slot(...) noexcept { return true; }
 
 // -------------------------------------------------------------------------------------------------
 

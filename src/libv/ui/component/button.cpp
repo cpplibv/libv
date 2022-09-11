@@ -25,6 +25,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreButton::routineSubmit() {
+	EventSubmit event{};
+	fire(event);
+	if (!event.submit_rejected())
+		onSubmit();
+}
+
 void CoreButton::onFocus(const EventFocus& event) {
 	(void) event;
 	// TODO P3: listen to hotkey event (ui.select) (? aka libv.ctrl enter context)
@@ -44,7 +51,7 @@ void CoreButton::onMouseButton(const EventMouseButton& event) {
 	// TODO P3: use hotkey event (ui.select) (even for mouse)
 	if (event.action == libv::input::Action::press && event.button == libv::input::MouseButton::Left) {
 		style_state(StyleState::active, true);
-		fire(EventSubmit{});
+		routineSubmit();
 	}
 
 	event.stop_propagation();
@@ -92,7 +99,12 @@ void CoreButton::doStyle(ContextStyle& ctx) {
 }
 
 libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {
-	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
+	const auto dynamic_size_text = text_.measure_content_size(
+				xy(environment.size) - padding_size(),
+				property.font(), property.font_size()
+			) + padding_size();
+
+//	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
 //	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
 //	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
@@ -100,15 +112,18 @@ libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {
 }
 
 void CoreButton::doLayout2(const ContextLayout2& environment) {
-	text_.limit(xy(environment.size) - padding_size());
+	text_.invalidateLayout2(xy(environment.size) - padding_size());
+//	text_.layout(xy(environment.size) - padding_size(), property.font(), property.font_size(), property.align_horizontal(), property.align_vertical());
 }
 
 void CoreButton::doRender(Renderer& r) {
 	property.background().render(r, {0, 0}, layout_size2(), *this);
 
-	r.text(padding_LB(), text_,
+	r.text(padding_LB(),
+//			text_.vertices_data(),
+			text_.vertices_data(property.font(), property.font_size(), property.align_horizontal(), property.align_vertical()),
+			property.font(),
 			property.font_color(),
-			text_.font(),
 			property.font_shader());
 }
 
@@ -131,43 +146,35 @@ void Button::background(Background value) {
 // -------------------------------------------------------------------------------------------------
 
 void Button::align_horizontal(AlignHorizontal value) {
-	AccessProperty::setter(self(), self().property.align_horizontal, PropertyDriver::manual, [&]() {
-		self().text_.align_horizontal(value);
-	});
+	AccessProperty::manual(self(), self().property.align_horizontal, std::move(value));
 }
 
 AlignHorizontal Button::align_horizontal() const noexcept {
-	return self().text_.align_horizontal();
+	return self().property.align_horizontal();
 }
 
 void Button::align_vertical(AlignVertical value) {
-	AccessProperty::setter(self(), self().property.align_vertical, PropertyDriver::manual, [&]() {
-		 self().text_.align_vertical(value);
-	});
+	AccessProperty::manual(self(), self().property.align_vertical, std::move(value));
 }
 
 AlignVertical Button::align_vertical() const noexcept {
-	return self().text_.align_vertical();
+	return self().property.align_vertical();
 }
 
 void Button::font(Font2D_view value) {
-	AccessProperty::setter(self(), self().property.font, PropertyDriver::manual, [&]() {
-		self().text_.font(std::move(value));
-	});
+	AccessProperty::manual(self(), self().property.font, std::move(value));
 }
 
 const Font2D_view& Button::font() const noexcept {
-	return self().text_.font();
+	return self().property.font();
 }
 
 void Button::font_size(FontSize value) {
-	AccessProperty::setter(self(), self().property.font, PropertyDriver::manual, [&]() {
-		self().text_.size(value);
-	});
+	AccessProperty::manual(self(), self().property.font_size, std::move(value));
 }
 
 FontSize Button::font_size() const noexcept {
-	return self().text_.size();
+	return self().property.font_size();
 }
 
 void Button::font_color(Color value) {

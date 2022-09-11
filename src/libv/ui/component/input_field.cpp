@@ -76,7 +76,7 @@ private:
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-private:
+protected:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& context) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
@@ -157,8 +157,8 @@ void CoreInputField::access_properties(T& ctx) {
 			"Font size in pixel"
 	);
 	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().text(std::move(v)); },
-			[](const auto& c) { return c.handler().text(); },
+			T::handler_setter(&InputField::text),
+			T::handler_getter(&InputField::text),
 			pgr::behaviour, pnm::text,
 			"Displayed text"
 	);

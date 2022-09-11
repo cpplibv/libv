@@ -10,6 +10,9 @@
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component/selection_group.hpp>
+#include <libv/ui/component/toggle_button.hpp>
+//#include <libv/ui/event/detail/event_reentry_guard.hpp>
 #include <libv/utility/parse_number.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
@@ -73,6 +76,24 @@ struct SettingsBuilder {
 
 			input.text(event.entry.value() ? "On" : "Off");
 		});
+		//		libv::ui::ToggleButton input;
+		//		input.style("settings.entry.value.toggle");
+		//		input.text_on("On");
+		//		input.text_off("Off");
+		//		input.event().submit.connect_system([&entry, input]() mutable {
+		//			const auto reentry_guard = input.event_reentry_guard(input.ptr(), &entry);
+		//			if (!reentry_guard)
+		//				return;
+		//
+		//			entry.store_and_update(!entry.value());
+		//		});
+		//		entry.subscribe_and_call(ownerPtr, [input](const ConfigEntry<bool>::Change& event) mutable {
+		//			const auto reentry_guard = input.event_reentry_guard(&event.entry, input.ptr());
+		//			if (!reentry_guard)
+		//				return;
+		//
+		//			input.state(event.entry.value());
+		//		});
 
 		grid.add(std::move(input));
 	}
@@ -150,35 +171,35 @@ struct SettingsBuilder {
 		const void* ownerPtr;
 		ConfigEntry<int>& entry;
 		libv::ui::PanelLine row;
+		libv::ui::SelectionGroupUnique<int> group;
 
 		OptionProxy(const void* ownerPtr, ConfigEntry<int>& entry, libv::ui::PanelLine&& row) :
 			ownerPtr(ownerPtr), entry(entry), row(std::move(row)) {
+
+			group.event().change.connect_system([en_ptr = &entry](libv::ui::SelectionGroupUnique<int>& group) {
+				libv::ui::reentry_guard(group.ptr(), en_ptr, [&] {
+					en_ptr->store_and_update(group.value());
+				});
+			});
+
+			entry.subscribe(ownerPtr, [group = this->group](const auto& event) mutable {
+				libv::ui::reentry_guard(&event.entry, group.ptr(), [&] {
+					group.select(event.entry.value());
+				});
+			});
 		}
 
-		void operator()(std::string name, int value) {
-			libv::ui::Button input;
-			input.style("settings.entry.value.option.button");
-			input.text(std::move(name));
-			input.event().submit.connect_system([e = &entry, input, value]() mutable {
-				const auto reentry_guard = input.event_reentry_guard(input.ptr(), e);
-				if (!reentry_guard)
-					return;
+		OptionProxy& operator()(std::string name, int value) {
+			libv::ui::ToggleButton button;
+			button.style("settings.entry.value.option.button");
+			button.text_on(name);
+			button.text_off(std::move(name));
+			button.select(entry.value() == value);
 
-				e->store_and_update(value);
-				// !!! instead of style state change, radio button / group select will be a better solution
-				input.style_state(libv::ui::StyleState::select, true);
-			});
-			// !!! Do not sub per option entry, sub per config entry, or this would be super simple hack
-			entry.subscribe_and_call(ownerPtr, [input, value](const ConfigEntry<int>::Change& event) mutable {
-				const auto reentry_guard = input.event_reentry_guard(&event.entry, input.ptr());
-				if (!reentry_guard)
-					return;
+			group.add(button, value);
+			row.add(std::move(button));
 
-				// !!! instead of style state change, radio button / group select will be a better solution
-				input.style_state(libv::ui::StyleState::select, value == event.entry.value());
-			});
-
-			row.add(std::move(input));
+			return *this;
 		}
 	};
 
@@ -280,42 +301,48 @@ libv::ui::Component createSceneSettings(GameClient& gameClient) {
 		builder.text(config->profile.player_name);
 
 		builder.toggle(config->graphics.vsync_enable);
-		auto test_setting3 = builder.options(config->graphics.msaa_samples);
-		test_setting3("Off", 1);
-		test_setting3("2", 2);
-		test_setting3("4", 4);
-		test_setting3("8", 8);
-		test_setting3("16", 16);
-		auto test_setting4 = builder.options(config->graphics.msaa_samples);
-		test_setting4("Off", 1);
-		test_setting4("2", 2);
-		test_setting4("4", 4);
-		test_setting4("8", 8);
-		test_setting4("16", 16);
-		auto test_setting5 = builder.options(config->graphics.msaa_samples);
-		test_setting5("Off", 1);
-		test_setting5("2", 2);
-		test_setting5("4", 4);
-		test_setting5("8", 8);
+		builder.options(config->graphics.msaa_samples)
+				("Off", 1)
+				("2", 2)
+				("4", 4)
+				("8", 8)
+				("16", 16);
+		builder.options(config->graphics.msaa_samples)
+				("Off", 1)
+				("2", 2)
+				("4", 4)
+				("8", 8)
+				("16", 16);
+		builder.options(config->graphics.msaa_samples)
+				("Off", 1)
+				("2", 2)
+				("4", 4)
+				("8", 8);
+//		builder.options(config->graphics.af_samples)
+//				("Off", 1)
+//				("2", 2)
+//				("4", 4)
+//				("8", 8)
+//				("16", 16);
 
 		builder.number(config->development.test_setting);
 		builder.number(config->development.test_setting);
 		builder.number(config->development.test_setting);
 
-		auto test_setting0 = builder.options(config->development.test_setting);
-		test_setting0("Low", 0);
-		test_setting0("Medium", 1);
+		builder.options(config->development.test_setting)
+				("Low", 0)
+				("Medium", 1);
 
-		auto test_setting1 = builder.options(config->development.test_setting);
-		test_setting1("Low", 0);
-		test_setting1("Medium", 1);
-		test_setting1("High", 2);
+		builder.options(config->development.test_setting)
+				("Low", 0)
+				("Medium", 1)
+				("High", 2);
 
-		auto test_setting2 = builder.options(config->development.test_setting);
-		test_setting2("Low", 0);
-		test_setting2("Medium", 1);
-		test_setting2("High", 2);
-		test_setting2("Ultra", 2);
+		builder.options(config->development.test_setting)
+				("Low", 0)
+				("Medium", 1)
+				("High A", 2)
+				("High B", 2);
 
 		builder.restart_group();
 

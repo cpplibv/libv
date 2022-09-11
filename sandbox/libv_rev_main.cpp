@@ -254,7 +254,7 @@ struct Sandbox {
 		}
 		const auto mini_count = 16;
 		const auto mini_countf = static_cast<float>(mini_count);
-		for (int i = 0 ; i < mini_count; ++i) {
+		for (int i = 0; i < mini_count; ++i) {
 			const auto fi = static_cast<float>(i);
 			const auto guard_m2 = glr.model.push_guard();
 			glr.model.translate(static_cast<float>(window_size.x) * 0.9f + std::sin(running_time.count()) * 50.f, (0.5f + fi) / mini_countf * static_cast<float>(window_size.y), 0);

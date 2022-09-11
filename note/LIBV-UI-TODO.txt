@@ -72,11 +72,30 @@ libv.ui: Issue: In the ui sandbox 1 frame flicker on card removal | solved by sw
 
 
 
+libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
+libv.ui: Clip with stencil:
+		ui init
+			glEnable(GL_STENCIL_TEST);
+			glStencilMask(0xFF);
+
+		glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+		vertex only pass: GL_INCR the stencil on the clip region
+
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glStencilFunc(GL_GEQUAL, clipDepth++, 0xFF)
+		render every child
+
+		glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
+		vertex only pass: GL_DECR the stencil on the clip region
 
 libv.ui: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
 
 libv.ui: Allow focus not yet attached components
-libv.ui: Clicks into nothingness should clear focus | True, but define nothingness first
+libv.ui: Clicks into nothingness should clear focus
+		| True, but define nothingness first
+		| Callback/hook system for "unhandled" mouse click -> if noone would react to it -> clear focus
+
+libv.ui: Font subpixel options: OFF RGB BGR
 
 libv.ui: Stateify every UI component (minimal: hover and focus)
 		label
@@ -482,6 +501,8 @@ libv.ui: Idea: Zombie state, instead of keeping the dying component in their con
 		What issue could it cause?
 			? Maaaaaybe something around expecting it inside parent, but, even that
 
+libv.ui: Layout optimization: Some layout (like full and anchor) could handle layout invalidation independently, so if 1 child gets invalidated only that child gets to be relayouted
+
 
 --- "The" backlog ---
 
@@ -698,6 +719,29 @@ libv.ui.event: slot / signal flags could be unflagged if a disconnect leaves an 
 
 
 === PAPERS ========================================================================================
+
+
+Alternatives:
+		--- elements ---
+		https://github.dev/cycfi/elements
+			Composition and properties are based on a decorator pattern
+
+		Observations:
+
+		composition:
+			elements achieves good composition by a decorator pattern
+			in case of composite components (like slider) it uses memory local storage
+				with virtual functions to access parts
+				virtual & rail
+
+		elements have no property system, everything is composed via a decorator pattern
+
+		--- nana ---
+		https://github.com/cnjinhao/nana
+			Great event system API
+
+
+
 
 libv.ui: UI re-entering event loop problem and solution:
 	Solution event_reentry_guard:

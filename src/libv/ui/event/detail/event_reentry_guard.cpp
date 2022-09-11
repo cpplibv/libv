@@ -4,6 +4,7 @@
 #include <libv/ui/event/detail/event_reentry_guard.hpp>
 // pro
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/context/context_ui_link.hpp>
 
 
 namespace libv {
@@ -22,6 +23,10 @@ ReentryGuard::ReentryGuard(ContextUI& contextUI, const void* source, const void*
 ReentryGuard::~ReentryGuard() {
 	if (source_lock_owned)
 		contextUI.reentry_unlock(source);
+}
+
+[[nodiscard]] ReentryGuard event_reentry_guard(const void* source, const void* target) noexcept {
+	return ReentryGuard{libv::ui::current_thread_context(), source, target};
 }
 
 // -------------------------------------------------------------------------------------------------

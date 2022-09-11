@@ -43,8 +43,8 @@ public:
 	CardID add(Component component);
 	void add(CardID cardID, Component component); /// Add or reassigns the card
 //	[[nodiscard]] Component& getCard(CardID cardID);
-//	[[nodiscard]] CardID getActiveCardID();
 	void show(CardID cardID);
+	[[nodiscard]] CardID getActiveCardID();
 	void remove(Component& component);
 	void remove(std::string_view component_name);
 	void remove(CardID cardID);

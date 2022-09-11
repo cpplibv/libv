@@ -60,7 +60,7 @@ namespace ui {
 //	virtual void onMouseMovement(const EventMouseMovement& event) override;
 //	virtual void onMouseScroll(const EventMouseScroll& event) override;
 //
-//private:
+//protected:
 //	virtual void doAttach() override;
 //	virtual void doStyle(ContextStyle& ctx) override;
 //	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;

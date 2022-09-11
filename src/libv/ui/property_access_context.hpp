@@ -65,6 +65,8 @@ private:
 	template <typename Get>
 	using get_value_type_t = std::remove_cvref_t<decltype(std::declval<const Get&>()(std::declval<CoreOwner&>()))>;
 
+//	using handler_t = decltype(std::declval<CoreOwner>().handler());
+
 //	template <typename Access>
 //	static constexpr bool is_access_v = false;
 //	template <typename Access>
@@ -73,6 +75,20 @@ private:
 //	static constexpr bool is_set_v = false;
 //	template <typename Access>
 //	static constexpr bool is_get_v = false;
+
+public:
+	template <typename C, typename T>
+	[[nodiscard]] static constexpr inline auto handler_setter(void(C::*MemberFunc)(T)) noexcept {
+		return [MemberFunc](CoreOwner& c, auto v) {
+			(c.handler().*MemberFunc)(std::move(v));
+		};
+	}
+	template <typename C, typename T>
+	[[nodiscard]] static constexpr inline auto handler_getter(T(C::*MemberFunc)() const) noexcept {
+		return [MemberFunc](CoreOwner& c) {
+			return (c.handler().*MemberFunc)();
+		};
+	}
 
 public:
 	template <typename Access>

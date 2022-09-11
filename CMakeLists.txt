@@ -105,6 +105,13 @@ wish_compiler_flags(
 	GNU -std=c++23
 )
 
+#wish_linker_flags(
+#	BUILD_TYPE Release GNU -mwindows
+#)
+#add_link_options(
+#	-mwindows
+#)
+
 wish_optimization_flags()
 
 # Includes Directories -----------------------------------------------------------------------------
@@ -538,7 +545,6 @@ wish_create_external(
 	CMAKE_ARGS
 		-DJUST_INSTALL_VIDE=ON
 )
-
 
 # === Targets =====================================================================================
 

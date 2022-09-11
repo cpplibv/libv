@@ -41,7 +41,7 @@ public:
 	void remove(Component& component);
 	void clear();
 
-private:
+protected:
 	virtual void doRender(Renderer& r) override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;

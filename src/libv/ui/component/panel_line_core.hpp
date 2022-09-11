@@ -34,7 +34,7 @@ private:
 public:
 	using CoreBasePanel::CoreBasePanel;
 
-private:
+protected:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;

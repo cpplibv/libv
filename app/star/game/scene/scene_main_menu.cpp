@@ -26,6 +26,21 @@ libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
 	//libv::ui::PanelAnchor layers{"layers"};
 	libv::ui::PanelAnchor layers;
 
+	const auto menuEntry = [&gameClient](std::string name, auto createFn) {
+		libv::ui::Button btn;
+		btn.style("main-menu.menu.entry");
+		btn.text(std::move(name));
+
+		if constexpr (std::is_same_v<decltype(createFn), std::nullptr_t>)
+			btn.enable(false);
+		else
+			btn.event().submit.connect([&gameClient, createFn](libv::ui::Button& source) {
+						source.event().global.fire<SwitchPrimaryScene>(createFn(gameClient));
+					});
+
+		return btn;
+	};
+
 	{
 		libv::ui::PanelLine golden_line{"golden-line"};
 		golden_line.style("main-menu.golden-line");
@@ -48,60 +63,17 @@ libv::ui::Component createSceneMainMenu(GameClient& gameClient) {
 					lbl.style("main-menu.menu.title");
 					lbl.text("IRIS STAR");
 					menu_box.add(std::move(lbl));
+				}
 
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Single player");
-					btn.enable(false);
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Multiplayer");
-					btn.enable(false);
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Load");
-					btn.enable(false);
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Mods");
-//					btn.enable(false);
-					btn.event().submit.connect([] {
-		//				nexus.broadcast(ChangeScene(createSceneSettings()));
-					});
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Settings");
-					btn.event().submit.connect([&gameClient](libv::ui::Button& source) {
-						source.event().global.fire<SwitchPrimaryScene>(createSceneSettings(gameClient));
-					});
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Controls");
-					btn.event().submit.connect([&gameClient](libv::ui::Button& source) {
-						source.event().global.fire<SwitchPrimaryScene>(createSceneControls(gameClient));
-					});
-					menu_box.add(std::move(btn));
-				} {
-					libv::ui::Button btn;
-					btn.style("main-menu.menu.entry");
-					btn.text("Credits");
-					btn.enable(false);
-					btn.event().submit.connect([] {
-//						nexus.broadcast(RequestClientExit());
-					});
-					menu_box.add(std::move(btn));
-				} {
+				menu_box.add(menuEntry("Single player", nullptr));
+				menu_box.add(menuEntry("Multiplayer", nullptr));
+				menu_box.add(menuEntry("Load", nullptr));
+				menu_box.add(menuEntry("Mods", nullptr));
+				menu_box.add(menuEntry("Settings", createSceneSettings));
+				menu_box.add(menuEntry("Controls", createSceneControls));
+				menu_box.add(menuEntry("Credits", nullptr));
+
+				{
 					libv::ui::Button btn;
 					btn.style("main-menu.menu.entry");
 					btn.text("Exit");

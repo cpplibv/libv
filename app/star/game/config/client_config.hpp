@@ -27,16 +27,17 @@ struct ConfigGroupGameplay : BaseConfigGroup {
 };
 
 struct ConfigGroupGraphics : BaseConfigGroup {
-	ConfigEntry<int> window_size_x           {config, 1280, "window_size_x", "window_size_x desc"};
-	ConfigEntry<int> window_size_y           {config, 800, "window_size_y", "window_size_y desc"};
+	ConfigEntry<int32_t> window_size_x       {config, 1280, "window_size_x", "window_size_x desc"};
+	ConfigEntry<int32_t> window_size_y       {config, 800, "window_size_y", "window_size_y desc"};
 	ConfigEntry<bool> persist_window_size    {config, false, "persist_window_size", "persist_window_size desc"};
 
-	ConfigEntry<int> window_position_x       {config, 0, "window_position_x", "window_position_x desc"};
-	ConfigEntry<int> window_position_y       {config, 0, "window_position_y", "window_position_y desc"};
+	ConfigEntry<int32_t> window_position_x   {config, 0, "window_position_x", "window_position_x desc"};
+	ConfigEntry<int32_t> window_position_y   {config, 0, "window_position_y", "window_position_y desc"};
 	ConfigEntry<bool> persist_window_position{config, false, "persist_window_position", "persist_window_position desc"};
 
 	ConfigEntry<bool> vsync_enable           {config, true, "VSync Enable", "Enable/Disable VSync"};
-	ConfigEntry<int> msaa_samples            {config, 4, "MSAA Samples", "Number of MSAA samples"};
+	ConfigEntry<int32_t> msaa_samples        {config, 4, "MSAA Samples", "Number of MSAA samples"};
+//	ConfigEntry<int32_t> af_samples          {config, 16, "AF Samples", "Number of anisotropic filter samples"};
 
 	template <typename Archive> void serialize(Archive& ar) {
 		ar.nvp("window_size_x", window_size_x);
@@ -49,6 +50,9 @@ struct ConfigGroupGraphics : BaseConfigGroup {
 
 		ar.nvp("vsync_enable", vsync_enable);
 		ar.nvp("msaa_samples", msaa_samples);
+//		ar.nvp("af_samples", af_samples);
+//		if (ar.scope_version() >= 3)
+//			ar.nvp("af_samples", af_samples);
 	}
 };
 
@@ -65,11 +69,10 @@ struct ConfigGroupSounds : BaseConfigGroup {
 };
 
 struct ConfigGroupDevelopment : BaseConfigGroup {
-
 	ConfigEntry<bool> logging_trace_ui{config, false, "Logging: UI Trace", "Enable/Disable UI Trace logging"};
 	ConfigEntry<bool> always_on_top{config, false, "Always On Top", "Enable/Disable always on top window setting on start"};
 
-	ConfigEntry<int> test_setting            {config, 1, "test_setting", "test_setting desc"};
+	ConfigEntry<int32_t> test_setting        {config, 1, "test_setting", "test_setting desc"};
 	ConfigEntry<std::string> test_setting_str{config, "Test string default content", "test_setting_str", "test_setting str desc"};
 
 	template <typename Archive> void serialize(Archive& ar) {
@@ -99,6 +102,7 @@ public:
 		else {
 			int32_t _input_version;
 			ar.nvp("config_version", _input_version);
+//			ar.scope_version(_input_version);
 		}
 		// ar.version_constant("config_version", config_version);
 		// ar.constant("config_version", config_version);

@@ -183,6 +183,11 @@ public:
 
 public:
 	template <typename F>
+	void subscribe(const void* slotPtr, F&& callback) {
+		config.nexus().connect_channel<Change>(this, slotPtr, std::forward<F>(callback));
+	}
+
+	template <typename F>
 	void subscribe_and_call(const void* slotPtr, F&& callback) {
 		config.nexus().connect_channel_and_call<Change>(this, slotPtr, std::forward<F>(callback), Change{*this});
 	}

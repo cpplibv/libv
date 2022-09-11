@@ -173,8 +173,9 @@ void PanelCard::show(CardID cardID) {
 	self().fire(EventPanelCardChange{{}, prevCardID, nextCardID});
 }
 
-//void PanelCard::show(Component component) {
-//}
+CardID PanelCard::getActiveCardID() {
+	return self().activeCardID;
+}
 
 static inline void aux_remove(CorePanelCard& self, auto cardIt) {
 	const auto cardID = cardIt->first;

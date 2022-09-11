@@ -92,6 +92,15 @@ struct EventHostUI : EventHostGlobal<ComponentT> {
 
 // -------------------------------------------------------------------------------------------------
 
+struct EventSelectionGroupChange : BaseEvent {};
+
+template <typename ComponentT>
+struct EventHostSelectionGroup : EventHostGlobal<ComponentT> {
+	BasicEventProxy<ComponentT, EventSelectionGroupChange> change{this->owner};
+};
+
+// -------------------------------------------------------------------------------------------------
+
 template <typename ComponentT>
 struct EventHostGeneral : EventHostGlobal<ComponentT> {
 	BasicEventProxy<ComponentT, EventChar> char_{this->owner};

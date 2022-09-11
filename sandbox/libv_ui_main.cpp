@@ -2,9 +2,11 @@
 
 // libv
 #include <libv/frame/frame.hpp>
+#include <libv/log/log.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/write_file.hpp>
 //#include <libv/input/event.hpp>
 //#include <libv/input/input.hpp>
-#include <libv/log/log.hpp>
 //#include <libv/parse/color.hpp>
 // std
 #include <iostream>
@@ -19,8 +21,10 @@
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
+#include <libv/ui/component/selection_group.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
+#include <libv/ui/component/toggle_button.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
@@ -33,6 +37,7 @@
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
+constexpr inline std::string_view configFilePath = "bin/sandbox.libv_ui.config";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -129,6 +134,14 @@ public:
 	void selectTab(libv::ui::CardID cardID) {
 		body.show(cardID);
 	}
+
+	[[nodiscard]] libv::ui::CardID selectedTab() {
+		return body.getActiveCardID();
+	}
+
+	[[nodiscard]] int numTab() {
+		return static_cast<int>(mappingToTabButtons.size());
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -169,352 +182,467 @@ private:
 	libv::ui::ScrollArea scroll_area_inner;
 	libv::ui::PanelStatusLine status_log;
 
-public:
-	SandboxFrame() :
-			Frame("UI Sandbox", 1280, 800) {
-		setPosition(FramePosition::center_current_monitor);
-		setOpenGLProfile(OpenGLProfile::core);
-		setOpenGLVersion(3, 3);
-		setOpenGLSamples(OpenGLSamples{4});
-		ui.attach(*this);
+	// --- Buttons -------------------------------------------------------------------------------------
 
-		{ // =================================================================================================
+	auto createTabButtons() {
+		libv::ui::PanelLine card{"card-buttons-root"};
 
-			button.text("Hello World!");
-			button.event().submit([](const libv::ui::EventSubmit&) {
-				log_sandbox.info("Button submitted");
-			});
-			button.event().submit([](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
-				(void) event;
-				log_sandbox.info("Button pressed {}", component.path());
-				component.text(component.text() + ".");
-				event.stop_propagation(); // stop propagation so 'connect' handler is not called
-			});
-			button.event().submit.connect([](const libv::ui::EventSubmit&) {
-				log_sandbox.info("connect"); // never called as propagation in stopped
-			});
-			button.event().submit.connect_system([](const libv::ui::EventSubmit&) {
-				log_sandbox.info("connect_system"); // always called as system handler
-			});
-			button.event().submit.connect_system_front([](const libv::ui::EventSubmit&) {
-				log_sandbox.info("connect_system_front"); // always called as system handler
-			});
+		libv::ui::PanelLine line{"card-buttons-line"};
+//		line.size(libv::ui::parse_size_or_throw("250px, 300px"));
+		line.orientation(libv::ui::Orientation::down);
+		line.anchor(libv::ui::Anchor::center_center);
+		line.spacing(10);
+		line.padding(10);
+		card.add(line);
 
-			button0.text("Button 0!");
-			button1.text("Button 1!");
-			button1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+//		libv::ui::Label label;
+//		label.text("Buttons");
+//		label.align_vertical(libv::ui::AlignVertical::center);
+//		label.align_horizontal(libv::ui::AlignHorizontal::center);
+//		line.add(label);
 
-			button2.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
-			button2.text("Button 2!");
-			button2.anchor(libv::ui::Anchor::top_left);
-			button2.size(libv::ui::parse_size_or_throw("33%, 33%"));
+		libv::ui::Button button0;
+		button0.text("Normal");
+		button0.padding(10);
+		line.add(button0);
 
-			button3.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
-			button3.text("Button 3!");
-			button3.anchor(libv::ui::Anchor::bottom_right);
-			button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
+		libv::ui::ToggleButton button1;
+		button1.text_on("Toggle: ON");
+		button1.text_off("Toggle: OFF");
+		button1.padding(10);
+		line.add(button1);
 
-			button4.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
-			button4.text("Button 4!");
-			button4.size(libv::ui::parse_size_or_throw("D, D"));
-			button4.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+		// ---
 
-			label.text("Label");
-			label.align_horizontal(libv::ui::AlignHorizontal::center);
-			label.align_vertical(libv::ui::AlignVertical::center);
+		libv::ui::PanelLine row0{"card-buttons-row0"};
+		row0.orientation(libv::ui::Orientation::right);
+		row0.spacing(10);
+		line.add(row0);
 
-			label_image1.text("Label image");
-			label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.0f}, ui.context().texture2D("separator_bar_256x16.png")));
+		libv::ui::ToggleButton g1Button0;
+		g1Button0.text_on("G1 Option A: ON");
+		g1Button0.text_off("G1 Option A: OFF");
+		g1Button0.padding(10);
+		row0.add(g1Button0);
 
-			label_image2.text("Label image2");
-			label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 0.5f}, ui.context().texture2D("separator_bar_256x16.png")));
+		libv::ui::ToggleButton g1Button1;
+		g1Button1.text_on("G1 Option B: ON");
+		g1Button1.text_off("G1 Option B: OFF");
+		g1Button1.padding(10);
+		row0.add(g1Button1);
 
-			image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
-			image.size(libv::ui::parse_size_or_throw("25%, 50px"));
+		libv::ui::ToggleButton g1Button2;
+		g1Button2.text_on("G1 Option C: ON");
+		g1Button2.text_off("G1 Option C: OFF");
+		g1Button2.padding(10);
+		row0.add(g1Button2);
 
-			input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
-			input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
-			input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		libv::ui::SelectionGroup<std::string> group1;
+		group1.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
+			log_sandbox.info_if(group.has_value(), "Group1 change: {}", group.value());
+			log_sandbox.info_if(!group.has_value(), "Group1 has no value");
+		});
+		group1.add(g1Button0, "G1:A");
+		group1.add(g1Button1, "G1:B");
+		group1.add(g1Button2, "G1:C");
 
-			input_field0.text("Input field 0");
-			input_field0.event().change([](auto& component, const auto&) {
-				log_sandbox.info("Input field 0 {} changed to {}", component.path(), component.text());
-			});
-			input_field0.event().caret([](auto& component, const auto&) {
-				log_sandbox.info("Input field 0 {} caret moved to {}", component.path(), component.caret());
-			});
-			input_field0.event().submit([](auto& component, const auto&) {
-				log_sandbox.info("Input field 0 {} submitted", component.path());
-			});
-			input_field0.size(libv::ui::parse_size_or_throw("D, 50px"));
-			//		input_field0.size(libv::ui::parse_size_or_throw("D, D")); // <<< P92: cascades nan
+		// ---
 
-			input_field1.text("Input field 1 line 1\nInput field 1 line 2\nInput field 1 line 3\nInput field 1 line 4\nInput field 1 line 5");
-			input_field1.event().change([](auto& component, const auto&) {
-				log_sandbox.info("Input field 1 {} changed to {}", component.path(), component.text());
-			});
-			input_field1.event().caret([](auto& component, const auto&) {
-				log_sandbox.info("Input field 1 {} caret moved to {}", component.path(), component.caret());
-			});
-			input_field1.event().submit([](auto& component, const auto&) {
-				log_sandbox.info("Input field 1 {} submitted", component.path());
-			});
-			input_field1.size(libv::ui::parse_size_or_throw("D, D"));
+		libv::ui::PanelLine row1{"card-buttons-row1"};
+		row1.orientation(libv::ui::Orientation::right);
+		row1.spacing(10);
+		line.add(row1);
 
-			input_field2.text("Input field 2");
-			input_field2.event().change([](auto& component, const auto&) {
-				log_sandbox.info("Input field 2 {} changed to {}", component.path(), component.text());
-			});
-			input_field2.event().caret([](auto& component, const auto&) {
-				log_sandbox.info("Input field 2 {} caret moved to {}", component.path(), component.caret());
-			});
-			input_field2.event().submit([](auto& component, const auto&) {
-				log_sandbox.info("Input field 2 {} submitted", component.path());
-			});
-			input_field2.size(libv::ui::parse_size_or_throw("D, D"));
+		libv::ui::ToggleButton g2Button0;
+		g2Button0.text_on("G2 Option A: ON");
+		g2Button0.text_off("G2 Option A: OFF");
+		g2Button0.padding(10);
+		row1.add(g2Button0);
 
-			stretch.background(libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("stretch_border.png")));
+		libv::ui::ToggleButton g2Button1;
+		g2Button1.text_on("G2 Option B: ON");
+		g2Button1.text_off("G2 Option B: OFF");
+		g2Button1.padding(10);
+		row1.add(g2Button1);
 
-			quad.background(libv::ui::Background::color({.8f, .5f, .5f, 1.f}));
-			quad.anchor(libv::ui::Anchor::center_center);
-			quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
+		libv::ui::ToggleButton g2Button2;
+		g2Button2.text_on("G2 Option C: ON");
+		g2Button2.text_off("G2 Option C: OFF");
+		g2Button2.padding(10);
+		row1.add(g2Button2);
 
-			panel_line_scrolled.orientation(libv::ui::Orientation::down);
-			panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
+		libv::ui::SelectionGroup<std::string> group2;
+		group2.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
+			log_sandbox.info_if(group.has_value(), "Group2 change: {}", group.value());
+			log_sandbox.info_if(!group.has_value(), "Group2 has no value");
+		});
+		group2.add(g2Button0, "G2:A");
+		group2.add(g2Button1, "G2:B", true);
+		group2.add(g2Button2, "G2:C");
 
-			scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
-			scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
-			scroll_bar_x.orientation(libv::ui::Orientation::right);
-			scroll_bar_x.value_min(-500);
-			scroll_bar_x.value_max(500);
-			scroll_bar_x.value(0);
-			scroll_bar_x.event().change([this](auto& component, const auto& event) {
-				log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
-				scroll_area_outer.area_position({static_cast<float>(component.value()), scroll_area_outer.area_position().y});
-			});
+		// Overlapping selection groups are just chaos event graph wise, Skip for now
+		//		libv::ui::SelectionGroup<std::string> groupC;
+		//		group2.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
+		//			log_sandbox.info_if(group.has_value(), "GroupC change: {}", group.value());
+		//			log_sandbox.info_if(!group.has_value(), "GroupC has no value");
+		//		});
+		//		group2.add(g1Button2, "GC:G1:C");
+		//		group2.add(g2Button2, "GC:G2:C");
 
-			scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
-			scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
-			scroll_bar_y.orientation(libv::ui::Orientation::up);
-			scroll_bar_y.value_min(-1000);
-			scroll_bar_y.value_max(1000);
-			scroll_bar_y.value(0);
-			scroll_bar_y.event().change([this](auto& component, const auto& event) {
-				log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
-				scroll_area_outer.area_position({scroll_area_outer.area_position().x, static_cast<float>(component.value())});
-			});
+		return card;
+	}
 
-			scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
-			scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
-			scroll_bar_ix.orientation(libv::ui::Orientation::right);
-			scroll_bar_ix.value_min(-500);
-			scroll_bar_ix.value_max(500);
-			scroll_bar_ix.value(0);
-			scroll_bar_ix.event().change([this](auto& component, const auto& event) {
-				log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
-				scroll_area_inner.area_position({static_cast<float>(component.value()), scroll_area_inner.area_position().y});
-			});
+	// --- Cards ---------------------------------------------------------------------------------------
 
-			scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
-			scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
-			scroll_bar_iy.orientation(libv::ui::Orientation::up);
-			scroll_bar_iy.value_min(-1000);
-			scroll_bar_iy.value_max(1000);
-			scroll_bar_iy.value(0);
-			scroll_bar_iy.event().change([this](auto& component, const auto& event) {
-				log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
-				scroll_area_inner.area_position({scroll_area_inner.area_position().x, static_cast<float>(component.value())});
-			});
-
-			scroll_area_outer.content(panel_line_scrolled);
-			scroll_area_outer.mode(libv::ui::ScrollAreaMode::vertical);
-			scroll_area_outer.size(libv::ui::parse_size_or_throw("50%, 3r"));
-			scroll_area_outer.anchor(libv::ui::Anchor::center_center);
-			scroll_area_outer.event().area([](auto& component, const auto& event) {
-				log_sandbox.info("Scroll area outer size {} changed to {}", event.old_size, component.area_size());
-			});
-
-			scroll_area_inner.content(input_field1);
-			scroll_area_inner.mode(libv::ui::ScrollAreaMode::vertical);
-			scroll_area_inner.size(libv::ui::parse_size_or_throw("50%, 50px"));
-			scroll_area_inner.anchor(libv::ui::Anchor::center_center);
-
-			{
-				libv::ui::Label tmp;
-				tmp.text(
-						"And I will strike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
-						"And I will strike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
-						"And I will strike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
-						"And I will strike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
-				);
-				tmp.size(libv::ui::parse_size_or_throw("D, D"));
-				panel_line_scrolled.add(tmp);
-			}
-			panel_line_scrolled.add(scroll_area_inner);
-			//		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
-			//		panel_line_scrolled.anchor(libv::ui::Anchor::bottom_right);
-			panel_line_scrolled.add(input_field2);
-			panel_line_scrolled.add(button4);
-			{
-				libv::ui::Label tmp;
-				tmp.text(
-						"222222222222trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
-						"222222222222trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
-						"222222222222trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
-						"222222222222trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
-				);
-				tmp.size(libv::ui::parse_size_or_throw("D, D"));
-				panel_line_scrolled.add(tmp);
-			}
-			{
-				libv::ui::Label tmp;
-				tmp.text(
-						"333333333333trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
-						"333333333333trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
-						"333333333333trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
-						"333333333333trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
-				);
-				tmp.size(libv::ui::parse_size_or_throw("D, D"));
-				panel_line_scrolled.add(tmp);
-			}
-			panel_line_scrolled.add(image);
-
-			status_log.orientation(libv::ui::Orientation::down);
-
-			button3.event().submit([this] {
-				if (button3.anchor() != libv::ui::Anchor::center_center)
-					button3.anchor(libv::ui::Anchor::center_center);
-				else
-					button3.anchor(libv::ui::Anchor::bottom_right);
-			});
-
-			button5.text("Fill status log");
-			button5.align_horizontal(libv::ui::AlignHorizontal::center);
-			button5.align_vertical(libv::ui::AlignVertical::center);
-			button5.event().submit(status_log, [this] {
-				for (int i = 0 ; i < 5 ; ++i) {
-					const auto t = std::chrono::seconds(i + 1);
-					libv::ui::Button tmp;
-					tmp.background(libv::ui::Background::color({0.7f, 0.7f, 0.5f, 1.0f}));
-					tmp.align_horizontal(libv::ui::AlignHorizontal::center);
-					tmp.align_vertical(libv::ui::AlignVertical::center);
-					//				tmp.size(libv::ui::parse_size_or_throw("150px, 10px"));
-					tmp.margin({static_cast<float>(i) * 15.f, 1, static_cast<float>(i) * 15.f, 3});
-					tmp.text(fmt::format("Status entry {} for {}s", i, t.count()));
-					tmp.event().submit([](libv::ui::Button& btn) {
-						btn.markRemove();
-					});
-					status_log.add(i, tmp, t);
-				}
-			});
-
-			panel_full.add(button1);
-
-			panel_anchor.add(button2);
-			panel_anchor.add(button3);
-
-			panel_grid.column_count(5);
-			panel_grid.padding({5, 5, 5, 10});
-			//		panel_grid.padding({5, 5, 5, 50});
-			//		panel_grid.padding({5, 5, 5, 5});
-			panel_grid.orientation2(libv::ui::Orientation2::right_down);
-			panel_grid.spacing2(libv::ui::Spacing2{1, 2});
-			panel_grid.size(libv::ui::parse_size_or_throw("1r, 3r"));
-
-			panel_grid.add(button0);
-			panel_grid.add(panel_full);
-			panel_grid.add(panel_anchor);
-			panel_grid.add(input_field0);
-			panel_grid.add(label_image1);
-			panel_grid.add(quad);
-			panel_grid.add(stretch);
-			panel_grid.add(scroll_bar_x);
-			panel_grid.add(scroll_bar_y);
-			panel_grid.add(scroll_bar_ix);
-			panel_grid.add(scroll_bar_iy);
-			panel_grid.add(label);
-			panel_grid.add(button5);
-
-			panel_line.orientation(libv::ui::Orientation::down);
-			//		panel_line.orientation(libv::ui::Orientation::up);
-			panel_line.padding({20, 10, 20, 10});
-			//		panel_line.padding({5, 5, 5, 5});
-			panel_line.spacing(libv::ui::Spacing{6});
-			//		panel_line.spacing(libv::ui::Spacing{2});
-			panel_line.add(panel_grid);
-			panel_line.add(status_log);
-			panel_line.add(button);
-			panel_line.add(scroll_area_outer);
-			panel_line.add(label_image2);
-
-			struct State {
-				libv::ui::PanelLine component;
-
-				explicit State(libv::ui::PanelLine component) :
-						component(std::move(component)) {
-				}
-			};
-			libv::ui::attach_state<State>(panel_line)(panel_line);
-
-			tabs.addTab("Legacy", panel_line);
-
-		}
-		{ // ===============================================================================================
-
-			// TODO P1: attach_state<Tabs> is abused here, make tabs into a component
+	auto createTabCards() {
+		// TODO P1: attach_state<Tabs> is abused here, make tabs into a component
 //			auto& cardTabs = libv::ui::attach_state<Tabs>(page)();
-			auto& cardTabs = libv::ui::attach_state<Tabs>(tabs.main)("cards");
+		auto& cardTabs = libv::ui::attach_state<Tabs>(tabs.main)("cards");
 
-			for (int i = 0 ; i < 10 ; ++i) {
-				libv::ui::PanelLine line{fmt::format("CardLine{}", i)};
-				line.orientation(libv::ui::Orientation::down);
-				const auto cardID = cardTabs.addTab(fmt::format("Card #{}", i), line);
+		for (int i = 0; i < 10; ++i) {
+			libv::ui::PanelLine line{fmt::format("CardLine{}", i)};
+			line.orientation(libv::ui::Orientation::down);
+			const auto cardID = cardTabs.addTab(fmt::format("Card #{}", i), line);
 
-				libv::ui::Button closeBtn{fmt::format("closeBtn", i)};
-				closeBtn.align_horizontal(libv::ui::AlignHorizontal::center);
-				closeBtn.align_vertical(libv::ui::AlignVertical::center);
-				closeBtn.text(fmt::format("Close card #{}", i));
-				closeBtn.event().submit.connect([&cardTabs, cardID, i] {
-					cardTabs.removeTab(cardID);
-					log_sandbox.info("Close requested for tab: {}", i);
-				});
-				line.add(closeBtn);
+			libv::ui::Button closeBtn{fmt::format("closeBtn", i)};
+			closeBtn.align_horizontal(libv::ui::AlignHorizontal::center);
+			closeBtn.align_vertical(libv::ui::AlignVertical::center);
+			closeBtn.text(fmt::format("Close card #{}", i));
+			closeBtn.event().submit.connect([&cardTabs, cardID, i] {
+				cardTabs.removeTab(cardID);
+				log_sandbox.info("Close requested for tab: {}", i);
+			});
+			line.add(closeBtn);
 
-				libv::ui::Label lbl{fmt::format("lbl", i)};
-				lbl.align_horizontal(libv::ui::AlignHorizontal::center);
-				lbl.align_vertical(libv::ui::AlignVertical::center);
-				lbl.font_color({1, 1, 1, 1});
-				lbl.text(fmt::format("Panel card #{}", i));
-				line.add(lbl);
-			}
-
-			auto cardID = tabs.addTab("Card layout", cardTabs.main);
-			tabs.selectTab(cardID);
-
-		}
-		{ // ===============================================================================================
-
-			libv::ui::PanelLine card{"Tab#3"};
-
-			libv::ui::Label lbl;
-			lbl.text("Most of the important things in the world have been accomplished by people who\nhave kept on trying when there seemed to be no hope at all. (Dale Carnegie)");
+			libv::ui::Label lbl{fmt::format("lbl", i)};
 			lbl.align_horizontal(libv::ui::AlignHorizontal::center);
 			lbl.align_vertical(libv::ui::AlignVertical::center);
 			lbl.font_color({1, 1, 1, 1});
-			card.add(std::move(lbl));
-
-			tabs.addTab("Tab #3", card);
-
+			lbl.text(fmt::format("Panel card #{}", i));
+			line.add(lbl);
 		}
-		{ // ===============================================================================================
 
-			libv::ui::PanelLine card;
-			tabs.addTab("Empty Tab", card);
+		return cardTabs.main;
+	}
+
+	// --- Tab 3 ---------------------------------------------------------------------------------------
+
+	auto createTab3() {
+		libv::ui::PanelLine card{"Tab#3"};
+
+		libv::ui::Label lbl;
+		lbl.text("«Nothing is true; everything is permitted»\n"
+				 "\n"
+				 "Most of the important things in the world have been accomplished by people who\n"
+				 "have kept on trying when there seemed to be no hope at all.");
+		lbl.align_horizontal(libv::ui::AlignHorizontal::center);
+		lbl.align_vertical(libv::ui::AlignVertical::center);
+		lbl.font_color({1, 1, 1, 1});
+		card.add(std::move(lbl));
+
+		return card;
+	}
+
+	// --- Legacy --------------------------------------------------------------------------------------
+
+	auto createTabLegacy() {
+		button.text("Hello World!");
+		button.event().submit([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("Button submitted");
+		});
+		button.event().submit([](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
+			(void) event;
+			log_sandbox.info("Button pressed {}", component.path());
+			component.text(component.text() + ".");
+			event.stop_propagation(); // stop propagation so 'connect' handler is not called
+		});
+		button.event().submit.connect([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect"); // never called as propagation in stopped
+		});
+		button.event().submit.connect_system([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect_system"); // always called as system handler
+		});
+		button.event().submit.connect_system_front([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect_system_front"); // always called as system handler
+		});
+
+		button0.text("Button 0!");
+		button1.text("Button 1!");
+		button1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+
+		button2.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
+		button2.text("Button 2!");
+		button2.anchor(libv::ui::Anchor::top_left);
+		button2.size(libv::ui::parse_size_or_throw("33%, 33%"));
+
+		button3.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
+		button3.text("Button 3!");
+		button3.anchor(libv::ui::Anchor::bottom_right);
+		button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
+
+		button4.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
+		button4.text("Button 4!");
+		button4.size(libv::ui::parse_size_or_throw("D, D"));
+		button4.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+
+		label.text("Label");
+		label.align_horizontal(libv::ui::AlignHorizontal::center);
+		label.align_vertical(libv::ui::AlignVertical::center);
+
+		label_image1.text("Label image");
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.0f}, ui.context().texture2D("separator_bar_256x16.png")));
+
+		label_image2.text("Label image2");
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 0.5f}, ui.context().texture2D("separator_bar_256x16.png")));
+
+		image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
+
+		input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+
+		input_field0.text("Input field 0");
+		input_field0.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} changed to {}", component.path(), component.text());
+		});
+		input_field0.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field0.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} submitted", component.path());
+		});
+		input_field0.size(libv::ui::parse_size_or_throw("D, 50px"));
+		//		input_field0.size(libv::ui::parse_size_or_throw("D, D")); // <<< P92: cascades nan
+
+		input_field1.text("Input field 1 line 1\nInput field 1 line 2\nInput field 1 line 3\nInput field 1 line 4\nInput field 1 line 5");
+		input_field1.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} changed to {}", component.path(), component.text());
+		});
+		input_field1.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field1.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} submitted", component.path());
+		});
+		input_field1.size(libv::ui::parse_size_or_throw("D, D"));
+
+		input_field2.text("Input field 2");
+		input_field2.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} changed to {}", component.path(), component.text());
+		});
+		input_field2.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field2.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} submitted", component.path());
+		});
+		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
+
+		stretch.background(libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("stretch_border.png")));
+
+		quad.background(libv::ui::Background::color({.8f, .5f, .5f, 1.f}));
+		quad.anchor(libv::ui::Anchor::center_center);
+		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
+
+		panel_line_scrolled.orientation(libv::ui::Orientation::down);
+		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
+
+		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
+		scroll_bar_x.orientation(libv::ui::Orientation::right);
+		scroll_bar_x.value_min(-500);
+		scroll_bar_x.value_max(500);
+		scroll_bar_x.value(0);
+		scroll_bar_x.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_outer.area_position({static_cast<float>(component.value()), scroll_area_outer.area_position().y});
+		});
+
+		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
+		scroll_bar_y.orientation(libv::ui::Orientation::up);
+		scroll_bar_y.value_min(-1000);
+		scroll_bar_y.value_max(1000);
+		scroll_bar_y.value(0);
+		scroll_bar_y.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_outer.area_position({scroll_area_outer.area_position().x, static_cast<float>(component.value())});
+		});
+
+		scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
+		scroll_bar_ix.orientation(libv::ui::Orientation::right);
+		scroll_bar_ix.value_min(-500);
+		scroll_bar_ix.value_max(500);
+		scroll_bar_ix.value(0);
+		scroll_bar_ix.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_inner.area_position({static_cast<float>(component.value()), scroll_area_inner.area_position().y});
+		});
+
+		scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
+		scroll_bar_iy.orientation(libv::ui::Orientation::up);
+		scroll_bar_iy.value_min(-1000);
+		scroll_bar_iy.value_max(1000);
+		scroll_bar_iy.value(0);
+		scroll_bar_iy.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_inner.area_position({scroll_area_inner.area_position().x, static_cast<float>(component.value())});
+		});
+
+		scroll_area_outer.content(panel_line_scrolled);
+		scroll_area_outer.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_outer.size(libv::ui::parse_size_or_throw("50%, 3r"));
+		scroll_area_outer.anchor(libv::ui::Anchor::center_center);
+		scroll_area_outer.event().area([](auto& component, const auto& event) {
+			log_sandbox.info("Scroll area outer size {} changed to {}", event.old_size, component.area_size());
+		});
+
+		scroll_area_inner.content(input_field1);
+		scroll_area_inner.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_inner.size(libv::ui::parse_size_or_throw("50%, 50px"));
+		scroll_area_inner.anchor(libv::ui::Anchor::center_center);
+
+		{
+			libv::ui::Label tmp;
+			tmp.text(
+					"And I will strike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+					"And I will strike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+					"And I will strike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+					"And I will strike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
 		}
+		panel_line_scrolled.add(scroll_area_inner);
+		//		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
+		//		panel_line_scrolled.anchor(libv::ui::Anchor::bottom_right);
+		panel_line_scrolled.add(input_field2);
+		panel_line_scrolled.add(button4);
+		{
+			libv::ui::Label tmp;
+			tmp.text(
+					"222222222222trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+					"222222222222trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+					"222222222222trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+					"222222222222trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
+		}
+		{
+			libv::ui::Label tmp;
+			tmp.text(
+					"333333333333trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+					"333333333333trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+					"333333333333trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+					"333333333333trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
+		}
+		panel_line_scrolled.add(image);
+
+		status_log.orientation(libv::ui::Orientation::down);
+
+		button3.event().submit([this] {
+			if (button3.anchor() != libv::ui::Anchor::center_center)
+				button3.anchor(libv::ui::Anchor::center_center);
+			else
+				button3.anchor(libv::ui::Anchor::bottom_right);
+		});
+
+		button5.text("Fill status log");
+		button5.align_horizontal(libv::ui::AlignHorizontal::center);
+		button5.align_vertical(libv::ui::AlignVertical::center);
+		button5.event().submit(status_log, [this] {
+			for (int i = 0; i < 5; ++i) {
+				const auto t = std::chrono::seconds(i + 1);
+				libv::ui::Button tmp;
+				tmp.background(libv::ui::Background::color({0.7f, 0.7f, 0.5f, 1.0f}));
+				tmp.align_horizontal(libv::ui::AlignHorizontal::center);
+				tmp.align_vertical(libv::ui::AlignVertical::center);
+				//				tmp.size(libv::ui::parse_size_or_throw("150px, 10px"));
+				tmp.margin({static_cast<float>(i) * 15.f, 1, static_cast<float>(i) * 15.f, 3});
+				tmp.text(fmt::format("Status entry {} for {}s", i, t.count()));
+				tmp.event().submit([](libv::ui::Button& btn) {
+					btn.markRemove();
+				});
+				status_log.add(i, tmp, t);
+			}
+		});
+
+		panel_full.add(button1);
+
+		panel_anchor.add(button2);
+		panel_anchor.add(button3);
+
+		panel_grid.column_count(5);
+		panel_grid.padding({5, 5, 5, 10});
+		//		panel_grid.padding({5, 5, 5, 50});
+		//		panel_grid.padding({5, 5, 5, 5});
+		panel_grid.orientation2(libv::ui::Orientation2::right_down);
+		panel_grid.spacing2(libv::ui::Spacing2{1, 2});
+		panel_grid.size(libv::ui::parse_size_or_throw("1r, 3r"));
+
+		panel_grid.add(button0);
+		panel_grid.add(panel_full);
+		panel_grid.add(panel_anchor);
+		panel_grid.add(input_field0);
+		panel_grid.add(label_image1);
+		panel_grid.add(quad);
+		panel_grid.add(stretch);
+		panel_grid.add(scroll_bar_x);
+		panel_grid.add(scroll_bar_y);
+		panel_grid.add(scroll_bar_ix);
+		panel_grid.add(scroll_bar_iy);
+		panel_grid.add(label);
+		panel_grid.add(button5);
+
+		panel_line.orientation(libv::ui::Orientation::down);
+		//		panel_line.orientation(libv::ui::Orientation::up);
+		panel_line.padding({20, 10, 20, 10});
+		//		panel_line.padding({5, 5, 5, 5});
+		panel_line.spacing(libv::ui::Spacing{6});
+		//		panel_line.spacing(libv::ui::Spacing{2});
+		panel_line.add(panel_grid);
+		panel_line.add(status_log);
+		panel_line.add(button);
+		panel_line.add(scroll_area_outer);
+		panel_line.add(label_image2);
+
+		struct State {
+			libv::ui::PanelLine component;
+
+			explicit State(libv::ui::PanelLine component) :
+					component(std::move(component)) {
+			}
+		};
+		libv::ui::attach_state<State>(panel_line)(panel_line);
+
+		return panel_line;
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+public:
+	SandboxFrame() :
+			Frame("UI Sandbox", 1680, 1050) {
+		setPosition(FramePosition::center_current_monitor);
+		setOpenGLProfile(OpenGLProfile::core);
+		setOpenGLVersion(4, 5);
+		setOpenGLSamples(OpenGLSamples{4});
+		ui.attach(*this);
+
+		tabs.addTab("Empty Tab", libv::ui::PanelLine());
+		tabs.addTab("Buttons", createTabButtons());
+		tabs.addTab("Card layout", createTabCards());
+		tabs.addTab("Tab #3", createTab3());
+		tabs.addTab("Legacy", createTabLegacy());
 
 		ui.add(tabs.main);
-
-		// ===================================================================================================
 
 //		This was a test case for padding_pattern background
 
@@ -872,10 +1000,33 @@ public:
 //			log_sandbox.trace("Append string {}", e.utf8);
 //			label.text(label.text() + e.utf8);
 //		});
+
+		loadConfig();
 	}
 
 	~SandboxFrame() {
+		saveConfig();
 		disconnectAll();
+	}
+
+	void loadConfig() {
+		const auto config_result = libv::read_file_ec(configFilePath);
+		if (config_result.ec == std::errc::no_such_file_or_directory)
+			return;
+		else if (config_result.ec)
+			throw std::system_error(config_result.ec);
+
+		const auto card_id = libv::ui::CardID{std::stoi(config_result.data)};
+
+		log_sandbox.trace("Loaded config with CardID {}", libv::to_underlying(card_id));
+		if (libv::to_underlying(card_id) < tabs.numTab())
+			tabs.selectTab(card_id);
+	}
+
+	void saveConfig() {
+		const auto card_id = tabs.selectedTab();
+		const auto config_str = std::to_string(libv::to_underlying(card_id));
+		libv::write_file_or_throw(configFilePath, config_str);
 	}
 };
 

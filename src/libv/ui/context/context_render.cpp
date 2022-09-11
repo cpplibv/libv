@@ -506,8 +506,10 @@ void Renderer::quad(libv::vec2f pos, libv::vec2f size, libv::vec4f color, const 
 }
 
 void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader) {
-	const auto& vd = text_.vertices_data();
+	text(pos, text_.vertices_data(), font, color, shader);
+}
 
+void Renderer::text(libv::vec2f pos, const TextLayoutData& vd, const Font2D_view& font, libv::vec4f color, const ShaderFont_view& shader) {
 	const auto base_vertex = context.vtx_positions.size();
 	const auto base_index = context.vtx_indices.size();
 	const auto num_vertex = vd.positions.size();

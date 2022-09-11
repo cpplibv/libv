@@ -32,7 +32,7 @@ private:
 public:
 	using CoreComponent::CoreComponent;
 
-private:
+protected:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doRender(Renderer& r) override;

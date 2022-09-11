@@ -67,7 +67,7 @@ private:
 	virtual void onMouseMovement(const EventMouseMovement& event) override;
 //	virtual void onMouseScroll(const EventMouseScroll& event) override;
 
-private:
+protected:
 	virtual void doAttach() override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doStyle(ContextStyle& context) override;
@@ -410,7 +410,7 @@ void ScrollArea::area_position(libv::vec2f value) noexcept {
 //	virtual void onMouseMovement(const EventMouseMovement& event) override;
 //	virtual void onMouseScroll(const EventMouseScroll& event) override;
 //
-//private:
+//protected:
 //	virtual void doAttach() override;
 //	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;

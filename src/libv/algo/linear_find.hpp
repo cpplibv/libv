@@ -29,6 +29,16 @@ template <typename Range, typename Pred, typename Proj = std::identity>
 	return std::ranges::find_if(range, pred, proj);
 }
 
+template <typename Int = int, typename Range, typename Key, typename Proj = std::identity>
+[[nodiscard]] constexpr inline Int linear_find_index(Range&& range, const Key& key, Proj proj = {}) {
+	const auto end = std::end(range);
+	for (auto it = std::begin(range); it != end; ++it)
+		if (std::invoke(proj, *it) == key)
+			return static_cast<Int>(std::distance(std::begin(range), it));
+
+	return Int{-1};
+}
+
 template <typename Range, typename Key, typename Proj = std::identity>
 [[nodiscard]] constexpr inline auto* linear_find_optional(Range&& range, const Key& key, Proj proj = {}) {
 	// NOTE: The concepts on std::ranges::find gives trouble if only operator==(const ValueType&, const Key&) is provided

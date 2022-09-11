@@ -229,19 +229,19 @@ ui.style("settings.entry.value.option.button") {
 		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 	},
 
-	--state_override("select") {
-	--
-	--},
-	--state("select") {
-	--	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
-	--	background = "green",
-	--},
-	--inherit("background", "settings.entry.value"),
+			--state_override("select") {
+			--
+			--},
+			--state("select") {
+			--	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+			--	background = "green",
+			--},
+			--inherit("background", "settings.entry.value"),
 
-	--state("!select") {
-	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
-	--	background = "blue",
-	--},
+			--state("!select") {
+			--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+			--	background = "blue",
+			--},
 }
 
 -- =================================================================================================

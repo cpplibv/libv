@@ -14,11 +14,19 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+//struct TextProperties {
+//	PropertyL1L2LP<std::shared_ptr<Font2D>> font;
+//	PropertyL1L2LP<FontSize> font_size;
+//	PropertyL1L2<AlignHorizontal> align_horizontal;
+//	PropertyL1L2<AlignVertical> align_vertical;
+//};
+
 class CoreButton : public CoreComponent {
+public:
 	friend class Button;
 	[[nodiscard]] inline auto handler() { return Button{this}; }
 
-private:
+public:
 	template <typename T> static void access_properties(T& ctx);
 
 	struct Properties {
@@ -27,17 +35,29 @@ private:
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyL2<> align_horizontal;
-		PropertyL2<> align_vertical;
-		PropertyL1L2<> font;
-		PropertyL1L2<> font_size;
+		// LP what does LP means again ???, do font font_size need it?
+		PropertyL1L2LP<std::shared_ptr<Font2D>> font;
+		PropertyL1L2LP<FontSize> font_size;
+		PropertyL2<AlignHorizontal> align_horizontal;
+		PropertyL2<AlignVertical> align_vertical;
+
+//		TextProperties text_properties;
+
+//		PropertyL2<> align_horizontal;
+//		PropertyL2<> align_vertical;
+//		PropertyL1L2<> font;
+//		PropertyL1L2<> font_size;
 	} property;
 
 private:
-	TextLayout text_;
+	TextLayoutLite text_;
 
 public:
 	using CoreComponent::CoreComponent;
+
+protected:
+	void routineSubmit();
+	virtual void onSubmit() {}
 
 private:
 	virtual void onFocus(const EventFocus& event) override;
@@ -48,7 +68,7 @@ private:
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-private:
+protected:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
@@ -63,58 +83,42 @@ void CoreButton::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.background; },
 			Background::color({0.9f, 1.f, 0.9f, 1.f}),
-			pgr::appearance, pnm::background,
-			"Background"
-	);
-	ctx.indirect(
-			[](auto& c) -> auto& { return c.property.align_horizontal; },
-			[](auto& c, auto v) { c.text_.align_horizontal(v); },
-			[](const auto& c) { return c.text_.align_horizontal(); },
-			AlignHorizontal::left,
-			pgr::appearance, pnm::align_horizontal,
-			"Horizontal alignment of the text"
-	);
-	ctx.indirect(
-			[](auto& c) -> auto& { return c.property.align_vertical; },
-			[](auto& c, auto v) { c.text_.align_vertical(v); },
-			[](const auto& c) { return c.text_.align_vertical(); },
-			AlignVertical::top,
-			pgr::appearance, pnm::align_vertical,
-			"Vertical alignment of the text"
+			pgr::appearance, pnm::background, "Background"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_color; },
 			Color(0, 0, 0, 1),
-			pgr::appearance, pnm::font_color,
-			"Font color"
+			pgr::appearance, pnm::font_color, "Font color"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_shader; },
 			[](auto& u) { return u.shaderFont(); },
-			pgr::appearance, pnm::font_shader,
-			"Font shader"
+			pgr::appearance, pnm::font_shader, "Font shader"
 	);
-	ctx.indirect(
+	ctx.property(
 			[](auto& c) -> auto& { return c.property.font; },
-			[](auto& c, auto v) { c.text_.font(std::move(v)); },
-			[](const auto& c) { return c.text_.font(); },
 			[](auto& u) { return u.fallbackFont(); },
-			pgr::font, pnm::font,
-			"Font file"
+			pgr::font, pnm::font, "Font file"
 	);
-	ctx.indirect(
+	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_size; },
-			[](auto& c, auto v) { c.text_.size(v); },
-			[](const auto& c) { return c.text_.size(); },
 			FontSize{12},
-			pgr::font, pnm::font_size,
-			"Font size in pixel"
+			pgr::font, pnm::font_size, "Font size in pixel"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.align_horizontal; },
+			AlignHorizontal::left,
+			pgr::appearance, pnm::align_horizontal, "Horizontal alignment of the text"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.align_vertical; },
+			AlignVertical::top,
+			pgr::appearance, pnm::align_vertical, "Vertical alignment of the text"
 	);
 	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().text(std::move(v)); },
-			[](const auto& c) { return c.handler().text(); },
-			pgr::behaviour, pnm::text,
-			"Displayed text"
+			T::handler_setter(&Button::text),
+			T::handler_getter(&Button::text),
+			pgr::behaviour, pnm::text, "Displayed text"
 	);
 }
 

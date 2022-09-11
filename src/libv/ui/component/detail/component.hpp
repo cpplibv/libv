@@ -31,11 +31,15 @@ namespace ui {
 /// Handler class for components
 /// @Warning: Derived classes must not contain any data member
 class Component {
+public:
+	using CoreT = CoreComponent;
+
 private:
 	core_ptr ptr_ = nullptr;
 
 public:
 	constexpr inline Component() noexcept = default;
+	explicit constexpr inline Component(std::nullptr_t) noexcept { }
 	explicit Component(core_ptr ptr_) noexcept;
 
 public:
@@ -70,7 +74,7 @@ public:
 		return ptr_ != nullptr;
 	}
 	[[nodiscard]] constexpr inline bool operator!() const noexcept {
-		return ptr_ != nullptr;
+		return ptr_ == nullptr;
 	}
 
 public:

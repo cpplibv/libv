@@ -47,6 +47,12 @@ bool is_marked_as_slot(const Component& component) noexcept {
 	return get_core(component)->isSlot();
 }
 
+// ---
+
+libv::Nexus& get_nexus(...) noexcept {
+	return current_thread_context().event.nexus;
+}
+
 // =================================================================================================
 
 CoreComponent::CoreComponent(std::string name) :

@@ -72,6 +72,10 @@ read:
 libv.rev / libv.vm4: Parallel model memory upload to GPU. Steps:
 		FS Thread: Read model header
 		GL Thread: Memory map buffers based on header information
+			! WARNING with memory mapping: Without Resizable BAR only 256 MB can be accessed
+					| Needs a configurable limit (like 192 MB)
+					\ if limit is reached, do not schedule more mapping operations
+					\ alternatively fallback mechanism which load into sys memory and waits for upload and batch uploads it
 		FS Thread: Read model buffer contents directly into mapped GPU memory
 		GL Thread: Memory unmap, Finalize VAO
 
@@ -167,6 +171,19 @@ place.it:
 
 
 libv.rev: Post-processing
+	libv.rev: build a multistep composer with custom entry points
+			custom entry points source
+				read a file, macro "main" as a function name or the entry point function name
+				and chaim the calls together
+				have decent signature for it vec4(vec4)
+			custom entry points placement
+				step4_after_bloom
+				step5_before_bloom
+				step6_after_tonemap
+				step7_before_tonemap
+				step8_after_contrast
+				step9_before_contrast
+
 	TODO: Order the post-processing steps:
 			Fog
 			Bloom

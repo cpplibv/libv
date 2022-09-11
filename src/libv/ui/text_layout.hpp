@@ -30,12 +30,16 @@ struct TextLayoutData {
 	std::vector<uint32_t> indices;
 };
 
+// -------------------------------------------------------------------------------------------------
+
 class TextLayout : TextLayoutData {
 private:
 	std::shared_ptr<Font2D> font_;
 
-	FontSize fontSize_ = FontSize{12};
+protected:
 	bool dirty = true;
+private:
+	FontSize fontSize_ = FontSize{12};
 	AlignHorizontal align_horizontal_ = AlignHorizontal::center;
 	AlignVertical align_vertical_ = AlignVertical::center;
 	libv::vec2f limit_;
@@ -134,6 +138,53 @@ public:
 private:
 	void layout();
 };
+
+// -------------------------------------------------------------------------------------------------
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
+struct TextLayoutLite : TextLayout {
+private:
+	using TextLayout::content;
+	using TextLayout::limit;
+
+public:
+	void invalidateLayout2(const libv::vec2f limit_) {
+		dirty = true;
+		limit(limit_);
+	}
+
+	[[nodiscard]] const libv::ui::TextLayoutData& vertices_data(
+			const std::shared_ptr<Font2D>& font_,
+			FontSize size_,
+			AlignHorizontal align_horizontal_,
+			AlignVertical align_vertical_) {
+
+		font(font_);
+		size(size_);
+		align_horizontal(align_horizontal_);
+		align_vertical(align_vertical_);
+
+		return TextLayout::vertices_data();
+	}
+
+	[[nodiscard]] libv::vec2f measure_content_size(
+			libv::vec2f probe_limit,
+			const std::shared_ptr<Font2D>& font_,
+			FontSize size_) {
+
+		font(font_);
+		size(size_);
+
+		return TextLayout::content(probe_limit);
+	}
+};
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
 
 // -------------------------------------------------------------------------------------------------
 
