@@ -12,7 +12,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename CRTP, typename ID_t, auto InvalidID>
+template <typename CRTP, typename ID_t, ID_t InvalidID>
 class Entity {
 	friend libv::entity_access;
 
@@ -25,6 +25,10 @@ private:
 //	std::atomic_uint32_t ref_count = 0;
 	bool dead_ = false;
 	// TODO P3: dead_ could be stored as ref_count's LSB and increase/decrease ref_count by 2 instead of 1
+	//			dead could and/or should be stored as a single bit inside ID
+	//				=> invalidID:= 0, firstID:=1, isDead:= value < 0, id:=abs(value)
+	//					-> requires definition of operator<=> for the enum type as abs has to be used
+	//					 \ OR store a different type than the ID
 
 public:
 	ID id = InvalidID;
@@ -45,12 +49,6 @@ public:
 		return dead_;
 	}
 
-//	isDead() // isDead could and/or should be stored as a single bit inside ID
-//		=> invalidID:= 0, firstID:=1, isDead:= value < 0, id:=abs(value)
-//			-> requires definition of operator<=> for the enum type as abs has to be used
-//			 \ OR store a different type than the ID
-//
-//public:
 //	libv::observer_ptr<Simulation> simulation() {
 //		return libv::entity_store<CRTP>::context_from_pointer(static_cast<CRTP*>(this));
 //	}

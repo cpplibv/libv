@@ -63,9 +63,9 @@ private:
 
 public:
 //private:
-	std::vector<ProductionEntry> production_ship_queue;
-	std::vector<ProductionEntry> production_tank_queue;
-	std::vector<ProductionEntry> production_building_queue;
+	std::vector<ProductionEntry> production_queue_ship;
+	std::vector<ProductionEntry> production_queue_tank;
+	std::vector<ProductionEntry> production_queue_building;
 
 public:
 //private:

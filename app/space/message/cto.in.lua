@@ -139,7 +139,7 @@ namespace("space")
 cto_struct("CTO_Introduction", 0, {
 	--member_v("UserID", "userID"),
 	member_mv("std::string", "user_name"),
-	member_v("uint64_t", "version"),
+	member_v("uint64_t", "version", 0),
 })
 
 ----------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ cto_struct("CTO_ClientJoined", 20, {
 	member_v("UserID", "userID", "invalidUserID"),
 	member_mv("std::string", "user_name"),
 	member_v("std::chrono::system_clock::time_point", "joined_at"),
-	member_v("uint64_t", "version"),
+	member_v("uint64_t", "version", 0),
 })
 
 cto_struct("CTO_ClientLeave", 21, {

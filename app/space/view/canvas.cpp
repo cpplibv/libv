@@ -362,9 +362,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		const auto s2_guard = glr.state.push_guard();
 		glr.state.disableDepthMask();
 //		gl.state.polygonModeLine();
-//		for (int i = 0 ; i < 20 ; ++i) {
+//		for (int i = 0; i < 20; ++i) {
 //			const auto fi = static_cast<float>(i);
-//			for (int j = 0 ; j < 20 ; ++j) {
+//			for (int j = 0; j < 20; ++j) {
 //				const auto fj = static_cast<float>(j);
 //				add_debug_sphere({-fi, -fj, 0.4f}, 0.4f, {fi / 20.0f, fj / 20.0f, 0, 0.8f}, i, j);
 //			}

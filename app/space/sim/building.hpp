@@ -10,6 +10,7 @@
 #include <libv/serial/serial.hpp>
 // std
 #include <string>
+#include <vector>
 // pro
 #include <space/sim/building_resources.hpp>
 
@@ -55,7 +56,7 @@ struct BuildingTypeDefinition {
 	BuildingResources resources;
 
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int) {
+	void serialize(Archive& ar) {
 		ar & LIBV_NVP(id);
 		ar & LIBV_NVP(localeName);
 		ar & LIBV_NVP(localeDescription);
@@ -68,6 +69,7 @@ struct BuildingTypeDefinition {
 		ar & LIBV_NVP(buildProduction);
 		ar & LIBV_NVP(buildMoneyCost);
 
+		ar & LIBV_NVP(tags);
 		ar & LIBV_NVP(resources);
 	}
 };

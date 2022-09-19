@@ -332,8 +332,8 @@ void selection3D(CanvasControl& ctx, bool commitSelection) {
 				{0.8f, 0, 1, 1}, {0.2f, 0.2f, 0.6f, 0.2f});
 
 		//			{
-//				for (int i = -20 ; i < 20 ; ++i) {
-//					for (int j = -20 ; j < 20 ; ++j) {
+//				for (int i = -20; i < 20; ++i) {
+//					for (int j = -20; j < 20; ++j) {
 //						const auto result = frustum.sphereInFrustum({i, j, 0}, 0.25f);
 //						libv::vec4f color;
 //						switch (result) {
