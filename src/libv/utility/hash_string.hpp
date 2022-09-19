@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/meta/force_inline.hpp>
 // std
 #include <functional>
 #include <string>
@@ -19,13 +21,13 @@ struct hash_string {
 	using hash_type = std::hash<std::string_view>;
 
 public:
-	[[nodiscard]] inline std::size_t operator()(const char* txt) const {
+	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(const char* txt) const noexcept {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] inline std::size_t operator()(std::string_view txt) const {
+	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(std::string_view txt) const noexcept {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] inline std::size_t operator()(const std::string& txt) const {
+	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(const std::string& txt) const noexcept {
 		return hash_type{}(txt);
 	}
 };
