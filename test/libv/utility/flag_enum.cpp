@@ -12,7 +12,7 @@
 
 using test_flag = libv::flag_enum<uint8_t, class TestTag>;
 
-TEST_CASE("Constructor usage", "[flag_enum]") {
+TEST_CASE("Test flag_enum Constructor usage", "[libv.utility.flag_enum]") {
 	CHECK(test_flag{libv::bit(0)}.value() == 1);
 	CHECK(test_flag{libv::bit(1)}.value() == 2);
 	CHECK(test_flag{libv::bit(7)}.value() == 128);
@@ -22,7 +22,7 @@ TEST_CASE("Constructor usage", "[flag_enum]") {
 	CHECK(test_flag{128}.value() == 128);
 }
 
-TEST_CASE("Constructor merge flags", "[flag_enum]") {
+TEST_CASE("Test flag_enum Constructor merge flags", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_bit_0 = libv::bit(0);
 	constexpr test_flag flag_bit_1 = libv::bit(1);
 	constexpr test_flag flag_bit_7 = libv::bit(7);
@@ -36,7 +36,7 @@ TEST_CASE("Constructor merge flags", "[flag_enum]") {
 	CHECK(flag_bit_17.value() == 130);
 }
 
-TEST_CASE("static_cast", "[flag_enum]") {
+TEST_CASE("Test flag_enum static_cast", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0 = libv::bit(0);
 	constexpr test_flag flag_1 = libv::bit(1);
 	constexpr test_flag flag_7 = libv::bit(7);
@@ -46,7 +46,7 @@ TEST_CASE("static_cast", "[flag_enum]") {
 	CHECK(flag_7.value() == 128);
 }
 
-TEST_CASE("NOT", "[flag_enum]") {
+TEST_CASE("Test flag_enum NOT", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0{0};
 	constexpr test_flag flag_1{1};
 	constexpr test_flag flag_7{128};
@@ -56,7 +56,7 @@ TEST_CASE("NOT", "[flag_enum]") {
 	CHECK((~flag_7).value() == 0b01111111);
 }
 
-TEST_CASE("Equal", "[flag_enum]") {
+TEST_CASE("Test flag_enum Equal", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0{0};
 	constexpr test_flag flag_1{1};
 
@@ -66,7 +66,7 @@ TEST_CASE("Equal", "[flag_enum]") {
 	CHECK(flag_0 != flag_1);
 }
 
-TEST_CASE("AND", "[flag_enum]") {
+TEST_CASE("Test flag_enum AND", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0{0};
 	constexpr test_flag flag_1{1};
 
@@ -81,7 +81,7 @@ TEST_CASE("AND", "[flag_enum]") {
 	test_flag tmp_flags_3{1}; CHECK((tmp_flags_3 &= flag_1).value() == 1);
 }
 
-TEST_CASE("OR", "[flag_enum]") {
+TEST_CASE("Test flag_enum OR", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0{0};
 	constexpr test_flag flag_1{1};
 
@@ -96,7 +96,7 @@ TEST_CASE("OR", "[flag_enum]") {
 	test_flag tmp_flags_3{1}; CHECK((tmp_flags_3 |= flag_1).value() == 1);
 }
 
-TEST_CASE("XOR", "[flag_enum]") {
+TEST_CASE("Test flag_enum XOR", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_0{0};
 	constexpr test_flag flag_1{1};
 
@@ -111,7 +111,7 @@ TEST_CASE("XOR", "[flag_enum]") {
 	test_flag tmp_flags_3{1}; CHECK((tmp_flags_3 ^= flag_1).value() == 0);
 }
 
-TEST_CASE("Match mask", "[flag_enum]") {
+TEST_CASE("Test flag_enum Match mask", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_bit_0 = libv::bit(0);
 	constexpr test_flag flag_bit_1 = libv::bit(1);
 	constexpr test_flag flag_bit_7 = libv::bit(7);
@@ -136,7 +136,7 @@ TEST_CASE("Match mask", "[flag_enum]") {
 	CHECK(not flag_bit_17.match_mask(flag_bit_017));
 }
 
-TEST_CASE("OStream", "[flag_enum]") {
+TEST_CASE("Test flag_enum OStream", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_1{1};
 	constexpr test_flag flag_2{2};
 	constexpr test_flag flag_128{128};
@@ -146,7 +146,7 @@ TEST_CASE("OStream", "[flag_enum]") {
 	CHECK(fmt::format("{}", flag_128) == "128");
 }
 
-TEST_CASE("Mix operations with bit", "[flag_enum]") {
+TEST_CASE("Test flag_enum Mix operations with bit", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag{0b11110000};
 
 	CHECK((flag | libv::bit(2)).value() == 0b11110100);
@@ -171,7 +171,7 @@ TEST_CASE("Mix operations with bit", "[flag_enum]") {
 	auto tmp_flag_5 = flag; CHECK((tmp_flag_5 &= libv::bit(5)).value() == 0b00100000);
 }
 
-TEST_CASE("reset", "[flag_enum]") {
+TEST_CASE("Test flag_enum reset", "[libv.utility.flag_enum]") {
 	test_flag flag_1{1};
 	test_flag flag_2{2};
 	auto flag_3 = flag_1 | flag_2;

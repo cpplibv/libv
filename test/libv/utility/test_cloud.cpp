@@ -8,7 +8,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Test cloud simple set/get/remove", "[libv.utility.cloud]") {
+TEST_CASE("Test Cloud simple set/get/remove", "[libv.utility.cloud]") {
 	libv::Cloud cloud;
 
 	int objectA = 0;
@@ -30,7 +30,7 @@ TEST_CASE("Test cloud simple set/get/remove", "[libv.utility.cloud]") {
 	CHECK(cloud.get<int>() == nullptr);
 }
 
-TEST_CASE("Test cloud addressed set/get/remove", "[libv.utility.cloud]") {
+TEST_CASE("Test Cloud addressed set/get/remove", "[libv.utility.cloud]") {
 	libv::Cloud cloud;
 
 	int objectA = 0;
