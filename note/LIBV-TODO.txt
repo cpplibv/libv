@@ -630,6 +630,52 @@ libv.glr: UniformBlockSharedView_std140
 
 
 
+Create CMake Presets:
+
+{
+	"version": 6,
+	"configurePresets": [
+		{
+			"name": "ninja-base",
+			"hidden": true,
+			"generator": "Ninja",
+//"architecture": "x64",
+			"cacheVariables": {
+				"SKIP_EXTERNAL_CONFIGURES": "true",
+				"FORCE_COLORED_OUTPUT": "true"
+			},
+			"environment": {
+				"NINJA_STATUS": "%e [%f/%t] "
+			}
+		},
+		{
+			"name": "ninja-debug",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "debug",
+			}
+		},
+		{
+			"name": "ninja-release",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "release",
+				"SKIP_EXTERNAL_CONFIGURES": "false",
+			}
+		},
+		{
+			"name": "ninja-dev",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/dev",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "dev",
+			}
+		}
+	]
+}
+
 
 What do I need from libv to make a 'minimal' working iris program?
 	libv.ui

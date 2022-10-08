@@ -74,7 +74,7 @@ int main(int argc, const char** argv) {
 
 	try {
 		// Change working directory
-		if (devMode) // During development binary artifacts created under /bin/build_type
+		if (devMode) // During development, binary artifacts created under /bin/build_type
 			std::filesystem::current_path("../../app/star/");
 
 		const auto path = std::filesystem::path(argv[0]);
@@ -85,12 +85,12 @@ int main(int argc, const char** argv) {
 
 		star::log_star.info("--- Star {} ---", star::build.version_name);
 		star::log_star.info_if(devMode, "Running in developer mode");
-		star::log_star.info("Current path  {}", std::filesystem::current_path().generic_string());
-		star::log_star.info("Executable    {}/{}", path_dir.generic_string(), path_bin.generic_string());
-		star::log_star.info("Last modified {:%Y.%m.%d %H:%M:%S}", lwt);
-		star::log_star.info("Config file   {}", arg_config.value());
-//		star::log_star.info("Resource path {}", path_resource);
-		star::log_star.info("OS: {}", libv::sys::os_version());
+		star::log_star.info("Current path:  {}", std::filesystem::current_path().generic_string());
+		star::log_star.info("Executable:    {}/{}", path_dir.generic_string(), path_bin.generic_string());
+		star::log_star.info("Last modified: {:%Y.%m.%d %H:%M:%S}", lwt);
+		star::log_star.info("Config file:   {}", arg_config.value());
+//		star::log_star.info("Resource path: {}", path_resource);
+		star::log_star.info("System:        {}", libv::sys::os_version());
 
 		// Run the game
 		auto game = star::GameClient(arg_config.value());

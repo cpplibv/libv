@@ -3,7 +3,7 @@
 // hpp
 #include <star/game/game_client.hpp>
 // libv
-#include <libv/mt/worker_thread.hpp>
+//#include <libv/mt/worker_thread.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
@@ -13,16 +13,16 @@
 //#include <libv/ui/event_hub.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
+#include <libv/ui/component/scene_container.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/config/config.hpp>
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client_frame.hpp>
-#include <star/game/scene/scene_main_menu.hpp>
-#include <star/game/scene/scene_root.hpp>
+#include <star/game/scene/scenes.hpp>
+#include <star/log.hpp>
 //#include <star/game/view/camera_control.hpp>
 //#include <star/game/view/canvas_control.hpp>
-//#include <star/log.hpp>
 
 
 //#include <libv/ui/context/context_state.hpp>
@@ -52,7 +52,7 @@ struct ImplGameClient {
 	GameClientFrame frame;
 
 //	libv::ctrl::Controls controls;
-
+//
 //	Renderer renderer{ui};
 //
 //	GameThread game_thread{ui, nexus};
@@ -110,22 +110,33 @@ GameClient::~GameClient() {
 }
 
 void GameClient::register_nexus() {
-//	nexus_.connect<mc::RequestNameChange>(this, [this](const mc::RequestNameChange& event) {
-//		user.name = event.name;
-//		nexus_.broadcast<mc::OnNameChange>();
-//	});
+	self->nexus_.object_view_set<ClientConfig>(self->config_.get());
+
 	self->nexus_.connect_global<RequestClientExit>(this, [this](const RequestClientExit&) {
 		self->frame.closeDefault();
+	});
+
+	// Setup Logging
+	self->config_->development.logging_trace_ui.subscribe_and_call(this, [](const ConfigEntry<bool>::Change& event) {
+		libv::logger_stream.below("libv.ui", libv::Logger::Severity::Info, event.entry.value());
 	});
 }
 
 void GameClient::unregister_nexus() {
+	self->config_->unsubscribe(this);
+
 	self->nexus_.disconnect_all(this);
+	self->nexus_.object_view_remove<ClientConfig>();
+
+	assert(self->nexus_.num_tracked() == 0);
+	assert(self->nexus_.num_object() == 0);
 }
 
 void GameClient::init_ui() {
-	self->ui.add(SceneRoot());
-	self->ui.event().global.fire<SwitchPrimaryScene>(createSceneMainMenu(*this));
+	auto msc = libv::ui::SceneContainer("sc-main");
+	msc.identifier("main");
+	msc.assign(createSceneMainMenu(self->nexus_));
+	self->ui.add(std::move(msc));
 	self->ui.event().before_update([this] {
 		self->config_->update();
 	});

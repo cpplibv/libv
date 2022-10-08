@@ -1,32 +1,25 @@
 // Project: libv, File: app/star/game/scene/scene_settings.cpp
 
 // hpp
-#include <star/game/scene/scene_controls.hpp>
-// ext
-#include <fmt/format.h>
+#include <star/game/scene/scenes.hpp>
 // libv
 #include <libv/ui/component/button.hpp>
-//#include <libv/ui/component/gap.hpp>
-//#include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
-//#include <libv/ui/component/panel_grid.hpp>
-#include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/panel_board.hpp>
+#include <libv/ui/component/panel_line.hpp>
 // pro
 #include <star/game/scene/controls_layout.hpp>
-// Only for scene switching and manipulation, there should be a better way:
-#include <star/game/game_client.hpp>
-#include <star/game/scene/scene_main_menu.hpp>
-#include <star/game/scene/scene_root.hpp>
+#include <star/game/scene/utility.hpp>
+//#include <star/game/config/client_config.hpp>
 
 
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component createSceneControls(GameClient& gameClient) {
-	auto config = gameClient.config();
+libv::ui::Component createSceneControls(libv::Nexus& nexus) {
+//	auto& config = requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
 
 	libv::ui::PanelLine line{"controls-line"};
 	line.style("settings.main");
@@ -100,8 +93,8 @@ libv::ui::Component createSceneControls(GameClient& gameClient) {
 	libv::ui::Button btn;
 	btn.style("settings.ctrl");
 	btn.text("Back");
-	btn.event().submit.connect_system([gameClient = &gameClient](libv::ui::Button& source) {
-		source.event().global.fire<SwitchPrimaryScene>(createSceneMainMenu(*gameClient));
+	btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
+		switchParentScene(source, "main", createSceneMainMenu(nexus));
 	});
 	line.add(std::move(btn));
 

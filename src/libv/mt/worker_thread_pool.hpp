@@ -25,6 +25,9 @@ public:
 	~worker_thread_pool() noexcept;
 
 public:
+//	void identify_async(libv::unique_function<void(int)> id_task);
+//	std::vector<int> thread_ids() const;
+//	std::vector<std::thread::id> thread_ids() const;
 	void execute_async(libv::unique_function<void()> task);
 	void execute_async(libv::unique_function<void()> task, std::chrono::steady_clock::duration after);
 	void execute_async(libv::unique_function<void()> task, std::chrono::steady_clock::time_point at);

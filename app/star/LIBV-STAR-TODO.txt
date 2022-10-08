@@ -20,48 +20,103 @@ Star - System integration demo
 
 
 
-ToggleButton has the extra text_ variable from Button
-ToggleButton properties setters are not matching the TextLayoutLite pattern
-ToggleButton toggle state?
 
-TextLayoutLite Property
-TextLayoutLite might is kinda broken or all over the place (getPositions and the rest of the API)
-TextLayoutProperties
 
-try to remove friends from core-s
-	I think visibility can be public, only core inheritance would
-	need it to be different, and even that is not /that/ important
 
-try to remove handler() from core-s
-		handler could be removed with context knowing the handler type
-			OR
-		by having a single typedef in the core to the handler
-			and doing the pointer ctor itself
 
-up next
-	ui bean system (nexus like storage system) | cloud
-	ui normalize contexts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.ui: Easy scene level storage
+	class SceneSettings : Scene {
+		Config temp_config;
+	};
+	Scene as a class? (Instead of a single function to libv::ui::Component)
+	Maybe interop with scene container
+
+libv.ui: Choose the null component constructor(s):
+	ComponentT{}
+	ComponentT{ptr} // where ptr == null
+	ComponentT{nullptr}
+	ComponentT{null_component}
+	ComponentT::null()
+
+libv.ui: Implement the better constructors
+	ComponentT::n(name)
+	ComponentT::s(style)
+	ComponentT::ns(name, style)
+	ComponentT::na(name, args...)
+	ComponentT::sa(style, args...)
+	ComponentT::nsa(name, style, args...)
+
+libv.ui: PageLayouts
+libv.ui: Move star::SceneContainer to libv::ui::SceneContainer
+
+
+
+
+
+ui normalize contexts
+	libv.ui: Expose nexus from a context
 	libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
 		style intrusive_ptr -> intrusive2_ptr
-	ui settings flag: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
-	ui scene switcher with the help of the bean system
-	star adopt bean and scene switcher system
 
 
 
 
-Cleanup duty:
-	// LP what does LP means again ???, do font font_size need it?
+ToggleButton has the extra text_ variable from Button
+!!! ToggleButton properties setters are not matching the TextLayoutLite pattern
+
+
+libv.ui: Cleanup duty:
+	TextLayoutLite Property
+	TextLayoutLite might is kinda broken or all over the place (getPositions and the rest of the API)
+	TextLayoutProperties
+
+	try to remove friends from core-s
+		I think visibility can be public, only core inheritance would
+		need it to be different, and even that is not /that/ important
+
+	try to remove handler() from core-s
+			handler could be removed with context knowing the handler type
+				OR
+			by having a single typedef in the core to the handler
+				and doing the pointer ctor itself
+
+	// PropertyLP what does LP means again ???, do font font_size need it?
 
 	get_nexus(0)
-
 	Nicer function dispatch for non-component event hubs
 		get_nexus(...)
 		mark_as_signal(...)
 		mark_as_slot(...)
 		is_marked_as_signal(...)
 		is_marked_as_slot(...)
-
 	Concept usage, in a lightweight header libv/ui/component/detail/core_ptr.hpp
 		template <typename T>
 			requires (!std::derived_from<T, Component>)
@@ -69,6 +124,7 @@ Cleanup duty:
 			return component_like.ptr();
 		}
 
+libv.ui: Setting: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
 
 
 
@@ -76,19 +132,6 @@ Cleanup duty:
 
 
 ----------
-
-place.it:
-	idea: tracked entities as "sleeping ones", not 2 but 3 update state
-		sleeping, awake, tracked
-		runs different code
-
-	read: https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
-	research: push constants
-
-	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
-	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
-	Knowledge: Anisotropic filtering is useless for many textures
-	Knowledge: Mip maps are useless for some textures (UI textures dont care)
 
 libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
 
@@ -115,6 +158,19 @@ libv.ui: Tooltips
 			clipping:
 				use (scroll pane) clipping
 				render above everything
+
+place.it:
+	idea: tracked entities as "sleeping ones", not 2 but 3 update state
+		sleeping, awake, tracked
+		runs different code
+
+	read: https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
+	research: push constants
+
+	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
+	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
+	Knowledge: Anisotropic filtering is useless for many textures
+	Knowledge: Mip maps are useless for some textures (UI textures dont care)
 
 ----------
 

@@ -30,7 +30,7 @@ private:
 	void register_nexus();
 	void unregister_nexus();
 	void init_ui();
-	void update();
+//	void update();
 
 public:
 	void run();

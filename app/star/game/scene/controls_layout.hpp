@@ -3,30 +3,14 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
 #include <libv/ctrl/input_id.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <vector>
-#include <string>
 
 
-// libv
-//#include <libv/glr/procedural/cube.hpp>
-//#include <libv/glr/procedural/grid.hpp>
-//#include <libv/glr/procedural/ignore.hpp>
-//#include <libv/glr/procedural/sphere.hpp>
-//#include <libv/glr/queue.hpp>
-#include <libv/math/angle.hpp>
-#include <libv/math/bezier.hpp>
-#include <libv/math/bezier_curve.hpp>
-// pro
-//#include <vm4_viewer/attribute.hpp>
-//#include <vm4_viewer/log.hpp>
-//#include <vm4_viewer/ui/keyboard.hpp>
-
-
-#include <libv/ctrl/controls.hpp>
-#include <libv/ctrl/binding.hpp>
+//#include <libv/ctrl/controls.hpp>
+//#include <libv/ctrl/binding.hpp>
 
 
 namespace star {

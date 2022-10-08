@@ -4,15 +4,16 @@
 
 // libv
 #include <libv/ui/component/component.hpp>
-// pro
-#include <star/game/fwd.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 
 
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] libv::ui::Component createSceneControls(GameClient& gameClient);
+[[nodiscard]] libv::ui::Component createSceneControls(libv::Nexus& nexus);
+[[nodiscard]] libv::ui::Component createSceneMainMenu(libv::Nexus& nexus);
+[[nodiscard]] libv::ui::Component createSceneSettings(libv::Nexus& nexus);
 
 // -------------------------------------------------------------------------------------------------
 
