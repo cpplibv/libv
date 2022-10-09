@@ -126,7 +126,7 @@ private:
 		using MatcherFunction = bool (Rule::*)(Severity, const std::string_view) const;
 
 	private:
-		std::string module{""};
+		std::string module = "";
 		Severity severity = Severity::Trace;
 		bool allow;
 		MatcherFunction matcher;
@@ -177,6 +177,14 @@ private:
 				bool allow,
 				MatcherFunction matcher) :
 			module(module), severity(severity), allow(allow), matcher(matcher) { }
+
+		bool alter_if_replacing(const std::string_view module, const Severity severity, bool allow, Rule::MatcherFunction fn) {
+			if (module == this->module && severity == this->severity && fn == this->matcher) {
+				this->allow = allow;
+				return true;
+			}
+			return false;
+		}
 	};
 
 private:
@@ -197,70 +205,77 @@ private:
 		return true;
 	}
 
+private:
+	Logger& add_rule(const std::string_view module, const Severity severity, bool allow, Rule::MatcherFunction fn) {
+		for (auto& rule : rules)
+			if (rule.alter_if_replacing(module, severity, allow, fn))
+				return *this;
+
+		rules.emplace_back(module, severity, allow, fn);
+		return *this;
+	}
+
 public:
 	Logger& allow() {
-		rules.emplace_back("", Severity::Trace, true, &Rule::matcher_any);
-		return *this;
+		return add_rule("", Severity::Trace, true, &Rule::matcher_any);
 	}
 	Logger& allow(const std::string_view module) {
-		rules.emplace_back(module, Severity::Trace, true, &Rule::matcher_module);
-		return *this;
+		return add_rule(module, Severity::Trace, true, &Rule::matcher_module);
 	}
 	Logger& allow(const Severity severity) {
-		rules.emplace_back("", severity, true, &Rule::matcher_severity_equal);
-		return *this;
+		return add_rule("", severity, true, &Rule::matcher_severity_equal);
 	}
 	Logger& allow(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_equal);
-		return *this;
+		return add_rule(module, severity, true, &Rule::matcher_module_severity_equal);
 	}
 	Logger& allow_above(const Severity severity) {
-		rules.emplace_back("", severity, true, &Rule::matcher_severity_above);
-		return *this;
+		return add_rule("", severity, true, &Rule::matcher_severity_above);
 	}
 	Logger& allow_above(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_above);
-		return *this;
+		return add_rule(module, severity, true, &Rule::matcher_module_severity_above);
 	}
 	Logger& allow_below(const Severity severity) {
-		rules.emplace_back("", severity, true, &Rule::matcher_severity_below);
-		return *this;
+		return add_rule("", severity, true, &Rule::matcher_severity_below);
 	}
 	Logger& allow_below(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_below);
-		return *this;
+		return add_rule(module, severity, true, &Rule::matcher_module_severity_below);
 	}
 	Logger& deny() {
-		rules.emplace_back("", Severity::Trace, false, &Rule::matcher_any);
-		return *this;
+		return add_rule("", Severity::Trace, false, &Rule::matcher_any);
 	}
 	Logger& deny(const std::string_view module) {
-		rules.emplace_back(module, Severity::Trace, false, &Rule::matcher_module);
-		return *this;
+		return add_rule(module, Severity::Trace, false, &Rule::matcher_module);
 	}
 	Logger& deny(const Severity severity) {
-		rules.emplace_back("", severity, false, &Rule::matcher_severity_equal);
-		return *this;
+		return add_rule("", severity, false, &Rule::matcher_severity_equal);
 	}
 	Logger& deny(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_equal);
-		return *this;
+		return add_rule(module, severity, false, &Rule::matcher_module_severity_equal);
 	}
 	Logger& deny_above(const Severity severity) {
-		rules.emplace_back("", severity, false, &Rule::matcher_severity_above);
-		return *this;
+		return add_rule("", severity, false, &Rule::matcher_severity_above);
 	}
 	Logger& deny_above(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_above);
-		return *this;
+		return add_rule(module, severity, false, &Rule::matcher_module_severity_above);
 	}
 	Logger& deny_below(const Severity severity) {
-		rules.emplace_back("", severity, false, &Rule::matcher_severity_below);
-		return *this;
+		return add_rule("", severity, false, &Rule::matcher_severity_below);
 	}
 	Logger& deny_below(const std::string_view module, const Severity severity) {
-		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_below);
-		return *this;
+		return add_rule(module, severity, false, &Rule::matcher_module_severity_below);
+	}
+
+	Logger& above(const Severity severity, bool allow) {
+		return add_rule("", severity, allow, &Rule::matcher_module_severity_below);
+	}
+	Logger& above(const std::string_view module, const Severity severity, bool allow) {
+		return add_rule(module, severity, allow, &Rule::matcher_module_severity_below);
+	}
+	Logger& below(const Severity severity, bool allow) {
+		return add_rule("", severity, allow, &Rule::matcher_module_severity_below);
+	}
+	Logger& below(const std::string_view module, const Severity severity, bool allow) {
+		return add_rule(module, severity, allow, &Rule::matcher_module_severity_below);
 	}
 
 public:
