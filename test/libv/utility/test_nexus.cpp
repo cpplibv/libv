@@ -605,3 +605,84 @@ TEST_CASE("Test Nexus broadcasted arguments", "[libv.utility.nexus]") {
 
 	CHECK(std::exchange(callCount, 0) == 6);
 }
+
+// -------------------------------------------------------------------------------------------------
+
+TEST_CASE("Test Nexus simple set/get/remove", "[libv.utility.nexus]") {
+	libv::Nexus nexus;
+
+	int objectA = 0;
+	int objectB = 0;
+
+	CHECK(nexus.num_object() == 0);
+	CHECK(nexus.object_view_get<int>() == nullptr);
+
+	nexus.object_view_set<int>(&objectA);
+	CHECK(nexus.num_object() == 1);
+	CHECK(nexus.object_view_get<int>() == &objectA);
+
+	nexus.object_view_set<int>(&objectB);
+	CHECK(nexus.num_object() == 1);
+	CHECK(nexus.object_view_get<int>() == &objectB);
+
+	nexus.object_view_remove<int>();
+	CHECK(nexus.num_object() == 0);
+	CHECK(nexus.object_view_get<int>() == nullptr);
+}
+
+TEST_CASE("Test Nexus addressed set/get/remove", "[libv.utility.nexus]") {
+	libv::Nexus nexus;
+
+	int objectA = 0;
+	int objectB = 0;
+
+	CHECK(nexus.num_object() == 0);
+	CHECK(nexus.object_view_get<int>("A") == nullptr);
+	CHECK(nexus.object_view_get<int>("B") == nullptr);
+
+	nexus.object_view_set<int>("A", &objectA);
+	CHECK(nexus.num_object() == 1);
+	CHECK(nexus.object_view_get<int>("A") == &objectA);
+	CHECK(nexus.object_view_get<int>("B") == nullptr);
+
+	nexus.object_view_set<int>("B", &objectB);
+	CHECK(nexus.num_object() == 2);
+	CHECK(nexus.object_view_get<int>("A") == &objectA);
+	CHECK(nexus.object_view_get<int>("B") == &objectB);
+
+	SECTION("Without simple names") {
+		// Noop
+	}
+	SECTION("With simple names") {
+		CHECK(nexus.num_object() == 2);
+		CHECK(nexus.object_view_get<int>() == nullptr);
+
+		nexus.object_view_set<int>(&objectA);
+		CHECK(nexus.num_object() == 3);
+		CHECK(nexus.object_view_get<int>() == &objectA);
+
+		nexus.object_view_set<int>(&objectB);
+		CHECK(nexus.num_object() == 3);
+		CHECK(nexus.object_view_get<int>() == &objectB);
+
+		nexus.object_view_remove<int>();
+		CHECK(nexus.num_object() == 2);
+		CHECK(nexus.object_view_get<int>() == nullptr);
+	}
+
+	nexus.object_view_set<int>("A", &objectB);
+	CHECK(nexus.num_object() == 2);
+	CHECK(nexus.object_view_get<int>("A") == &objectB);
+	CHECK(nexus.object_view_get<int>("B") == &objectB);
+
+	nexus.object_view_remove<int>("A");
+	CHECK(nexus.num_object() == 1);
+	CHECK(nexus.object_view_get<int>("A") == nullptr);
+	CHECK(nexus.object_view_get<int>("B") == &objectB);
+
+	nexus.object_view_remove<int>("B");
+	CHECK(nexus.num_object() == 0);
+	CHECK(nexus.object_view_get<int>("A") == nullptr);
+	CHECK(nexus.object_view_get<int>("B") == nullptr);
+}
+

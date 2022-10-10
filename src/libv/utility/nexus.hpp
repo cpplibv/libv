@@ -27,13 +27,17 @@ namespace libv {
 
 class ImplNexus;
 
+// NOTE: It is possible to extend or implement Nexus with an owning version: Simple 8 byte deleter function with the object pointer
+
 /// Handler type
 class Nexus {
 public:
 	using channel_ptr = const void*;
 	using slot_ptr = const void*;
 	using channel_or_slot_ptr = const void*;
-	using key_type = libv::type_uid;
+	using type_uid = libv::type_uid;
+
+	using object_ptr = void*;
 
 private:
 	std::shared_ptr<ImplNexus> self;
@@ -47,17 +51,31 @@ public:
 	inline ~Nexus() = default;
 
 private:
-	void aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func);
-	void aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
-	void aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func);
-	void aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, key_type event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
-	void aux_broadcast(channel_ptr channel_owner, key_type event_type, const void* event_ptr) const;
+	void aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func);
+	void aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
+	void aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func);
+	void aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
+	void aux_broadcast(channel_ptr channel_owner, type_uid event_type, const void* event_ptr) const;
 	void aux_disconnect_all(channel_or_slot_ptr owner);
-	void aux_disconnect_channel(channel_ptr channel_owner, key_type event_type);
+	void aux_disconnect_channel(channel_ptr channel_owner, type_uid event_type);
 	void aux_disconnect_channel_all(channel_ptr channel_owner);
-	void aux_disconnect_slot(slot_ptr slot_owner, key_type event_type);
+	void aux_disconnect_slot(slot_ptr slot_owner, type_uid event_type);
 	void aux_disconnect_slot_all(slot_ptr slot_owner);
 
+private:
+	void aux_object_view_set(type_uid object_type, object_ptr ptr);
+	void aux_object_view_set(std::string name, type_uid object_type, object_ptr ptr);
+	[[nodiscard]] object_ptr aux_object_view_get(type_uid object_type) const noexcept;
+	[[nodiscard]] object_ptr aux_object_view_get(const std::string_view name, type_uid object_type) const noexcept;
+//	[[nodiscard]] object_ptr aux_object_view_get(const std::string_view name, type_uid object_type) const noexcept;
+	void aux_object_view_remove(type_uid object_type) const noexcept;
+	void aux_object_view_remove(const std::string_view name, type_uid object_type) const noexcept;
+//	void aux_object_view_push(type_uid object_type, object_ptr ptr);
+//	void aux_object_view_pop(type_uid object_type) noexcept;
+//	void aux_object_view_push(std::string name, type_uid object_type, object_ptr ptr);
+//	void aux_object_view_pop(std::string name, type_uid object_type) noexcept;
+
+private:
 	template <typename Event, typename Func>
 	[[nodiscard]] LIBV_FORCE_INLINE std::function<void(channel_ptr, const void*)> aux_make_callback_global(Func&& func) {
 		return [f = std::forward<Func>(func)](channel_ptr, const void* event_ptr) mutable {
@@ -108,6 +126,47 @@ private:
 						"\n\tvoid()");
 		}
 	}
+
+public:
+	template <typename Object>
+	LIBV_FORCE_INLINE void object_view_set(Object* ptr) {
+		aux_object_view_set(libv::type_key<Object>(), ptr);
+	}
+
+	template <typename Object>
+	LIBV_FORCE_INLINE void object_view_set(const std::string& name, Object* ptr) {
+		aux_object_view_set(name, libv::type_key<Object>(), ptr);
+	}
+
+	template <typename Object>
+	[[nodiscard]] LIBV_FORCE_INLINE Object* object_view_get() const noexcept {
+		return static_cast<Object*>(aux_object_view_get(libv::type_key<Object>()));
+	}
+
+	template <typename Object>
+	[[nodiscard]] LIBV_FORCE_INLINE Object* object_view_get(const std::string_view name) const noexcept {
+		return static_cast<Object*>(aux_object_view_get(name, libv::type_key<Object>()));
+	}
+
+	template <typename Object>
+	LIBV_FORCE_INLINE void object_view_remove() noexcept {
+		aux_object_view_remove(libv::type_key<Object>());
+	}
+
+	template <typename Object>
+	LIBV_FORCE_INLINE void object_view_remove(const std::string_view name) noexcept {
+		aux_object_view_remove(name, libv::type_key<Object>());
+	}
+
+//	template <typename Object>
+//	LIBV_FORCE_INLINE void push_object_view(Object* ptr) {
+//		aux_push(libv::type_key<Object>(), ptr);
+//	}
+//
+//	template <typename Object>
+//	LIBV_FORCE_INLINE void pop_object_view(Object* ptr) noexcept {
+//		aux_pop(libv::type_key<Object>());
+//	}
 
 public:
 	template <typename Event, typename Func>
@@ -240,8 +299,12 @@ public:
 	}
 
 public:
+	/// Number of channels
 	[[nodiscard]] std::size_t num_channel() const noexcept;
+	/// Number of tracked objects as either signal or slot
 	[[nodiscard]] std::size_t num_tracked() const noexcept;
+	/// Number of objects as beans
+	[[nodiscard]] std::size_t num_object() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
