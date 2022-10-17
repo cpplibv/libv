@@ -158,6 +158,12 @@ core_ptr Label::create_core(std::string name) {
 	return create_core_ptr<CoreType>(std::move(name));
 }
 
+core_ptr Label::create_core(std::string name, std::string text) {
+	auto p = create_core_ptr<CoreType>(std::move(name));
+	p->text_.string(std::move(text));
+	return p;
+}
+
 bool Label::castable(libv::ui::core_ptr core) noexcept {
 	return dynamic_cast<CoreType*>(core) != nullptr;
 }

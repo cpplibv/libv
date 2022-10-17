@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/meta/force_inline.hpp>
 // std
 #include <string>
 #include <string_view>
@@ -16,7 +18,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T, typename... Args>
-[[nodiscard]] inline core_ptr create_core_ptr(Args&&... args) noexcept {
+[[nodiscard]] LIBV_FORCE_INLINE T* create_core_ptr(Args&&... args) noexcept {
 	return new T(std::forward<Args>(args)...);
 }
 
@@ -37,35 +39,66 @@ public:
 	using CoreType = CoreT;
 
 public:
-	explicit inline ComponentAPI(std::nullptr_t) noexcept :
+	explicit LIBV_FORCE_INLINE ComponentAPI(std::nullptr_t) noexcept :
 		BaseT(nullptr) { }
 
-	explicit inline ComponentAPI(core_ptr ptr) noexcept :
+	explicit LIBV_FORCE_INLINE ComponentAPI(core_ptr ptr) noexcept :
 		BaseT(ptr) { }
 
 	template <typename... Args>
-	explicit inline ComponentAPI(std::string name, Args&&... args) :
+	explicit LIBV_FORCE_INLINE ComponentAPI(std::string name, Args&&... args) :
 		ComponentAPI(HandlerT::create_core(std::move(name), std::forward<Args>(args)...)) { }
 
 	template <typename... Args>
-	explicit inline ComponentAPI(GenerateName_t = {}, Args&&... args) :
+	explicit LIBV_FORCE_INLINE ComponentAPI(GenerateName_t = {}, Args&&... args) :
 		ComponentAPI(generate_component_name(HandlerT::component_type, nextID++), std::forward<Args>(args)...) { }
 
 public:
-	[[nodiscard]] static inline HandlerT from_core(core_ptr ptr) noexcept {
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT n(std::string name) {
+		return HandlerT{std::move(name)};
+	}
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT s(std::string_view style) {
+		HandlerT handler{};
+		handler.style(style);
+		return handler;
+	}
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT ns(std::string name, std::string_view style) {
+		HandlerT handler{std::move(name)};
+		handler.style(style);
+		return handler;
+	}
+	template <typename... Args>
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT na(std::string name, Args&&... args) {
+		return HandlerT{std::move(name), std::forward<Args>(args)...};
+	}
+	template <typename... Args>
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT sa(std::string_view style, Args&&... args) {
+		HandlerT handler{generate_component_name(HandlerT::component_type, nextID++), std::forward<Args>(args)...};
+		handler.style(style);
+		return handler;
+	}
+	template <typename... Args>
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT nsa(std::string name, std::string_view style, Args&&... args) {
+		HandlerT handler{std::move(name), std::forward<Args>(args)...};
+		handler.style(style);
+		return handler;
+	}
+
+public:
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT from_core(core_ptr ptr) noexcept {
 		return HandlerT{ptr};
 	}
 
 protected:
-	[[nodiscard]] constexpr inline CoreT& self() noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE CoreT& self() noexcept {
 		return static_cast<CoreT&>(this->core());
 	}
-	[[nodiscard]] constexpr inline const CoreT& self() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE const CoreT& self() const noexcept {
 		return static_cast<const CoreT&>(this->core());
 	}
 
 public:
-	[[nodiscard]] inline EventHostT<HandlerT> event() noexcept {
+	[[nodiscard]] LIBV_FORCE_INLINE EventHostT<HandlerT> event() noexcept {
 		return EventHostT<HandlerT>{static_cast<HandlerT&>(*this)};
 	}
 };

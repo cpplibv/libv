@@ -23,9 +23,7 @@ libv::ui::Component layoutSceneMainMenu(libv::ui::Component&& content) {
 	libv::ui::PanelAnchor layers{"layers"};
 	layers.add(std::move(content));
 
-	libv::ui::Label lbl("version_lbl");
-	lbl.style("main-menu.version-lbl");
-	lbl.text(star::build.version_name);
+	auto lbl = libv::ui::Label::nsa("version_lbl", "main-menu.version-lbl", star::build.version_name);
 	layers.add(std::move(lbl));
 
 	return layers;
@@ -33,9 +31,7 @@ libv::ui::Component layoutSceneMainMenu(libv::ui::Component&& content) {
 
 libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 	const auto menuEntry = [&](std::string name, auto createFn) {
-		libv::ui::Button btn;
-		btn.style("main-menu.menu.entry");
-		btn.text(std::move(name));
+		auto btn = libv::ui::Button::sa("main-menu.menu.entry", std::move(name));
 
 		if constexpr (std::is_same_v<decltype(createFn), std::nullptr_t>)
 			btn.enable(false);
@@ -47,26 +43,20 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 		return btn;
 	};
 
-	libv::ui::PanelLine golden_line{"golden-line"};
-	golden_line.style("main-menu.golden-line");
+	auto golden_line = libv::ui::PanelLine::ns("golden-line", "main-menu.golden-line");
 
 	{
-		libv::ui::PanelLine golden_box{"golden-box"};
-		golden_box.style("main-menu.golden-box");
+		auto golden_box = libv::ui::PanelLine::ns("golden-box", "main-menu.golden-box");
 
 		{
-			libv::ui::Gap golden_gap{"golden-gap"};
-			golden_gap.style("main-menu.golden-gap");
+			auto golden_gap = libv::ui::Gap::ns("golden-gap", "main-menu.golden-gap");
 			golden_line.add(std::move(golden_gap));
 
 		} {
-			libv::ui::PanelLine menu_box{"menu_box"};
-			menu_box.style("main-menu.menu.panel");
+			auto menu_box = libv::ui::PanelLine::ns("menu_box", "main-menu.menu.panel");
 
 			{
-				libv::ui::Label lbl("title");
-				lbl.style("main-menu.menu.title");
-				lbl.text("IRIS STAR");
+				auto lbl = libv::ui::Label::nsa("title", "main-menu.menu.title", "IRIS STAR");
 				menu_box.add(std::move(lbl));
 			}
 
@@ -79,8 +69,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 			menu_box.add(menuEntry("Credits", nullptr));
 
 			{
-				libv::ui::Button btn;
-				btn.style("main-menu.menu.entry");
+				auto btn = libv::ui::Button::s("main-menu.menu.entry");
 				btn.text("Exit");
 				btn.event().submit.connect([nexus] {
 					nexus.broadcast_global(RequestClientExit());

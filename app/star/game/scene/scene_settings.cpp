@@ -26,36 +26,25 @@ struct SettingsBuilder {
 	libv::Nexus& nexus;
 	const void* owner_ptr;
 
-	libv::ui::PanelLine main;
-	libv::ui::PanelGrid grid{"grid"};
+	libv::ui::PanelLine main = libv::ui::PanelLine::s("settings.main");
+	libv::ui::PanelGrid grid = libv::ui::PanelGrid::ns("grid", "settings.grid");
 
 	SettingsBuilder(libv::Nexus& nexus, const void* owner_ptr) :
 		nexus(nexus),
 		owner_ptr(owner_ptr) {
 
-		grid.style("settings.grid");
+		main.add(libv::ui::Label::sa("settings.title", "Settings"));
 
-		libv::ui::Label title;
-		title.style("settings.title");
-		title.text("Settings");
-		main.add(std::move(title));
-
-		main.style("settings.main");
 		main.add(grid);
 	}
 
 	void toggle(ConfigEntry<bool>& entry) {
-		//	libv::ui::PanelLine line;
-		//	line.style("settings.entry.panel");
-		//line.tooltip(entry.description());
+//		auto line = libv::ui::PanelLine::s("settings.entry.panel");
+//		line.tooltip(entry.description());
 
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(entry.name());
-		grid.add(std::move(label));
+		grid.add(libv::ui::Label::sa("settings.entry.lbl", entry.name()));
 
-		libv::ui::ToggleButton button;
-		button.style("settings.entry.value.toggle");
+		auto button = libv::ui::ToggleButton::s("settings.entry.value.toggle");
 		button.text_on("On");
 		button.text_off("Off");
 		button.select(entry.value());
@@ -78,17 +67,12 @@ struct SettingsBuilder {
 	}
 
 	void number(ConfigEntry<int>& entry) {
-		//	libv::ui::PanelLine line;
-		//	line.style("settings.entry.panel");
-		//line.tooltip(entry.description());
+//		auto line = libv::ui::PanelLine::s("settings.entry.panel");
+//		line.tooltip(entry.description());
 
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(entry.name());
-		grid.add(std::move(label));
+		grid.add(libv::ui::Label::sa("settings.entry.lbl", entry.name()));
 
-		libv::ui::InputField input;
-		input.style("settings.entry.value.number");
+		auto input = libv::ui::InputField::s("settings.entry.value.number");
 		input.event().change.connect_system([&entry, input]() mutable {
 			const auto reentry_guard = input.event_reentry_guard(input.ptr(), &entry);
 			if (!reentry_guard)
@@ -117,17 +101,12 @@ struct SettingsBuilder {
 	}
 
 	void text(ConfigEntry<std::string>& entry) {
-		//	libv::ui::PanelLine line;
-		//	line.style("settings.entry.panel");
-		//line.tooltip(entry.description());
+//		auto line = libv::ui::PanelLine::s("settings.entry.panel");
+//		line.tooltip(entry.description());
 
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(entry.name());
-		grid.add(std::move(label));
+		grid.add(libv::ui::Label::sa("settings.entry.lbl", entry.name()));
 
-		libv::ui::InputField input;
-		input.style("settings.entry.value.text");
+		auto input = libv::ui::InputField::s("settings.entry.value.text");
 		input.event().change.connect_system([&entry, input]() {
 			const auto reentry_guard = input.event_reentry_guard(input.ptr(), &entry);
 			if (!reentry_guard)
@@ -169,8 +148,7 @@ struct SettingsBuilder {
 		}
 
 		OptionProxy& operator()(std::string name, int value) {
-			libv::ui::ToggleButton button;
-			button.style("settings.entry.value.option.button");
+			auto button = libv::ui::ToggleButton::s("settings.entry.value.option.button");
 			button.text_on(name);
 			button.text_off(std::move(name));
 			button.select(entry.value() == value);
@@ -183,36 +161,28 @@ struct SettingsBuilder {
 	};
 
 	[[nodiscard]] OptionProxy options(ConfigEntry<int>& entry) {
-		//	libv::ui::PanelLine line;
-		//	line.style("settings.entry.panel");
-		//line.tooltip(entry.description());
+//		auto line = libv::ui::PanelLine::s("settings.entry.panel");
+//		line.tooltip(entry.description());
 
-		libv::ui::Label label;
-		label.style("settings.entry.lbl");
-		label.text(entry.name());
+		auto label = libv::ui::Label::sa("settings.entry.lbl", entry.name());
 		grid.add(std::move(label));
 
-		libv::ui::PanelLine row;
-		row.style("settings.entry.value.option.row");
+		auto row = libv::ui::PanelLine::s("settings.entry.value.option.row");
 		grid.add(row);
 
 		return OptionProxy{owner_ptr, entry, std::move(row)};
 	}
 
 	void restart_group() {
-		grid = libv::ui::PanelGrid{"grid"};
-		grid.style("settings.grid");
+		grid = libv::ui::PanelGrid::ns("grid", "settings.grid");
 		main.add(grid);
 	}
 
 	[[nodiscard]] libv::ui::Component build(ClientConfig& config) {
-		libv::ui::PanelLine ctrl;
-		ctrl.style("settings.ctrl_line");
+		auto ctrl = libv::ui::PanelLine::s("settings.ctrl_line");
 
 		{
-			libv::ui::Button btn;
-			btn.style("settings.ctrl");
-			btn.text("Back");
+			auto btn = libv::ui::Button::sa("settings.ctrl", "Back");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
 				switchParentScene(source, "main", createSceneMainMenu(nexus_));
 			});
@@ -223,27 +193,21 @@ struct SettingsBuilder {
 			ctrl.add(std::move(gap));
 
 		} {
-			libv::ui::Button btn;
-			btn.style("settings.ctrl");
-			btn.text("Reset");
+			auto btn = libv::ui::Button::sa("settings.ctrl", "Reset");
 			btn.event().submit.connect([config_ptr = &config] mutable {
 				config_ptr->resetToDefault();
 			});
 			ctrl.add(std::move(btn));
 
 		} {
-			libv::ui::Button btn;
-			btn.style("settings.ctrl");
-			btn.text("Apply");
+			auto btn = libv::ui::Button::sa("settings.ctrl", "Apply");
 //			btn.event().submit.connect([](libv::ui::Button& source) {
 //				active_config.assign(local_config);
 //			});
 			ctrl.add(std::move(btn));
 
 		} {
-			libv::ui::Button btn;
-			btn.style("settings.ctrl");
-			btn.text("Save");
+			auto btn = libv::ui::Button::sa("settings.ctrl", "Save");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
 //				active_config.assign(local_config);
 				switchParentScene(source, "main", createSceneMainMenu(nexus_));

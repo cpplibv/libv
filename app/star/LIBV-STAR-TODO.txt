@@ -66,14 +66,6 @@ libv.ui: Choose the null component constructor(s):
 	ComponentT{null_component}
 	ComponentT::null()
 
-libv.ui: Implement the better constructors
-	ComponentT::n(name)
-	ComponentT::s(style)
-	ComponentT::ns(name, style)
-	ComponentT::na(name, args...)
-	ComponentT::sa(style, args...)
-	ComponentT::nsa(name, style, args...)
-
 libv.ui: PageLayouts
 libv.ui: Move star::SceneContainer to libv::ui::SceneContainer
 

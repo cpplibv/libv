@@ -21,28 +21,22 @@ namespace star {
 libv::ui::Component createSceneControls(libv::Nexus& nexus) {
 //	auto& config = requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
 
-	libv::ui::PanelLine line{"controls-line"};
-	line.style("settings.main");
+	auto line = libv::ui::PanelLine::ns("controls-line", "settings.main");
 
-	libv::ui::Label title;
-	title.text("Controls");
-	title.style("settings.title");
+	auto title = libv::ui::Label::sa("settings.title", "Controls");
 	line.add(std::move(title));
 
 	{
-		libv::ui::PanelLine vis_line{"visual-line"};
-		vis_line.style("controls.visual.line");
+		auto vis_line = libv::ui::PanelLine::ns("visual-line", "controls.visual.line");
 
 		{
-			libv::ui::PanelBoard board{"keyboard-board"};
-			board.style("controls.visual.board");
+			auto board = libv::ui::PanelBoard::ns("keyboard-board", "controls.visual.board");
 
 			// 22 column x 6 row + gaps
 			Keyboard keyboard(48.f, 6.0f, 2.0f * 6.0f);
 
 			for (const auto& button : keyboard.buttons) {
-				libv::ui::Button key;
-				key.style("controls.visual.key");
+				auto key = libv::ui::Button::s("controls.visual.key");
 
 				if (button.input == libv::ctrl::Keycode::PrintScreen)
 					key.text("Print\nScreen");
@@ -90,9 +84,7 @@ libv::ui::Component createSceneControls(libv::Nexus& nexus) {
 		line.add(std::move(vis_line));
 	}
 
-	libv::ui::Button btn;
-	btn.style("settings.ctrl");
-	btn.text("Back");
+	auto btn = libv::ui::Button::sa("settings.ctrl", "Back");
 	btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
 		switchParentScene(source, "main", createSceneMainMenu(nexus));
 	});
