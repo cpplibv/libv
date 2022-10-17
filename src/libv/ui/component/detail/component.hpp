@@ -33,6 +33,7 @@ namespace ui {
 class Component {
 public:
 	using CoreT = CoreComponent;
+	using CoreType = CoreT;
 
 private:
 	core_ptr ptr_ = nullptr;
@@ -50,15 +51,6 @@ public:
 	~Component() noexcept;
 
 public:
-	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
-		return EventHostGeneral<Component>{*this};
-	}
-
-	/// Reentry-locks the source and reentry-tests the target.
-	/// ReentryGuard evaluates to true if entry is allowed (without causing a reentry)
-	[[nodiscard]] ReentryGuard event_reentry_guard(const void* source, const void* target) const noexcept;
-
-public:
 	[[nodiscard]] inline CoreComponent& core() noexcept {
 		return *ptr_;
 	}
@@ -69,12 +61,30 @@ public:
 		return ptr_;
 	}
 
-public:
 	[[nodiscard]] constexpr explicit inline operator bool() const noexcept {
 		return ptr_ != nullptr;
 	}
 	[[nodiscard]] constexpr inline bool operator!() const noexcept {
 		return ptr_ == nullptr;
+	}
+
+public:
+	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
+		return EventHostGeneral<Component>{*this};
+	}
+
+	/// Reentry-locks the source and reentry-tests the target.
+	/// ReentryGuard evaluates to true if entry is allowed (without causing a reentry)
+	[[nodiscard]] ReentryGuard event_reentry_guard(const void* source, const void* target) const noexcept;
+
+public:
+	[[nodiscard]] Component parent() const noexcept;
+
+	template <typename T>
+		requires (std::derived_from<T, Component> || std::derived_from<Component, T>)
+		// TODO P5: Use deducing this to check for static castability
+	[[nodiscard]] inline T cast() noexcept {
+		return T::castable(ptr_) ? T{ptr_} : T{nullptr};
 	}
 
 public:

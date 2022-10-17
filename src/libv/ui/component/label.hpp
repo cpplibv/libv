@@ -20,7 +20,8 @@ class Label : public ComponentAPI<Component, Label, class CoreLabel, EventHostGe
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "label";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
 	void background(Background value);

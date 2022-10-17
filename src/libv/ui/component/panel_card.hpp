@@ -34,7 +34,8 @@ class PanelCard : public ComponentAPI<BasePanel, PanelCard, class CorePanelCard,
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "card";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 private:
 	void aux_add(CardID cardID, Component component);

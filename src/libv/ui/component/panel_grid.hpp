@@ -19,7 +19,8 @@ class PanelGrid : public ComponentAPI<BasePanel, PanelGrid, class CorePanelGrid,
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "grid";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
 	void column_count(ColumnCount value);

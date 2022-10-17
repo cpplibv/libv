@@ -326,10 +326,14 @@ void CoreOverlayZoom::postRender(libv::glr::Queue& gl) {
 // =================================================================================================
 
 core_ptr OverlayZoom::create_core(std::string name) {
-	auto core = create_core_ptr<CoreOverlayZoom>(std::move(name));
+	auto core = create_core_ptr<CoreType>(std::move(name));
 	// TODO P5: Try to find a way to get back the ctors
 	static_cast<CoreOverlayZoom*>(core)->init();
 	return core;
+}
+
+bool OverlayZoom::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

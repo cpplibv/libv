@@ -140,7 +140,11 @@ void CoreBasePanel::doForeachChildren(libv::function_ref<void(Component&)> callb
 // =================================================================================================
 
 core_ptr BasePanel::create_core(std::string name) {
-	return create_core_ptr<CoreBasePanel>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool BasePanel::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

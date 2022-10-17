@@ -531,7 +531,11 @@ void CoreScrollBar::make_scroll(double amount) noexcept {
 // =================================================================================================
 
 core_ptr ScrollBar::create_core(std::string name) {
-	return create_core_ptr<CoreScrollBar>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool ScrollBar::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

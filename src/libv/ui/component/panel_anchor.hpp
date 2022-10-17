@@ -18,7 +18,8 @@ class PanelAnchor : public ComponentAPI<BasePanel, PanelAnchor, class CorePanelA
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "anchor";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
 	void snap_to_edge(SnapToEdge value);

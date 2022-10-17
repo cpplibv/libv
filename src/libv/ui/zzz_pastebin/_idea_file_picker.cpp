@@ -39,7 +39,11 @@
 // =================================================================================================
 //
 //core_ptr QuickFilePicker6::create_core(std::string name) {
-//	return create_core_ptr<CoreQuickFilePicker6>(std::move(name));
+//	return create_core_ptr<CoreType>(std::move(name));
+//}
+//
+//bool QuickFilePicker6::castable(libv::ui::core_ptr core) noexcept {
+//	return dynamic_cast<CoreType*>(core) != nullptr;
 //}
 //
 //QuickFilePicker6::~QuickFilePicker6() { }

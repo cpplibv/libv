@@ -155,7 +155,11 @@ void CoreLabel::doRender(Renderer& r) {
 // =================================================================================================
 
 core_ptr Label::create_core(std::string name) {
-	return create_core_ptr<CoreLabel>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool Label::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

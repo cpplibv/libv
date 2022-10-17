@@ -130,7 +130,11 @@ void CoreButton::doRender(Renderer& r) {
 // =================================================================================================
 
 core_ptr Button::create_core(std::string name) {
-	return create_core_ptr<CoreButton>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool Button::castable(core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

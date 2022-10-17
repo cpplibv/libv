@@ -96,7 +96,11 @@ void CorePanelCard::doStyle(ContextStyle& ctx, ChildID childID) {
 // =================================================================================================
 
 core_ptr PanelCard::create_core(std::string name) {
-	return create_core_ptr<CorePanelCard>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool PanelCard::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

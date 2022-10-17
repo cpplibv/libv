@@ -16,7 +16,8 @@ class PanelFull : public ComponentAPI<BasePanel, PanelFull, class CorePanelFull,
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "full";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

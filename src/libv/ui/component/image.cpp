@@ -72,7 +72,11 @@ void CoreImage::doRender(Renderer& r) {
 // =================================================================================================
 
 core_ptr Image::create_core(std::string name) {
-	return create_core_ptr<CoreImage>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool Image::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

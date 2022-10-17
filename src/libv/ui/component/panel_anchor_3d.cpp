@@ -118,7 +118,11 @@ void CorePanelAnchor3D::doLayout2(const ContextLayout2& layout_env) {
 // =================================================================================================
 
 core_ptr PanelAnchor3D::create_core(std::string name) {
-	return create_core_ptr<CorePanelAnchor3D>(std::move(name));
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool PanelAnchor3D::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

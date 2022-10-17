@@ -32,7 +32,8 @@ class ScrollArea : public ComponentAPI<Component, ScrollArea, class CoreScrollAr
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "s-area";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
 	void mode(ScrollAreaMode value) noexcept;

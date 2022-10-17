@@ -16,7 +16,8 @@ class Image : public ComponentAPI<Component, Image, class CoreImage, EventHostGe
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "image";
-	static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
 	void background(Background value);

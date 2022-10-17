@@ -140,7 +140,7 @@ void CanvasBase::focus() {
 // -------------------------------------------------------------------------------------------------
 
 core_ptr CanvasAdaptor::create_core(std::string name, std::unique_ptr<CanvasBase>&& canvas_object) {
-	return create_core_ptr<CoreCanvasAdaptor>(std::move(name), std::move(canvas_object));
+	return create_core_ptr<CoreType>(std::move(name), std::move(canvas_object));
 }
 
 CanvasBase& CanvasAdaptor::object_base() noexcept {

@@ -82,7 +82,7 @@ public:
 	using libv::ui::ComponentAPI<libv::ui::Component, TestComponent, class CoreTestComponent, libv::ui::EventHostGeneral>::ComponentAPI;
 	static constexpr std::string_view component_type = "test";
 	static libv::ui::core_ptr create_core(std::string name) {
-		return libv::ui::create_core_ptr<CoreTestComponent>(std::move(name));
+		return libv::ui::create_core_ptr<CoreType>(std::move(name));
 	}
 
 	void injected_dynamic_size(libv::vec3f v) {

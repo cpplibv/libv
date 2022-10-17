@@ -259,7 +259,11 @@ namespace ui {
 //// =================================================================================================
 //
 //core_ptr RadioButton::create_core(std::string name) {
-//	return create_core_ptr<CoreRadioButton>(std::move(name));
+//	return create_core_ptr<CoreType>(std::move(name));
+//}
+//
+//bool RadioButton::castable(libv::ui::core_ptr core) noexcept {
+//	return dynamic_cast<CoreType*>(core) != nullptr;
 //}
 //
 //// -------------------------------------------------------------------------------------------------

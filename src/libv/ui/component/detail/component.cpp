@@ -77,6 +77,14 @@ ReentryGuard Component::event_reentry_guard(const void* source, const void* targ
 
 // -------------------------------------------------------------------------------------------------
 
+Component Component::parent() const noexcept {
+	const auto s = libv::make_observer_ref(ptr_);
+	const auto p = ptr_->parent();
+	return s == p ? Component{} : Component{p};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Flag_t Component::flags() const noexcept {
 	return ptr_->flags;
 }

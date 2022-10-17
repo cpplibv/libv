@@ -34,6 +34,9 @@ protected:
 	using BaseAPI = ComponentAPI;
 
 public:
+	using CoreType = CoreT;
+
+public:
 	explicit inline ComponentAPI(std::nullptr_t) noexcept :
 		BaseT(nullptr) { }
 
