@@ -10,16 +10,24 @@ Star - System integration demo
 
 
 
+libv.ui: Easy scene level storage
+	class SceneSettings : Scene {
+		Config temp_config;
+	};
+	Scene as a class? (Instead of a single function to libv::ui::Component)
+	Maybe interop with scene container
+
+app.star: whats next?
+	have a canvas
+	pretty design, ui elements
+	have a surface
+	updater - self update
 
 
+---
 
 
-
-
-
-
-
-ui normalize contexts
+libv.ui: ui normalize contexts
 	libv.ui: Expose nexus from a context
 	libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
 		style intrusive_ptr -> intrusive2_ptr
@@ -127,13 +135,6 @@ app.star: Settings
 	tooltips with description
 
 libv.ui: PageLayouts
-
-libv.ui: Easy scene level storage
-	class SceneSettings : Scene {
-		Config temp_config;
-	};
-	Scene as a class? (Instead of a single function to libv::ui::Component)
-	Maybe interop with scene container
 
 star: Separate "save/apply": preview and commit changes, or maybe the auto-save is fine as it is
 	star: Make save/apply buttons inactive if there is no change

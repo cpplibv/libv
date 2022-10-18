@@ -13,6 +13,8 @@
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/component/scene_container.hpp>
 
+#include <libv/ui/attach_state.hpp>
+
 
 namespace star {
 
@@ -38,6 +40,27 @@ inline void switchParentScene(const libv::ui::Component& component, std::string_
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T>
+struct AssembleSceneProxy {
+	std::unique_ptr<T> t;
+
+	template <typename... Args>
+	libv::ui::Component operator()(Args&&... args) {
+		auto c = t->create_scene(std::forward<Args>(args)...);
+		libv::ui::attach_state<std::unique_ptr<T>>(c)(std::move(t));
+		return c;
+	}
+};
+
+/// Requires a libv::ui::Component create_scene(...) member function
+/// @usage: assembleScene<SceneType>(SceneCtorArgs...)(CreateSceneArgs...);
+template <typename T, typename... Args>
+[[nodiscard]] AssembleSceneProxy<T> assembleScene(Args&&... args) {
+	return AssembleSceneProxy<T>(std::make_unique<T>(std::forward<Args>(args)...));
+}
+
+// -------------------------------------------------------------------------------------------------
+
 //libv::ui::Component createMainLayoutScene(...) {
 //libv::ui::Component createMainOverlay(...) {
 //	libv::ui::PanelAnchor layers{"layers"};
@@ -56,9 +79,9 @@ inline void switchParentScene(const libv::ui::Component& component, std::string_
 //
 //	return layers;
 //}
-
-// -------------------------------------------------------------------------------------------------
-
+//
+//// -------------------------------------------------------------------------------------------------
+//
 //struct SceneHandler;
 //
 //struct SceneBase {
@@ -72,7 +95,7 @@ inline void switchParentScene(const libv::ui::Component& component, std::string_
 //
 //	std::unique_ptr<SceneBase> activeScene;
 //
-//	void switch_scene(???);
+//	void switch_scene(?);
 //};
 //
 //template <typename T>
@@ -98,7 +121,6 @@ inline void switchParentScene(const libv::ui::Component& component, std::string_
 //		return btn;
 //	}
 //};
-//
 
 // -------------------------------------------------------------------------------------------------
 

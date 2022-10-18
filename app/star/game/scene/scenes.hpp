@@ -14,6 +14,7 @@ namespace star {
 [[nodiscard]] libv::ui::Component createSceneControls(libv::Nexus& nexus);
 [[nodiscard]] libv::ui::Component createSceneMainMenu(libv::Nexus& nexus);
 [[nodiscard]] libv::ui::Component createSceneSettings(libv::Nexus& nexus);
+[[nodiscard]] libv::ui::Component createSceneSurface(libv::Nexus& nexus);
 
 // -------------------------------------------------------------------------------------------------
 
