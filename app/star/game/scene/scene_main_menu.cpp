@@ -45,43 +45,24 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 
 	auto golden_line = libv::ui::PanelLine::ns("golden-line", "main-menu.golden-line");
 
-	{
-		auto golden_box = libv::ui::PanelLine::ns("golden-box", "main-menu.golden-box");
+	golden_line.add_ns<libv::ui::Gap>("golden-gap", "main-menu.golden-gap");
+	auto golden_box = golden_line.add_ns<libv::ui::PanelLine>("golden-box", "main-menu.golden-box");
 
-		{
-			auto golden_gap = libv::ui::Gap::ns("golden-gap", "main-menu.golden-gap");
-			golden_line.add(std::move(golden_gap));
+	auto menu_box = golden_box.add_ns<libv::ui::PanelLine>("menu_box", "main-menu.menu.panel");
 
-		} {
-			auto menu_box = libv::ui::PanelLine::ns("menu_box", "main-menu.menu.panel");
+	menu_box.add_nsa<libv::ui::Label>("title", "main-menu.menu.title", "IRIS STAR");
+	menu_box.add(menuEntry("Single player", nullptr));
+	menu_box.add(menuEntry("Multiplayer", nullptr));
+	menu_box.add(menuEntry("Load", nullptr));
+	menu_box.add(menuEntry("Mods", nullptr));
+	menu_box.add(menuEntry("Settings", createSceneSettings));
+	menu_box.add(menuEntry("Controls", createSceneControls));
+	menu_box.add(menuEntry("Credits", nullptr));
 
-			{
-				auto lbl = libv::ui::Label::nsa("title", "main-menu.menu.title", "IRIS STAR");
-				menu_box.add(std::move(lbl));
-			}
-
-			menu_box.add(menuEntry("Single player", nullptr));
-			menu_box.add(menuEntry("Multiplayer", nullptr));
-			menu_box.add(menuEntry("Load", nullptr));
-			menu_box.add(menuEntry("Mods", nullptr));
-			menu_box.add(menuEntry("Settings", createSceneSettings));
-			menu_box.add(menuEntry("Controls", createSceneControls));
-			menu_box.add(menuEntry("Credits", nullptr));
-
-			{
-				auto btn = libv::ui::Button::s("main-menu.menu.entry");
-				btn.text("Exit");
-				btn.event().submit.connect([nexus] {
-					nexus.broadcast_global(RequestClientExit());
-				});
-				menu_box.add(std::move(btn));
-			}
-
-			golden_box.add(std::move(menu_box));
-		}
-
-		golden_line.add(std::move(golden_box));
-	}
+	auto btn_exit = menu_box.add_sa<libv::ui::Button>("main-menu.menu.entry", "Exit");
+	btn_exit.event().submit.connect([nexus] {
+		nexus.broadcast_global(RequestClientExit());
+	});
 
 	return layoutSceneMainMenu(std::move(golden_line));
 }

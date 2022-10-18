@@ -62,6 +62,10 @@ public:
 		handler.style(style);
 		return handler;
 	}
+	template <typename... Args>
+	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT a(Args&&... args) {
+		return HandlerT{generate_component_name(HandlerT::component_type, nextID++), std::forward<Args>(args)...};
+	}
 	[[nodiscard]] static LIBV_FORCE_INLINE HandlerT ns(std::string name, std::string_view style) {
 		HandlerT handler{std::move(name)};
 		handler.style(style);
