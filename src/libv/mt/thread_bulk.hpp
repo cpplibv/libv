@@ -11,6 +11,7 @@
 #include <thread>
 #include <vector>
 // pro
+#include <libv/mt/mutex_spinlock.hpp>
 #include <libv/mt/thread_group.hpp>
 
 
@@ -26,9 +27,9 @@ class thread_bulk {
 	std::atomic_bool finishing = false;
 	std::atomic_size_t working{0};
 
-	std::mutex mutex;
-	std::condition_variable work_cv;
-	std::condition_variable done_cv; // TODO P5: C++20 'done_cv' can be folded under the 'done' atomic
+	libv::mutex_spinlock mutex;
+	std::condition_variable_any work_cv;
+	std::condition_variable_any done_cv; // TODO P5: C++20 'done_cv' can be folded under the 'done' atomic
 
 	thread_group group;
 

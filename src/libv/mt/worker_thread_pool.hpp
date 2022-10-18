@@ -22,6 +22,10 @@ class worker_thread_pool {
 
 public:
 	explicit worker_thread_pool(std::size_t n, std::string name = "unnamed-pool");
+	inline worker_thread_pool(const worker_thread_pool&) noexcept = default;
+	inline worker_thread_pool& operator=(const worker_thread_pool&) & noexcept = default;
+	inline worker_thread_pool(worker_thread_pool&&) noexcept = default;
+	inline worker_thread_pool& operator=(worker_thread_pool&&) & noexcept = default;
 	~worker_thread_pool() noexcept;
 
 public:

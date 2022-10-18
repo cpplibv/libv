@@ -6,6 +6,8 @@
 #include <atomic>
 #include <chrono>
 #include <mutex>
+// pro
+#include <libv/mt/mutex_spinlock.hpp>
 
 
 namespace libv {
@@ -21,7 +23,7 @@ namespace mt {
 class work_cooldown {
 private:
 	std::atomic_bool in_flight = false;
-	std::mutex cooldown_m;
+	mutable libv::mutex_spinlock cooldown_m;
 	std::chrono::steady_clock::time_point cooldown_at = std::chrono::steady_clock::time_point::min();
 	std::chrono::steady_clock::duration cooldown{std::chrono::milliseconds{100}};
 
@@ -68,7 +70,7 @@ public:
 class work_warmup_cooldown {
 private:
 	std::atomic_bool in_flight = false;
-	std::mutex cooldown_m;
+	mutable libv::mutex_spinlock cooldown_m;
 	std::chrono::steady_clock::time_point cooldown_at = std::chrono::steady_clock::time_point::min();
 	std::chrono::steady_clock::duration warmup{std::chrono::milliseconds{100}};
 	std::chrono::steady_clock::duration cooldown{std::chrono::milliseconds{100}};
@@ -115,7 +117,7 @@ public:
 class work_warmup {
 private:
 	std::atomic_bool in_flight = false;
-	std::mutex cooldown_m;
+	mutable libv::mutex_spinlock cooldown_m;
 	std::chrono::steady_clock::duration warmup{std::chrono::milliseconds{100}};
 
 public:

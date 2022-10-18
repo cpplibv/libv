@@ -6,6 +6,8 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+// pro
+#include <libv/mt/mutex_spinlock.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ class SingleInstance {
 	friend class detail::SingleInstanceProxy;
 
 private:
-	std::mutex mutex;
+	mutable libv::mutex_spinlock mutex;
 	std::optional<T> variable; // Instead of optional: libv::storage<T> variable; aka alignas(T) std::byte storage[sizeof(T)]
 	std::size_t ref_count = 0;
 	// NOTE: Not implemented with weak_ptr because the destructors are also guarded with the same mutex

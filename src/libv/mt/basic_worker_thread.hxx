@@ -3,8 +3,8 @@
 #pragma once
 
 // libv
-#include <libv/utility/unique_function.hpp>
 #include <libv/log/log.hpp>
+#include <libv/utility/unique_function.hpp>
 // std
 #include <chrono>
 #include <condition_variable>
@@ -12,6 +12,8 @@
 #include <queue>
 #include <string>
 #include <thread>
+// pro
+#include <libv/mt/mutex_spinlock.hpp>
 
 
 namespace libv {
@@ -38,9 +40,9 @@ class basic_worker_thread {
 	};
 
 private:
+	mutable libv::mutex_spinlock queue_m;
+	mutable std::condition_variable_any work_cv;
 	std::priority_queue<queued_task, std::vector<queued_task>, queue_comp> queue;
-	mutable std::mutex queue_m;
-	mutable std::condition_variable work_cv;
 
 	bool terminate = false;
 	Threads context_;

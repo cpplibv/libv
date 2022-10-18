@@ -8,6 +8,8 @@
 #include <optional>
 #include <queue>
 #include <stop_token>
+// pro
+#include <libv/mt/mutex_spinlock.hpp>
 
 
 namespace libv {
@@ -17,7 +19,7 @@ namespace mt {
 
 template <typename T>
 class queue_concurrent {
-	mutable std::mutex queue_m;
+	mutable libv::mutex_spinlock queue_m;
 	std::queue<T> queue;
 	mutable std::condition_variable_any received_cv;
 	mutable std::condition_variable_any consumed_cv;

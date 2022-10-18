@@ -8,6 +8,8 @@
 #include <mutex>
 #include <optional>
 #include <stop_token>
+// pro
+#include <libv/mt/mutex_spinlock.hpp>
 
 
 namespace libv {
@@ -23,7 +25,7 @@ template <typename T>
 class async_value {
 private:
 	struct payload_t {
-		mutable std::mutex mutex;
+		mutable libv::mutex_spinlock mutex;
 		std::size_t async_value_ref_count = 1; // ref count used to cancel async task (shared/weak ptr has no viable event for it)
 		std::optional<T> value;
 		std::stop_source stop_source;
