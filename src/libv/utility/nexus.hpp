@@ -8,8 +8,8 @@
 #include <libv/meta/always.hpp>
 #include <libv/meta/force_inline.hpp>
 #include <libv/utility/type_key.hpp>
+#include <libv/utility/unique_function.hpp>
 // std
-#include <functional>
 #include <memory>
 #include <type_traits>
 
@@ -51,10 +51,10 @@ public:
 	inline ~Nexus() = default;
 
 private:
-	void aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func);
-	void aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
-	void aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func);
-	void aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
+	void aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func);
+	void aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
+	void aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func);
+	void aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func, const void* event_ptr);
 	void aux_broadcast(channel_ptr channel_owner, type_uid event_type, const void* event_ptr) const;
 	void aux_disconnect_all(channel_or_slot_ptr owner);
 	void aux_disconnect_channel(channel_ptr channel_owner, type_uid event_type);
@@ -77,7 +77,7 @@ private:
 
 private:
 	template <typename Event, typename Func>
-	[[nodiscard]] LIBV_FORCE_INLINE std::function<void(channel_ptr, const void*)> aux_make_callback_global(Func&& func) {
+	[[nodiscard]] LIBV_FORCE_INLINE libv::unique_function<void(channel_ptr, const void*)> aux_make_callback_global(Func&& func) {
 		return [f = std::forward<Func>(func)](channel_ptr, const void* event_ptr) mutable {
 			if constexpr(std::is_invocable_v<Func, const Event&>)
 				f(*static_cast<const Event*>(event_ptr));
@@ -87,7 +87,7 @@ private:
 	}
 
 	template <typename Event, typename Channel, typename Func>
-	[[nodiscard]] LIBV_FORCE_INLINE std::function<void(channel_ptr, const void*)> aux_make_callback_channel(Func&& func) {
+	[[nodiscard]] LIBV_FORCE_INLINE libv::unique_function<void(channel_ptr, const void*)> aux_make_callback_channel(Func&& func) {
 		static constexpr bool is_void_channel = std::is_void_v<Channel>;
 
 		if constexpr (is_void_channel) {

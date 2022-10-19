@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/meta/force_inline.hpp>
 // std
 #include <optional>
 // pro
@@ -17,7 +19,7 @@ template <typename State>
 struct AttachedState {
 	std::optional<State> object;
 
-	void operator()() {
+	LIBV_FORCE_INLINE void operator()() {
 		object.reset();
 	}
 };
@@ -27,7 +29,7 @@ struct AttachedStateProxy {
 	AttachedState<State>& state;
 
 	template <typename... Args>
-	State& operator()(Args&&... args) {
+	LIBV_FORCE_INLINE State& operator()(Args&&... args) {
 		return state.object.emplace(std::forward<Args>(args)...);
 	}
 };
@@ -38,8 +40,8 @@ struct AttachedStateProxy {
 ///
 /// The state is allowed to store an owning reference to the component (During detach the state is destroyed, so it will not keep alive the component indefinitely)
 template <typename State>
-[[nodiscard]] auto attach_state(Component& component) {
-	return AttachedStateProxy<State>{component.event().detach.connect_system_out_ref(AttachedState<State>{})};
+[[nodiscard]] LIBV_FORCE_INLINE AttachedStateProxy<State> attach_state(Component& component) {
+	return {component.event().detach.connect_system_out_ref(AttachedState<State>{})};
 }
 
 // -------------------------------------------------------------------------------------------------

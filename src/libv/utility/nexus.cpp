@@ -8,6 +8,7 @@
 #include <libv/algo/erase_unstable.hpp>
 #include <libv/algo/linear_contains.hpp>
 #include <libv/utility/hash.hpp>
+//#include <libv/mt/mutex_spinlock.hpp> // Would lead to cyclic dependency between mt <-> utility
 // std
 #include <cassert>
 #include <mutex>
@@ -72,7 +73,7 @@ struct ImplNexus {
 public:
 	struct Target {
 		slot_ptr slot_owner;
-		std::function<void(channel_ptr, const void*)> callback;
+		libv::unique_function<void(channel_ptr, const void*)> callback;
 	};
 
 	std::recursive_mutex channel_m;
@@ -144,42 +145,32 @@ std::vector<ImplNexus::Target>& aux_create_channel(ImplNexus& self, ImplNexus::c
 	return self.channels[channel_key];
 }
 
-void Nexus::aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func) {
+void Nexus::aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func) {
 	auto lock = std::unique_lock(self->channel_m);
 	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
 	channel.emplace_back(slot_owner, std::move(func));
 }
 
-void Nexus::aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
-	{
-		auto lock = std::unique_lock(self->channel_m);
-		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
-		// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
-		//			this could be solved by relying on the unordered_map value stability, but there are plans to move
-		//			to a different hash container
-		channel.emplace_back(slot_owner, func);
-	}
-
-	func(channel_owner, event_ptr);
+void Nexus::aux_connect_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
+	auto lock = std::unique_lock(self->channel_m);
+	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+	auto& callback = channel.emplace_back(slot_owner, std::move(func)).callback;
+	// WARNING: The callback mustn't modify the list of the subscribed entries of the same channel
+	callback(channel_owner, event_ptr);
 }
 
-void Nexus::aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func) {
+void Nexus::aux_connect_front(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func) {
 	auto lock = std::unique_lock(self->channel_m);
 	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
 	channel.emplace(channel.begin(), slot_owner, std::move(func));
 }
 
-void Nexus::aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, std::function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
-	{
-		auto lock = std::unique_lock(self->channel_m);
-		auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
-		// NOTE: func cannot be moved into aux_connect as func should be called without the mutex held
-		//			this could be solved by relying on the unordered_map value stability, but there are plans to move
-		//			to a different hash container
-		channel.emplace(channel.begin(), slot_owner, func);
-	}
-
-	func(channel_owner, event_ptr);
+void Nexus::aux_connect_front_and_call(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func, const void* event_ptr) {
+	auto lock = std::unique_lock(self->channel_m);
+	auto& channel = aux_create_channel(*self, channel_owner, slot_owner, event_type);
+	auto& callback = channel.emplace(channel.begin(), slot_owner, std::move(func))->callback;
+	// WARNING: The callback mustn't modify the list of the subscribed entries of the same channel
+	callback(channel_owner, event_ptr);
 }
 
 void Nexus::aux_broadcast(channel_ptr channel_owner, type_uid event_type, const void* event_ptr) const {
@@ -189,7 +180,8 @@ void Nexus::aux_broadcast(channel_ptr channel_owner, type_uid event_type, const 
 
 	const auto it = self->channels.find(channel_key);
 	if (it != self->channels.end())
-		for (const auto& target : it->second)
+		for (auto& target : it->second)
+			// WARNING: The callback mustn't modify the list of the subscribed entries of the same channel
 			target.callback(channel_owner, event_ptr);
 }
 

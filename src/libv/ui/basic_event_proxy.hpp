@@ -224,21 +224,21 @@ public:
 				detail::internal_callback_component<ComponentT, EventT, true>(std::forward<F>(func)));
 	}
 
-	template <typename F>
-	inline F& connect_system_out_ref(F&& func) {
-		struct Target {
-			F f;
+	template <typename Target>
+	inline Target& connect_system_out_ref(Target&& target) {
+		struct Callback {
+			std::unique_ptr<Target> target;
 
 			void operator()(CoreComponent* signal_ptr, const EventT& event) {
 				(void) signal_ptr; // Callback is not interested in the component
 				(void) event; // Callback is not interested in the event
 				// NOTE: It's a system event, no need to check propagation
-				f();
+				(*target)();
 			}
 		};
 
-		auto callback = std::function<void(CoreComponent*, const EventT&)>{Target{std::forward<F>(func)}};
-		auto& target = callback.template target<Target>()->f;
+		Callback callback{std::make_unique<Target>(std::forward<Target>(target))};
+		auto& stable_ref = *callback.target;
 
 		mark_as_signal(this->component);
 		get_nexus(this->component).template connect_channel<EventT>(
@@ -246,7 +246,7 @@ public:
 				nullptr,
 				std::move(callback));
 
-		return target;
+		return stable_ref;
 	}
 
 	LIBV_FORCE_INLINE void fire(const EventT& event) {
