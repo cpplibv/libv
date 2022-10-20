@@ -95,6 +95,10 @@ struct build_info {
 //		Release
 //
 //		Stable
+//
+//	WISH_GIT_BRANCH
+//	WISH_GIT_COMMIT_HASH
+//	WISH_DATE_SHORT WISH_TIME_SHORT
 };
 
 //extern BuildInfo build;

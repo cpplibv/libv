@@ -22,6 +22,14 @@ Model::Model(libv::vm4::Model model) :
 }
 
 void Model::load() {
+//	constexpr auto attribute_position   = libv::glr::Attribute<0, libv::vec3f>{};
+//	constexpr auto attribute_normal     = libv::glr::Attribute<1, libv::vec3f>{};
+//	constexpr auto attribute_bondID     = libv::glr::Attribute<4, libv::vec4i>{};
+//	constexpr auto attribute_bondWeight = libv::glr::Attribute<5, libv::vec4f>{};
+//	constexpr auto attribute_tangent    = libv::glr::Attribute<6, libv::vec3f>{};
+//	constexpr auto attribute_bitangent  = libv::glr::Attribute<7, libv::vec3f>{};
+//	constexpr auto attribute_texture0   = libv::glr::Attribute<8, libv::vec2f>{};
+
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto tangent = mesh.attribute(attribute_tangent);
