@@ -28,6 +28,7 @@ public:
 
 private:
 	void register_nexus();
+	void register_controls();
 	void unregister_nexus();
 	void init_ui();
 //	void update();

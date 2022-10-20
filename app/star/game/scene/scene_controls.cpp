@@ -78,7 +78,7 @@ libv::ui::Component createSceneControls(libv::Nexus& nexus) {
 
 	auto btn = line.add_sa<libv::ui::Button>("settings.ctrl", "Back");
 	btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-		switchParentScene(source, "main", createSceneMainMenu(nexus));
+		switchParentScene("main", source, createSceneMainMenu(nexus));
 	});
 
 	return line;

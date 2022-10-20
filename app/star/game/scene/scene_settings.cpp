@@ -184,7 +184,7 @@ struct SettingsBuilder {
 		{
 			auto btn = libv::ui::Button::sa("settings.ctrl", "Back");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
-				switchParentScene(source, "main", createSceneMainMenu(nexus_));
+				switchParentScene("main", source, createSceneMainMenu(nexus_));
 			});
 			ctrl.add(std::move(btn));
 
@@ -210,7 +210,7 @@ struct SettingsBuilder {
 			auto btn = libv::ui::Button::sa("settings.ctrl", "Save");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
 //				active_config.assign(local_config);
-				switchParentScene(source, "main", createSceneMainMenu(nexus_));
+				switchParentScene("main", source, createSceneMainMenu(nexus_));
 			});
 
 			ctrl.add(std::move(btn));

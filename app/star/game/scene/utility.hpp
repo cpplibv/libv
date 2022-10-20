@@ -3,17 +3,15 @@
 #pragma once
 
 // libv
+#include <libv/ui/attach_state.hpp>
+#include <libv/ui/component/component.hpp>
+#include <libv/ui/component/scene_container.hpp>
 #include <libv/utility/nexus.hpp>
 // std
 #include <exception>
+#include <memory>
 #include <string>
-
-
-
-#include <libv/ui/component/component.hpp>
-#include <libv/ui/component/scene_container.hpp>
-
-#include <libv/ui/attach_state.hpp>
+#include <string_view>
 
 
 namespace star {
@@ -29,11 +27,11 @@ inline T& requireBean(libv::Nexus& nexus, const std::string& sceneName, const st
 	return *bean;
 }
 
-inline void switchParentScene(const libv::ui::Component& component, std::string_view sceneContainerIdentifier, libv::ui::Component scene) {
+inline void switchParentScene(std::string_view sceneContainerID, const libv::ui::Component& component, libv::ui::Component scene) {
 	auto it = component.parent();
 	while (it = it.parent()) {
 		auto sc = it.cast<libv::ui::SceneContainer>();
-		if (sc && sc.identifier() == sceneContainerIdentifier)
+		if (sc && sc.identifier() == sceneContainerID)
 			sc.assign(scene);
 	}
 }

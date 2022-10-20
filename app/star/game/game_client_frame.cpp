@@ -15,7 +15,8 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 GameClientFrame::GameClientFrame() :
-	Frame("Star", 1280, 800) {
+//	Frame("Star", 1280, 800) {
+	Frame("Star", 1680, 1050) {
 
 	setPosition(libv::Frame::FramePosition::center_current_monitor);
 	setOpenGLProfile(libv::Frame::OpenGLProfile::core);

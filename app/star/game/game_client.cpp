@@ -3,30 +3,31 @@
 // hpp
 #include <star/game/game_client.hpp>
 // libv
-//#include <libv/mt/worker_thread.hpp>
+#include <libv/ctrl/binding_register.hpp>
+#include <libv/ctrl/controls.hpp>
+#include <libv/ctrl/feature_register.hpp>
+#include <libv/sun/camera_control.hpp>
+#include <libv/ui/component/scene_container.hpp>
+#include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
-//#include <libv/ctrl/binding_register.hpp>
-//#include <libv/ctrl/feature_register.hpp>
-//#include <libv/ui/event/event_overlay.hpp>
-//#include <libv/ui/event_hub.hpp>
-#include <libv/utility/read_file.hpp>
-#include <libv/utility/write_file.hpp>
-#include <libv/ui/component/scene_container.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
-#include <star/game/config/config.hpp>
+//#include <star/game/config/config.hpp>
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/log.hpp>
+//#include <star/version.hpp>
+
+
+//#include <libv/mt/worker_thread.hpp>
+//#include <libv/ui/event/event_overlay.hpp>
+//#include <libv/ui/event_hub.hpp>
 //#include <star/game/view/camera_control.hpp>
 //#include <star/game/view/canvas_control.hpp>
-
-
 //#include <libv/ui/context/context_state.hpp>
-
 
 
 namespace star {
@@ -34,42 +35,33 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 struct ImplGameClient {
-//	libv::mt::worker_thread scheduler_{"scheduler"};
 	libv::Nexus nexus_;
 
-	std::shared_ptr<ClientConfig> config_;
+//	libv::mt::worker_thread scheduler_{"scheduler"};
+//	GameThread game_thread{ui, nexus};
+
 //	Config<ClientConfigGroup> config_;
 //	ConfigManager configManager{scheduler_, nexus_};
 //	Config<ClientConfig> config_;
 //	std::shared_ptr<ClientConfig> config_;
 //	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
-
-//	auto nexus = libv::Nexus();
 //	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
+	std::shared_ptr<ClientConfig> config_;
+//	User user;
+	libv::ctrl::Controls controls;
 
-	libv::ui::UI ui;
+//	Renderer renderer{ui};
 
 	GameClientFrame frame;
+	libv::ui::UI ui;
 
-//	libv::ctrl::Controls controls;
-//
-//	Renderer renderer{ui};
-//
-//	GameThread game_thread{ui, nexus};
-//
-//	User user;
-
-	inline ImplGameClient(libv::ui::Settings&& ui_settings, const std::filesystem::path& configFilepath) :
+	explicit inline ImplGameClient(const std::filesystem::path& configFilepath) :
 			config_(make_config<ClientConfig>(nexus_, configFilepath)),
-			ui(ui_settings) {}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-GameClient::GameClient(const std::filesystem::path& configFilepath) :
-	self(std::make_unique<ImplGameClient>(
-			[] {
+			ui([&] {
 				libv::ui::Settings settings;
+
+				// settings.nexus = nexus_;
+
 				// TODO P1: Internalize used UI resources under star, currently: app/star/../../res/
 				settings.res_font.base_path = "../../res/font/";
 				settings.res_shader.base_path = "../../res/shader/";
@@ -81,23 +73,18 @@ GameClient::GameClient(const std::filesystem::path& configFilepath) :
 
 				settings.track_style_scripts = true;
 				return settings;
-			}(),
-			configFilepath
-	)) {
+			}()) {
+	}
+};
 
+// -------------------------------------------------------------------------------------------------
+
+GameClient::GameClient(const std::filesystem::path& configFilepath) :
+		self(std::make_unique<ImplGameClient>(configFilepath)) {
+
+	register_controls();
 	register_nexus();
-//	CameraControl::register_controls(controls);
-//	CameraControl::bind_default_controls(controls);
-//	CanvasControl::register_controls(controls);
-//	CanvasControl::bind_default_controls(controls);
-//
-//	ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
-//		log_star.info("Controls intercepted: {}", event.controls_intercepted());
-//		// TODO P1: A more seamless integration of UI and Controls would be nice
-//		controls.ignore_events(event.controls_intercepted());
-//	});
 
-//	controls.attach(self->frame);
 	self->ui.attach(self->frame);
 
 	self->ui.load_style_script_file("style.lua");
@@ -109,14 +96,34 @@ GameClient::~GameClient() {
 	unregister_nexus();
 }
 
+void GameClient::register_controls() {
+	libv::sun::CameraControl::register_controls(self->controls);
+	libv::sun::CameraControl::bind_default_controls(self->controls);
+//	CanvasControl::register_controls(controls);
+//	CanvasControl::bind_default_controls(controls);
+
+	self->ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
+		log_star.info("Controls intercepted: {}", event.controls_intercepted());
+		// TODO P1: A more seamless integration of UI and Controls would be nice
+		self->controls.ignore_events(event.controls_intercepted());
+	});
+
+	self->controls.attach(self->frame);
+}
+
 void GameClient::register_nexus() {
 	self->nexus_.object_view_set<ClientConfig>(self->config_.get());
+	self->nexus_.object_view_set<libv::ctrl::Controls>(&self->controls);
 
 	self->nexus_.connect_global<RequestClientExit>(this, [this](const RequestClientExit&) {
 		self->frame.closeDefault();
 	});
 
-	// Setup Logging
+	// Setup configs
+	self->config_->graphics.vsync_enable.subscribe_and_call(this, [this](const ConfigEntry<bool>::Change& event) {
+		self->frame.setSwapInterval(event.entry.value() ? 1 : 0);
+	});
+
 	self->config_->development.logging_trace_ui.subscribe_and_call(this, [](const ConfigEntry<bool>::Change& event) {
 		libv::logger_stream.below("libv.ui", libv::Logger::Severity::Info, event.entry.value());
 	});
@@ -127,6 +134,7 @@ void GameClient::unregister_nexus() {
 
 	self->nexus_.disconnect_all(this);
 	self->nexus_.object_view_remove<ClientConfig>();
+	self->nexus_.object_view_remove<libv::ctrl::Controls>();
 
 	assert(self->nexus_.num_tracked() == 0);
 	assert(self->nexus_.num_object() == 0);

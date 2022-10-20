@@ -10,25 +10,82 @@ Star - System integration demo
 
 
 
-libv.ui: Easy scene level storage
-	class SceneSettings : Scene {
-		Config temp_config;
-	};
-	Scene as a class? (Instead of a single function to libv::ui::Component)
-	Maybe interop with scene container
+
+
+
+
+ctrl name constants
+
+
+base camera lib-wide
+with extensibility
+
+register_controls(libv::ctrl::FeatureRegister controls)
+	per controlled object (lib-wide)
+	blacklist (wildcard) support
+	whitelist (wildcard) support
+
+bind_default_controls(libv::ctrl::BindingRegister controls)
+	per application
+
+
+
+
+
+
+
+
+
+Organize camera
+	camera (merge all: star, space, vm4v, surface)
+	how? camera_controls (merge all: star, space, vm4v, surface)
+
+
+
+
+Improve design: Switch to nicer colors
+
+Organize star renderer
+	surface scene is a mess
+Organize star surface scene
+	use a style sheet
+Organize star rev
+	organize rev resource manager
+	use proper resource path
+	builtin:red.vs, builtin:red.fs should be built in and not file based
+
+	rev should use nexus instead of ui_hub
+
+Organize star overlay
+
+libv.ui: kill ui_hub and replace it with nexus
+
+
+
+
+
+
+libv.ui: Choose the null component constructor(s):
+	ComponentT{}
+	ComponentT{ptr} // where ptr == null
+	ComponentT{nullptr}
+	ComponentT{null_component}
+	ComponentT::null()
 
 app.star: whats next?
-	have a canvas
-	pretty design, ui elements
 	have a surface
+	pretty design, ui elements, edit stylesheet
 	updater - self update
-
+		on demand generation, keep last M
+		release level to indicate auto generation of patch paths
 
 ---
 
 
 libv.ui: ui normalize contexts
+	libv.ui: UI nexus, accept injected
 	libv.ui: Expose nexus from a context
+	libv.ui: Kill event_hub in favor of exposed nexus
 	libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
 		style intrusive_ptr -> intrusive2_ptr
 
@@ -71,14 +128,6 @@ libv.ui: Cleanup duty:
 libv.ui: Setting: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
 
 
-
-
-libv.ui: Choose the null component constructor(s):
-	ComponentT{}
-	ComponentT{ptr} // where ptr == null
-	ComponentT{nullptr}
-	ComponentT{null_component}
-	ComponentT::null()
 
 
 ----------
@@ -188,8 +237,6 @@ libv.ui: Warn whenever a UI component out lives the UI object itself
 
 app.star: Settings page back clear the focus while apply will rotate it to next
 app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-
-app.star: Better scene selector / navigation
 
 app.star: Self-Updater
 

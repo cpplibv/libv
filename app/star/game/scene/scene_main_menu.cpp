@@ -37,7 +37,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 			btn.enable(false);
 		else
 			btn.event().submit.connect([nexus, createFn](libv::ui::Button& source) mutable {
-				switchParentScene(source, "main", createFn(nexus));
+				switchParentScene("main", source, createFn(nexus));
 			});
 
 		return btn;
@@ -52,6 +52,8 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 
 	menu_box.add_nsa<libv::ui::Label>("title", "main-menu.menu.title", "IRIS STAR");
 	menu_box.add(menuEntry("Surface", createSceneSurface));
+//	menu_box.add(menuEntry("Space", nullptr));
+//	menu_box.add(menuEntry("VM4 Viewer", nullptr));
 	menu_box.add(menuEntry("Single player", nullptr));
 	menu_box.add(menuEntry("Multiplayer", nullptr));
 	menu_box.add(menuEntry("Load", nullptr));

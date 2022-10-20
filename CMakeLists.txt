@@ -843,7 +843,7 @@ wish_create_executable(
 	GENERATE codegen app/space/message/*.in.lua
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-	LINK   libv_vm4 libv_noise
+	LINK   libv_vm4 libv_noise libv_sun
 	LINK   libv_sys
 )
 
