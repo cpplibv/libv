@@ -53,7 +53,7 @@ public:
 
 	// named constructors --------------------------------------------------------------------------
 
-	[[nodiscard]] static constexpr inline quat_t identity() noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE quat_t identity() noexcept {
 		return quat_t();
 	}
 
