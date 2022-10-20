@@ -675,8 +675,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_math INTERFACE
-#	SOURCE src/libv/math/*.cpp
+	TARGET libv_math STATIC
+	SOURCE src/libv/math/*.cpp
+#	TARGET libv_math INTERFACE
 	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
 	LINK   ext_boost # For gradient small_vector
 	LINK   ext_fmt

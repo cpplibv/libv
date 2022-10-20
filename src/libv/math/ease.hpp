@@ -322,7 +322,6 @@ template <typename T>
 	return glm::bounceEaseInOut(x);
 }
 
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace math
