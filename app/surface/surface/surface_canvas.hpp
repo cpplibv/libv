@@ -65,10 +65,10 @@ public:
 	explicit inline Scene(Renderer& renderer) : renderer(renderer) {}
 
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) = 0;
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) = 0;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) = 0;
 
-	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
+	void renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum);
 
 	virtual ~Scene() = default;
 };
@@ -77,14 +77,14 @@ struct SurfaceScene : Scene {
 	using Scene::Scene;
 
 	virtual void build(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) override;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
 struct TextureScene : Scene {
 	using Scene::Scene;
 
-	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) override;
+	virtual void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) override;
 	virtual void buildVeggie(int generation, const std::vector<std::shared_ptr<Chunk>>& chunks) override;
 };
 
@@ -146,7 +146,7 @@ private:
 	std::unique_ptr<Scene> activeScene;
 	std::unique_ptr<Surface> surface;
 
-	Frustum cameraFrustum;
+	libv::frustum cameraFrustum;
 	bool surfaceDirty = false;
 	bool initializedSprites = false;
 

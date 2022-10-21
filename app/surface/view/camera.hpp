@@ -11,7 +11,7 @@
 #include <chrono>
 #include <cmath>
 //surface
-#include <surface/view/frustum.hpp>
+#include <libv/math/frustum.hpp>
 
 
 namespace surface {
@@ -99,7 +99,7 @@ public:
 	[[nodiscard]] vec3 up() const noexcept;
 
 	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
-	[[nodiscard]] Frustum frustum(vec2 canvas_size) const noexcept;
+	[[nodiscard]] libv::frustum frustum(vec2 canvas_size) const noexcept;
 
 public:
 	void look_at(vec3 eye, vec3 target) noexcept;
@@ -295,10 +295,10 @@ public:
 		position_ = value;
 	}
 
-	[[nodiscard]] constexpr inline Frustum frustum(vec2 canvasSize) const noexcept {
+	[[nodiscard]] constexpr inline libv::frustum frustum(vec2 canvasSize) const noexcept {
 		//TODO
 		(void) canvasSize;
-		return Frustum();
+		return libv::frustum();
 	}
 //	[[nodiscard]] constexpr inline float_type near() const noexcept {
 //		return near_;

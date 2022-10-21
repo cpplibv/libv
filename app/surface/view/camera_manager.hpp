@@ -4,9 +4,9 @@
 
 // libv
 #include <libv/ctrl/controls.hpp>
+#include <libv/math/frustum.hpp>
 // pro
 #include <surface/view/camera.hpp>
-#include <surface/view/frustum.hpp>
 
 
 namespace surface {
@@ -129,12 +129,12 @@ public:
 		return 0.f;
 	}
 
-	[[nodiscard]] Frustum getCameraFrustum(libv::vec2f canvasSize) const noexcept {
+	[[nodiscard]] libv::frustum getCameraFrustum(libv::vec2f canvas_size) const noexcept {
 		switch (currentCameraMode) {
 		case CameraMode::_2d:
-			return camera2D.frustum(canvasSize);
+			return camera2D.frustum(canvas_size);
 		case CameraMode::_3d:
-			return camera3D.frustum(canvasSize);
+			return camera3D.frustum(canvas_size);
 		}
 		assert(false && "Invalid CameraMode enum value");
 		return {};

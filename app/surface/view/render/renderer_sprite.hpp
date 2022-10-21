@@ -7,6 +7,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_buffer.hpp>
+#include <libv/math/frustum.hpp>
 #include <libv/math/vec.hpp>
 // std
 #include <array>
@@ -191,7 +192,7 @@ public:
 	void add(int32_t type, libv::vec3f position, libv::vec3f normal, libv::vec3f surfaceNormal, float rotation, float scale, libv::vec3f hsv_shift);
 	void commitChunk(int generation, libv::vec2i index);
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum);
 };
 
 // -------------------------------------------------------------------------------------------------

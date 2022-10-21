@@ -4,11 +4,11 @@
 #include <surface/view/render/renderer_sprite.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+#include <libv/math/frustum.hpp>
 #include <libv/rev/resource_manager.hpp>
 // pro
 #include <surface/log.hpp>
 #include <surface/surface/surface_constants.hpp>
-#include <surface/view/frustum.hpp>
 #include <surface/view/render/baker_sprite_atlas.hpp>
 
 
@@ -130,7 +130,7 @@ void RendererSprite::commitChunk(int generation, libv::vec2i index) {
 	entries_hsv_shift.clear();
 }
 
-void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	if (spriteChunks.empty())
 		return;
 
@@ -161,7 +161,7 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 			return true;
 		}
 
-		if (frustum.sphereInFrustum({chunkPosition, 0}, chunkSideLength * libv::sqrt2 * 0.5f) != Frustum::Position::OUTSIDE)
+		if (frustum.sphere_in_frustum({chunkPosition, 0}, chunkSideLength * libv::sqrt2 * 0.5f) != libv::frustum::position::outside)
 			glr.render(spriteChunk.mesh);
 
 		return false;

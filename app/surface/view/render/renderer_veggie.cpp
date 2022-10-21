@@ -91,7 +91,7 @@ void RendererVeggie::buildMesh(Mesh& mesh, const std::vector<Sphere>& veggies) {
 	}
 }
 
-void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
@@ -103,7 +103,7 @@ void RendererVeggie::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	const auto& eye = glr.eye();
 	for (const auto &[_, veggie] : vegetationMap) {
 
-		if (frustum.sphereInFrustum(veggie.chunkPos, veggie.chunkSize.length() / 2.f) != Frustum::Position::OUTSIDE) {
+		if (frustum.sphere_in_frustum(veggie.chunkPos, veggie.chunkSize.length() / 2.f) != libv::frustum::position::outside) {
 			if ((veggie.chunkPos - eye).length() < 10.f) {
 				const auto& mesh = veggie.mesh;
 				auto uniforms = uniform_stream.block_unique(layout_matrices);

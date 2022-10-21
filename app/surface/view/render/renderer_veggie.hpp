@@ -3,6 +3,7 @@
 #pragma once
 
 #include <libv/math/vec.hpp>
+#include <libv/math/frustum.hpp>
 #include <libv/glr/mesh.hpp>
 
 #include <array>
@@ -11,7 +12,6 @@
 #include <surface/view/vec_hash.hpp>
 #include <surface/view/render/shaders.hpp>
 #include <surface/surface/biome.hpp>
-#include <surface/view/frustum.hpp>
 
 
 namespace surface {
@@ -92,7 +92,7 @@ public:
 
 	void clear();
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum);
 };
 
 

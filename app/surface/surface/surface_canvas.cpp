@@ -49,7 +49,7 @@ inline libv::glr::Texture createTexture(const libv::vector_2D<libv::vec4f>& heat
 
 // -------------------------------------------------------------------------------------------------
 
-void Scene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void Scene::renderVeggie(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	renderer.veggie.render(glr, uniform_stream, frustum);
 }
 
@@ -61,7 +61,7 @@ void SurfaceScene::build(int generation, const std::vector<std::shared_ptr<Chunk
 	}
 }
 
-void SurfaceScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void SurfaceScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	renderer.surface.render(glr, uniform_stream, frustum);
 }
 
@@ -79,7 +79,7 @@ void SurfaceScene::buildVeggie(int generation, const std::vector<std::shared_ptr
 
 // -------------------------------------------------------------------------------------------------
 
-void TextureScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void TextureScene::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	(void) frustum;
 	auto s_guard = glr.state.push_guard();
 	glr.state.disableDepthMask();

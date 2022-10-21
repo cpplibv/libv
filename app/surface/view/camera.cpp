@@ -115,7 +115,7 @@ void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept {
 	orbit_distance_ = length;
 }
 
-Frustum BaseCameraOrbit::frustum(vec2 canvas_size) const noexcept {
+libv::frustum BaseCameraOrbit::frustum(vec2 canvas_size) const noexcept {
 	const auto width = canvas_size.x;
 	const auto height = canvas_size.y;
 
@@ -138,7 +138,7 @@ Frustum BaseCameraOrbit::frustum(vec2 canvas_size) const noexcept {
 	const auto ftl = eye_ + far_ * forward() + world_far_height_half * up() + world_far_width * -right();
 
 
-	return Frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
+	return libv::frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
 }
 
 // =================================================================================================

@@ -110,7 +110,7 @@ void RendererSurface::clear() {
 	chunkMeshMap.clear();
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Frustum& frustum) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::frustum& frustum) {
 	glr.program(shader.program());
 
 	glr.uniform(shader.uniform().fogEnabled, fogEnabled);
@@ -136,7 +136,7 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 			return true;
 		}
 
-		if (frustum.sphereInFrustum(chunkMesh.pos, chunkMesh.size.length() / 2.f) != Frustum::Position::OUTSIDE) {
+		if (frustum.sphere_in_frustum(chunkMesh.pos, chunkMesh.size.length() / 2.f) != libv::frustum::position::outside) {
 			auto uniforms = uniform_stream.block_unique(layout_matrices);
 			uniforms[layout_matrices.matMVP] = glr.mvp();
 			uniforms[layout_matrices.matM] = glr.model;
