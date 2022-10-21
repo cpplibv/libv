@@ -756,6 +756,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_sun STATIC
+	SOURCE src/libv/sun/*.cpp
+	LINK   libv_math libv_ctrl libv_log
+)
+
+wish_create_library(
 	TARGET libv_sys STATIC
 	SOURCE src/libv/sys/*.cpp
 	LINK   libv_log ext_clip ext_fmt
@@ -854,13 +860,14 @@ wish_create_executable(
 wish_create_executable(
 	TARGET star
 	SOURCE app/star/*.cpp
-	GENERATE codegen app/star/message/*.in.lua
+#	GENERATE codegen app/star/message/*.in.lua
 	LINK   libv_log libv_sys
 	LINK   libv_frame libv_ctrl libv_ui
-	LINK   libv_rev libv_glr libv_color
-	LINK   libv_lua
-	LINK   libv_net libv_serial
-	LINK   libv_vm4
+	LINK   libv_sun libv_rev libv_glr libv_color
+	LINK   libv_serial
+#	LINK   libv_lua
+#	LINK   libv_net
+#	LINK   libv_vm4
 )
 
 wish_create_executable(
