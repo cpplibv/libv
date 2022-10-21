@@ -7,7 +7,7 @@
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/distance/distance.hpp>
 #include <libv/math/distance/intersect.hpp>
-#include <space/view/frustum.hpp>
+#include <libv/math/frustum.hpp>
 // std
 #include <optional>
 // pro
@@ -286,19 +286,19 @@ void selection3D(CanvasControl& ctx, bool commitSelection) {
 	libv::vec3f ftr = eye + dnn * far / dnn_cos;
 	libv::vec3f ftl = eye + ann * far / ann_cos;
 
-	const auto frustum = Frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
+	const auto frustum = libv::frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
 
 	std::vector<FleetID> selectedFleetIDs;
 	for (auto& fleet : ctx.galaxy.fleets) {
-		const auto result = frustum.sphereInFrustum(fleet->position, Fleet::pickingType.radius_universe);
+		const auto result = frustum.sphere_in_frustum(fleet->position, Fleet::pickingType.radius_universe);
 
 		switch (result) {
-		case Frustum::Position::OUTSIDE:
+		case libv::frustum::position::outside:
 			fleet->selectionStatus = Fleet::Selection::notSelected;
 			break;
-		case Frustum::Position::INTERSECT:
+		case libv::frustum::position::intersect:
 			[[fallthrough]];
-		case Frustum::Position::INSIDE:
+		case libv::frustum::position::inside:
 			if (commitSelection) {
 				selectedFleetIDs.emplace_back(fleet->id);
 				fleet->selectionStatus = Fleet::Selection::selected;
@@ -334,16 +334,16 @@ void selection3D(CanvasControl& ctx, bool commitSelection) {
 		//			{
 //				for (int i = -20; i < 20; ++i) {
 //					for (int j = -20; j < 20; ++j) {
-//						const auto result = frustum.sphereInFrustum({i, j, 0}, 0.25f);
+//						const auto result = frustum.sphere_in_frustum({i, j, 0}, 0.25f);
 //						libv::vec4f color;
 //						switch (result) {
-//						case Frustum::Position::OUTSIDE:
+//						case libv::frustum::position::outside:
 //							color = {0.5f, 0.5f, 0.5f, 1};
 //							break;
-//						case Frustum::Position::INTERSECT:
+//						case libv::frustum::position::intersect:
 //							color = {1, 0.5f, 0, 1};
 //							break;
-//						case Frustum::Position::INSIDE:
+//						case libv::frustum::position::inside:
 //							color = {1, 1, 0.8f, 1};
 //							break;
 //						}
