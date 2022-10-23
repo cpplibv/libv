@@ -10,8 +10,6 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-class CameraPlayer;
-
 class GameInstance;
 class GameSession;
 class GameThread;

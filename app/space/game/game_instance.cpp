@@ -5,11 +5,11 @@
 // libv
 #include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/feature_register.hpp>
+#include <libv/sun/camera_control.hpp>
 #include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/settings.hpp>
 // pro
-#include <space/view/camera_control.hpp>
 #include <space/view/canvas_control.hpp>
 #include <space/view/scene_main_control.hpp>
 #include <space/message/internal_events.hpp>
@@ -61,8 +61,8 @@ GameInstance::GameInstance() :
 	}()) {
 
 	register_nexus();
-	CameraControl::register_controls(controls);
-	CameraControl::bind_default_controls(controls);
+	libv::sun::CameraControl::register_controls(controls);
+	libv::sun::CameraControl::bind_default_controls(controls);
 	CanvasControl::register_controls(controls);
 	CanvasControl::bind_default_controls(controls);
 	SceneMainControl::register_controls(controls);

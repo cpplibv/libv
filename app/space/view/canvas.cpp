@@ -159,11 +159,11 @@ void SpaceCanvas::enableControls(libv::ctrl::Controls& controls) {
 		);
 
 	controls.context_enter<CanvasControl>(&*controlVar);
-	controls.context_enter<BaseCameraOrbit>(&camera);
+	controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 }
 
 void SpaceCanvas::disableControls(libv::ctrl::Controls& controls) {
-	controls.context_leave_if_matches<BaseCameraOrbit>(&camera);
+	controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera);
 	controls.context_leave_if_matches<CanvasControl>(&*controlVar);
 }
 

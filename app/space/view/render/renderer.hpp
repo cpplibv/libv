@@ -14,6 +14,7 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/resource/shader_loader.hpp>
+#include <libv/sun/camera.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
@@ -21,7 +22,6 @@
 //#include <space/sim/universe.hpp>
 #include <space/sim/fleet.hpp> // For selection status
 #include <space/sim/planet.hpp> // For nothing (yet)
-#include <space/view/camera.hpp>
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>
 
@@ -298,7 +298,7 @@ public:
 	void clear_texts();
 	void add_debug_coordinates_if_nothing_else();
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const CameraPlayer::screen_picker& screen_picker);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::sun::CameraPlayer::screen_picker& screen_picker);
 };
 
 // -------------------------------------------------------------------------------------------------

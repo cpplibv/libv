@@ -12,8 +12,8 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/vm4/load.hpp>
+//#include <libv/sun/camera.hpp>
 // pro
-//#include <space/view/camera.hpp>
 //#include <space/command.hpp>
 //#include <space/game/game_instance.hpp>
 //#include <space/sim/playout/playout.hpp>
@@ -822,7 +822,7 @@ void RendererText::add_debug_coordinates_if_nothing_else() {
 	add_text({0, 0, -5}, {0, 0}, "(0, 0, -5)", {0.4f, 0.4f, 1, 1});
 }
 
-void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const CameraPlayer::screen_picker& screen_picker) {
+void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const libv::sun::CameraPlayer::screen_picker& screen_picker) {
 
 //	auto& task = std::get<ImplContextRender::TaskUI>(context.tasks.emplace_back(
 //			std::in_place_type<ImplContextRender::TaskUI>,

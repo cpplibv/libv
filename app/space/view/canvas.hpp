@@ -7,9 +7,9 @@
 // libv
 #include <libv/rev/post_processing.hpp>
 #include <libv/rev/render_target.hpp>
+#include <libv/sun/camera.hpp>
 #include <libv/ui/component/canvas.hpp>
 // pro
-#include <space/view/camera.hpp>
 #include <space/view/canvas_control.hpp>
 #include <space/view/render/renderer.hpp>
 
@@ -50,8 +50,8 @@ public:
 	// TODO P1: app.space: Should not store it (?) only to bypass controls invalidation issue
 	libv::ctrl::Controls& controls;
 
-	CameraPlayer camera;
-	CameraPlayer::screen_picker screen_picker;
+	libv::sun::CameraPlayer camera;
+	libv::sun::CameraPlayer::screen_picker screen_picker;
 
 private:
 	std::optional<CanvasControl> controlVar;
