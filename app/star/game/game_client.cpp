@@ -2,24 +2,29 @@
 
 // hpp
 #include <star/game/game_client.hpp>
+// ext
+#include <fmt/format.h>
 // libv
 #include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
+#include <libv/math/exponential_moving_average.hpp>
 #include <libv/sun/camera_control.hpp>
+#include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/scene_container.hpp>
 #include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
+#include <libv/utility/timer.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
-//#include <star/game/config/config.hpp>
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/log.hpp>
-//#include <star/version.hpp>
+#include <star/version.hpp>
 
 
 //#include <libv/mt/worker_thread.hpp>
@@ -124,6 +129,10 @@ void GameClient::register_nexus() {
 		self->frame.setSwapInterval(event.entry.value() ? 1 : 0);
 	});
 
+	self->config_->development.always_on_top.subscribe_and_call(this, [this](const ConfigEntry<bool>::Change& event) {
+		self->frame.setAlwaysOnTop(event.entry.value());
+	});
+
 	self->config_->development.logging_trace_ui.subscribe_and_call(this, [](const ConfigEntry<bool>::Change& event) {
 		libv::logger_stream.below("libv.ui", libv::Logger::Severity::Info, event.entry.value());
 	});
@@ -141,14 +150,24 @@ void GameClient::unregister_nexus() {
 }
 
 void GameClient::init_ui() {
-	auto msc = libv::ui::SceneContainer("sc-main");
+	auto layers = libv::ui::PanelAnchor("layers");
+
+	auto msc = layers.add_n<libv::ui::SceneContainer>("sc-main");
 	msc.identifier("main");
 	msc.assign(createSceneMainMenu(self->nexus_));
-	self->ui.add(std::move(msc));
-	self->ui.event().before_update([this] {
-		self->config_->update();
-	});
 
+	layers.add_nsa<libv::ui::Label>("version", "overlay.version", fmt::format("Star {}", build.version_name));
+	auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
+
+	self->ui.add(std::move(layers));
+	self->ui.event().before_update([this, fps, t = libv::Timer{}, avg = libv::exponential_moving_average<float, 1>(0)] mutable {
+		self->config_->update();
+
+		// TODO P4: Implement proper statistics gathering (including integration with UI and Game state statistics)
+		const auto dt = t.timef_s().count();
+		avg.add(1.0f / dt, dt);
+		fps.text(fmt::format("{:6.1f} FPS", avg.value()));
+	});
 //	frame.onKey.output([&](const libv::input::EventKey& e) {
 //		if (e.keycode == libv::input::Keycode::F2 && e.action == libv::input::Action::press)
 //			ui.foreach_recursive_component([](const libv::ui::Component& component) {

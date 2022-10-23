@@ -19,7 +19,7 @@ public:
 	static_assert(T{0} < Window);
 
 //	static constexpr T match = Match; /// Convergence rate over the window
-	static constexpr T match = 0.8; /// Convergence rate over the window
+	static constexpr T match = T{0.8}; /// Convergence rate over the window
 	static constexpr T window = Window;
 	static constexpr T alpha = -std::pow(T{1} - match, T{1} / window) + T{1};
 

@@ -2,12 +2,8 @@
 
 // hpp
 #include <star/game/game_client_frame.hpp>
-// libv
-#include <libv/frame/frame.hpp>
-//#include <libv/frame/monitor.hpp>
 // pro
 #include <star/game/view/icon_set.hpp>
-//#include <star/log.hpp>
 
 
 namespace star {
@@ -16,7 +12,9 @@ namespace star {
 
 GameClientFrame::GameClientFrame() :
 //	Frame("Star", 1280, 800) {
-	Frame("Star", 1680, 1050) {
+	Frame("Star", 1680, 945) {
+//	Frame("Star", 1680, 1050) {
+//	Frame("Star", 1920, 1080) {
 
 	setPosition(libv::Frame::FramePosition::center_current_monitor);
 	setOpenGLProfile(libv::Frame::OpenGLProfile::core);
@@ -39,17 +37,6 @@ GameClientFrame::GameClientFrame() :
 //				config.window_height = e.size.y;
 //			}
 //		});
-
-//		int frame_index = 0;
-//		int frame_total = 6;
-//		int num_row = 4; // TODO P5: math to keep good ratio based on total;
-//		getCurrentMonitor().workAreaPosition;
-//		const auto workAreaSize = workAreaSize;
-//		setPosition(...)
-//		setSize(...
-//				workAreaSize.x / num_row,
-//				workAreaSize.y / (frame_total / num_row
-//		);
 }
 
 GameClientFrame::~GameClientFrame() {

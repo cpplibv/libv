@@ -69,15 +69,16 @@ struct ConfigGroupSounds : BaseConfigGroup {
 };
 
 struct ConfigGroupDevelopment : BaseConfigGroup {
-	ConfigEntry<bool> logging_trace_ui{config, true, "Logging: UI Trace", "Enable/Disable UI Trace logging"};
 	ConfigEntry<bool> always_on_top{config, false, "Always On Top", "Enable/Disable always on top window setting on start"};
+
+	ConfigEntry<bool> logging_trace_ui{config, true, "Logging: UI Trace", "Enable/Disable UI Trace logging"};
 
 	ConfigEntry<int32_t> test_setting        {config, 1, "test_setting", "test_setting desc"};
 	ConfigEntry<std::string> test_setting_str{config, "Test string default content", "test_setting_str", "test_setting str desc"};
 
 	template <typename Archive> void serialize(Archive& ar) {
-		ar.nvp("logging_trace_ui", logging_trace_ui);
 		ar.nvp("always_on_top", always_on_top);
+		ar.nvp("logging_trace_ui", logging_trace_ui);
 		ar.nvp("test_setting", test_setting);
 		ar.nvp("test_setting_str", test_setting_str);
 	}

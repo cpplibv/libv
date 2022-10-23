@@ -21,6 +21,25 @@ local colors = {
 	--hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
 }
 
+-- === Overlay =====================================================================================
+
+ui.style("overlay.fps") {
+	font = fonts.mono,
+	align_horizontal = "left",
+	align_vertical = "bottom",
+	margin = {4, 2},
+	font_color = {1, 1, 1, 0.8},
+}
+
+ui.style("overlay.version") {
+	font = fonts.mono,
+	font_size = 12,
+	align_horizontal = "right",
+	align_vertical = "bottom",
+	margin = {4, 2},
+	font_color = {1, 1, 1, 0.8},
+}
+
 -- === Main Menu ===================================================================================
 
 ui.style("main-menu") {
@@ -86,15 +105,6 @@ ui.style("main-menu.menu.entry") {
 		font_color = {0.5, 0.5, 0.5, 1},
 		background = {type = "border_padding_pattern", color_border = {0.4, 0.4, 0.4, 0.6}, color_pattern = {0.4, 0.4, 0.4, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 	},
-}
-
-ui.style("main-menu.version-lbl") {
-	size = "D, D",
-	anchor = "bottom_right",
-	align_horizontal = "center",
-	align_vertical = "center",
-	margin = {10, 0},
-	font_color = {1, 1, 1, 1},
 }
 
 -- === Settings ====================================================================================
