@@ -83,7 +83,7 @@ int main(int argc, const char** argv) {
 //		const auto path_resource = "../../res";
 		const auto lwt = libv::last_write_time(path);
 
-		star::log_star.info("--- Star {} ---", star::build.version_name);
+		star::log_star.info("--- Star {} ---", star::build.version_number);
 		star::log_star.info_if(devMode, "Running in developer mode");
 		star::log_star.info("Current path:  {}", std::filesystem::current_path().generic_string());
 		star::log_star.info("Executable:    {}/{}", path_dir.generic_string(), path_bin.generic_string());
@@ -93,7 +93,7 @@ int main(int argc, const char** argv) {
 		star::log_star.info("System:        {}", libv::sys::os_version());
 
 		// Run the game
-		auto game = star::GameClient(arg_config.value());
+		auto game = star::GameClient(devMode, arg_config.value());
 		game.run();
 
 	} catch (const std::exception& e) {

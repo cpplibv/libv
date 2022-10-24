@@ -34,8 +34,10 @@ TEST_CASE("Test version number fmt", "[libv.utility.version]") {
 	libv::version_number v1{1, 2, 3};
 	libv::version_number v2{1, 2, 3, 4};
 
-	CHECK(fmt::format("{}", v0) == "1.2.0.0");
-	CHECK(fmt::format("{}", v1) == "1.2.3.0");
+//	CHECK(fmt::format("{}", v0) == "1.2.0.0");
+//	CHECK(fmt::format("{}", v1) == "1.2.3.0");
+	CHECK(fmt::format("{}", v0) == "1.2");
+	CHECK(fmt::format("{}", v1) == "1.2.3");
 	CHECK(fmt::format("{}", v2) == "1.2.3.4");
 
 //	CHECK(fmt::format("{:%M}", v2) == "1");

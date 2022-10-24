@@ -60,12 +60,17 @@ struct fmt::formatter<libv::version_number> : fmt::formatter<uint16_t> {
 		*out++ = '.';
 		ctx.advance_to(out);
 		out = formatter<uint16_t>::format(var.minor, ctx);
-		*out++ = '.';
-		ctx.advance_to(out);
-		out = formatter<uint16_t>::format(var.patch, ctx);
-		*out++ = '.';
-		ctx.advance_to(out);
-		out = formatter<uint16_t>::format(var.build, ctx);
+		// TODO P5: Use a custom formatting syntax to configure these rules like non printed patch or build number
+		if (var.patch != 0 || var.build != 0) {
+			*out++ = '.';
+			ctx.advance_to(out);
+			out = formatter<uint16_t>::format(var.patch, ctx);
+		}
+		if (var.build != 0) {
+			*out++ = '.';
+			ctx.advance_to(out);
+			out = formatter<uint16_t>::format(var.build, ctx);
+		}
 
 		ctx.advance_to(out);
 		return out;

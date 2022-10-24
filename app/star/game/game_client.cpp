@@ -84,7 +84,7 @@ struct ImplGameClient {
 
 // -------------------------------------------------------------------------------------------------
 
-GameClient::GameClient(const std::filesystem::path& configFilepath) :
+GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath) :
 		self(std::make_unique<ImplGameClient>(configFilepath)) {
 
 	register_controls();
@@ -94,7 +94,7 @@ GameClient::GameClient(const std::filesystem::path& configFilepath) :
 
 	self->ui.load_style_script_file("style.lua");
 
-	init_ui();
+	init_ui(devMode);
 }
 
 GameClient::~GameClient() {
@@ -149,14 +149,14 @@ void GameClient::unregister_nexus() {
 	assert(self->nexus_.num_object() == 0);
 }
 
-void GameClient::init_ui() {
+void GameClient::init_ui(bool devMode) {
 	auto layers = libv::ui::PanelAnchor("layers");
 
 	auto msc = layers.add_n<libv::ui::SceneContainer>("sc-main");
 	msc.identifier("main");
 	msc.assign(createSceneMainMenu(self->nexus_));
 
-	layers.add_nsa<libv::ui::Label>("version", "overlay.version", fmt::format("Star {}", build.version_name));
+	layers.add_nsa<libv::ui::Label>("version", "overlay.version", fmt::format("Star {}{}", build.version_number, devMode ? " [Dev]" : ""));
 	auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
 
 	self->ui.add(std::move(layers));

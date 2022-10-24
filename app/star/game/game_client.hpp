@@ -23,14 +23,14 @@ private:
 	std::unique_ptr<ImplGameClient> self;
 
 public:
-	explicit GameClient(const std::filesystem::path& configFilepath);
+	GameClient(bool devMode, const std::filesystem::path& configFilepath);
 	~GameClient();
 
 private:
 	void register_nexus();
 	void register_controls();
 	void unregister_nexus();
-	void init_ui();
+	void init_ui(bool devMode);
 //	void update();
 
 public:
