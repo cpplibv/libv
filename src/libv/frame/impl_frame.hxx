@@ -45,9 +45,9 @@ public:
 	libv::vec2i aspectRatio = {-1, -1};
 	libv::vec2f contentScale = {1, 1};
 	libv::vec2i framebufferSize;
-	libv::vec2i position = {};
+	libv::vec2i position;
 	libv::vec2i size;
-	libv::vec4i frameSize = {}; /// x - left, y - top, z - right, w - bottom
+	libv::vec4i frameSize; /// x - left, y - top, z - right, w - bottom
 	libv::vec2i sizeLimitMax = {-1, -1};
 	libv::vec2i sizeLimitMin = {-1, -1};
 
@@ -71,6 +71,7 @@ public:
 	bool maximized = false;
 	bool minimized = false;
 
+	bool initializePosition = false; /// Marks if creation should set the position to override the OS default
 	bool initialFocus = true;
 	bool focusOnShow = true;
 

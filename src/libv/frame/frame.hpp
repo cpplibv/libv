@@ -118,7 +118,7 @@ public: // ---------------------------------------------------------------------
 	enum class FramePosition {
 		center_current_monitor,
 		center_primary_monitor,
-//		not_specified, // TODO P5: libv.frame: Implement not specified position to use OS default
+		os_default,
 	};
 
 	enum class CloseOperation {

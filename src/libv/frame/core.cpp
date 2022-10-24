@@ -121,7 +121,11 @@ void Frame::cmdCoreCreate() {
 		if (!self->window)
 			return log_core.error("GLFW window creation failed");
 
-		glfwSetWindowPos(self->window, self->position.x, self->position.y);
+		if (self->initializePosition)
+			glfwSetWindowPos(self->window, self->position.x, self->position.y);
+		else
+			// To use OS Default position we don't Set only Get the position
+			glfwGetWindowPos(self->window, &self->position.x, &self->position.y);
 
 		glfwSetWindowSizeLimits(self->window,
 				self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,

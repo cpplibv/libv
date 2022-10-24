@@ -404,6 +404,13 @@ void Frame::setPosition(libv::vec2i newpos) {
 void Frame::setPosition(FramePosition pos) {
 	self->context.executeAsync([this, pos] {
 		std::lock_guard lock(self->frameState_m);
+
+		if (pos == FramePosition::os_default) {
+			self->initializePosition = false;
+			return; // Position to OS default is not possible of the window was already created, return now
+		} else
+			self->initializePosition = true;
+
 		auto& monitor = pos == FramePosition::center_current_monitor ? _getCurrentMonitor() : Monitor::getPrimaryMonitor();
 
 		auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
