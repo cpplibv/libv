@@ -56,7 +56,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 	menu_box.add(menuEntry("Mods", nullptr));
 	menu_box.add(menuEntry("Settings", createSceneSettings));
 	menu_box.add(menuEntry("Controls", createSceneControls));
-	menu_box.add(menuEntry("Credits", nullptr));
+	menu_box.add(menuEntry("Credits", createSceneCredits));
 
 	auto btn_exit = menu_box.add_sa<libv::ui::Button>("main-menu.menu.entry", "Exit");
 	btn_exit.event().submit.connect([nexus] {

@@ -16,7 +16,8 @@ GameClientFrame::GameClientFrame() :
 //	Frame("Star", 1680, 1050) {
 //	Frame("Star", 1920, 1080) {
 
-	setPosition(libv::Frame::FramePosition::os_default);
+//	setPosition(libv::Frame::FramePosition::center_current_monitor);
+//	setPosition(libv::Frame::FramePosition::os_default);
 	setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 	setOpenGLVersion(4, 5);
 	setOpenGLSamples(libv::Frame::OpenGLSamples{0});

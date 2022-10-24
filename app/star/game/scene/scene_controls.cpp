@@ -5,7 +5,6 @@
 // libv
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_board.hpp>
 #include <libv/ui/component/panel_line.hpp>
 // pro

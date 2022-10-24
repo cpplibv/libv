@@ -303,6 +303,73 @@ ui.style("controls.visual.key") {
 	--},
 }
 
+-- === Credits =====================================================================================
+
+local credits_tps = 12 -- credits third party spacing
+
+ui.style("credits") {
+	font = fonts.label,
+	font_color = "#EEE",
+	font_size = 14,
+}
+
+ui.style("credits.main") {
+	orientation = "down",
+	padding = 25,
+}
+
+ui.style("credits.line") {
+	orientation = "down",
+	--spacing = 25,
+}
+
+ui.style("credits.segment") {
+	size = "1r, D",
+	font_size = 20,
+}
+
+ui.style("credits.personnel") {
+	size = "1r, D",
+}
+
+ui.style("credits.third-party.panel") {
+	orientation = "down",
+	size = "1r, D",
+	background = "#FFF1",
+	margin = { 0, 10 },
+}
+
+ui.style("credits.third-party.separator") {
+	size = "1r, 4px",
+	background = "#FFFA",
+}
+
+ui.style("credits.third-party.title") {
+	background = "#FFF1",
+	size = "1r, D",
+	font_size = 20,
+	margin = { 0, credits_tps * 0.5, 0, 0 },
+	padding = { 12, 2 },
+}
+
+ui.style("credits.third-party.url") {
+	size = "1r, D",
+	margin = { 0, credits_tps * 0.5 },
+	padding = { 12, 0 },
+}
+
+ui.style("credits.third-party.license_short") {
+	size = "1r, D",
+	margin = { 0, credits_tps * 0.5 },
+	padding = { 12, 0 },
+}
+
+ui.style("credits.third-party.license_text") {
+	size = "1r, D",
+	font_size = 12,
+	padding = { 12, credits_tps, 12, 0.5 * credits_tps },
+	background = "#0001",
+}
 
 -- =================================================================================================
 

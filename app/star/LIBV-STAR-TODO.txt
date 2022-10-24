@@ -13,37 +13,29 @@ Star - System integration demo
 
 
 
-
-ctrl name constants
-
-
-base camera lib-wide
-with extensibility
-
-register_controls(libv::ctrl::FeatureRegister controls)
-	per controlled object (lib-wide)
-	blacklist (wildcard) support
-	whitelist (wildcard) support
-
-bind_default_controls(libv::ctrl::BindingRegister controls)
-	per application
+Improve design
+	Switch to nicer colors, bye bye blue background
 
 
 
+controls / camera
+	Organize camera
+		camera (merge all: star, space, vm4v, surface)
+		how? camera_controls (merge all: star, space, vm4v, surface)
+
+	base camera lib-wide
+		camera_settings
+		with extensibility per application
+
+	register_controls(libv::ctrl::FeatureRegister controls)
+		per controlled object (lib-wide)
+		blacklist (wildcard) support
+		whitelist (wildcard) support
+
+	bind_default_controls(libv::ctrl::BindingRegister controls)
+		per application
 
 
-
-
-
-
-Organize camera
-	camera (merge all: star, space, vm4v, surface)
-	how? camera_controls (merge all: star, space, vm4v, surface)
-
-
-
-
-Improve design: Switch to nicer colors
 
 Organize star renderer
 	surface scene is a mess
