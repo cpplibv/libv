@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/camera_control.cpp
+// Project: libv, File: app/surface/view/camera_control.cpp
 
 // hpp
 #include <surface/view/camera_control.hpp>
@@ -22,7 +22,7 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	// TODO P2: libv.ctrl: These groups are kind of universal, make them libv.ctrl level constant with a multiplier support over them
 	//                  So one could just write: auto my_sg_rotate = ctrl::sg_rotate * 2.0;
 	//                  Include groups for:
-	//                      camera_rotate, camera_move, camera_zoom, number_slider, scroll_bar
+	//                      camera_rotate, camera_move, camera_zoom, number_slider, slider
 
 	libv::ctrl::scale_group sg_rotate{
 			.impulse = libv::to_rad(5.0),

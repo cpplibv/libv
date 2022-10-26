@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/camera.cpp
+// Project: libv.sun, File: src/libv/sun/camera.cpp
 
 // hpp
 //#include <star/game/scene/surface/camera.hpp>

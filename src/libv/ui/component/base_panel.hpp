@@ -5,7 +5,7 @@
 // libv
 #include <libv/meta/force_inline.hpp>
 // pro
-#include <libv/ui/component/detail/component_api.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 #include <libv/ui/property/background.hpp>
 
 

@@ -11,7 +11,7 @@
 #include <memory>
 // pro
 #include <libv/ui/chrono.hpp>
-#include <libv/ui/component/detail/component_api.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 
 
 namespace libv {

@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/frame.hpp
+// Project: libv, File: app/surface/view/frame.hpp
 
 #pragma once
 

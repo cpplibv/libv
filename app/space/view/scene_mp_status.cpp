@@ -3,8 +3,8 @@
 // hpp
 #include <space/view/scene_mp_status.hpp>
 // libv
-#include <libv/ui/attach_state.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/component_system/attach_state.hpp>
 #include <libv/utility/nexus.hpp>
 // pro
 #include <space/network/lobby.hpp>

@@ -4,6 +4,8 @@
 
 // libv
 #include <libv/math/vec.hpp>
+// pro
+#include <libv/ui/property/extent.hpp>
 
 
 namespace libv {
@@ -12,6 +14,8 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 using Padding = libv::vec4f;
+
+using PaddingExtent = Extent<float>;
 
 // -------------------------------------------------------------------------------------------------
 

@@ -6,20 +6,18 @@
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-//#include <libv/ui/font_2D.hpp>
-#include <libv/ui/property_access_context.hpp>
-//#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+//#include <libv/ui/resource/font_2D.hpp>
+//#include <libv/ui/resource/shader_font.hpp>
 //#include <libv/ui/string_2D.hpp>
-#include <libv/ui/style.hpp>
 
 
 namespace libv {
@@ -28,13 +26,9 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 //class CoreRadioButton : public CoreComponent {
-//public:
-//	friend class RadioButton;
-//	[[nodiscard]] inline auto handler() { return RadioButton{this}; }
+//	using base_type = CoreComponent;
 //
 //private:
-//	template <typename T> static void access_properties(T& ctx);
-//
 //	struct Properties {
 //		PropertyR<Background> background;
 //
@@ -46,6 +40,8 @@ namespace ui {
 //		PropertyL<> font;
 //		PropertyL<> font_size;
 //	} property;
+//
+//	template <typename T> static void access_properties(T& ctx);
 //
 //private:
 //	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
@@ -62,7 +58,7 @@ namespace ui {
 //
 //protected:
 //	virtual void doAttach() override;
-//	virtual void doStyle(ContextStyle& ctx) override;
+//	virtual void doStyle(StyleAccess& access) override;
 //	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;
 //	virtual void doRender(Renderer& r) override;
@@ -197,10 +193,8 @@ namespace ui {
 //	watchMouse(true);
 //}
 //
-//void CoreRadioButton::doStyle(ContextStyle& ctx) {
-//	PropertyAccessContext<CoreRadioButton> setter{*this, ctx.component, ctx.style, context()};
-//	access_properties(setter);
-//	CoreComponent::doStyle(ctx);
+//void CoreRadioButton::doStyle(StyleAccess& access) {
+//	access.self(*this);
 //}
 //
 //libv::vec3f CoreRadioButton::doLayout1(const ContextLayout1& environment) {

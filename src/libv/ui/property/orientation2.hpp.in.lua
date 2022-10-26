@@ -1,6 +1,6 @@
 -- Project: libv.ui, File: src/libv/ui/property/orientation2.hpp.in.lua, Author: Császár Mátyás [Vader]
 
-enum("Orientation2", "int32_t")
+enum("Orientation2", "int8_t")
 namespace("libv::ui")
 
 value("down_left",  "down-left")

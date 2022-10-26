@@ -1,4 +1,4 @@
-// Project: libv.container, File: src/libv/container/vector_2d.hpp
+// Project: libv.container, File: src/libv/container/sliding_window_2d.hpp
 
 #pragma once
 

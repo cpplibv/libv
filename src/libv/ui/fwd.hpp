@@ -22,7 +22,7 @@ class ContextLayout2;
 class ContextMouse;
 class ContextRender;
 class ContextState;
-class ContextStyle;
+class StyleAccess; //class ContextStyle;
 class ContextUI;
 
 class EventHub;

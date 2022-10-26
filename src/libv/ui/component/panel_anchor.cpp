@@ -9,12 +9,11 @@
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/layout_utility.hpp>
 #include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -22,14 +21,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelAnchor::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
-	access_properties(setter);
-	CoreBasePanel::doStyle(ctx);
+void CorePanelAnchor::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
-void CorePanelAnchor::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelAnchor::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 

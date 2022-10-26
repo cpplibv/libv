@@ -1,4 +1,4 @@
-// Created by dbobula on 4/2/2022.
+// Project: libv.math, File: src/libv/math/fract.hpp
 
 #pragma once
 

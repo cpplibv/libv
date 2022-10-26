@@ -2,20 +2,20 @@
 
 // hpp
 #include <libv/ui/component/scroll_pane.hpp>
-#include <libv/meta/for_constexpr.hpp>
 // std
 #include <optional>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_slc.hpp>
+#include <libv/ui/component/layout/layout_utility.hpp>
+#include <libv/ui/component/scroll_area.hpp>
+#include <libv/ui/component/slider.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
-#include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -23,56 +23,41 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreScrollArea : public CoreComponent {
-public:
-	friend ScrollArea;
-	[[nodiscard]] inline auto handler() { return ScrollArea{this}; }
-
-private:
-	struct Properties {
-		PropertyL1L2LP<ScrollAreaMode> mode;
-//		PropertyL<libv::vec2f> area_position;
-//		PropertyL<libv::vec2f> area_size;
-	} property;
-
-	struct ChildProperties {
-	};
-
-	template <typename T> static void access_properties(T& ctx);
-	template <typename T> static void access_child_properties(T& ctx);
-
-//	static ComponentPropertyDescription description;
-//	static ComponentPropertyDescription child_description;
-
-private:
-//	Component client;
-	std::optional<Component> client;
-	libv::vec2f area_position;
-	libv::vec2f area_size;
+struct CoreScrollPane : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
 
 public:
-	using CoreComponent::CoreComponent;
+	PropertyR<Background> background;
 
-	inline void content(Component&& value) noexcept {
-		client = std::move(value);
-		flagForce(Flag::pendingAttachChild);
-	}
+	PropertyL1L2LP<Spacing2> spacing2;
+	PropertyL1L2LP<ScrollMode> mode;
+//	BarPlacementHorizontal bar_placement_horizontal;
+//	BarPlacementVertical bar_placement_vertical;
+//	BarVisibility bar_visibility_horizontal;
+//	BarVisibility bar_visibility_vertical;
+//	PropertyL<libv::vec2f> area_position;
+//	PropertyL<libv::vec2f> area_size;
 
-	inline void content(const Component& value) noexcept {
-		client = value;
-		flagForce(Flag::pendingAttachChild);
-	}
+	template <typename Access> static void access_properties(Access& access);
+	template <typename Access> void access_children(Access&& access);
+	template <typename Access> void access_layout(Access&& access);
 
-private:
-	virtual void onMouseMovement(const EventMouseMovement& event) override;
-//	virtual void onMouseScroll(const EventMouseScroll& event) override;
+public:
+	ScrollArea area;
+	Slider vbar;
+	Slider hbar;
 
-protected:
+public:
+//	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+public:
 	virtual void doAttach() override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
+	virtual void doStyle(StyleAccess& access) override;
+//	virtual void doStyle(StyleAccess& access, ChildID childID) override;
+//	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
 	virtual void doRender(Renderer& r) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
@@ -82,431 +67,321 @@ protected:
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-void CoreScrollArea::access_properties(T& ctx) {
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.mode; },
-			ScrollAreaMode::vertical,
-			pgr::appearance, pnm::scroll_area_mode,
-			"Scroll area mode"
+template <typename Access>
+void CoreScrollPane::access_properties(Access& access) {
+	access.property(
+			[](auto& c) -> auto& { return c.background; },
+			// Access::core_property(&CoreScrollPane::background),
+			Background::none(),
+			pgr::appearance, pnm::background, "Background"
 	);
-//	ctx.synthesize(
-//			[](auto& c, auto v) { c.handler().mode(std::move(v)); },
-//			[](const auto& c) { return c.handler().mode(); },
-//			pgr::behaviour, pnm::scroll_area_mode,
-//			"Scroll area mode"
+	access.property(
+			[](auto& c) -> auto& { return c.spacing2; },
+			// Access::core_property(&CoreScrollPane::spacing2),
+			Spacing2{0, 0},
+			pgr::layout, pnm::spacing2, "Spacing between the component columns (X) and rows (Y)"
+	);
+	access.property(
+			[](auto& c) -> auto& { return c.mode; },
+			// Access::core_property(&CoreScrollPane::mode),
+			ScrollMode::both,
+			pgr::layout, pnm::scroll_mode, "Scroll area mode"
+	);
+////	access.synthesize(
+////			[](auto& c, auto v) { c.handler().mode(std::move(v)); },
+////			[](const auto& c) { return c.handler().mode(); },
+////			pgr::behaviour, pnm::scroll_mode, "Scroll area mode"
+////	);
+//	access.synthesize(
+//			[](auto& c, auto v) { c.handler().area_position(std::move(v)); },
+//			[](const auto& c) { return c.handler().area_position(); },
+//			pgr::behaviour, pnm::area_position, "Scroll area view position"
 //	);
-	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().area_position(std::move(v)); },
-			[](const auto& c) { return c.handler().area_position(); },
-			pgr::behaviour, pnm::area_position,
-			"Scroll area view position"
-	);
-	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().area_size(std::move(v)); },
-			[](const auto& c) { return c.handler().area_size(); },
-			pgr::behaviour, pnm::area_size,
-			"Scroll area view size"
-	);
+//	access.synthesize(
+//			[](auto& c, auto v) { c.handler().area_size(std::move(v)); },
+//			[](const auto& c) { return c.handler().area_size(); },
+//			pgr::behaviour, pnm::area_size, "Scroll area view size"
+//	);
 }
 
-template <typename T>
-void CoreScrollArea::access_child_properties(T& ctx) {
-	(void) ctx;
+template <typename Access>
+void CoreScrollPane::access_children(Access&& access) {
+	access(area);
+	access(vbar);
+	access(hbar);
+}
+
+template <typename Access>
+void CoreScrollPane::access_layout(Access&& access) {
+	//	static_layout_padding(padding) (
+	//		static_layout_line(libv::ui::Orientation::right) (
+	//			static_layout_line(libv::ui::Orientation::down) (
+	//				content,
+	//				vbar
+	//			),
+	//			hbar
+	//		)
+	//	)
+
+	const auto is_vertical = info(mode()).vertical();
+	const auto is_horizontal = info(mode()).horizontal();
+
+	if (is_vertical && is_horizontal)
+		access(
+				SLC_Padding(this->padding_extent(),
+					SLC_LineStatic(spacing2().x, Orientation::right,
+						SLC_LineStatic(spacing2().y, Orientation::down,
+							SLC_Component(area),
+							SLC_Component(hbar)
+						),
+						SLC_Component(vbar)
+					)
+				)
+		);
+
+	else if (is_vertical)
+		access(
+				SLC_Padding(this->padding_extent(),
+					SLC_LineStatic(spacing2().x, Orientation::right,
+						SLC_Component(area),
+						SLC_Component(vbar)
+					)
+				)
+		);
+
+	else if (is_horizontal)
+		access(
+				SLC_Padding(this->padding_extent(),
+					SLC_LineStatic(spacing2().y, Orientation::down,
+						SLC_Component(area),
+						SLC_Component(hbar)
+					)
+				)
+		);
+
+	else
+		access(
+				SLC_Padding(this->padding_extent(),
+					SLC_Component(area)
+				)
+		);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreScrollArea::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreScrollArea> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
-}
-
-void CoreScrollArea::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
-	(void) childID;
+void CoreScrollPane::doStyle(StyleAccess& access) {
+	access.self(*this);
+	access.nested(area, "area");
+	access.nested(vbar, "vbar");
+	access.nested(hbar, "hbar");
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreScrollArea::onMouseMovement(const EventMouseMovement& event) {
-	event.pass_through();
-}
-
-//void CoreScrollArea::onMouseScroll(const EventMouseScroll& event) {
-//
+//void CoreScrollPane::onMouseMovement(const EventMouseMovement& event) {
+//	event.pass_through();
 //}
 
+void CoreScrollPane::onMouseScroll(const EventMouseScroll& event) {
+	// <<< Event into h/v bar
+}
+
 // -------------------------------------------------------------------------------------------------
 
-void CoreScrollArea::doAttach() {
-	floatRegion(true);
-}
+void CoreScrollPane::doAttach() {
+	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
+	vbar.orientation(Orientation::down);
+	hbar.orientation(Orientation::right);
 
-libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& layout_env) {
-	if (!client || !client->core().isLayouted())
-		return padding_size3();
+	// <<< value_range s
+	vbar.value_range(1);
+	hbar.value_range(1);
+	vbar.value(0);
+	hbar.value(0);
 
-	const auto is_vertical = property.mode() != ScrollAreaMode::horizontal;
-	const auto is_horizontal = property.mode() != ScrollAreaMode::vertical;
-
-	const auto env_size = layout_env.size - padding_size3();
-	const auto client_env_size = libv::vec3f{
-			is_horizontal ? -1.0f : env_size.x,
-			is_vertical ? -1.0f : env_size.y,
-			env_size.z};
-
-	auto result = libv::vec3f{};
-
-	const auto client_dynamic = client->size().has_dynamic() ?
-			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
-			libv::vec3f{};
-
-	libv::meta::for_constexpr<0, 3>([&](auto i) {
-		result[i] = std::max(
-				result[i],
-				resolvePercent(
-						client->size()[i].pixel + (client->size()[i].dynamic ? client_dynamic[i] : 0.f),
-						client->size()[i].percent, client->core())
-		);
+	// <<< Event reentry loops
+	auto handler = ScrollPane{this};
+	vbar.event().change.connect_system(handler, [this](const EventScrollChange& event) {
+		area.area_position({area.area_position().x, static_cast<float>(event.request)});
 	});
-
-	return result + padding_size3();
-}
-
-void CoreScrollArea::doLayout2(const ContextLayout2& layout_env) {
-	if (!client || !client->core().isLayouted())
-		return;
-
-	const auto is_vertical = property.mode() != ScrollAreaMode::horizontal;
-	const auto is_horizontal = property.mode() != ScrollAreaMode::vertical;
-
-	const auto env_size = layout_env.size - padding_size3();
-	const auto client_env_size = libv::vec3f{
-			is_horizontal ? -1.0f : env_size.x,
-			is_vertical ? -1.0f : env_size.y,
-			env_size.z};
-
-	// Size ---
-
-	auto size = libv::vec3f{};
-
-	const auto client_dynamic = client->size().has_dynamic() ?
-			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
-			libv::vec3f{};
-
-	const auto client_area_size = libv::vec3f{
-			is_horizontal ? client_dynamic.x : env_size.x,
-			is_vertical ? client_dynamic.y : env_size.y,
-			env_size.z};
-
-	if (xy(client_area_size) != area_size) { // Update area size
-		const auto old_area_size = area_size;
-		area_size = xy(client_area_size);
-		fire(EventScrollArea{area_position, old_area_size});
-	}
-
-	libv::meta::for_constexpr<0, 3>([&](auto i) {
-		const auto has_ratio = client->size()[i].ratio != 0.f;
-
-		if (has_ratio)
-			size[i] = client_area_size[i]; // NOTE: Ratio uses the client area size
-		else
-			size[i] =
-					client->size()[i].pixel +
-					client->size()[i].percent * 0.01f * env_size[i] + // NOTE: Percent uses the scroll-area size
-					(client->size()[i].dynamic ? client_dynamic[i] : 0.f);
+	hbar.event().change.connect_system(handler, [this](const EventScrollChange& event) {
+//		area.area_position({-static_cast<float>(event.request), area.area_position().y});
+		area.area_position({static_cast<float>(event.request), area.area_position().y});
 	});
-
-	// Position ---
-
-	const auto client_area_anchor = info(client->anchor()).rate();
-	const auto client_anchor = info(client->anchor()).rate();
-	// NOTE: For now client_area_anchor is the same as client_anchor, if needed this could be a property of the scroll area
-
-	const auto position =
-			+ padding_LB3()
-			+ client_area_anchor * layout_env.size
-			- client_area_anchor * client_area_size
-			+ client_anchor * client_area_size
-			- client_anchor * size; // NOTE: Anchor uses layout env size and client size
-
-	const auto roundedPosition = libv::vec::round(position);
-	const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
-
-	AccessLayout::layout2(client->core(), layout_env.enter(roundedPosition, roundedSize));
 }
 
-void CoreScrollArea::doRender(Renderer& r) {
-	if (!client)
-		return;
-
-	r.clip({}, layout_size2());
-
-	const auto rounded_area_position = libv::vec3f(libv::vec::round(area_position), 0.f);
-	r.translate(rounded_area_position);
-
-	Renderer rc = r.enter(*client);
-	AccessParent::render(client->core(), rc);
-
-	// TODO P4: Renderer proper translate and clip guarding (same in component_core.render)
-	r.translate(-rounded_area_position);
+void CoreScrollPane::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
+	access_children(callback);
 }
 
-void CoreScrollArea::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
-	if (!client) {
-		assert(false && "Internal error: Requesting detach for a not set client component");
-		return;
-	}
+libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& layout_env) {
+	// +------------+---+
+	// |            | v |
+	// |    area    | . |
+	// |            | b |
+	// +------------+ a |
+	// |    hbar    | r |
+	// +------------+---+
 
-	callback(*client);
+	libv::vec2f result;
+	access_layout([&](auto&& plan) {
+		result = libv::ui::layoutSLCPass1(layout_env.size, plan);
+	});
+	return {result, 0};
 }
 
-libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
-	if (current == ChildIDNone) {
-		// unrelated component is focused, focus self or iterate every children
-		if (AccessParent::isFocusableComponent(*this))
-			return libv::make_observer_ptr(this);
+void CoreScrollPane::doLayout2(const ContextLayout2& layout_env) {
+	hbar.value_min(0);
+	hbar.value_max(layout_env.size.x);
+	vbar.value_min(0);
+	vbar.value_max(layout_env.size.y);
+//	vbar.value_step(10 * 2);
+//	hbar.value_step(10 * 2);
 
-	} else if (current == ChildIDSelf) {
-		// this component itself is currently focused, iterate every children
-
-	} else {
-		// one of the children is currently focused, iterate remaining children
-		if (!context.isForward())
-			if (AccessParent::isFocusableComponent(*this))
-				return libv::make_observer_ptr(this);
-
-		return nullptr;
-	}
-
-	if (!client || !AccessParent::isFocusableChild(*this))
-		return nullptr;
-
-	if (auto hit = AccessParent::doFocusTraverse(client->core(), context, ChildIDNone))
-		return hit;
-
-	return nullptr;
+	access_layout([&](auto&& plan) {
+		libv::ui::layoutSLCPass2(layout_env.size, layout_env, plan);
+	});
 }
 
-void CoreScrollArea::doForeachChildren(libv::function_ref<bool(Component&)> callback) {
-	if (!client)
-		return;
+void CoreScrollPane::doRender(Renderer& r) {
+	const auto is_vertical = info(mode()).vertical();
+	const auto is_horizontal = info(mode()).horizontal();
 
-	callback(*client);
+	background().render(r, {0, 0}, layout_size2(), *this);
+
+	AccessParent::render(ref_core(area), r.enter(area));
+
+	if (is_horizontal)
+		AccessParent::render(ref_core(hbar), r.enter(hbar));
+
+	if (is_vertical)
+		AccessParent::render(ref_core(vbar), r.enter(vbar));
 }
 
-void CoreScrollArea::doForeachChildren(libv::function_ref<void(Component&)> callback) {
-	if (!client)
-		return;
+//libv::observer_ptr<CoreComponent> CoreScrollPane::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
+//	if (current == ChildIDNone) {
+//		// unrelated component is focused, focus self or iterate every children
+//		if (AccessParent::isFocusableComponent(*this))
+//			return libv::make_observer_ptr(this);
+//
+//	} else if (current == ChildIDSelf) {
+//		// this component itself is currently focused, iterate every children
+//
+//	} else {
+//		// one of the children is currently focused, iterate remaining children
+//		if (!context.isForward())
+//			if (AccessParent::isFocusableComponent(*this))
+//				return libv::make_observer_ptr(this);
+//
+//		return nullptr;
+//	}
+//
+//	if (!client || !AccessParent::isFocusableChild(*this))
+//		return nullptr;
+//
+//	if (auto hit = AccessParent::doFocusTraverse(client->core(), context, ChildIDNone))
+//		return hit;
+//
+//	return nullptr;
+//}
 
-	callback(*client);
+void CoreScrollPane::doForeachChildren(libv::function_ref<bool(Component&)> callback) {
+	// Ignoring short-circuit logic
+	access_children(callback);
+}
+
+void CoreScrollPane::doForeachChildren(libv::function_ref<void(Component&)> callback) {
+	access_children(callback);
 }
 
 // =================================================================================================
 
-core_ptr ScrollArea::create_core(std::string name) {
+core_ptr ScrollPane::create_core(std::string name) {
 	return create_core_ptr<CoreType>(std::move(name));
 }
 
-bool ScrollArea::castable(libv::ui::core_ptr core) noexcept {
+bool ScrollPane::castable(libv::ui::core_ptr core) noexcept {
 	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollArea::mode(ScrollAreaMode value) noexcept {
-	AccessProperty::manual(self(), self().property.mode, value);
+void ScrollPane::background(Background value) {
+	AccessProperty::manual(self(), self().background, std::move(value));
 }
 
-ScrollAreaMode ScrollArea::mode() const noexcept {
-	return self().property.mode();
-}
-
-void ScrollArea::content(Component&& value) noexcept {
-	self().content(std::move(value));
-}
-
-void ScrollArea::content(const Component& value) noexcept {
-	self().content(value);
-}
-
-Component& ScrollArea::content() noexcept {
-	assert(self().client && "No content assigned");
-	return *self().client;
-}
-
-const Component& ScrollArea::content() const noexcept {
-	assert(self().client && "No content assigned");
-	return *self().client;
+[[nodiscard]] const Background& ScrollPane::background() const noexcept {
+	return self().background();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollArea::area_position(libv::vec2f value) noexcept {
-	self().area_position = value;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	self().context().mouse.update_region(self(), libv::vec::round(value));
+void ScrollPane::mode(ScrollMode value) noexcept {
+	AccessProperty::manual(self(), self().mode, value);
 }
 
-[[nodiscard]] libv::vec2f ScrollArea::area_position() const noexcept {
-	return self().area_position;
+ScrollMode ScrollPane::mode() const noexcept {
+	return self().mode();
 }
 
-//void ScrollArea::area_size(libv::vec2f value) noexcept {
+void ScrollPane::content(Component&& value) noexcept {
+	self().area.content(std::move(value));
+}
+
+void ScrollPane::content(const Component& value) noexcept {
+	self().area.content(value);
+}
+
+Component& ScrollPane::content() noexcept {
+	return self().area.content();
+}
+
+const Component& ScrollPane::content() const noexcept {
+	return self().area.content();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollPane::area_position(libv::vec2f value) noexcept {
+	self().area.area_position(value);
+}
+
+libv::vec2f ScrollPane::area_position() const noexcept {
+	return self().area.area_position();
+}
+
+//void ScrollPane::area_size(libv::vec2f value) noexcept {
 //	self().area_size = value;
 //	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
 //}
 
-[[nodiscard]] libv::vec2f ScrollArea::area_size() const noexcept {
-	return self().area_size;
+libv::vec2f ScrollPane::area_size() const noexcept {
+	return self().area.area_size();
 }
 
-// -------------------------------------------------------------------------------------------------
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// -------------------------------------------------------------------------------------------------
+void ScrollPane::spacing2(Spacing2 value) {
+	AccessProperty::manual(self(), self().spacing2, value);
+}
 
-//class CoreScrollPane : public CoreComponent {
-//public:
-//	friend class ScrollPane;
-//	[[nodiscard]] inline auto handler() { return ScrollPane{this}; }
-//
-//private:
-//	struct Properties {
-//		ScrollPaneMode mode;
-//
-//		BarPlacementHorizontal bar_placement_horizontal;
-//		BarPlacementVertical bar_placement_vertical;
-//
-//		BarVisibility bar_visibility_horizontal;
-//		BarVisibility bar_visibility_vertical;
-//	} property;
-//
-//	struct ChildProperties {
-//	};
-//
-//	template <typename T> static void access_properties(T& ctx);
-//	template <typename T> static void access_child_properties(T& ctx);
-//
-////	static ComponentPropertyDescription description;
-////	static ComponentPropertyDescription child_description;
-//
-//public:
-//	using CoreComponent::CoreComponent;
-//
-//private:
-//	virtual void onMouseButton(const EventMouseButton& event) override;
-//	virtual void onMouseMovement(const EventMouseMovement& event) override;
-//	virtual void onMouseScroll(const EventMouseScroll& event) override;
-//
-//protected:
-//	virtual void doAttach() override;
-//	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
-//	virtual void doLayout2(const ContextLayout2& environment) override;
-//	virtual void doRender(Renderer& r) override;
-//	virtual void doStyle(ContextStyle& context) override;
-//	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-//};
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//template <typename T>
-//void CoreScrollPane::access_properties(T& ctx) {
-//	(void) ctx;
-//}
-//
-//template <typename T>
-//void CoreScrollPane::access_child_properties(T& ctx) {
-//	(void) ctx;
-//}
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//void CoreScrollPane::doStyle(ContextStyle& ctx) {
-//	PropertyAccessContext<CoreScrollPane> setter{*this, ctx.component, ctx.style, ctx.component.context()};
-//	access_properties(setter);
-//	CoreComponent::doStyle(ctx);
-//}
-//
-//void CoreScrollPane::doStyle(ContextStyle& ctx, ChildID childID) {
-//	(void) ctx;
-//	(void) childID;
-//}
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& environment) {
-//	(void) environment;
-//
-//	auto result = libv::vec3f{};
-//
-//	for (auto& child : children | view_layouted()) {
-//		AccessLayout::layout1(child.core(), ContextLayout1{});
-//		libv::meta::for_constexpr<0, 3>([&](auto dim) {
-//			result[dim] = libv::max(
-//					result[dim],
-//					resolvePercent(
-//							child.size()[dim].pixel + (child.size()[dim].dynamic ? AccessLayout::lastDynamic(child.core())[dim] : 0.f),
-//							child.size()[dim].percent, child.core())
-//			);
-//		});
-//	}
-//
-//	return result;
-//}
-//
-//void CoreScrollPane::doLayout2(const ContextLayout2& environment) {
-//	for (auto& child : children | view_layouted()) {
-//		AccessLayout::layout2(
-//				child.core(),
-//				ContextLayout2{
-//					environment.position,
-//					environment.size,
-//					MouseOrder{libv::to_value(environment.mouseOrder) + 1}
-//				}
-//		);
-//	}
-//}
-//
-//// =================================================================================================
-//
-//ScrollPane::ScrollPane(std::string name) :
-//	ComponentHandler<CoreScrollPane, EventHostGeneral<ScrollPane>>(std::move(name)) { }
-//
-//ScrollPane::ScrollPane(GenerateName_t gen, const std::string_view type) :
-//	ComponentHandler<CoreScrollPane, EventHostGeneral<ScrollPane>>(gen, type) { }
-//
-//ScrollPane::ScrollPane(core_ptr core) noexcept :
-//	ComponentHandler<CoreScrollPane, EventHostGeneral<ScrollPane>>(core) { }
-//
-//// -------------------------------------------------------------------------------------------------
-//
-////void ScrollPane::add(Component component) {
-////	self().add(std::move(component));
-////}
-////
-////void ScrollPane::remove(Component& component) {
-////	self().remove(component);
-////}
-////
-////void ScrollPane::clear() {
-////	self().clear();
-////}
+Spacing2 ScrollPane::spacing2() const noexcept {
+	return self().spacing2();
+}
+
+Slider& ScrollPane::bar_vertical() noexcept {
+	return self().vbar;
+}
+
+const Slider& ScrollPane::bar_vertical() const noexcept {
+	return self().vbar;
+}
+
+Slider& ScrollPane::bar_horizontal() noexcept {
+	return self().hbar;
+}
+
+const Slider& ScrollPane::bar_horizontal() const noexcept {
+	return self().hbar;
+}
 
 // -------------------------------------------------------------------------------------------------
 

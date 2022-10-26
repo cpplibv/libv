@@ -7,11 +7,10 @@
 // std
 #include <iostream>
 // pro
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/lua/script_style.hpp>
-#include <libv/ui/property_visit.hpp>
-#include <libv/ui/style.hpp>
+#include <libv/ui/property_system/property_visit.hpp>
+#include <libv/ui/style/style.hpp>
 #include <libv/ui/ui.hpp>
 
 
@@ -22,6 +21,10 @@
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
+
+// static constexpr auto style_file = "app/space/style.lua";
+// static constexpr auto style_file = "app/star/style.lua";
+static constexpr auto style_file = "sandbox/libv_ui_main_style.lua";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -40,20 +43,22 @@ int main(int, char**) {
 
 		log_sandbox.info(" --- Execute script ---");
 
-//		libv::ui::script_style(ui, lua, libv::read_file_or_throw("app/space/style.lua"));
-		libv::ui::script_style(ui, lua, libv::read_file_or_throw("app/star/style.lua"));
+		libv::ui::script_style(ui, lua, libv::read_file_or_throw(style_file));
 
 		auto f = [](std::string_view name, libv::ui::Style& style) {
 			log_sandbox.info("Style: {}", name);
 
+			style.foreach_bases_recursive([](const libv::ui::Style& base) {
+				log_sandbox.info("    base: {}", base.style_name);
+			});
 			style.foreach([](std::string_view key, const libv::ui::PropertyDynamic& property, libv::ui::StyleState mask, libv::ui::StyleState state) {
 				libv::ui::visitProperty(property, [&](auto& v) {
 					if constexpr (requires { std::cout << v; })
-						log_sandbox.info("    {} = {} mask: {} state: {} [{}]", key, v, +mask, +state, typeid(v).name());
+						log_sandbox.info("        {} = {} mask: {} state: {} [{}]", key, v, +mask, +state, typeid(v).name());
 					else if constexpr (std::is_enum_v<decltype(v)>)
-						log_sandbox.info("    {} = {} mask: {} state: {} [{}]", key, libv::to_underlying(v), +mask, +state, typeid(v).name());
+						log_sandbox.info("        {} = {} mask: {} state: {} [{}]", key, libv::to_underlying(v), +mask, +state, typeid(v).name());
 					else
-						log_sandbox.info("    {} = ?? mask: {} state: {} [{}]", key, +mask, +state, typeid(v).name());
+						log_sandbox.info("        {} = ?? mask: {} state: {} [{}]", key, +mask, +state, typeid(v).name());
 				});
 			});
 		};
@@ -61,7 +66,7 @@ int main(int, char**) {
 	};
 
 	run(42);
-	fsw.subscribe_file("app/space/style.lua", run);
+	fsw.subscribe_file(style_file, run);
 
 	while (true)
 		std::this_thread::sleep_for(std::chrono::seconds(5));

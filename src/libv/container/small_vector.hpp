@@ -1,4 +1,4 @@
-// Created by Vader on 2022.07.29..
+// Project: libv.container, File: src/libv/container/small_vector.hpp
 
 #pragma once
 

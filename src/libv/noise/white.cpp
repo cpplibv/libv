@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/noise/white.cpp
+// Project: libv.noise, File: src/libv/noise/white.cpp
 
 // hpp
 #include <libv/noise/white.hpp>

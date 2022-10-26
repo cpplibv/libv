@@ -237,7 +237,7 @@ libv.ui.property: set/get/reset changed/manual in general not only in hybrid
 libv.ui.property: setter / getter issue: does not set manual/changed flag when called manually
 libv.ui.property: have a single line in set/get function that refers to the property?
 libv.ui.property: hybrid reflection - static
-libv.ui.property: hybrid implement doStyle work
+libv.ui.property: hybrid implement doStyleChild work
 libv.ui.property: hybrid Add a default / init value per instance ("above" fallback)
 libv.ui.property: hybrid reset (address could be used to lookup) | simple full style invalidation at first
 libv.ui: rename cursor to caret
@@ -628,6 +628,52 @@ libv.glr: UniformBlockSharedView_std140
 
 
 
+What do I need from libv to make a 'minimal' working iris program?
+	libv.ui
+		2 List component
+		3 Scroll pane = scroll area + scroll bar + connecting them
+		5 Font outline render
+			freetype2 Now has an SDF render option
+			spread property set:
+				const FT_Int spread = 8;
+				FT_Property_Set(library, "sdf", "spread", &spread);
+				8bit uint normalized to [+spread .. -spread]
+			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
+
+	libv.ctrl
+		4 Interaction with UI
+		5 Resolve analog-binary accidental collusion with time
+
+	libv.serial
+		3 Safe container resize/reserve on deserialization
+
+	libv.state
+		5 Generated source for state machines
+
+	libv.net
+		UDP Communication
+			Reliable
+			QoS (Redundancy levels, and prioritaziations)
+			Rate Limiting (per connection, [per group], per global)
+			NAT punching
+
+	libv.update
+		Resource
+			1 Working resource download protocol
+			1 Update/Resource signature verification
+		Working update
+			1 Self update support
+			1 Marry Resource and Update
+		Deployment
+			2 Scripts to create a new build and deploy to libv.update servers
+
+
+
+libv: Implement a dynamic library build variant (dev build type ++)
+
+
+
+
 
 
 Create CMake Presets:
@@ -677,46 +723,10 @@ Create CMake Presets:
 }
 
 
-What do I need from libv to make a 'minimal' working iris program?
-	libv.ui
-		2 List component
-		3 Scroll pane = scroll area + scroll bar + connecting them
-		5 Font outline render
-			freetype2 Now has an SDF render option
-			spread property set:
-				const FT_Int spread = 8;
-				FT_Property_Set(library, "sdf", "spread", &spread);
-				8bit uint normalized to [+spread .. -spread]
-			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
-
-	libv.ctrl
-		4 Interaction with UI
-		5 Resolve analog-binary accidental collusion with time
-
-	libv.serial
-		3 Safe container resize/reserve on deserialization
-
-	libv.update
-		Resource
-			1 Working resource download protocol
-			1 Update/Resource signature verification
-		Working update
-			1 Self update support
-			1 Marry Resource and Update
-		Deployment
-			2 Scripts to create a new build and deploy to libv.update servers
-
-	libv.state
-		5 Generated source for state machines
-
-
-
-
 ext: lexy https://github.com/foonathan/lexy
 		try out / adopt
 		Parser lib
 		https://www.youtube.com/watch?v=Cb0j6DVmwzY
-
 
 ext: adopt https://github.com/olegpublicprofile/stdfwd
 ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
@@ -827,6 +837,9 @@ place.it:
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
 	cpp.tool: perfbench.com - Mirco benchmark runtime with more detail
 	cpp.tool: cppinsights.io
+	cpp.knowledge: Coroutines: Deciphering Coroutines a visual approach - Andreas Weis - Meeting C++ 2022 - https://www.youtube.com/watch?v=e5F6k01A0RI
+	cpp.knowledge: Coroutines: Deciphering Coroutines a visual approach - Andreas Weis - Cppcon 2022 - https://www.youtube.com/watch?v=J7fYddslH0Q
+
 	opengl.knowledge: docs.gl - Reference documentations
 	opengl.knowledge: learnopengl.com - Great tutorial site
 	opengl.knowledge: ogldev.org - Great tutorial site

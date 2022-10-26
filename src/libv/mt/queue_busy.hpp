@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/busy_queue.hpp
+// Project: libv.mt, File: src/libv/mt/queue_busy.hpp
 
 #pragma once
 

@@ -16,8 +16,8 @@
 #include <span>
 #include <map>
 
-#include <libv/ui/property.hpp>
-#include <libv/ui/style.hpp>
+#include <libv/ui/property_system/property.hpp>
+// #include <libv/ui/style/style.hpp>
 
 
 namespace app {

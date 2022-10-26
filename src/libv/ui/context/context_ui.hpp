@@ -15,7 +15,7 @@
 // pro
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/settings.hpp>
-#include <libv/ui/style_fwd.hpp>
+#include <libv/ui/style/style_fwd.hpp>
 
 
 namespace libv {

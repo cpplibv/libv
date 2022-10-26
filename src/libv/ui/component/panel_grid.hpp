@@ -4,7 +4,7 @@
 
 // pro
 #include <libv/ui/component/base_panel.hpp>
-#include <libv/ui/component/detail/component_api.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/orientation2.hpp>
 #include <libv/ui/property/spacing.hpp>

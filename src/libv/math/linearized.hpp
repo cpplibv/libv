@@ -1,4 +1,4 @@
-// Created by dbobula on 3/31/2022.
+// Project: libv.math, File: src/libv/math/linearized.hpp
 
 #pragma once
 

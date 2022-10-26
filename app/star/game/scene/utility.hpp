@@ -1,11 +1,11 @@
-// Project: libv, File: app/star/game/scene/scene_settings.hpp
+// Project: libv, File: app/star/game/scene/utility.hpp
 
 #pragma once
 
 // libv
-#include <libv/ui/attach_state.hpp>
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/component/scene_container.hpp>
+#include <libv/ui/component_system/attach_state.hpp>
 #include <libv/utility/nexus.hpp>
 // std
 #include <exception>

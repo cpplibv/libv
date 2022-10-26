@@ -1,0 +1,630 @@
+// Project: libv.ui, File: src/libv/ui/component/slider.cpp
+
+// hpp
+#include <libv/ui/component/slider.hpp>
+// libv
+#include <libv/math/remap.hpp>
+#include <libv/math/snap.hpp>
+#include <libv/utility/approx.hpp>
+#include <libv/utility/float_equal.hpp>
+// std
+#include <cmath>
+// pro
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_mouse.hpp>
+#include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_state.hpp>
+#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/event/event_mouse.hpp>
+#include <libv/ui/log.hpp>
+#include <libv/ui/property_system/property.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+#include <libv/ui/resource/texture_2D.hpp>
+
+
+namespace libv {
+namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+struct CoreSlider : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
+
+	// TODO P5: Remove handler()
+	[[nodiscard]] inline auto handler() { return Slider{this}; }
+
+public:
+	struct BarBounds {
+		libv::vec2f position;
+		libv::vec2f size;
+	};
+
+	enum class DragState : uint8_t {
+		idle,
+		track,
+		bar,
+	};
+
+	struct Properties {
+		PropertyR<Color> bar_color;
+		PropertyL1<Texture2D_view> bar_image;
+		PropertyR<ShaderImage_view> bar_shader;
+
+		PropertyR<Background> background;
+
+		PropertyL1L2<Orientation> orientation;
+	} property;
+
+	template <typename T> static void access_properties(T& ctx);
+
+public:
+	double value_ = 0.0;
+	double value_max_ = 100.0;
+	double value_min_ = 0.0;
+	double value_range_ = 10.0;
+	double value_step_ = 0.0;
+
+public:
+	libv::vec2f drag_point;
+	DragState drag_mode = DragState::idle;
+
+	BarBounds bar_bounds_;
+
+//	double scroll_step_button;
+//	double scroll_step_scroll;
+//	double scroll_step_track;
+//	double scroll_hold_button;
+//	double scroll_hold_scroll;
+//	double scroll_hold_track;
+
+public:
+	void value(double value);
+	[[nodiscard]] double value() const noexcept;
+
+	void value_int(int64_t value);
+	[[nodiscard]] int64_t value_int() const noexcept;
+
+	void value_max(double value);
+	[[nodiscard]] double value_max() const noexcept;
+
+	void value_min(double value);
+	[[nodiscard]] double value_min() const noexcept;
+
+	void value_range(double value);
+	[[nodiscard]] double value_range() const noexcept;
+
+	void value_step(double value);
+	[[nodiscard]] double value_step() const noexcept;
+
+public:
+	void make_step(double amount) noexcept;
+	void make_scroll(double amount) noexcept;
+
+public:
+//	inline auto bar_size() const noexcept;
+	inline BarBounds bar_bounds() const noexcept;
+
+public:
+	virtual void onMouseButton(const EventMouseButton& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+public:
+	virtual void doAttach() override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(Renderer& r) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void CoreSlider::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bar_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::bar_color,
+			"Bar color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bar_image; },
+			[](auto& u) { return u.fallbackTexture2D(); },
+			pgr::appearance, pnm::bar_image,
+			"Bar image"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bar_shader; },
+			[](auto& u) { return u.shaderImage(); },
+			pgr::appearance, pnm::bar_shader,
+			"Bar shader"
+	);
+
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::none(),
+			pgr::appearance, pnm::background,
+			"Background"
+	);
+
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.orientation; },
+			Orientation::up,
+			pgr::layout, pnm::orientation,
+			"Orientation"
+	);
+
+	ctx.synthesize(
+			[](auto& c, auto v) { c.handler().value(std::move(v)); },
+			[](const auto& c) { return c.handler().value(); },
+			pgr::behaviour, pnm::value,
+			"Current value"
+	);
+	ctx.synthesize(
+			[](auto& c, auto v) { c.handler().value_min(std::move(v)); },
+			[](const auto& c) { return c.handler().value_min(); },
+			pgr::behaviour, pnm::value_min,
+			"Minimum value"
+	);
+	ctx.synthesize(
+			[](auto& c, auto v) { c.handler().value_max(std::move(v)); },
+			[](const auto& c) { return c.handler().value_max(); },
+			pgr::behaviour, pnm::value_max,
+			"Maximum value"
+	);
+	ctx.synthesize(
+			[](auto& c, auto v) { c.handler().value_range(std::move(v)); },
+			[](const auto& c) { return c.handler().value_range(); },
+			pgr::behaviour, pnm::value_range,
+			"Value range covered by the scroll bar"
+	);
+	ctx.synthesize(
+			[](auto& c, auto v) { c.handler().value_step(std::move(v)); },
+			[](const auto& c) { return c.handler().value_step(); },
+			pgr::behaviour, pnm::value_step,
+			"Value step"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+namespace {
+
+struct OrientationData {
+	int32_t dim_control;
+	int32_t dim_secondary;
+	bool control_inverted;
+	float control_direction;
+};
+
+static constexpr OrientationData OrientationTable[] = {
+	{1, 0, false, +1}, // Orientation::up;
+	{0, 1, false, +1}, // Orientation::right;
+	{0, 1,  true, -1}, // Orientation::left;
+	{1, 0,  true, -1}, // Orientation::down;
+};
+
+} // namespace
+
+// -------------------------------------------------------------------------------------------------
+
+inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
+	//
+	//                    Orientation::up
+	//          value == value_min             value == value_max
+	//
+	//         +->   |..|                     +->   |##|   <-+
+	//         |     |..|                     |     |##|     |
+	//         |     |..|                     |     |##|     |
+	//         |     |..|        value_range' |     |##|     | bar
+	//         |     |..|                     |     |##|     |
+	//    diff |     |..|                     |     |##|     |
+	//         |     |..|   <---- value_max --+->   |##|   <-+-- value
+	//         |     |..|                           |..|     |
+	//         |     |..|                           |..|     |
+	//         |     |..|                           |..|     |
+	//         +->   |##|   <-+                     |..|     |
+	//         |     |##|     |                     |..|     | diff
+	//         |     |##|     |                     |..|     |
+	//     bar |     |##|     | value_range'        |..|     |
+	//         |     |##|     |                     |..|     |
+	//         |     |##|     |                     |..|     |
+	// value --+->   |##|   <-+-- value_min ---->   |..|   <-+
+	//
+	//      value_range' = (value_range) / (value_max - value_min)
+	//
+
+	const auto orient = OrientationTable[underlying(property.orientation())];
+
+	const auto value_extent = std::abs(value_max_ - value_min_);
+
+	const auto size_x = static_cast<double>(layout_size2()[orient.dim_control]);
+	const auto size_y = static_cast<double>(layout_size2()[orient.dim_secondary]);
+
+	// NOTE: std::clamp is not usable as min should have priority (0 size should yield 0 sized bar)
+	const auto size_bar_x = value_extent < value_range_ ?
+			size_x :
+			std::min(std::max(std::round(value_range_ / value_extent * size_x), 1.0), size_x);
+	const auto size_bar_y = size_y;
+
+	const auto position_bar_x =	std::round(value_extent < value_range_ ?
+			0.0 :
+			orient.control_inverted ?
+				libv::remap(value_, value_min_, value_max_, size_x - size_bar_x, 0.0) :
+				libv::remap(value_, value_min_, value_max_, 0.0, size_x - size_bar_x)
+	);
+	const auto position_bar_y = 0.0f;
+
+	BarBounds result;
+
+	result.size[orient.dim_control] = static_cast<float>(size_bar_x);
+	result.size[orient.dim_secondary] = static_cast<float>(size_bar_y);
+
+	result.position[orient.dim_control] = static_cast<float>(position_bar_x);
+	result.position[orient.dim_secondary] = static_cast<float>(position_bar_y);
+
+	return result;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CoreSlider::onMouseButton(const EventMouseButton& event) {
+	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
+		const auto orient = OrientationTable[underlying(property.orientation())];
+		const auto bar = bar_bounds_;
+		const auto local_mouse = event.local_position;
+
+		if (libv::vec::within(local_mouse, bar.position, bar.position + bar.size - 1.0f)) {
+			drag_mode = DragState::bar;
+			drag_point = local_mouse - bar.position;
+		} else {
+			drag_mode = DragState::track;
+			const auto value_extent = std::abs(value_max_ - value_min_);
+			const auto local_drag = std::floor(bar.size[orient.dim_control] * 0.5f);
+			const auto local_value = value_extent < value_range_ ?
+					value_ :
+					libv::remap_clamp<double>(
+						local_mouse[orient.dim_control] - local_drag,
+						0,
+						layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
+						orient.control_inverted ? value_max_ : value_min_,
+						orient.control_inverted ? value_min_ : value_max_);
+			handler().value(local_value);
+		}
+
+		context().mouse.acquire(*this);
+		return event.stop_propagation();
+	}
+
+	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::release) {
+		context().mouse.release(*this);
+		drag_mode = DragState::idle;
+		return event.stop_propagation();
+	}
+
+//	// === TEMP ========================================================================================
+//	if (event.button == libv::input::MouseButton::Right && event.action == libv::input::Action::press) {
+//		set(property.orientation, Orientation{(underlying(property.orientation()) + 1) % 4});
+//		type(property.orientation()).next()
+//		return event.stop_propagation();
+//	}
+//	// === TEMP ========================================================================================
+}
+
+void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
+//	if (event.enter) {
+////		set(property.bg_color, property.bg_color() + 0.2f);
+//		set(property.bar_color, property.bar_color() + 0.2f);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//	}
+//
+//	if (event.leave) {
+////		set(property.bg_color, property.bg_color() - 0.2f);
+//		set(property.bar_color, property.bar_color() - 0.2f);
+////		reset(property.bg_color);
+////		reset(property.bar_color);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//	}
+
+	if (drag_mode == DragState::idle)
+		return;
+
+	const auto orient = OrientationTable[underlying(property.orientation())];
+	const auto bar = bar_bounds_; // Cache bar_bounds
+	const auto local_mouse = event.local_position;
+	const auto value_extent = std::abs(value_max_ - value_min_);
+
+	if (value_extent < value_range_) {
+		// Handle special case with oversized (range) bar
+		const auto side_a = local_mouse[orient.dim_control] < layout_size2()[orient.dim_control] * 0.5f;
+		const auto toward_min = side_a == orient.control_inverted;
+		const auto local_value = toward_min ? value_min_ : value_max_;
+		handler().value(local_value);
+		return event.stop_propagation();
+	}
+
+	const auto local_drag = drag_mode == DragState::track ?
+			std::floor(bar.size[orient.dim_control] * 0.5f) : // DragState::track
+			drag_point[orient.dim_control];                   // DragState::bar
+
+	const auto local_value = libv::remap_clamp<double>(
+			local_mouse[orient.dim_control] - local_drag,
+			0,
+			layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
+			orient.control_inverted ? value_max_ : value_min_,
+			orient.control_inverted ? value_min_ : value_max_);
+
+	handler().value(local_value);
+	event.stop_propagation();
+}
+
+void CoreSlider::onMouseScroll(const EventMouseScroll& event) {
+	const auto orient = OrientationTable[underlying(property.orientation())];
+	const auto movement = static_cast<double>(event.scroll_movement.y * orient.control_direction);
+	const auto inverse_interval = value_min_ < value_max_ ? 1.0 : -1.0;
+	handler().make_scroll(movement * inverse_interval);
+
+	event.stop_propagation();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CoreSlider::doAttach() {
+	drag_mode = DragState::idle;
+
+	watchMouse(true);
+}
+
+void CoreSlider::doStyle(StyleAccess& access) {
+	access.self(*this);
+}
+
+libv::vec3f CoreSlider::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
+
+	const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
+//	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
+
+//	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
+	return {dynamic_size_bar, 0.f};
+}
+
+void CoreSlider::doLayout2(const ContextLayout2& environment) {
+	(void) environment;
+
+	bar_bounds_ = bar_bounds(); // Cache bar_bounds
+}
+
+void CoreSlider::doRender(Renderer& r) {
+	property.background().render(r, {0, 0}, layout_size2(), *this);
+
+	r.texture_2D(bar_bounds_.position, bar_bounds_.size, {0, 0}, {1, 1},
+			property.bar_color(),
+			property.bar_image(),
+			property.bar_shader());
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CoreSlider::value(double request) {
+	if (libv::float_equal(request, value_))
+		return;
+
+	if (!libv::math::check_interval(request, value_min_, value_max_))
+		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", request, value_min_, value_max_, path());
+
+	const auto var = libv::math::snap_interval(request, value_step_, value_min_, value_max_);
+
+	const auto change = var - value_;
+	value_ = var;
+	bar_bounds_ = bar_bounds(); // Cache bar_bounds
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventScrollChange{request, change});
+}
+double CoreSlider::value() const noexcept {
+	return value_;
+}
+
+void CoreSlider::value_int(int64_t value_) {
+	value(static_cast<double>(value_));
+}
+int64_t CoreSlider::value_int() const noexcept {
+	return std::llround(value());
+}
+
+void CoreSlider::value_max(double var) {
+	if (libv::float_equal(var, value_max_))
+		return;
+
+	const auto request = value_;
+	value_max_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+
+	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
+		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+		const auto change = new_value - value_;
+		value_ = new_value;
+		fire(EventScrollChange{request, change});
+	}
+}
+double CoreSlider::value_max() const noexcept {
+	return value_max_;
+}
+
+void CoreSlider::value_min(double var) {
+	if (libv::float_equal(var, value_min_))
+		return;
+
+	const auto request = value_;
+	value_min_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+
+	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
+		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+		const auto change = new_value - value_;
+		value_ = new_value;
+		fire(EventScrollChange{request, change});
+	}
+}
+double CoreSlider::value_min() const noexcept {
+	return value_min_;
+}
+
+void CoreSlider::value_range(double var) {
+	if (libv::float_equal(var, value_range_))
+		return;
+
+	if (var < 0) {
+		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", value_, path());
+		var = std::abs(var);
+	}
+
+	value_range_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+double CoreSlider::value_range() const noexcept {
+	return value_range_;
+}
+
+void CoreSlider::value_step(double var) {
+	if (libv::float_equal(var, value_step_))
+		return;
+
+	value_step_ = var;
+	value(value_);
+}
+double CoreSlider::value_step() const noexcept {
+	return value_step_;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CoreSlider::make_step(double amount) noexcept {
+	// WONT FIX: make_step can overstep the nearest value if the amount is big enough
+	//		most noticeable on min/max values that are not aligned to step and current value is min/max.
+	//		Fixing this rounding behaviour would result in more oddities than what it would solve
+	const auto step = libv::float_equal(value_step_, 0.0) ? 1.0 : value_step_;
+
+	const auto request = value_;
+	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_min_, value_max_);
+	const auto change = new_value - value_;
+	value_ = new_value;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventScrollChange{request, change});
+}
+
+void CoreSlider::make_scroll(double amount) noexcept {
+	make_step(amount);
+}
+
+// =================================================================================================
+
+core_ptr Slider::create_core(std::string name) {
+	return create_core_ptr<CoreType>(std::move(name));
+}
+
+bool Slider::castable(libv::ui::core_ptr core) noexcept {
+	return dynamic_cast<CoreType*>(core) != nullptr;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Slider::value(double request) {
+	self().value(request);
+}
+double Slider::value() const noexcept {
+	return self().value();
+}
+void Slider::value_int(int64_t request) {
+	self().value_int(request);
+}
+int64_t Slider::value_int() const noexcept {
+	return self().value_int();
+}
+void Slider::value_max(double var) {
+	self().value_max(var);
+}
+double Slider::value_max() const noexcept {
+	return self().value_max();
+}
+void Slider::value_min(double var) {
+	self().value_min(var);
+}
+double Slider::value_min() const noexcept {
+	return self().value_min();
+}
+void Slider::value_range(double var) {
+	self().value_range(var);
+}
+double Slider::value_range() const noexcept {
+	return self().value_range();
+}
+void Slider::value_step(double var) {
+	self().value_step(var);
+}
+double Slider::value_step() const noexcept {
+	return self().value_step();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Slider::make_step(double amount) noexcept {
+	self().make_step(amount);
+}
+void Slider::make_scroll(double amount) noexcept {
+	self().make_scroll(amount);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Slider::bar_color(Color value) {
+	AccessProperty::manual(self(), self().property.bar_color, value);
+}
+
+const Color& Slider::bar_color() const noexcept {
+	return self().property.bar_color();
+}
+
+void Slider::bar_image(Texture2D_view value) {
+	AccessProperty::manual(self(), self().property.bar_image, std::move(value));
+}
+
+const Texture2D_view& Slider::bar_image() const noexcept {
+	return self().property.bar_image();
+}
+
+void Slider::bar_shader(ShaderImage_view value) {
+	AccessProperty::manual(self(), self().property.bar_shader, std::move(value));
+}
+
+const ShaderImage_view& Slider::bar_shader() const noexcept {
+	return self().property.bar_shader();
+}
+
+void Slider::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
+}
+
+[[nodiscard]] const Background& Slider::background() const noexcept {
+	return self().property.background();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Slider::orientation(Orientation value) {
+	AccessProperty::manual(self(), self().property.orientation, value);
+}
+
+Orientation Slider::orientation() const noexcept {
+	return self().property.orientation();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ui
+} // namespace libv

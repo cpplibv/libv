@@ -15,7 +15,15 @@ namespace mt {
 struct mutex_spinlock {
 	std::atomic<bool> lock_ = {false};
 
-	void lock() noexcept {
+public:
+	inline mutex_spinlock() noexcept = default;
+	mutex_spinlock(const mutex_spinlock&) = delete;
+	mutex_spinlock& operator=(const mutex_spinlock&) & = delete;
+	mutex_spinlock(mutex_spinlock&&) = delete;
+	mutex_spinlock& operator=(mutex_spinlock&&) & = delete;
+
+public:
+	inline void lock() noexcept {
 		while (true) {
 			// Optimistically assume the lock is free on the first try
 			if (!lock_.exchange(true, std::memory_order_acquire))
@@ -28,14 +36,14 @@ struct mutex_spinlock {
 		}
 	}
 
-	bool try_lock() noexcept {
+	[[nodiscard]] inline bool try_lock() noexcept {
 		// First do a relaxed load to check if lock is free in order to prevent
 		// unnecessary cache misses if someone does while(!try_lock())
 		return !lock_.load(std::memory_order_relaxed) &&
 				!lock_.exchange(true, std::memory_order_acquire);
 	}
 
-	void unlock() noexcept {
+	inline void unlock() noexcept {
 		lock_.store(false, std::memory_order_release);
 	}
 };

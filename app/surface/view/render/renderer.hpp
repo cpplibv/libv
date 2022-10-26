@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/renderer.hpp
+// Project: libv, File: app/surface/view/render/renderer.hpp
 
 #pragma once
 
@@ -10,13 +10,13 @@
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
-//#include <libv/meta/reflection_access.hpp>
 #include <libv/rev/resource/resource_manager.hpp>
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/settings.hpp>
 #include <libv/ui/component/canvas.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 //#include <libv/glr/layout_to_string.hpp>
+//#include <libv/meta/reflection_access.hpp>
 //#include <libv/ui/component/canvas.hpp>
 // pro
 #include <surface/view/render/shaders.hpp>
@@ -223,7 +223,7 @@ private:
 		libv::vec3f position;
 		libv::vec2f screenOffset;
 		libv::vec4f color;
-		libv::ui::TextLayout layout;
+		libv::ui::LayoutText layout;
 	};
 	std::vector<Entry> texts;
 

@@ -14,14 +14,14 @@
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 // pro
-#include <libv/ui/component/detail/component.hpp>
-#include <libv/ui/font_2D.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/shader/shader_quad.hpp>
-#include <libv/ui/text_layout.hpp>
-#include <libv/ui/texture_2D.hpp>
+#include <libv/ui/component/component.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/shader_font.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+#include <libv/ui/resource/shader_quad.hpp>
+#include <libv/ui/resource/texture_2D.hpp>
 
 
 namespace libv {
@@ -122,6 +122,10 @@ public:
 
 	std::vector<std::variant<TaskUI, TaskNative>> tasks;
 
+public:
+	std::size_t stat_cull_pass = 0;
+	std::size_t stat_cull_fail = 0;
+
 private:
 	void init() {
 		libv::vec4uc white_zero_texture_data = {255, 255, 255, 255};
@@ -173,7 +177,7 @@ public:
 
 		// Upload new state
 		{
-			mesh_stream.clear();
+//			mesh_stream.clear();
 
 			auto position = mesh_stream.attribute(attribute_position);
 			auto color0 = mesh_stream.attribute(attribute_color0);
@@ -213,6 +217,10 @@ public:
 		glr.callback([this](libv::gl::GL&) {
 			uniform_stream.clear();
 		});
+
+//		log_ui.info("Statistics culling: Pass: {}, Fail: {}", stat_cull_pass, stat_cull_fail);
+		stat_cull_pass = 0;
+		stat_cull_fail = 0;
 	}
 
 	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, libv::glr::Texture texture, libv::glr::Program shader,
@@ -275,6 +283,7 @@ time_point Renderer::time_frame() const noexcept {
 
 void Renderer::translate(libv::vec3f value) noexcept {
 	glr.model.translate(value);
+//	log_ui.info("translate: {} (offset={})", value, xy(glr.model * libv::vec4f{0, 0, 0, 1}));
 	clip_pos -= xy(value);
 }
 
@@ -284,6 +293,34 @@ void Renderer::clip(libv::vec2f pos, libv::vec2f size) noexcept {
 
 	clip_pos = bl;
 	clip_size = tr - bl;
+}
+
+// --- Auxiliary -----------------------------------------------------------------------------------
+
+bool Renderer::cull_test(libv::vec2f pos, libv::vec2f size, float threshold) const noexcept {
+	const auto min = xy(glr.model * libv::vec4f{pos, 0, 1});
+	const auto max = xy(glr.model * libv::vec4f{pos + size, 0, 1});
+
+//	const auto max = pos + size;
+
+//	const auto limit = context.ui_size;
+//	const auto x_pass = min.x <= limit.x && max.x >= 0;
+//	const auto y_pass = min.y <= limit.y && max.y >= 0;
+
+	// !!! Clip space is wierd, I have to add min to it to be in 'screen' stuffy space
+	const auto limit_min = libv::max(min + clip_pos, libv::vec2f(0, 0));
+	const auto limit_max = libv::min(min + clip_pos + clip_size, context.ui_size);
+
+	const auto x_pass = min.x <= limit_max.x && max.x >= limit_min.x;
+	const auto y_pass = min.y <= limit_max.y && max.y >= limit_min.y;
+
+	const auto pass = x_pass && y_pass;
+	context.stat_cull_pass += pass;
+	context.stat_cull_fail += !pass;
+
+//	log_ui.info("{}:{} -> {}:{}, | Limit {} - {} | {}", pos, pos + size, min, max, limit_min, limit_max, pass ? "PASS" : "FAIL");
+
+	return pass;
 }
 
 // --- Low level -----------------------------------------------------------------------------------
@@ -297,6 +334,11 @@ void Renderer::begin_triangles() {
 
 void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader) {
 	const auto& layout_UIInfo = context.layout_UIInfo;
+
+//	if (cull(current_component))
+//		return;
+//	current_component.layout_position2()
+//	current_component.layout_size2()
 
 	auto& task = std::get<ImplContextRender::TaskUI>(context.tasks.emplace_back(
 			std::in_place_type<ImplContextRender::TaskUI>,
@@ -505,11 +547,11 @@ void Renderer::quad(libv::vec2f pos, libv::vec2f size, libv::vec4f color, const 
 			glr, current_component, clip_pos, clip_size);
 }
 
-void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader) {
+void Renderer::text(libv::vec2f pos, LayoutText& text_, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader) {
 	text(pos, text_.vertices_data(), font, color, shader);
 }
 
-void Renderer::text(libv::vec2f pos, const TextLayoutData& vd, const Font2D_view& font, libv::vec4f color, const ShaderFont_view& shader) {
+void Renderer::text(libv::vec2f pos, const LayoutTextData& vd, const Font2D_view& font, libv::vec4f color, const ShaderFont_view& shader) {
 	const auto base_vertex = context.vtx_positions.size();
 	const auto base_index = context.vtx_indices.size();
 	const auto num_vertex = vd.positions.size();

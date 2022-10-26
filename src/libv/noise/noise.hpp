@@ -1,4 +1,4 @@
-// Created by dbobula on 2/12/2022.
+// Project: libv.noise, File: src/libv/noise/noise.hpp
 
 #pragma once
 

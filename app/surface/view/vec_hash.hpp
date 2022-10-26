@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/renderer.hpp
+// Project: libv, File: app/surface/view/vec_hash.hpp
 
 #pragma once
 

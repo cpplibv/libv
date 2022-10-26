@@ -3,13 +3,12 @@
 // hpp
 #include <libv/ui/component/image.hpp>
 // pro
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/shader_image.hpp>
 
 
 namespace libv {
@@ -18,22 +17,18 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreImage : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
+
 public:
-	friend class Image;
-	[[nodiscard]] inline auto handler() { return Image{this}; }
-
-private:
-	template <typename T> static void access_properties(T& ctx);
-
 	struct Properties {
 		PropertyR<Background> background;
 	} property;
 
-public:
-	using CoreComponent::CoreComponent;
+	template <typename T> static void access_properties(T& ctx);
 
-protected:
-	virtual void doStyle(ContextStyle& ctx) override;
+public:
+	virtual void doStyle(StyleAccess& access) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doRender(Renderer& r) override;
 };
@@ -52,10 +47,8 @@ void CoreImage::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreImage::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreImage> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CoreImage::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
 libv::vec3f CoreImage::doLayout1(const ContextLayout1& environment) {

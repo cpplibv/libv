@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/gl.hpp
+// Project: libv.gl, File: src/libv/gl/gl.cpp
 
 // hpp
 #include <libv/gl/gl.hpp>
@@ -73,8 +73,8 @@ void GL::init() {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	checkGL();
 
-//		glDisable(GL_FRAMEBUFFER_SRGB);
-//		glEnable(GL_FRAMEBUFFER_SRGB);
+	// glDisable(GL_FRAMEBUFFER_SRGB);
+	// glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// Fetch OpenGL context current state
 	capability.blend.init();

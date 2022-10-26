@@ -9,6 +9,14 @@ Star - System integration demo
 
 
 
+credits scroll pane
+-> libv.ui notes for scroll pane
+
+
+compute test these noises:
+https://www.getrevue.co/profile/xordev/issues/gm-shaders-mini-noise-1437243
+	https://www.shadertoy.com/view/DdBGDh
+
 
 
 
@@ -71,35 +79,78 @@ app.star: whats next?
 		on demand generation, keep last M
 		release level to indicate auto generation of patch paths
 
+app.star: Credits:
+		performance: text/ui rendering
+			in the credits scene text rendering is pretty slow, currently only 100 fps, if every license is written it will drop below 60 for sure, check out why
+			maybe test with scissor
+			| its the text rendering
+				not the state switching
+				not the render calls
+			| It might be the data uploading
+
+		> commenting mesh_stream.clear(); doubled the performance 100->200
+		> not uploading new data at all 200->400
+		? Would DSA help anything?
+
+		mesh_stream.clear()
+			off 200
+			on 100
+			we shouldnt need it
+
+		glr.render(mesh_str...
+				with mesh_stream.clear() off
+			render calls off: 400
+			render calls on: 250
+			at this point, the only thing that is happening is:
+				80 bindTexture and bindBufferRange
+
+		glr.texture(t->textur
+				with mesh_stream.clear() off
+			off 250
+			on 240
+
+		glr.texture(t->textur
+				with mesh_stream.clear() off
+			off 270
+			on 240
+
+		!! CPU BOTTLENECK
+			render + render exec take up 3.5ms (285 hard fps cap)
+
+		|| Solutions:
+			Primary: Dont call mesh_stream.clear()
+			Primary: Do CPU culling
+			mesh_stream
+				Reduce renderer context mesh_data
+					color rgba32f -> rgba8
+					position vec3f -> vec2f
+					? texture0_tile vec4f -> int
+				Interleave attributes
+				Upload data with Mapped memory
+			render caching/invalidation is upon us?
+			Advanced: glMultiDrawElementsIndirect
+			everything is a font shader?
+
+		read / understand:
+			http://behindthepixels.io/assets/files/High-performance,%20Low-Overhead%20Rendering%20with%20OpenGL%20and%20Vulkan%20-%20Edward%20Liu.pdf
+			You make it fast by not making any GL API calls, like bind buffer or draw, per object. Instead use multidraw*indirect, index ubo/ssbo with draw id for per object uniforms. Combine with persistently mapped buffers.
+
+		libv.ui: Do more CPU culling, generalize, currently not everything is supported
+
+		libv.ui: Component flag to report a component is well behaving in renders for early hierarchical culling
+				(aka no render fragment exists the component layout_position and layout_size)
+
 ---
 
 
-libv.ui: ui normalize contexts
-	libv.ui: UI nexus, accept injected
-	libv.ui: Expose nexus from a context
-	libv.ui: Kill event_hub in favor of exposed nexus
-	libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
-		style intrusive_ptr -> intrusive2_ptr
-
-
 ToggleButton has the extra text_ variable from Button
-!!! ToggleButton properties setters are not matching the TextLayoutLite pattern
+!!! ToggleButton properties setters are not matching the LayoutTextLite pattern
 
 
 libv.ui: Cleanup duty:
-	TextLayoutLite Property
-	TextLayoutLite might is kinda broken or all over the place (getPositions and the rest of the API)
-	TextLayoutProperties
-
-	try to remove friends from core-s
-		I think visibility can be public, only core inheritance would
-		need it to be different, and even that is not /that/ important
-
-	try to remove handler() from core-s
-			handler could be removed with context knowing the handler type
-				OR
-			by having a single typedef in the core to the handler
-				and doing the pointer ctor itself
+	LayoutTextLite Property
+	LayoutTextLite might is kinda broken or all over the place (getPositions and the rest of the API)
+	LayoutTextProperties
 
 	// PropertyLP what does LP means again ???, do font font_size need it?
 
@@ -124,8 +175,6 @@ libv.ui: Setting: Do not clear buffer during render (Useful if there is a canvas
 
 ----------
 
-libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
-
 libv.ui: Tooltips
 		UI wide overlay
 		Options:
@@ -142,7 +191,7 @@ libv.ui: Tooltips
 			edge:
 				(scroll pane) clipping space
 				window
-			edge behaviour:
+			edge behaviour (per axis):
 				overhang
 				push in axis
 				flip to opposite side

@@ -8,7 +8,7 @@
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_line.hpp>
-#include <libv/ui/component/scroll_bar.hpp>
+#include <libv/ui/component/slider.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/ui.hpp>
@@ -102,7 +102,7 @@ public:
 		libv::ui::PanelLine line;
 
 		libv::ui::Label lbl_name;
-		libv::ui::ScrollBar slider;
+		libv::ui::Slider slider;
 		libv::ui::InputField in_value;
 
 		std::optional<double> requested_number;
@@ -163,7 +163,7 @@ public:
 				control.line.add(control.lbl_name);
 
 				// <<< P1: &control
-				control.slider.event().change([this, &control, in = control.in_value, name = var.name](const libv::ui::ScrollBar& slider, const libv::ui::EventScrollChange& event) mutable {
+				control.slider.event().change([this, &control, in = control.in_value, name = var.name](const libv::ui::Slider& slider, const libv::ui::EventScrollChange& event) mutable {
 					if (control.requested_number && libv::float_equal(*control.requested_number, event.request))
 						return;
 

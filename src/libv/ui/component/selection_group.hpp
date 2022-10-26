@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/_idea_radio_button.hpp
+// Project: libv.ui, File: src/libv/ui/component/selection_group.hpp
 
 #pragma once
 

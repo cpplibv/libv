@@ -1,4 +1,4 @@
-// Created by Vader on 2022.07.26..
+// Project: libv.fwd, File: src/libv/fwd/ext/fmt_fwd.hpp
 
 #pragma once
 

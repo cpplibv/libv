@@ -1,4 +1,4 @@
-// Created by dbobula on 2/13/2022.
+// Project: libv.noise, File: src/libv/noise/noise.cpp
 
 // hpp
 #include <libv/noise/noise.hpp>

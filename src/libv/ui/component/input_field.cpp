@@ -6,22 +6,20 @@
 #include <libv/sys/clipboard.hpp>
 // pro
 #include <libv/ui/chrono.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_quad.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/shader_font.hpp>
+#include <libv/ui/resource/shader_quad.hpp>
 
 
 namespace libv {
@@ -29,14 +27,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreInputField : public CoreComponent {
-public:
-	friend class InputField;
+struct CoreInputField : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
+
+	// TODO P5: Remove handler()
 	[[nodiscard]] inline auto handler() { return InputField{this}; }
 
-private:
-	template <typename T> static void access_properties(T& ctx);
-
+public:
 	struct Properties {
 		PropertyB<FocusSelectPolicy> focus_select_policy;
 
@@ -54,18 +52,16 @@ private:
 		PropertyL1L2<> font_size;
 	} property;
 
-private:
-	TextLayout text_;
+	template <typename T> static void access_properties(T& ctx);
 
-private:
+public:
+	LayoutText text_;
+
 	time_point caretStartTime;
 	libv::vec2f caretPosition;
 	uint32_t caret = 0; /// 0 = Before the first character, n = Before the nth character, length() = After the last character
 
 public:
-	using CoreComponent::CoreComponent;
-
-private:
 	virtual void onChar(const EventChar& event) override;
 	virtual void onKey(const EventKey& event) override;
 	virtual void onFocus(const EventFocus& event) override;
@@ -76,9 +72,9 @@ private:
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-protected:
+public:
 	virtual void doAttach() override;
-	virtual void doStyle(ContextStyle& context) override;
+	virtual void doStyle(StyleAccess& access) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;
@@ -430,10 +426,8 @@ void CoreInputField::doAttach() {
 	watchMouse(true);
 }
 
-void CoreInputField::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreInputField> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CoreInputField::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
 libv::vec3f CoreInputField::doLayout1(const ContextLayout1& environment) {

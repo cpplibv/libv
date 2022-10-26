@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/noise/perlin.cpp
+// Project: libv.noise, File: src/libv/noise/perlin.cpp
 
 // hpp
 #include <libv/noise/perlin.hpp>

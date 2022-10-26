@@ -1,4 +1,4 @@
-// Created by dbobula on 4/23/2022.
+// Project: libv, File: app/surface/view/render/renderer_veggie.hpp
 
 #pragma once
 

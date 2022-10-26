@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/scene.cpp
+// Project: libv, File: app/vm4_viewer/scene.cpp
 
 // hpp
 #include <vm4_viewer/scene/scene.hpp>

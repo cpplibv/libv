@@ -3,7 +3,6 @@
 // hpp
 #include <libv/ui/component/panel_board.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/property/background.hpp>
 
@@ -13,12 +12,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelBoard : public CoreComponent {
-public:
-	friend PanelBoard;
-	[[nodiscard]] inline auto handler() { return PanelBoard{this}; }
+struct CorePanelBoard : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
 
-private:
+public:
 	struct Properties {
 		PropertyR<Background> background;
 	} property;
@@ -29,7 +27,7 @@ private:
 	template <typename T> static void access_properties(T& ctx);
 	template <typename T> static void access_child_properties(T& ctx);
 
-private:
+public:
 	struct Child {
 		Component component;
 		libv::vec2f position;
@@ -38,11 +36,8 @@ private:
 	std::vector<Child> children;
 
 public:
-	using CoreComponent::CoreComponent;
-
-protected:
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 	virtual void doRender(Renderer& r) override;

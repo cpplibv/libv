@@ -313,6 +313,51 @@ ui.style("credits") {
 	font_size = 14,
 }
 
+-- =================================================================================================
+
+--ui.style("credits.scroll") {
+--}
+--
+--ui.style("credits.scroll > button-increment") {
+--}
+--
+--ui.style("credits.scroll > button-decrement") {
+--}
+--
+-- -------------------------------------------------------------------------------------------------
+
+ui.style("credits.scroll") {
+
+	--scroll_mode = "both",
+	--scroll_mode = "vertical",
+	--size = "1r, 200px",
+	--
+	--nest("vbar") {
+	--	size = "25px, 1r",
+	--},
+	----nest("hbar") {
+	----	size = "1r, 25px",
+	----},
+
+	background = "#77F6",
+	--size = "50%, 90%",
+
+	spacing2 = 0,
+	--scroll_mode = "vertical",
+	--scroll_mode = "both",
+
+	nest("area") {
+		background = "#7F76",
+		size = "1r, 1r",
+	},
+	nest("vbar") {
+		size = "25px, 1r",
+	},
+	--nest("hbar") {
+	--	size = "1r, 25px",
+	--},
+}
+
 ui.style("credits.main") {
 	orientation = "down",
 	padding = 25,

@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_serialize_cereal_main.cpp
+// Project: libv, File: sandbox/libv_serialize_vide_main.cpp
 
 // ext
 #include <vide/archives/binary.hpp>

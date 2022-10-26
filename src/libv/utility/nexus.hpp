@@ -11,6 +11,7 @@
 #include <libv/utility/unique_function.hpp>
 // std
 #include <memory>
+#include <string>
 #include <type_traits>
 
 

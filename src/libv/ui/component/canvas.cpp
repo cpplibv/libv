@@ -5,14 +5,13 @@
 // libv
 #include <libv/glr/queue.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/style.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -20,16 +19,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreCanvasAdaptor : public CoreComponent {
-	friend CanvasAdaptor;
+struct CoreCanvasAdaptor : CoreComponent {
+	using base_type = CoreComponent;
+	CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
 
-private:
+public:
 	std::unique_ptr<CanvasBase> canvas_object;
 
 public:
-	CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
-
-protected:
 	virtual void onMouseButton(const EventMouseButton& event) override;
 //	virtual void onMouseMovement(const EventMouseMovement& event) override;
 

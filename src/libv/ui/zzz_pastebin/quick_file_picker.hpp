@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/quick_file_picker.hpp
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/quick_file_picker.hpp
 
 // libv
 #include <libv/ui/component/fwd.hpp>
@@ -16,15 +16,15 @@
 
 // -------------------------------------------------------------------------------------------------
 
-namespace app {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class QuickFilePicker : public libv::ui::PanelLine {
+class QuickFilePicker6 : public libv::ui::PanelLine {
 public:
 	struct EventPick {
-		QuickFilePicker& component;
+		QuickFilePicker6& component;
 	};
 
 private:
@@ -57,25 +57,30 @@ private:
 	} pathDisplayMode = PathDisplayMode::flat;
 
 	bool followUpdates = false;
+//	bool trackFilesystem = false;
 
 	int select = -1;
 
-	std::shared_ptr<libv::ui::InputField> search_field;
-	std::shared_ptr<libv::ui::PanelFull> list_panel;
+	libv::ui::InputField search_field;
+	libv::ui::PanelFull list_panel;
 
 public:
-	explicit QuickFilePicker(libv::ui::CoreComponent& parent);
-	QuickFilePicker(libv::ui::CoreComponent& parent, std::string name);
-	QuickFilePicker(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
-	~QuickFilePicker();
+class QuickFilePicker6 : public ComponentAPI<Component, QuickFilePicker6, class CoreQuickFilePicker6, EventHostGeneral> {
+public:
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "q-f-pick";
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
+
+	~QuickFilePicker6();
 
 	void update_filelist();
 
 public:
-	template <typename F>
-	inline void event_pick(libv::observer_ptr<CoreComponent> slot, F&& func) {
-		connect<EventPick>(slot, std::forward<F>(func));
-	}
+//	template <typename F>
+//	inline void event_pick(libv::observer_ptr<CoreComponent> slot, F&& func) {
+//		connect<EventPick>(slot, std::forward<F>(func));
+//	}
 
 	[[nodiscard]] inline const std::string& value() const noexcept {
 		return value_;
@@ -91,4 +96,4 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui
-} // namespace app
+} // namespace libv

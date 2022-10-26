@@ -1,12 +1,12 @@
-// Project: libv.ui, File: src/libv/ui/component/_idea_base_panel_static.hpp
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_idea_base_panel_static.hpp
 
 #pragma once
 
 // std
 #include <vector>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/detail/component.hpp>
+#include <libv/ui/component/component.hpp>
+#include <libv/ui/component/component_core.hpp>
 
 
 
@@ -19,7 +19,6 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/log.hpp>
 //#include <libv/ui/context/context_style.hpp>
-//#include <libv/ui/style.hpp>
 
 
 namespace libv {
@@ -48,17 +47,15 @@ protected:
 	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback) override;
 
-//	virtual void doStyle(ContextStyle& ctx) override;
-//	virtual void doStyle(ContextStyle& ctx, ChildID childID) override;
+//	virtual void doStyle(StyleAccess& access) override;
+//	virtual void doStyle(StyleAccess& access, ChildID childID) override;
 
-//	void doStyle(ContextStyle& ctx) {
-//		PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
-//		access_properties(setter);
-//		CoreComponent::doStyle(ctx);
+//	void doStyle(StyleAccess& access) {
+//		access.self(*this);
 //	}
 //
-//void CorePanelStatusLine::doStyle(ContextStyle& ctx, ChildID childID) {
-//	(void) ctx;
+//void CorePanelStatusLine::doStyle(StyleAccess& access, ChildID childID) {
+//	(void) access;
 //	(void) childID;
 //}
 };

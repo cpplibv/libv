@@ -7,6 +7,13 @@
 
 
 
+Topology / biome controlled random generation
+	https://www.youtube.com/watch?v=rBY2Dzej03A
+
+
+Delaunay triangulation
+	Could solve biome generation (smooth/blended voronoi)
+
 
 Grass
 	https://www.youtube.com/watch?v=Y0Ko0kvwfgA
@@ -15,7 +22,8 @@ Grass
 
 	Procedural Grass in 'Ghost of Tsushima' - https://www.youtube.com/watch?v=Ibe1JBF5i5Y
 
-vegetation
+
+Vegetation
 	when glsl generation is online, use compute shader to place vegetation (and handle instancing)
 	GDC - Between Tech and Art: The Vegetation of Horizon Zero Dawn - https://www.youtube.com/watch?v=wavnKZNSYqU
 

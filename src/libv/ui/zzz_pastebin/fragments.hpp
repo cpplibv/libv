@@ -1,4 +1,4 @@
-// Created by Vader on 2022.08.06..
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/fragments.hpp
 
 #pragma once
 
@@ -7,17 +7,17 @@
 // std
 #include <type_traits>
 // pro
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/property.hpp>
 #include <libv/ui/property/align_horizontal.hpp>
 #include <libv/ui/property/align_vertical.hpp>
 #include <libv/ui/property/background.hpp>
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/padding.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/property_system/property.hpp>
 
 
 namespace libv {
@@ -86,6 +86,7 @@ struct FragmentPadding2 : Content {
 	void fragmentRender(Renderer& r) {
 		r.translate(padding_BL());
 		Content::fragmentRender(r);
+		r.translate(-padding_BL());
 	}
 };
 
@@ -103,7 +104,7 @@ struct FragmentText : BaseFragment {
 	PropertyL2<AlignHorizontal> align_horizontal;
 	PropertyL2<AlignVertical> align_vertical;
 
-	TextLayoutLite text;
+	LayoutTextLite text;
 
 	libv::vec3f fragmentLayout1(const ContextLayout1& environment) {
 		return text.measure_content_size(

@@ -4,6 +4,8 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/meta/force_inline.hpp>
+#include <libv/utility/float_equal.hpp>
 // std
 #include <utility>
 
@@ -19,8 +21,8 @@ struct SizeDim {
 	float ratio = 1.0f;   /// Parent leftover space ratio
 	bool dynamic = false; /// Yield all available space and shrink to the dynamic size
 
-	inline SizeDim() = default;
-	inline SizeDim(float pixel, float percent, float ratio, bool dynamic) :
+	constexpr LIBV_FORCE_INLINE SizeDim() noexcept = default;
+	constexpr LIBV_FORCE_INLINE SizeDim(float pixel, float percent, float ratio, bool dynamic) noexcept :
 		pixel(pixel), percent(percent), ratio(ratio), dynamic(dynamic) { }
 
 //	static inline SizeDim add(const SizeDim& a, const SizeDim& b) {
@@ -53,19 +55,19 @@ struct SizeDim {
 		return os;
 	}
 
-	[[nodiscard]] inline bool operator==(const SizeDim& other) const noexcept = default;
+	[[nodiscard]] constexpr inline bool operator==(const SizeDim& other) const noexcept = default;
 };
 
-inline auto pixel(float value) {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto pixel(float value) noexcept {
 	return SizeDim{value, 0.0f, 0.0f, false};
 }
-inline auto percent(float value) {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto percent(float value) noexcept {
 	return SizeDim{0.0f, value, 0.0f, false};
 }
-inline auto ratio(float value = 1.0f) {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto ratio(float value = 1.0f) noexcept {
 	return SizeDim{0.0f, 0.0f, value, false};
 }
-inline auto dynamic() {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto dynamic() noexcept {
 	return SizeDim{0.0f, 0.0f, 0.0f, true};
 }
 
@@ -74,62 +76,51 @@ inline auto dynamic() {
 struct Size {
 	libv::vec3_t<SizeDim> value;
 
-	constexpr inline Size() = default;
-	constexpr inline Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) :
-		value{std::move(x), std::move(y), std::move(z)} {}
+	constexpr LIBV_FORCE_INLINE Size() noexcept = default;
+	constexpr LIBV_FORCE_INLINE Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) noexcept :
+		value(std::move(x), std::move(y), std::move(z)) {}
 
-	[[nodiscard]] SizeDim& operator[](std::size_t dim) {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE SizeDim& operator[](std::size_t dim) noexcept {
 		return value[dim];
 	}
-	[[nodiscard]] const SizeDim& operator[](std::size_t dim) const {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE const SizeDim& operator[](std::size_t dim) const noexcept {
 		return value[dim];
 	}
 
-	[[nodiscard]] constexpr inline bool has_dynamic() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool has_dynamic() const noexcept {
 		return value.x.dynamic || value.y.dynamic || value.z.dynamic;
 	}
 
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f pixel2() const noexcept {
+		return {value.x.pixel, value.y.pixel};
+	}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f percent2() const noexcept {
+		return {value.x.percent, value.y.percent};
+	}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f ratio2() const noexcept {
+		return {value.x.ratio, value.y.ratio};
+	}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f ratio_mask2() const noexcept {
+		return {
+			libv::float_equal(value.x.ratio, 0.f) ? 0.f : 1.f,
+			libv::float_equal(value.y.ratio, 0.f) ? 0.f : 1.f
+		};
+	}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f dynamic_mask2() const noexcept {
+		return {
+			value.x.dynamic ? 1.f : 0.f,
+			value.y.dynamic ? 1.f : 0.f
+		};
+	}
+
 	template <typename OStream>
-	friend OStream& operator<<(OStream& os, const Size& size) {
+	friend LIBV_FORCE_INLINE OStream& operator<<(OStream& os, const Size& size) {
 		os << size.value;
 		return os;
 	}
 
-	[[nodiscard]] inline bool operator==(const Size& other) const noexcept = default;
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool operator==(const Size& other) const noexcept = default;
 };
-
-// -------------------------------------------------------------------------------------------------
-
-//	struct SizeStat {
-//		float fix = 0.f;
-//		float percent = 0.f;
-//
-//		void add(const SizeStat& stat) {
-//			fix += stat.fix;
-//			percent += stat.percent;
-//		}
-//
-//		void add(const Size& size, libv::vec3f dynamic_, uint32_t dim) {
-//			fix += size[dim].pixel + (size[dim].dynamic ? dynamic_[dim] : 0.f);
-//			percent += size[dim].percent;
-//		}
-//
-//		void max(const Size& size, libv::vec3f dynamic_, uint32_t dim) {
-//			fix = std::max(fix, size[dim].pixel + (size[dim].dynamic ? dynamic_[dim] : 0.f));
-//			percent = std::max(percent, size[dim].percent);
-//		}
-//
-//		float resolve(const CoreComponent& component) const {
-//			if (fix < 0.01f) {
-//				return fix;
-//			} else if (percent > 99.99f) {
-//				log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
-//				return fix * 2.f;
-//			} else {
-//				return fix / (1.f - percent * 0.01f);
-//			}
-//		}
-//	};
 
 // -------------------------------------------------------------------------------------------------
 

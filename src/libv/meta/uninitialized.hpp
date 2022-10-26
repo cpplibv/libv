@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/meta/uninitialized.hpp
+// Project: libv.meta, File: src/libv/meta/uninitialized.hpp
 
 #pragma once
 

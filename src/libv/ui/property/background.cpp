@@ -7,11 +7,11 @@
 // libv
 #include <libv/math/vec.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
-#include <libv/ui/texture_2D.hpp>
+#include <libv/ui/resource/texture_2D.hpp>
 
 
 namespace libv {
@@ -642,6 +642,8 @@ Background::Background() noexcept :
 }
 
 void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const {
+	if (!r.cull_test(pos, size))
+		return;
 	fragment->render(r, pos, size, component);
 }
 

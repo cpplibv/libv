@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/client_config.cpp
+// Project: libv, File: app/star/game/config/client_config.cpp
 
 // hpp
 #include <star/game/config/client_config.hpp>

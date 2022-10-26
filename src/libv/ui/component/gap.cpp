@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/component/gap.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 
 
 namespace libv {
@@ -12,12 +12,8 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreGap : CoreComponent {
-public:
-	friend Gap;
-	[[nodiscard]] inline auto handler() { return Gap{this}; }
-
-public:
-	using CoreComponent::CoreComponent;
+	using base_type = CoreComponent;
+	using base_type::base_type;
 };
 
 // =================================================================================================

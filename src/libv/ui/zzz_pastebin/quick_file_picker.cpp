@@ -1,4 +1,4 @@
-//// Project: libv.ui, File: app/vm4_viewer/ui/quick_file_picker.cpp
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/quick_file_picker.cpp
 //
 //// hpp
 //#include <vm4_viewer/ui/quick_file_picker.hpp>
@@ -238,6 +238,69 @@
 //			entry->text(libv::generic_path(p));
 //			panel_files->add(entry);
 //		}
+//
+////		switch (pathDisplayMode) {
+////		case PathDisplayMode::flat: {
+////			int i = 0;
+////			for(auto& p : std::filesystem::recursive_directory_iterator(path)) {
+////				if (not p.is_regular_file())
+////					continue;
+////
+////				if (not libv::match_wildcard_glob(libv::generic_path(p), filter_pattern))
+////					continue;
+////
+////				auto ext = p.path().extension();
+////				auto entry = std::make_shared<libv::ui::Label>(*list_panel, "entry");
+////
+////				if (select == i++) {
+////					value_ = libv::generic_path(p);
+////					entry->style(context().style("vm4pv.file_list.entry.selected"));
+////				}
+////				else if (exts_vm.contains(ext))
+////					entry->style(context().style("vm4pv.file_list.entry.vm"));
+////				else if (exts_importable.contains(ext))
+////					entry->style(context().style("vm4pv.file_list.entry.importable"));
+////				else
+////					entry->style(context().style("vm4pv.file_list.entry.other"));
+////
+////				entry->text(libv::generic_path(p));
+////				panel_files->add(entry);
+////			}
+////
+////			break;
+////		}
+////		case PathDisplayMode::tree: {
+////			for(auto& p : std::filesystem::directory_iterator(path)) {
+////				if (p.is_directory()) {
+////					add_button();
+////
+////					continue;
+////				} else if (p.is_regular_file()) {
+////					if (not libv::match_wildcard_glob(libv::generic_path(p), filter_pattern))
+////						continue;
+////
+////					auto ext = p.path().extension();
+////					auto entry = std::make_shared<libv::ui::Label>(*list_panel, "entry");
+////
+////					if (select == i++) {
+////						value_ = libv::generic_path(p);
+////						entry->style(context().style("vm4pv.file_list.entry.selected"));
+////					}
+////					else if (exts_vm.contains(ext))
+////						entry->style(context().style("vm4pv.file_list.entry.vm"));
+////					else if (exts_importable.contains(ext))
+////						entry->style(context().style("vm4pv.file_list.entry.importable"));
+////					else
+////						entry->style(context().style("vm4pv.file_list.entry.other"));
+////
+////					entry->text(libv::generic_path(p));
+////					panel_files->add(entry);
+////				}
+////			}
+////
+////			break;
+////		}
+////		}
 //
 //		list_panel->add(panel_files);
 //	}

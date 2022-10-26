@@ -1,4 +1,4 @@
-// Created by dbobula on 4/25/2022.
+// Project: libv, File: app/surface/view/camera_manager.hpp
 
 #pragma once
 

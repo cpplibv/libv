@@ -1051,6 +1051,42 @@ template <std::size_t N, typename T>
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2_t<T> swizzle_to_vec2(
+		uint32_t dim0, T value0,
+		uint32_t dim1, T value1) noexcept {
+	libv::vec2_t<T> result;
+	result[dim0] = value0;
+	result[dim1] = value1;
+	return result;
+}
+
+template <typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec3_t<T> swizzle_to_vec3(
+		uint32_t dim0, T value0,
+		uint32_t dim1, T value1,
+		uint32_t dim2, T value2) noexcept {
+	libv::vec3_t<T> result;
+	result[dim0] = value0;
+	result[dim1] = value1;
+	result[dim2] = value2;
+	return result;
+}
+
+template <typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec4_t<T> swizzle_to_vec4(
+		uint32_t dim0, T value0,
+		uint32_t dim1, T value1,
+		uint32_t dim2, T value2,
+		uint32_t dim3, T value3) noexcept {
+	libv::vec4_t<T> result;
+	result[dim0] = value0;
+	result[dim1] = value1;
+	result[dim2] = value2;
+	result[dim3] = value3;
+	return result;
+}
+
+template <typename T>
 [[nodiscard]] constexpr LIBV_FORCE_INLINE auto from_rgba(const T& v) noexcept {
 	return vec_t<4, decltype(v.r)>{v.r, v.g, v.b, v.a};
 }

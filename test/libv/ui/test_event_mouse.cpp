@@ -9,7 +9,7 @@
 #include <iostream>
 #include <utility>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_mouse.hpp>

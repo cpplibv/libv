@@ -1,4 +1,4 @@
-// Created by Vader on 2022.09.19..
+// Project: libv.utility, File: src/libv/utility/version.hpp
 
 #pragma once
 
@@ -48,6 +48,94 @@ public:
 };
 
 } // namespace libv --------------------------------------------------------------------------------
+
+
+////template <std::size_t N, typename T>
+////struct fmt::formatter<libv::vec_t<N, T>, char, void> : public fmt::formatter<T, char, void> {
+////	const char* sep_begin = " ";
+////	const char* sep_end = sep_begin + 1;
+////
+////	template <typename ParseContext>
+////	constexpr auto parse(ParseContext& ctx) {
+////		const auto specified = ctx.begin() != ctx.end();
+////		const auto begin = ctx.begin();
+////		auto end = begin;
+////		for (; end != ctx.end() && *end != '}'; ++end);
+////
+////		if (!specified)
+////			return formatter<T, char, void>::parse(ctx);
+////
+////		auto it_colon = begin;
+////		for (; it_colon != end && *it_colon != ':'; ++it_colon);
+////		if (it_colon == end) {
+////			sep_begin = &*begin;
+////			sep_end = &*end;
+////			ctx.advance_to(end);
+////			return formatter<T, char, void>::parse(ctx);
+////		}
+////
+////		sep_begin = &*begin;
+////		sep_end = &*it_colon;
+////		ctx.advance_to(it_colon + 1);
+////		return formatter<T, char, void>::parse(ctx);
+////	}
+////
+////	template <typename FormatContext>
+////	auto format(const libv::vec_t<N, T>& vec, FormatContext& ctx) const {
+////		auto out = ctx.out();
+////
+////		for (std::size_t i = 0; i < N; ++i) {
+////			if (i != 0) {
+////				for (auto s = sep_begin; s != sep_end; ++s)
+////					*out++ = *s;
+////				ctx.advance_to(out);
+////			}
+////			out = formatter<T, char, void>::format(vec[i], ctx);
+////			ctx.advance_to(out);
+////		}
+////
+////		return out;
+////	}
+////};
+//
+//
+//template <>
+//struct fmt::formatter<libv::version_number> {
+//	bool hex = false;
+//
+//	constexpr auto parse(fmt::format_parse_context& ctx) {
+//		auto it = ctx.begin();
+//		if (it == ctx.end() || *it != 'x')
+//			return it;
+//		++it;
+//		hex = true;
+//		return it;
+//	}
+//
+//	auto format(libv::version_number var, fmt::format_context& ctx) {
+//		if (hex)
+//			return fmt::format_to(ctx.out(), "{:x}", var.major);
+//		else
+//			return fmt::format_to(ctx.out(), "{}", var.major);
+//	}
+//};
+//
+//template <>
+//struct fmt::formatter<libv::version_number> {
+//
+//	fmt::formatter<uint16_t> fmt_major;
+//	fmt::formatter<uint16_t> fmt_minor;
+//	fmt::formatter<uint16_t> fmt_patch;
+//	fmt::formatter<uint16_t> fmt_build;
+//
+//	template <typename ParseContext>
+//	constexpr auto parse(ParseContext& ctx) {
+//		auto it = ctx.begin();
+//		const auto end = ctx.end();
+//
+//		fmt_major.parse(fmt::format_parse_context(fmt::string_view{it, end}));
+//
+//	}
 
 template <>
 struct fmt::formatter<libv::version_number> : fmt::formatter<uint16_t> {

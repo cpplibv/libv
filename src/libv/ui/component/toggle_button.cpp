@@ -1,23 +1,22 @@
-// Project: libv.ui, File: src/libv/ui/component/button.cpp
+// Project: libv.ui, File: src/libv/ui/component/toggle_button.cpp
 
 // hpp
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/ui/component/toggle_button_core.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/font_2D.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/style_state.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/shader_font.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+#include <libv/ui/style/style_state.hpp>
 
 
 namespace libv {
@@ -30,6 +29,8 @@ void CoreToggleButton::onSubmit() {
 
 	CoreButton::onSubmit();
 	handler().toggle();
+	//	ToggleButton{this}.toggle();
+	// TODO P5: ToggleButton{this} = the old now missing handler(), need a better solution
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -42,10 +43,8 @@ libv::vec4f CoreToggleButton::getInnerContentBounds() {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreToggleButton::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreToggleButton> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreButton::doStyle(ctx);
+void CoreToggleButton::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
 libv::vec3f CoreToggleButton::doLayout1(const ContextLayout1& environment) {

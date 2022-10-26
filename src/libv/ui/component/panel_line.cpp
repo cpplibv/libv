@@ -11,14 +11,11 @@
 #include <algorithm>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/layout_utility.hpp>
 #include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -63,14 +60,12 @@ struct AlignmentData {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelLine::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
-	access_properties(setter);
-	CoreBasePanel::doStyle(ctx);
+void CorePanelLine::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
-void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelLine::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 
@@ -110,7 +105,7 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 
 	for (auto& child : children | view_layouted()) {
 		const auto child_max_size = base_content_area_size - child.margin_size3()[_Y_];
-		const auto child_dynamic = calculate_layout1_contrib(child.core(), child_max_size);
+		const auto child_dynamic = calculate_layout1_dynamic_contrib(child.core(), child_max_size);
 
 		pixelX += child.size()[_X_].pixel;
 		percentX += child.size()[_X_].percent;
@@ -211,7 +206,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 	// Dynamic
 	for (auto& entry : entries) {
 		const auto max_child_size = libv::vec2f{unused_spaceX, layout_sizeY - padding_sizeY - entry.marginSizeSW.y};
-		const auto dynamic_contrib_size = swizzle(calculate_layout1_contrib(*entry.child, unswizzle(max_child_size, orientData._X_, orientData._Y_)), orientData._X_, orientData._Y_);
+		const auto dynamic_contrib_size = swizzle(calculate_layout1_dynamic_contrib(*entry.child, unswizzle(max_child_size, orientData._X_, orientData._Y_)), orientData._X_, orientData._Y_);
 		entry.resultSizeSW += dynamic_contrib_size;
 
 		unused_spaceX -= dynamic_contrib_size.x;

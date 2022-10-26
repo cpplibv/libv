@@ -20,7 +20,8 @@ class PanelFull;
 class PanelGrid;
 class PanelLine;
 class Quad;
-class ScrollBar;
+class Slider;
+class ScrollPane;
 class Stretch;
 
 class CanvasBase;

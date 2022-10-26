@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_root.cpp
+// Project: libv.ui, File: src/libv/ui/component/scene_container.cpp
 
 // hpp
 #include <libv/ui/component/scene_container.hpp>
@@ -11,17 +11,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreSceneContainer : public libv::ui::CorePanelAnchor {
-public:
-	friend SceneContainer;
-	[[nodiscard]] inline auto handler() { return SceneContainer{this}; }
+struct CoreSceneContainer : CorePanelAnchor {
+	using base_type = CorePanelAnchor;
+	using base_type::base_type;
 
-private:
+public:
 	std::string identifier;
 	libv::ui::Component primaryScene;
-
-public:
-	using CorePanelAnchor::CorePanelAnchor;
 };
 
 // =================================================================================================

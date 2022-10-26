@@ -11,12 +11,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelFull : public CoreBasePanel {
-public:
-	friend PanelFull;
-	[[nodiscard]] inline auto handler() { return PanelFull{this}; }
+struct CorePanelFull : CoreBasePanel {
+	using base_type = CoreBasePanel;
+	using base_type::base_type;
 
-private:
+public:
 	struct Properties {
 	} property;
 
@@ -30,11 +29,8 @@ private:
 //	static ComponentPropertyDescription child_description;
 
 public:
-	using CoreBasePanel::CoreBasePanel;
-
-protected:
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };

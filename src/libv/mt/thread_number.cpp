@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/number.cpp
+// Project: libv.mt, File: src/libv/mt/thread_number.cpp
 
 // hpp
 #include <libv/mt/thread_number.hpp>

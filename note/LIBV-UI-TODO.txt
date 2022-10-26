@@ -50,10 +50,16 @@ libv.ui: Issue: In the ui sandbox tabs not tracking active card properly
 libv.ui: For 'Tabs' selected style state
 libv.ui: In card layout create an event for card change
 libv.ui: Issue: In the ui sandbox 1 frame flicker on card removal | solved by switching active card before the frame ends
-
-
-
-
+libv.ui: Contents of property.hpp can be more hidden toward components (Especially the variant)
+libv.ui: Composite component style / property system
+libv.ui.property: complex composite component would result in "nested" property sets
+libv.ui.property: property system interaction with static_component system
+libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_system_front
+libv.ui.style: Do not track style changes, require ui to be prompted about change
+libv.ui.style: Verify that style change in child causes restyle in properties stored inside the parent
+libv.ui.SLC: Implement SLC - Static Layout Composition
+libv.ui.SLC: Document node function behaviours
+libv.ui: Rename scroll bar to slider
 
 
 
@@ -72,6 +78,86 @@ libv.ui: Issue: In the ui sandbox 1 frame flicker on card removal | solved by sw
 
 
 
+
+libv.ui: Scroll pane
+
+libv.ui: Layout env size -1 support, everywhere... oh fork...
+	limit, parent -> 2 seperate size for layout2 env
+
+	-1 size in a dim = no anchor or alignment in that dimension
+
+	also, I need a back channel to fetch scroll area final virtual size
+
+
+
+
+
+libv.ui: UI normalize contexts
+libv.ui: UI nexus, accept injected
+libv.ui: Expose nexus from a context
+libv.ui: Kill event_hub in favor of exposed nexus
+libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
+	style intrusive_ptr -> intrusive2_ptr
+
+
+libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
+
+
+libv.ui.SLC: Add anchor support
+libv.ui.SLC: Add alignment support
+libv.ui.SLC: Add layers support (to support scroll pane with overlayed scroll bar)
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+libv.ui: scroll_area only the "scroll pane" area without scroll bar
+	libv.ui: scroll area layout
+	libv.ui: scroll area render
+	libv.ui: scroll area (mouse) control
+	libv.ui: (?) scroll area size should equal or inherit(upward) it's content size
+			issue: If I want a scroll plane size to be content, I have to set the plane, the area and the line
+			idea: scroll area is not a component, but a component adaptor
+				what is a component adaptor? How does it fit a component hierarchy, how does it alters the behaviours?
+	libv.ui: container in scroll area, nested rendering alters clipping and control
+	libv.ui: scroll area in scroll area, nested rendering alters clipping and control
+
+	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
+			component bounds
+			clip bounds
+
+	problem: composition of components to create complex components
+		issue: create/attach/foreach/traverse/etc function implementations
+		issue: pollutes component hierarchy
+		issue: nested properties
+		issue: scroll area size propagation: if content is 50% area has to be set to 50% and content to 100%, so the size rules are messed up | would be nice to not deal with this issue, but transparent wrapping
+
+	ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
+
+	ideas and notes
+		new component memory models allows unlimited templates
+		component decorator
+		component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
+
+
+libv.ui: scroll_pane = client area + scroll bars
+	libv.ui: clipping vertex shader (with on/off)
+	libv.ui: shader clip plane (scissors), (effects every ui shader)
+			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
+			| or just use a viewport call and correct the projection matrix | would not allow 3D transforms
+			| clip planes should be the most generic solution
+	libv.ui: style sub component
+	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
+	libv.ui: mouse remapping regions and/or dimension and/or hubs to handle scroll panes and windows
+
+libv.ui: rename slider value_min and value_max to value_low and value_high
+libv.ui: create a real scroll_bar = slider + buttons
+libv.ui: Add support Nested-Nested-Styles for real Scroll bars in a scroll pane
+
+
 libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
 libv.ui: Clip with stencil:
 		ui init
@@ -87,6 +173,41 @@ libv.ui: Clip with stencil:
 
 		glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 		vertex only pass: GL_DECR the stencil on the clip region
+
+
+-------------------------------------------------------------------------------------------------
+
+
+libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
+
+libv.ui: static_component system (lite)
+	libv.ui: Check on the _pastebin/legacy codes for this one
+	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
+
+libv.ui: To fix property init
+		| scroll bar should not calculate any fucking layout in non layout
+		| it does it so it can process mouse event
+	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
+	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
+	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
+
+libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#typeeffect
+
+properties / style
+	libv.ui.property: if fallback value is requested log a warning
+	libv.ui.property: dynamic access
+	libv.ui.property: solve name/type collusion
+		libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
+	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not property fallback, its style sheet fallback.)
+	libv.ui.property: typed property registry
+	libv.ui.property: optimize property reset: address could be used to lookup
+
+
+====================================================================================================
+
 
 libv.ui: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
 
@@ -129,22 +250,9 @@ libv.ui: Style (resource) async loading
 
 libv.ui.property: scope / sheet / component type based style rules
 
-libv.ui: static_component system (lite)
-	Check on the _pastebin/legacy codes for this one
-
-	libv.ui: Restructure: property context creation stuffy simplification
-			maybe CRTP base for core components
-			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
-	libv.ui: Composite component style / property system
-		libv.ui.property: complex composite component would result in "nested" property sets
-		libv.ui.property: property system interaction with static_component system
-		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
-
 libv.ui: Component Image, CheckBox, Slider(for bar) could have a foreground fragment too (layout 1 should switch to that size)
 
-libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
+libv.ui: Background fragment
 	libv.ui: background to_string's: "Not implemented yet";
 
 	libv.ui: Implement getInnerContentBounds for every component
@@ -270,15 +378,7 @@ app.theme: create theme exporter: json and atlas texture
 app.theme: connect the theme gen with a running app to live update
 app.theme: clean up C++ blend/effect implementations
 
-libv.ui: multithreading cooldown for ui frame iteration. Aka: once_per_n_frame instead of X ms
-
-libv.ui: To fix property init
-		| scroll bar should not calculate any fucking layout in non layout
-		| it does it so it can process mouse event
-	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
-	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
-	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
-
+libv.ui: multithreading cooldown for ui frame iteration update callbacks. Aka: once_per_n_frame instead of X ms
 
 glow falloff is incorrect on corners, find a better solution
 	idea: it is 0-1 1-0: in the first range falloff should be a noop bc those values can be considered 1 AA
@@ -294,15 +394,6 @@ app.theme: --- PAPER ---
 	- from c++ ui run the generated lua script to acquire the theme
 	- | NOPE
 	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
-
-
-libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
-libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
-		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
-		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
-		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#typeeffect
-
-
 
 libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
@@ -320,10 +411,6 @@ libv.ui.layout:	verify what is going on with position change based layout invali
 
 libv.ui.layout: size over 100% is not an error
 
-libv.ui: make access_property a class member function (or use a single composite param)
-
-
-
 libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
 libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
 
@@ -334,54 +421,6 @@ libv.ui: Idea: new raw texture, white with size of 1x1 px BUT on the getters it 
 libv.ui: The ui should not know about glr, except in shader, context_render code and maybe the overlays
 
 libv.ui: overlay component layout stack highlight
-
-
-
-
-libv.ui: scroll_area only the "scroll pane" area without scroll bar
-	libv.ui: scroll area layout
-	libv.ui: scroll area render
-	libv.ui: scroll area (mouse) control
-	libv.ui: (?) scroll area size should equal or inherit(upward) it's content size
-			issue: If I want a scroll plane size to be content, I have to set the plane, the area and the line
-			idea: scroll area is not a component, but a component adaptor
-				what is a component adaptor? How does it fit a component hierarchy, how does it alters the behaviours?
-	libv.ui: container in scroll area, nested rendering alters clipping and control
-	libv.ui: scroll area in scroll area, nested rendering alters clipping and control
-
-	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
-			component bounds
-			clip bounds
-
-	problem: composition of components to create complex components
-		issue: create/attach/foreach/traverse/etc function implementations
-		issue: pollutes component hierarchy
-		issue: nested properties
-		issue: scroll area size propagation: if content is 50% area has to be set to 50% and content to 100%, so the size rules are messed up | would be nice to not deal with this issue, but transparent wrapping
-
-
-	ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
-
-	ideas and notes
-		new component memory models allows unlimited templates
-		component decorator
-		component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
-
-
-
-libv.ui: scroll_pane = client area + scroll bar
-	libv.ui: clipping vertex shader (with on/off)
-	libv.ui: shader clip plane (scissors), (effects every ui shader)
-			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
-			| or just use a viewport call and correct the projection matrix | would not allow 3D transforms
-			| clip planes should be the most generic solution
-	libv.ui: style sub component
-	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
-	libv.ui: mouse remapping regions and/or dimension and/or hubs to handle scroll panes and windows
-
-libv.ui: rename scroll bar to slider
-libv.ui: rename scroll bar (slider) value_min and value_max to value_low and value_high
-libv.ui: create a real scroll_bar = slider + buttons
 
 libv.ui: check box
 		Clickable elements with a cross in the middle that can be turned off or on.
@@ -428,9 +467,7 @@ libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 
 libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
 		| use enum generator
-libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
-libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
 libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .core() usages wherever possible
 
@@ -584,17 +621,6 @@ event
 			context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
 			context().events().fire("shader_reload", ShaderReportFailure{});
 
-properties / style
-	libv.ui.property: if fallback value is requested log a warning
-	libv.ui.property: dynamic access
-	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
-	libv.ui.property: solve name/type collusion
-		libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
-	libv.ui.style: do not track style changes, require ui to be prompted about change
-	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not property fallback, its style sheet fallback.)
-	libv.ui.property: typed property registry
-	libv.ui.property: optimize property reset: address could be used to lookup
-
 interactive
 	libv.ui: Ability to select, copy or click link from Labels if the specific properties are set to allow it
 
@@ -665,8 +691,6 @@ focus
 	libv.ui.focus: Focus traversal order: (index) position based
 
 style
-	libv.ui: style sheets | aka themes
-	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthesized styles?
 
 overlay
@@ -743,7 +767,7 @@ Alternatives:
 
 
 
-libv.ui: UI re-entering event loop problem and solution:
+PAPER: Re-entering event loop problem and solution:
 	Solution event_reentry_guard:
 		On every call execute 2 step:
 			- Test Target. If it fails abort early
@@ -762,7 +786,7 @@ libv.ui: UI re-entering event loop problem and solution:
 
 
 
-PAPER: libv.ui: Component styled states PAPER:
+PAPER: Component styled states:
 		Possible states:
 			Button
 				 Disabled : Normal : Hover : Focus : Active(Pressing) : Progress : Done/Error
@@ -789,6 +813,26 @@ PAPER: libv.ui: Component styled states PAPER:
 
 		- overriding: in case of multiple definition of the same property the last with matching state wins
 
+
+
+PAPER: SLC - Static Layout Composition
+	Node input / output:
+		area_size: The full size of the area that the node should consider
+			- For pixel / percent its the full conainer size
+			- For dynamic its the maximum limit the node could use (including its current reserverarion)
+			- For ratio its the exact new size (determined by ratio) of the node
+		return: Change in reservation in the area
+
+	Rules:
+		Pixel size:
+			Fix size in pixels
+		Percent size:
+			Percent size of the parent excluding the padding
+		Dynamic size:
+			Limit = assume every future dynamic is empty
+			Can "reuse" space already allocated by the objects fix size
+		Ratio size:
+			Distribute any unused space between nodes based on their ratio
 
 
 

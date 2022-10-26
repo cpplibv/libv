@@ -1,10 +1,10 @@
-// Project: libv.ui, File: src/libv/ui/component/_idea_enum_button.hpp
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_idea_enum_button.hpp
 
 #pragma once
 
 // pro
 #include <libv/ui/component/button.hpp>
-#include <libv/ui/component/detail/component_api.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 //#include <libv/ui/property/align.hpp>
 //#include <libv/ui/property/color.hpp>
 //#include <libv/ui/property/font_2D.hpp>

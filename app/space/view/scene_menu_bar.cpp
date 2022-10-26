@@ -3,11 +3,11 @@
 // hpp
 #include <space/view/scene_menu_bar.hpp>
 // libv
-#include <libv/ui/attach_state.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/attach_state.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/nexus.hpp>
 // pro

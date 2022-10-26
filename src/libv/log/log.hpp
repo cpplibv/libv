@@ -127,9 +127,9 @@ private:
 
 	private:
 		std::string module = "";
+		MatcherFunction matcher;
 		Severity severity = Severity::Trace;
 		bool allow;
-		MatcherFunction matcher;
 
 	private:
 		[[nodiscard]] bool isSubModule(const std::string_view submodule) const {
@@ -176,7 +176,7 @@ private:
 				Severity severity,
 				bool allow,
 				MatcherFunction matcher) :
-			module(module), severity(severity), allow(allow), matcher(matcher) { }
+			module(module), matcher(matcher), severity(severity), allow(allow) { }
 
 		bool alter_if_replacing(const std::string_view module, const Severity severity, bool allow, Rule::MatcherFunction fn) {
 			if (module == this->module && severity == this->severity && fn == this->matcher) {
@@ -188,12 +188,12 @@ private:
 	};
 
 private:
-	bool colored = true;
-	bool levelShort_ = true;
 	std::vector<Rule> rules;
 	std::vector<libv::observer_ref<std::ostream>> outputs;
 	std::vector<libv::observer_ref<Logger>> outputChains;
 	std::string format = "{severity} {thread_id} {module}: {message}, {file}:{line}\n";
+	bool colored = true;
+	bool levelShort_ = true;
 
 private:
 	bool notable(Severity severity, const std::string_view module) {

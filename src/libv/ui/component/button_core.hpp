@@ -5,8 +5,8 @@
 // hpp
 #include <libv/ui/component/button.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 
 
 namespace libv {
@@ -21,14 +21,11 @@ namespace ui {
 //	PropertyL1L2<AlignVertical> align_vertical;
 //};
 
-class CoreButton : public CoreComponent {
-public:
-	friend class Button;
-	[[nodiscard]] inline auto handler() { return Button{this}; }
+struct CoreButton : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
 
 public:
-	template <typename T> static void access_properties(T& ctx);
-
 	struct Properties {
 		PropertyR<Background> background;
 
@@ -49,17 +46,16 @@ public:
 //		PropertyL1L2<> font_size;
 	} property;
 
-private:
-	TextLayoutLite text_;
+	template <typename T> static void access_properties(T& ctx);
 
 public:
-	using CoreComponent::CoreComponent;
+	LayoutTextLite text_;
 
-protected:
+public:
 	void routineSubmit();
 	virtual void onSubmit() {}
 
-private:
+public:
 	virtual void onFocus(const EventFocus& event) override;
 	virtual void onMouseButton(const EventMouseButton& event) override;
 	virtual void onMouseMovement(const EventMouseMovement& event) override;
@@ -68,9 +64,9 @@ private:
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-protected:
+public:
 	virtual void doAttach() override;
-	virtual void doStyle(ContextStyle& ctx) override;
+	virtual void doStyle(StyleAccess& access) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;

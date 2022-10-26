@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_settings.cpp
+// Project: libv, File: app/star/game/scene/scene_controls.cpp
 
 // hpp
 #include <star/game/scene/scenes.hpp>

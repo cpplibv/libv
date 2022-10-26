@@ -56,4 +56,28 @@ template <typename Range, typename Pred, typename Proj = std::identity>
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename Range, typename Key, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto linear_find_last_iterator(Range&& range, const Key& key, Proj proj = {}) {
+	// NOTE: The concepts on std::ranges::find gives trouble if only operator==(const ValueType&, const Key&) is provided
+	//	return std::ranges::find(range, key, proj);
+
+	const auto end = std::rend(range);
+	for (auto it = std::rbegin(range); it != end; ++it)
+		if (std::invoke(proj, *it) == key)
+			return it;
+
+	return end;
+}
+
+template <typename Range, typename Key, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto* linear_find_last_optional(Range&& range, const Key& key, Proj proj = {}) {
+	// NOTE: The concepts on std::ranges::find gives trouble if only operator==(const ValueType&, const Key&) is provided
+	//	const auto it = std::ranges::find(range, key, proj);
+
+	const auto it = linear_find_last_iterator(range, key, proj);
+	return it != std::rend(range) ? std::addressof(*it) : nullptr;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace libv

@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/button_core.hpp
+// Project: libv.ui, File: src/libv/ui/component/toggle_button_core.hpp
 
 #pragma once
 
@@ -6,8 +6,8 @@
 #include <libv/ui/component/button_core.hpp>
 #include <libv/ui/component/toggle_button.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 
 
 namespace libv {
@@ -15,34 +15,31 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-//class CoreBaseButton {
-//
-//};
+struct CoreToggleButton : CoreButton {
+	using base_type = CoreButton;
+	using base_type::base_type;
 
-class CoreToggleButton : public CoreButton {
-//class CoreToggleButton : public CoreBaseButton {
-public:
-	friend class ToggleButton;
+	// TODO P5: Remove handler()
 	[[nodiscard]] inline auto handler() { return ToggleButton{this}; }
 
 public:
-	template <typename T> static void access_properties(T& ctx);
 	struct Properties {
 		PropertyR<bool> selection;
 	} property;
 
-private:
-//	TextLayout text_on;
-//	TextLayoutProperties text_properties;
+	template <typename T> static void access_properties(T& ctx);
 
+public:
+//	LayoutText text_on;
+//	LayoutTextProperties text_properties;
 
 //	TextProperties text_properties;
 //	TextBuilder text_builder;
 //	TextFragment text_on;
 //	TextFragment text_off;
 
-	TextLayoutLite text_on;
-	TextLayoutLite text_off;
+	LayoutTextLite text_on;
+	LayoutTextLite text_off;
 
 //	void set_size(int size_value) {
 //		text_builder.set_size(size_value);
@@ -54,17 +51,13 @@ private:
 //	}
 
 public:
-//	using CoreBaseButton::CoreBaseButton;
-	using CoreButton::CoreButton;
-
-private:
 	virtual void onSubmit() override;
 
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-protected:
-	virtual void doStyle(ContextStyle& ctx) override;
+public:
+	virtual void doStyle(StyleAccess& access) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;

@@ -17,12 +17,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CorePanelStatusLine : public CorePanelLine {
-public:
-	friend PanelStatusLine;
-	[[nodiscard]] inline auto handler() { return PanelStatusLine{this}; }
+struct CorePanelStatusLine : CorePanelLine {
+	using base_type = CorePanelLine;
+	using base_type::base_type;
 
-private:
+public:
 	struct LogEntry {
 		PanelStatusLine::EntryID id;
 //		std::string style;
@@ -33,9 +32,6 @@ private:
 	std::vector<LogEntry> entries;
 
 public:
-	using CorePanelLine::CorePanelLine;
-
-protected:
 	virtual void doUpdate() override {
 		const auto time_of_frame = context().state.time_frame();
 

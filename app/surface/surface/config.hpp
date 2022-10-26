@@ -1,4 +1,4 @@
-// Created by dbobula on 2/20/2022.
+// Project: libv, File: app/surface/surface/config.hpp
 
 #pragma once
 

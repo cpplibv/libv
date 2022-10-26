@@ -1,4 +1,4 @@
-//
+// Project: libv.noise, File: src/libv/noise/seed.hpp
 
 #pragma once
 

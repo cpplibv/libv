@@ -23,7 +23,8 @@
 #include <vector>
 // pro
 #include <libv/ui/chrono.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/overlay/overlay_zoom.hxx>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
@@ -33,9 +34,8 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
-#include <libv/ui/event_hub.hpp>
+#include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/overlay_zoom.hxx>
 #include <libv/ui/lua/script_style.hpp>
 
 
@@ -396,11 +396,11 @@ public:
 			// --- Style ---
 			try {
 				if (context.isAnyStyleDirty()) {
-					AccessRoot::styleScan(root.core());
+					AccessRoot::styleScanAll(root.core());
 					context.clearEveryStyleDirty();
 					stat.styleScan.sample(timer.time_ns());
 				} else {
-					AccessRoot::style(root.core());
+					AccessRoot::styleScan(root.core());
 					stat.style.sample(timer.time_ns());
 				}
 			} catch (const std::exception& ex) {
@@ -475,7 +475,7 @@ public:
 //		static int i = 0;
 //		if (++i == 1200) {
 //			i = 0;
-//			log_ui.trace("UI Statistics:\n{}", stat);
+//			log_ui.info("UI Statistics:\n{}", stat);
 //		}
 	}
 

@@ -15,13 +15,11 @@
 #include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
-#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/component/base_panel_core.hpp>
+#include <libv/ui/component/layout/layout_utility.hpp>
+#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
-#include <libv/ui/context/context_style.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -29,17 +27,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelGrid : public CoreBasePanel {
-public:
-	friend PanelGrid;
-	[[nodiscard]] inline auto handler() { return PanelGrid{this}; }
+struct CorePanelGrid : CoreBasePanel {
+	using base_type = CoreBasePanel;
+	using base_type::base_type;
 
-private:
-	struct Properties {
-		PropertyL1L2<ColumnCount> column_count;
-		PropertyL1L2<Orientation2> orientation2;
-		PropertyL1L2<Spacing2> spacing2;
-	} property;
+public:
+	PropertyL1L2<ColumnCount> column_count;
+	PropertyL1L2<Orientation2> orientation2;
+	PropertyL1L2<Spacing2> spacing2;
 
 	struct ChildProperties {
 	};
@@ -51,11 +46,8 @@ private:
 //	static ComponentPropertyDescription child_description;
 
 public:
-	using CoreBasePanel::CoreBasePanel;
-
-protected:
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
@@ -151,29 +143,27 @@ void CorePanelGrid::access_child_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelGrid::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
-	access_properties(setter);
-	CoreBasePanel::doStyle(ctx);
+void CorePanelGrid::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
-void CorePanelGrid::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelGrid::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
-	const auto column_count = property.column_count();
-	const auto& orient = Orientation2Table[underlying(property.orientation2())];
+	const auto column_count = this->column_count();
+	const auto& orient = Orientation2Table[underlying(orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;
 
 	libv::vec3f spacing_sum;
-	spacing_sum[_X_] = static_cast<float>(std::max(0, column_count - 1)) * property.spacing2()[_X_];
-	spacing_sum[_Y_] = static_cast<float>(std::max(0, static_cast<int32_t>(countLayoutedChildren(children) - 1)) / column_count) * property.spacing2()[_Y_];
+	spacing_sum[_X_] = static_cast<float>(std::max(0, column_count - 1)) * spacing2()[_X_];
+	spacing_sum[_Y_] = static_cast<float>(std::max(0, static_cast<int32_t>(countLayoutedChildren(children) - 1)) / column_count) * spacing2()[_Y_];
 	spacing_sum[_Z_] = 0;
 
 	const auto env_size = layout_env.size
@@ -241,15 +231,15 @@ libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
 
 void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 	// TODO P4: generalize a way for table lookup for various table lookup and handle invalid enum values
-	const auto column_count = property.column_count();
-	const auto& orient = Orientation2Table[underlying(property.orientation2())];
+	const auto column_count = this->column_count();
+	const auto& orient = Orientation2Table[underlying(orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;
 
 	libv::vec3f spacing_sum;
-	spacing_sum[_X_] = static_cast<float>(std::max(0, column_count - 1)) * property.spacing2()[_X_];
-	spacing_sum[_Y_] = static_cast<float>(std::max(0, static_cast<int32_t>(countLayoutedChildren(children) - 1)) / column_count) * property.spacing2()[_Y_];
+	spacing_sum[_X_] = static_cast<float>(std::max(0, column_count - 1)) * spacing2()[_X_];
+	spacing_sum[_Y_] = static_cast<float>(std::max(0, static_cast<int32_t>(countLayoutedChildren(children) - 1)) / column_count) * spacing2()[_Y_];
 	spacing_sum[_Z_] = 0;
 
 	const auto percent_size = layout_env.size - padding_size3();
@@ -413,10 +403,10 @@ void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 					layout_env.enter(roundedPosition, roundedSize)
 			);
 
-			startToPen[_X_] += orient.direction[_X_] * (advanceX[x] + property.spacing2()[_X_]);
+			startToPen[_X_] += orient.direction[_X_] * (advanceX[x] + spacing2()[_X_]);
 		}
 		startToPen[_X_] = 0;
-		startToPen[_Y_] += orient.direction[_Y_] * (advanceY[y] + property.spacing2()[_Y_]);
+		startToPen[_Y_] += orient.direction[_Y_] * (advanceY[y] + spacing2()[_Y_]);
 	}
 }
 
@@ -433,27 +423,27 @@ bool PanelGrid::castable(libv::ui::core_ptr core) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void PanelGrid::column_count(ColumnCount value) {
-	AccessProperty::manual(self(), self().property.column_count, value);
+	AccessProperty::manual(self(), self().column_count, value);
 }
 
 ColumnCount PanelGrid::column_count() const noexcept{
-	return self().property.column_count();
+	return self().column_count();
 }
 
 void PanelGrid::orientation2(Orientation2 value) {
-	AccessProperty::manual(self(), self().property.orientation2, value);
+	AccessProperty::manual(self(), self().orientation2, value);
 }
 
 Orientation2 PanelGrid::orientation2() const noexcept{
-	return self().property.orientation2();
+	return self().orientation2();
 }
 
 void PanelGrid::spacing2(Spacing2 value) {
-	AccessProperty::manual(self(), self().property.spacing2, value);
+	AccessProperty::manual(self(), self().spacing2, value);
 }
 
 Spacing2 PanelGrid::spacing2() const noexcept{
-	return self().property.spacing2();
+	return self().spacing2();
 }
 
 // -------------------------------------------------------------------------------------------------

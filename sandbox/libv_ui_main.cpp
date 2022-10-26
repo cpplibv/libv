@@ -11,7 +11,9 @@
 // std
 #include <iostream>
 // pro
+#include <libv/parse/color.hpp>
 #include <libv/ui/component/button.hpp>
+#include <libv/ui/component/gap.hpp>
 #include <libv/ui/component/image.hpp>
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
@@ -21,17 +23,17 @@
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
-#include <libv/ui/component/selection_group.hpp>
-#include <libv/ui/component/scroll_bar.hpp>
+#include <libv/ui/component/scroll_area.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
+#include <libv/ui/component/selection_group.hpp>
+#include <libv/ui/component/slider.hpp>
 #include <libv/ui/component/toggle_button.hpp>
+#include <libv/ui/component_system/attach_state.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
-//#include <libv/ui/style.hpp>
-
-#include <libv/ui/attach_state.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -146,6 +148,10 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+libv::ui::Component createTabScroll();
+
+// -------------------------------------------------------------------------------------------------
+
 class SandboxFrame : public libv::Frame {
 private:
 	libv::ui::UI ui;
@@ -174,10 +180,10 @@ private:
 	libv::ui::PanelLine panel_line_scrolled;
 	libv::ui::Image stretch;
 	libv::ui::Image quad;
-	libv::ui::ScrollBar scroll_bar_x;
-	libv::ui::ScrollBar scroll_bar_y;
-	libv::ui::ScrollBar scroll_bar_ix;
-	libv::ui::ScrollBar scroll_bar_iy;
+	libv::ui::Slider scroll_bar_x;
+	libv::ui::Slider scroll_bar_y;
+	libv::ui::Slider scroll_bar_ix;
+	libv::ui::Slider scroll_bar_iy;
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
 	libv::ui::PanelStatusLine status_log;
@@ -493,7 +499,7 @@ private:
 		});
 
 		scroll_area_outer.content(panel_line_scrolled);
-		scroll_area_outer.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_outer.mode(libv::ui::ScrollMode::vertical);
 		scroll_area_outer.size(libv::ui::parse_size_or_throw("50%, 3r"));
 		scroll_area_outer.anchor(libv::ui::Anchor::center_center);
 		scroll_area_outer.event().area([](auto& component, const auto& event) {
@@ -501,7 +507,7 @@ private:
 		});
 
 		scroll_area_inner.content(input_field1);
-		scroll_area_inner.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_inner.mode(libv::ui::ScrollMode::vertical);
 		scroll_area_inner.size(libv::ui::parse_size_or_throw("50%, 50px"));
 		scroll_area_inner.anchor(libv::ui::Anchor::center_center);
 
@@ -629,15 +635,22 @@ private:
 
 public:
 	SandboxFrame() :
-			Frame("UI Sandbox", 1680, 1050) {
+			Frame("UI Sandbox", 1680, 1050),
+			ui([] {
+				libv::ui::Settings settings;
+				settings.track_style_scripts = true;
+				return settings;
+			}()) {
 		setPosition(FramePosition::center_current_monitor);
 		setOpenGLProfile(OpenGLProfile::core);
 		setOpenGLVersion(4, 5);
 		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
+		ui.load_style_script_file("sandbox/libv_ui_main_style.lua");
 
 		tabs.addTab("Empty Tab", libv::ui::PanelLine());
 		tabs.addTab("Buttons", createTabButtons());
+		tabs.addTab("Scroll", createTabScroll());
 		tabs.addTab("Card layout", createTabCards());
 		tabs.addTab("Tab #3", createTab3());
 		tabs.addTab("Legacy", createTabLegacy());

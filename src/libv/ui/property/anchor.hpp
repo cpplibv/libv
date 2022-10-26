@@ -19,7 +19,7 @@ namespace libv::ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Anchor : int32_t {
+enum class Anchor : int8_t {
 	top_left = 0,
 	top_center = 1,
 	top_right = 2,
@@ -36,7 +36,7 @@ enum class Anchor : int32_t {
 struct Anchor_type {
 public:
 	using enum_type = Anchor;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	enum_type enum_value_;
@@ -119,7 +119,7 @@ public:
 class Anchor_state {
 public:
 	using enum_type = Anchor;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	static constexpr enum_type table_enum_values[] = {
@@ -151,11 +151,11 @@ inline std::ostream& operator<<(std::ostream& os, const Anchor var) {
 	return os << Anchor_type(var).to_string();
 }
 
-[[nodiscard]] constexpr inline int32_t underlying(Anchor enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t underlying(Anchor enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
-[[nodiscard]] constexpr inline int32_t operator+(Anchor enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t operator+(Anchor enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
 
 [[nodiscard]] constexpr inline Anchor_type type(Anchor enum_value) noexcept {

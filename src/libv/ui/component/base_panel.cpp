@@ -8,9 +8,8 @@
 // pro
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -68,14 +67,14 @@ void CoreBasePanel::clear() {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreBasePanel::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreBasePanel> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CoreBasePanel::doStyle(StyleAccess& access) {
+	access.self(*this);
+	for (auto& child : children)
+		access.child(child);
 }
 
 void CoreBasePanel::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	background().render(r, {0, 0}, layout_size2(), *this);
 
 	for (auto& child : children) {
 		Renderer rc = r.enter(child);
@@ -150,11 +149,11 @@ bool BasePanel::castable(libv::ui::core_ptr core) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void BasePanel::background(Background value) {
-	AccessProperty::manual(self(), self().property.background, std::move(value));
+	AccessProperty::manual(self(), self().background, std::move(value));
 }
 
 [[nodiscard]] const Background& BasePanel::background() const noexcept {
-	return self().property.background();
+	return self().background();
 }
 
 // -------------------------------------------------------------------------------------------------

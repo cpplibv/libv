@@ -9,10 +9,9 @@
 #include <ostream>
 // pro
 //#include <libv/ui/context/context_style.hpp>
-//#include <libv/ui/style.hpp>
-#include <libv/ui/component/detail/component_api.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/detail/core_ptr.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component_system/core_ptr.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/parse/parse_size.hpp>
@@ -100,7 +99,7 @@ struct TestPanel : T {
 		// Hacky injection of this as a non-null contextUI, it will not be used anyways
 
 		// Hacky styling to initialize properties of only this panel (Child are not yet attached, their non-base properties are ignored during testing)! AND It will crash if ContextUI is used to init a property
-		libv::ui::AccessRoot::styleScan(this->core());
+		libv::ui::AccessRoot::styleScanAll(this->core());
 	}
 
 private:

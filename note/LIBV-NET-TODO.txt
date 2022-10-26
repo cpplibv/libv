@@ -51,6 +51,7 @@ libv.net.mtcp: Single write op for header and body
 
 
 
+place.it: auto update could be assisted with the application main being in a dll? with a skeleton.exe
 
 place.it:
 	CICD:

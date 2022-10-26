@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/view/frustum.hpp
+// Project: libv.math, File: src/libv/math/frustum.hpp
 
 #pragma once
 

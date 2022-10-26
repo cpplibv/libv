@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/noise/perlin.hpp
+// Project: libv.noise, File: src/libv/noise/perlin.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/number.hpp
+// Project: libv.mt, File: src/libv/mt/thread_number.hpp
 
 #pragma once
 

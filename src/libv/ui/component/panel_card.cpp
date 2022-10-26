@@ -14,9 +14,8 @@
 #include <libv/ui/component/panel_full_core.hpp>
 #include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -24,17 +23,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelCard : public CorePanelFull {
-public:
-	friend PanelCard;
-	[[nodiscard]] inline auto handler() { return PanelCard{this}; }
+struct CorePanelCard : CorePanelFull {
+	using base_type = CorePanelFull;
+	using base_type::base_type;
 
 public:
 	CardID activeCardID = nullCardID;
 	CardID nextCardID = firstCardID;
 	boost::container::flat_map<CardID, Component> cardIDMapping;
 
-private:
+public:
 	struct Properties {
 	} property;
 
@@ -48,12 +46,9 @@ private:
 //	static ComponentPropertyDescription child_description;
 
 public:
-	using CorePanelFull::CorePanelFull;
-
-protected:
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -82,14 +77,12 @@ void CorePanelCard::doDetachChildren(libv::function_ref<bool(Component&)> callba
 	});
 }
 
-void CorePanelCard::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CorePanelCard> setter{*this, ctx.component, ctx.style, ctx.component.context()};
-	access_properties(setter);
-	CorePanelFull::doStyle(ctx);
+void CorePanelCard::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
-void CorePanelCard::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelCard::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 

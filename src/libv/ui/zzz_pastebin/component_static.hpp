@@ -8,7 +8,7 @@
 #include <functional>
 #include <string_view>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/layout_default.hpp>
 #include <libv/ui/module_layout.hpp>
 //#include <libv/ui/module_render.hpp>

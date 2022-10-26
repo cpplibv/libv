@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_coro_main.cpp
+// Project: libv.noise, File: sandbox/libv_noise_main.cpp
 
 // ext
 #include <fmt/printf.h>

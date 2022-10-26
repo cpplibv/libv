@@ -1,4 +1,4 @@
-// Created by dbobula on 4/23/2022.
+// Project: libv, File: app/surface/view/render/baker_sprite_atlas.cpp
 
 // hpp
 #include <surface/view/render/baker_sprite_atlas.hpp>

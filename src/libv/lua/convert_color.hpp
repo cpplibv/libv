@@ -1,4 +1,4 @@
-// Created by dbobula on 3/10/2022.
+// Project: libv.lua, File: src/libv/lua/convert_color.hpp
 
 #pragma once
 

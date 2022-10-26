@@ -3,55 +3,18 @@
 #pragma once
 
 // pro
-#include <libv/ui/component/detail/component_api.hpp>
-#include <libv/ui/property/scroll_area_mode.hpp>
+#include <libv/ui/component_system/component_api.hpp>
+#include <libv/ui/component/fwd.hpp>
+#include <libv/ui/component/scroll_area.hpp>
+#include <libv/ui/property/background.hpp>
+#include <libv/ui/property/scroll_mode.hpp>
+#include <libv/ui/property/spacing.hpp>
 
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-struct EventScrollArea : BaseEvent {
-	libv::vec2f old_position;
-	libv::vec2f old_size;
-
-	constexpr inline EventScrollArea(libv::vec2f old_position, libv::vec2f old_size) noexcept :
-		old_position(old_position),
-		old_size(old_size) {}
-};
-
-template <typename ComponentT>
-struct EventHostScrollArea : EventHostGeneral<ComponentT> {
-	BasicEventProxy<ComponentT, EventScrollArea> area{this->owner};
-};
-
-// -------------------------------------------------------------------------------------------------
-
-class ScrollArea : public ComponentAPI<Component, ScrollArea, class CoreScrollArea, EventHostScrollArea> {
-public:
-	using ComponentAPI::ComponentAPI;
-	static constexpr std::string_view component_type = "s-area";
-	[[nodiscard]] static core_ptr create_core(std::string name);
-	[[nodiscard]] static bool castable(core_ptr) noexcept;
-
-public:
-	void mode(ScrollAreaMode value) noexcept;
-	[[nodiscard]] ScrollAreaMode mode() const noexcept;
-
-	void content(Component&& value) noexcept;
-	void content(const Component& value) noexcept;
-	[[nodiscard]] Component& content() noexcept;
-	[[nodiscard]] const Component& content() const noexcept;
-
-public:
-	void area_position(libv::vec2f value) noexcept;
-	[[nodiscard]] libv::vec2f area_position() const noexcept;
-
-	[[nodiscard]] libv::vec2f area_size() const noexcept;
-};
-
-// =================================================================================================
 
 //enum class BarVisibility {
 //	/// The default. The scroll bar is displayed when the client area does not fit in the viewport.
@@ -70,126 +33,87 @@ public:
 //enum class ScrollPaneMode {
 //	horizontal,
 //	vertical,
-//
-//	both_with_corner,
 //	both_with_horizontal_main,
+//
+//	none,
+//	both_with_corner,
 //	both_with_vertical_main,
 //};
 //
 //enum class BarPlacementHorizontal {
+//	none,
 //	left,
+//	left_inner,
+//	left_inner_consider_occluding, // occluding means it will allow over-scrolling to uncover area under the scroll-bar
 //	right,
-//
+//	right_inner,
+//	right_inner_consider_occluding,
 //	both,
+//	both_inner,
+//	both_inner_consider_occluding,
 //};
 //
 //enum class BarPlacementVertical {
+//	none,
 //	top,
+//	top_inner,
+//	top_inner_consider_occluding,
 //	bottom,
-//
+//	bottom_inner,
+//	bottom_inner_consider_occluding,
 //	both,
+//	both_inner,
+//	both_inner_consider_occluding,
 //};
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//class ScrollPane : public ComponentHandler<class CoreScrollPane, EventHostGeneral<ScrollPane>> {
+
+// -------------------------------------------------------------------------------------------------
+
+class ScrollPane : public ComponentAPI<Component, ScrollPane, class CoreScrollPane, EventHostScrollArea> {
+public:
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "s-pane";
+	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static bool castable(core_ptr) noexcept;
+
+public:
+	void background(Background value);
+	[[nodiscard]] const Background& background() const noexcept;
+
+public:
+	void mode(ScrollMode value) noexcept;
+	[[nodiscard]] ScrollMode mode() const noexcept;
+
+	void content(Component&& value) noexcept;
+	void content(const Component& value) noexcept;
+	[[nodiscard]] Component& content() noexcept;
+	[[nodiscard]] const Component& content() const noexcept;
+
 //public:
-//	explicit ScrollPane(std::string name);
-//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "s-pane");
-//	explicit ScrollPane(core_ptr core) noexcept;
-//
-//public:
-//	void content(Component&& value) noexcept;
-//	void content(const Component& value) noexcept;
-//	[[nodiscard]] Component& content() noexcept;
-//	[[nodiscard]] const Component& content() const noexcept;
-//
-//public:
+//	void seek_to(const Component& component) noexcept;
+
+public:
+	void area_position(libv::vec2f value) noexcept;
+	[[nodiscard]] libv::vec2f area_position() const noexcept;
+
+	[[nodiscard]] libv::vec2f area_size() const noexcept;
+
+	void spacing2(Spacing2 value);
+	[[nodiscard]] Spacing2 spacing2() const noexcept;
+
 //	[[nodiscard]] ScrollArea& scroll_area();
 //	[[nodiscard]] const ScrollArea& scroll_area() const;
-//
-//	[[nodiscard]] ScrollBar& bar_vertical();
-//	[[nodiscard]] const ScrollBar& bar_vertical() const;
-//
-//	[[nodiscard]] ScrollBar& bar_horizontal();
-//	[[nodiscard]] const ScrollBar& bar_horizontal() const;
-//
+
+	[[nodiscard]] Slider& bar_vertical() noexcept;
+	[[nodiscard]] const Slider& bar_vertical() const noexcept;
+
+	[[nodiscard]] Slider& bar_horizontal() noexcept;
+	[[nodiscard]] const Slider& bar_horizontal() const noexcept;
+
 //	void corner(Component value);
 //	void clear_corner() noexcept;
 //	[[nodiscard]] bool has_corner() const noexcept;
 //	[[nodiscard]] const Component& corner() const;
-//};
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-//
-//// Property public API
-//#define LIBV_UI_PROPERTY_PAPI(RType, WType, Name) \
-//	void Name(WType value); \
-//	[[nodiscard]] RType Name() const noexcept;
-//
-//// Property member manual
-//#define LIBV_UI_PROPERTY_MMAN(Owner, RType, WType, Name) \
-//	void Owner::Name(WType value) { \
-//		AccessProperty::manual(self(), self().property.Name, std::move(value)); \
-//	} \
-//	RType Owner::Name() const noexcept { \
-//		return self().property.Name(); \
-//	}
-//
-//// Property public API | value based
-//#define LIBV_UI_PROPERTY_PAPI_V(Type, Name) LIBV_UI_PROPERTY_PAPI(Type, Type, Name)
-//// Property public API | reference based
-//#define LIBV_UI_PROPERTY_PAPI_R(Type, Name) LIBV_UI_PROPERTY_PAPI(const Type&, Type, Name)
-//
-//// Property member manual | value based
-//#define LIBV_UI_PROPERTY_MMAN_V(Owner, Type, Name) LIBV_UI_PROPERTY_MMAN(Owner, Type, Type, Name)
-//// Property member manual | reference based
-//#define LIBV_UI_PROPERTY_MMAN_R(Owner, Type, Name) LIBV_UI_PROPERTY_MMAN(Owner, const Type&, Type, Name)
-//
-//
-//// =================================================================================================
-//// =================================================================================================
-//
-//class ScrollPane : public ComponentHandler<class CoreScrollPane, EventHostGeneral<ScrollPane>> {
-////class ScrollPane :
-////	public ScrollArea,
-////	public ComponentDerived<ScrollPane>,
-////	public EventHost<EventHostGeneral<ScrollPane>>> {
-//public:
-//	explicit ScrollPane(std::string name);
-//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "s-pane");
-//	explicit ScrollPane(core_ptr core) noexcept;
-//
-//public:
-//	[[nodiscard]] ScrollBar& bar_vertical();
-//	[[nodiscard]] const ScrollBar& bar_vertical() const;
-//
-//	[[nodiscard]] ScrollBar& bar_horizontal();
-//	[[nodiscard]] const ScrollBar& bar_horizontal() const;
-//
-//	void corner(Component value);
-//	void clear_corner();
-//	[[nodiscard]] const Component& corner() const;
-//
-////	[[nodiscard]] ScrollArea& scroll_area();
-////	[[nodiscard]] const ScrollArea& scroll_area() const;
-//
-//public:
-//	LIBV_UI_PROPERTY_PAPI_V(BarPlacementHorizontal, bar_placement_horizontal)
-//	LIBV_UI_PROPERTY_PAPI_V(BarPlacementVertical, bar_placement_vertical)
-//	LIBV_UI_PROPERTY_PAPI_V(BarVisibility, bar_visibility_horizontal)
-//	LIBV_UI_PROPERTY_PAPI_V(BarVisibility, bar_visibility_vertical)
-//	LIBV_UI_PROPERTY_PAPI_V(ScrollPaneMode, mode)
-//};
-//
-//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarPlacementHorizontal, bar_placement_horizontal)
-//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarPlacementVertical, bar_placement_vertical)
-//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarVisibility, bar_visibility_horizontal)
-//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarVisibility, bar_visibility_vertical)
-//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, ScrollPaneMode, mode)
+};
 
 // -------------------------------------------------------------------------------------------------
 

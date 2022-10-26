@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 

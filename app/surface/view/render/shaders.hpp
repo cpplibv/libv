@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/shaders.hpp
+// Project: libv, File: app/surface/view/render/shaders.hpp
 
 #pragma once
 

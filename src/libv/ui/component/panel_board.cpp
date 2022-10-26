@@ -8,16 +8,14 @@
 // std
 #include <algorithm>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_utility.hpp>
 #include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -25,14 +23,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelBoard::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CorePanelBoard> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CorePanelBoard::doStyle(StyleAccess& access) {
+	access.self(*this);
+	for (auto& child : children)
+		access.child(child.component);
 }
 
-void CorePanelBoard::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelBoard::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 

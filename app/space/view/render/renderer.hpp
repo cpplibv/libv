@@ -16,7 +16,7 @@
 #include <libv/rev/resource/shader_loader.hpp>
 #include <libv/sun/camera.hpp>
 #include <libv/ui/component/canvas.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
 //#include <space/sim/universe.hpp>
@@ -274,7 +274,7 @@ private:
 		libv::vec3f position;
 		libv::vec2f screenOffset;
 		libv::vec4f color;
-		libv::ui::TextLayout layout;
+		libv::ui::LayoutText layout;
 	};
 	std::vector<Entry> texts;
 

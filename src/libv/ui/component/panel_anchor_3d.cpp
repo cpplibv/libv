@@ -8,12 +8,11 @@
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
-#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/layout_utility.hpp>
 #include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access_context.hpp>
+#include <libv/ui/property_system/property_access.hpp>
 
 
 namespace libv {
@@ -21,12 +20,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelAnchor3D : public CoreBasePanel {
-public:
-	friend PanelAnchor3D;
-	[[nodiscard]] inline auto handler() { return PanelAnchor3D{this}; }
+struct CorePanelAnchor3D : CoreBasePanel {
+	using base_type = CoreBasePanel;
+	using base_type::base_type;
 
-private:
+public:
 	struct Properties {
 	} property;
 
@@ -40,11 +38,8 @@ private:
 //	static ComponentPropertyDescription child_description;
 
 public:
-	using CoreBasePanel::CoreBasePanel;
-
-protected:
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual void doStyle(StyleAccess& access) override;
+	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
@@ -63,14 +58,12 @@ void CorePanelAnchor3D::access_child_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelAnchor3D::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CorePanelAnchor3D> setter{*this, ctx.component, ctx.style, ctx.component.context()};
-	access_properties(setter);
-	CoreBasePanel::doStyle(ctx);
+void CorePanelAnchor3D::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
-void CorePanelAnchor3D::doStyle(ContextStyle& ctx, ChildID childID) {
-	(void) ctx;
+void CorePanelAnchor3D::doStyleChild(StyleAccess& access, ChildID childID) {
+	(void) access;
 	(void) childID;
 }
 

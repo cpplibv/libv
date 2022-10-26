@@ -1,9 +1,9 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_line.hpp
+// Project: libv.ui, File: src/libv/ui/component/panel_board.hpp
 
 #pragma once
 
 // pro
-#include <libv/ui/component/detail/component_api.hpp>
+#include <libv/ui/component_system/component_api.hpp>
 #include <libv/ui/property/background.hpp>
 
 

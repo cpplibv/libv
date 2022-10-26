@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/view/frustum.cpp
+// Project: libv.math, File: src/libv/math/frustum.cpp
 
 // hpp
 #include <libv/math/frustum.hpp>

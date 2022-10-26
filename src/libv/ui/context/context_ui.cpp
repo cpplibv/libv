@@ -6,6 +6,7 @@
 #include <libv/algo/erase_unstable.hpp>
 #include <libv/gl/load_image.hpp>
 #include <libv/utility/generic_path.hpp>
+#include <libv/utility/hash_string.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
@@ -19,15 +20,15 @@
 // pro
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_mouse.hpp>
-#include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/raw/font_consolas_min.hpp>
-#include <libv/ui/raw/texture2D_white256.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/shader/shader_quad.hpp>
-#include <libv/ui/style.hpp>
-#include <libv/ui/texture_2D.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/raw/font_consolas_min.hpp>
+#include <libv/ui/resource/raw/texture2D_white256.hpp>
+#include <libv/ui/resource/shader_font.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+#include <libv/ui/resource/shader_quad.hpp>
+#include <libv/ui/resource/texture_2D.hpp>
+#include <libv/ui/style/style.hpp>
 #include <libv/ui/ui.hpp>
 
 
@@ -49,7 +50,7 @@ public:
 	std::shared_ptr<Texture2D> fallback_texture2D;
 	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
 
-	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+	std::unordered_map<std::string, libv::intrusive_ptr<Style>, libv::hash_string, std::equal_to<>> styles;
 
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
 //	std::unordered_map<TypeInfoRef, std::weak_ptr<Shader>, TypeInfoRefHasher, TypeInfoRefEqualTo> cache_typed_shader;
@@ -343,15 +344,15 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 }
 
 libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
-	// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
-	const auto it = self->styles.find(std::string(style_name));
+	const auto it = self->styles.find(style_name);
 	if (it != self->styles.end())
 		return it->second;
 
 	const auto result = self->styles.emplace(style_name, libv::make_intrusive<Style>(std::string(style_name))).first->second;
 	const auto lastDot = style_name.rfind('.');
+	const auto lastGrt = style_name.rfind('>');
 
-	if (lastDot != style_name.npos)
+	if (lastDot != style_name.npos && (lastGrt == style_name.npos || lastDot > lastGrt))
 		// Auto inherit based on dot naming hierarchy
 		result->inherit(style(style_name.substr(0, lastDot)));
 

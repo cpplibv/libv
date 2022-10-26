@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/icon_set.hpp
+// Project: libv, File: app/surface/view/icon_set.hpp
 
 #pragma once
 

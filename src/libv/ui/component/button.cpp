@@ -4,20 +4,19 @@
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/button_core.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/font_2D.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/style_state.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/shader_font.hpp>
+#include <libv/ui/resource/shader_image.hpp>
+#include <libv/ui/style/style_state.hpp>
 
 
 namespace libv {
@@ -92,10 +91,8 @@ void CoreButton::doAttach() {
 	watchMouse(true);
 }
 
-void CoreButton::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreButton> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CoreButton::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
 libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {

@@ -154,7 +154,8 @@ void GameClient::init_ui(bool devMode) {
 
 	auto msc = layers.add_n<libv::ui::SceneContainer>("sc-main");
 	msc.identifier("main");
-	msc.assign(createSceneMainMenu(self->nexus_));
+	// msc.assign(createSceneMainMenu(self->nexus_));
+	msc.assign(createSceneCredits(self->nexus_));
 
 	layers.add_nsa<libv::ui::Label>("version", "overlay.version", fmt::format("Star {}{}", build.version_number, devMode ? " [Dev]" : ""));
 	auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");

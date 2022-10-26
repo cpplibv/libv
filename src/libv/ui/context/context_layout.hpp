@@ -13,6 +13,9 @@ namespace ui {
 
 struct ContextLayout1 {
 	libv::vec3f size;
+
+	explicit ContextLayout1(libv::vec2f size) : size(size, 0) {}
+	explicit ContextLayout1(libv::vec3f size) : size(size) {}
 };
 
 struct ContextLayout2 {
@@ -45,6 +48,16 @@ public:
 				float_position_changed,
 				position_,
 				size_,
+				depth + 1
+		};
+	}
+
+	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec2f position_, libv::vec2f size_) const noexcept {
+		return ContextLayout2{
+				float_position + libv::vec3f(position_, 0.f),
+				float_position_changed,
+				libv::vec3f(position_, 0.f),
+				libv::vec3f(size_, 0.f),
 				depth + 1
 		};
 	}

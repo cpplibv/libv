@@ -7,6 +7,10 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: Set constants from overshoot, settling time and frequency
+// TODO P4: Angular PID
+// 		https://www.youtube.com/watch?v=y3K6FUgrgXw
+
 ///
 ///	libv::PID<double> pid(0.25, 0.01, 0.5);
 ///

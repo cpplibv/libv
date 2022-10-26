@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/_idea_base_panel_static.cpp
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_idea_base_panel_static.cpp
 
 // hpp
 //#include <libv/ui/component/_idea_base_panel_static.hpp>
@@ -9,7 +9,6 @@
 //#include <libv/ui/context/context_render.hpp>
 //#include <libv/ui/log.hpp>
 //#include <libv/ui/context/context_style.hpp>
-//#include <libv/ui/style.hpp>
 
 
 namespace libv {

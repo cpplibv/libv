@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/model.hpp
+// Project: libv, File: app/vm4_viewer/model.hpp
 
 #pragma once
 

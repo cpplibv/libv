@@ -3,7 +3,7 @@
 // hpp
 #include <catch2/catch_test_macros.hpp>
 // pro
-#include <libv/ui/style_state.hpp>
+#include <libv/ui/style/style_state.hpp>
 
 
 TEST_CASE("Style State: test always_shadows", "[libv.ui.style]") {

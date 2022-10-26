@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_settings.cpp
+// Project: libv, File: app/star/game/scene/scene_surface.cpp
 
 // hpp
 #include <star/game/scene/scenes.hpp>
@@ -257,7 +257,7 @@ private:
 		focus();
 	}
 	virtual void update(libv::ui::time_duration delta_time) override {
-
+		(void) delta_time;
 	}
 	virtual void render(libv::glr::Queue& glr) override {
 		renderer.prepare_for_render(glr);

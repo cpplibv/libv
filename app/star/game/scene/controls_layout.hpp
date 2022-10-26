@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/keyboard.hpp
+// Project: libv, File: app/star/game/scene/controls_layout.hpp
 
 #pragma once
 

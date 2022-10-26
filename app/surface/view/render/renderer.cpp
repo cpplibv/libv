@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/render/renderer.cpp
+// Project: libv, File: app/surface/view/render/renderer.cpp
 
 // hpp
 #include <surface/view/render/renderer.hpp>
@@ -7,8 +7,8 @@
 #include <libv/glr/queue.hpp>
 #include <libv/noise/white.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/event_hub.hpp>
-#include <libv/ui/font_2D.hpp>
+#include <libv/ui/event_system/event_hub.hpp>
+#include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/vm4/load.hpp>
@@ -505,7 +505,7 @@ void RendererText::add_text(
 			position,
 			screenOffset,
 			color,
-			libv::ui::TextLayout(
+			libv::ui::LayoutText(
 					font,
 					fontSize,
 					alignH,

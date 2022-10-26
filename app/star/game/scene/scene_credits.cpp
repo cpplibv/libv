@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_settings.cpp
+// Project: libv, File: app/star/game/scene/scene_credits.cpp
 
 // hpp
 #include <star/game/scene/scenes.hpp>
@@ -10,6 +10,10 @@
 // pro
 #include <star/game/scene/controls_layout.hpp>
 #include <star/game/scene/utility.hpp>
+
+
+#include <libv/ui/component/scroll_area.hpp>
+#include <libv/ui/component/scroll_pane.hpp>
 
 
 namespace star {
@@ -32,7 +36,10 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 
 	line.add_sa<libv::ui::Label>("settings.title", "Credits");
 
-	auto vis_line = line.add_s<libv::ui::PanelLine>("credits.line");
+	auto scroll = line.add_s<libv::ui::ScrollPane>("credits.scroll");
+	auto vis_line = libv::ui::PanelLine::s("credits.line");
+	scroll.content(vis_line);
+	scroll.mode(libv::ui::ScrollMode::vertical);
 
 	{
 		vis_line.add_sa<libv::ui::Label>("credits.segment", "Personnel");
@@ -47,6 +54,7 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 	}
 
 	vis_line.add_sa<libv::ui::Label>("credits.segment", "Third-Party libraries and tools");
+//	for (int i = 0; i < 10; ++i)
 	for (const auto& thirdParty : makeThirdPartyList()) {
 		auto panel = vis_line.add_s<libv::ui::PanelLine>("credits.third-party.panel");
 		panel.add_s<libv::ui::Image>("credits.third-party.separator");
@@ -69,13 +77,13 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 std::vector<ThirdPartyDescription> makeThirdPartyList() {
 	std::vector<ThirdPartyDescription> list;
 
+	//	TODO License: There is more at the end of the file VVV :)
 	//	TODO License: assimp
 	//	TODO License: libbacktrace
 	//	TODO License: boost
 	//	TODO License: catch
 	//	TODO License: clip
 	//	TODO License: colony
-	//	TODO License: There is more at the end of the file VVV :)
 
 	list.emplace_back(
 			"CppCoro",
@@ -432,6 +440,25 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 	//	TODO License: utf8cpp
 	//	TODO License: jc_voronoi
 	//	TODO License: vide
+
+	list.emplace_back(
+			"Wombat",
+
+			"https://github.com/BrianSharpe/Wombat",
+
+			"Custom / Unique",
+
+			"An efficient texture-free GLSL procedural noise library\n"
+			"Source: https://github.com/BrianSharpe/Wombat\n"
+			"Derived from: https://github.com/BrianSharpe/GPU-Noise-Lib\n"
+			"\n"
+			"I'm not one for copyrights.  Use the code however you wish.\n"
+			"All I ask is that credit be given back to the blog or myself when appropriate.\n"
+			"And also to let me know if you come up with any changes, improvements, thoughts or interesting uses for this stuff. :)\n"
+			"Thanks!\n"
+			"\n"
+			"Brian Sharpe"
+	);
 
 	return list;
 }

@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_quat.cpp
+// Project: libv.math, File: test/libv/math/test_frustum.cpp
 
 // hpp
 #include <catch2/catch_test_macros.hpp>

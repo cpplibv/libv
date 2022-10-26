@@ -17,7 +17,7 @@ namespace libv::ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Orientation2 : int32_t {
+enum class Orientation2 : int8_t {
 	down_left = 0,
 	down_right = 1,
 	left_down = 2,
@@ -33,7 +33,7 @@ enum class Orientation2 : int32_t {
 struct Orientation2_type {
 public:
 	using enum_type = Orientation2;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	enum_type enum_value_;
@@ -97,7 +97,7 @@ public:
 class Orientation2_state {
 public:
 	using enum_type = Orientation2;
-	using underlying_type = int32_t;
+	using underlying_type = int8_t;
 
 private:
 	static constexpr enum_type table_enum_values[] = {
@@ -128,11 +128,11 @@ inline std::ostream& operator<<(std::ostream& os, const Orientation2 var) {
 	return os << Orientation2_type(var).to_string();
 }
 
-[[nodiscard]] constexpr inline int32_t underlying(Orientation2 enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t underlying(Orientation2 enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
-[[nodiscard]] constexpr inline int32_t operator+(Orientation2 enum_value) noexcept {
-	return static_cast<int32_t>(enum_value);
+[[nodiscard]] constexpr inline int8_t operator+(Orientation2 enum_value) noexcept {
+	return static_cast<int8_t>(enum_value);
 }
 
 [[nodiscard]] constexpr inline Orientation2_type type(Orientation2 enum_value) noexcept {

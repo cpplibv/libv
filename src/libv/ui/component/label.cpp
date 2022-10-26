@@ -3,17 +3,14 @@
 // hpp
 #include <libv/ui/component/label.hpp>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/font_2D.hpp>
-#include <libv/ui/property.hpp>
-#include <libv/ui/property_access_context.hpp>
-#include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/style.hpp>
-#include <libv/ui/text_layout.hpp>
+#include <libv/ui/property_system/property_access.hpp>
+#include <libv/ui/resource/font_2D.hpp>
+#include <libv/ui/resource/shader_font.hpp>
 
 
 namespace libv {
@@ -22,13 +19,10 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct CoreLabel : CoreComponent {
+	using base_type = CoreComponent;
+	using base_type::base_type;
+
 public:
-	friend Label;
-	[[nodiscard]] inline auto handler() { return Label{this}; }
-
-private:
-	template <typename T> static void access_properties(T& ctx);
-
 	struct Properties {
 		PropertyR<Background> background;
 
@@ -41,17 +35,16 @@ private:
 		PropertyL1L2<> font_size;
 	} property;
 
-private:
-	TextLayout text_;
+	template <typename T> static void access_properties(T& ctx);
 
 public:
-	using CoreComponent::CoreComponent;
+	LayoutText text_;
 
 public:
 	virtual	libv::vec4f getInnerContentBounds() override;
 
-protected:
-	virtual void doStyle(ContextStyle& ctx) override;
+public:
+	virtual void doStyle(StyleAccess& access) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;
@@ -64,58 +57,50 @@ void CoreLabel::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.background; },
 			Background::none(),
-			pgr::appearance, pnm::background,
-			"Background"
+			pgr::appearance, pnm::background, "Background"
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
 			[](auto& c, auto v) { c.text_.align_horizontal(v); },
 			[](const auto& c) { return c.text_.align_horizontal(); },
 			AlignHorizontal::left,
-			pgr::appearance, pnm::align_horizontal,
-			"Horizontal alignment of the text"
+			pgr::appearance, pnm::align_horizontal, "Horizontal alignment of the text"
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_vertical; },
 			[](auto& c, auto v) { c.text_.align_vertical(v); },
 			[](const auto& c) { return c.text_.align_vertical(); },
 			AlignVertical::top,
-			pgr::appearance, pnm::align_vertical,
-			"Vertical alignment of the text"
+			pgr::appearance, pnm::align_vertical, "Vertical alignment of the text"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_color; },
 			Color(0, 0, 0, 1),
-			pgr::appearance, pnm::font_color,
-			"Font color"
+			pgr::appearance, pnm::font_color, "Font color"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_shader; },
 			[](auto& u) { return u.shaderFont(); },
-			pgr::appearance, pnm::font_shader,
-			"Font shader"
+			pgr::appearance, pnm::font_shader, "Font shader"
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font; },
 			[](auto& c, auto v) { c.text_.font(std::move(v)); },
 			[](const auto& c) { return c.text_.font(); },
 			[](auto& u) { return u.fallbackFont(); },
-			pgr::font, pnm::font,
-			"Font file"
+			pgr::font, pnm::font, "Font file"
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font_size; },
 			[](auto& c, auto v) { c.text_.size(v); },
 			[](const auto& c) { return c.text_.size(); },
 			FontSize{12},
-			pgr::font, pnm::font_size,
-			"Font size in pixel"
+			pgr::font, pnm::font_size, "Font size in pixel"
 	);
 	ctx.synthesize(
 			T::handler_setter(&Label::text),
 			T::handler_getter(&Label::text),
-			pgr::behaviour, pnm::text,
-			"Displayed text"
+			pgr::behaviour, pnm::text, "Displayed text"
 	);
 }
 
@@ -127,10 +112,8 @@ libv::vec4f CoreLabel::getInnerContentBounds() {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreLabel::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreLabel> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+void CoreLabel::doStyle(StyleAccess& access) {
+	access.self(*this);
 }
 
 libv::vec3f CoreLabel::doLayout1(const ContextLayout1& environment) {
@@ -146,6 +129,8 @@ void CoreLabel::doLayout2(const ContextLayout2& environment) {
 void CoreLabel::doRender(Renderer& r) {
 	property.background().render(r, {0, 0}, layout_size2(), *this);
 
+	if (!r.cull_test({0, 0}, layout_size2()))
+		return;
 	r.text(padding_LB(), text_,
 			property.font_color(),
 			text_.font(),

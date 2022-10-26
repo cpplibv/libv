@@ -69,6 +69,9 @@ public: // --- State ---
 	void translate(libv::vec3f value) noexcept;
 	void clip(libv::vec2f pos, libv::vec2f size) noexcept;
 
+public: // --- Auxiliary ---
+	[[nodiscard]] bool cull_test(libv::vec2f pos, libv::vec2f size, float threshold = 0.f) const noexcept;
+
 public: // --- Low level ---
 	//	Additional low level stuff, or maybe just a GL object itself? | If that happens the client need immediate mode switch
 	//			uniform
@@ -100,8 +103,8 @@ public: // --- Low level ---
 
 public: // --- High level ---
 	void quad(libv::vec2f pos, libv::vec2f size, libv::vec4f color, const ShaderQuad_view& shader);
-	void text(libv::vec2f pos, class TextLayout& text, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader);
-	void text(libv::vec2f pos, const class TextLayoutData& text, const Font2D_view& font, libv::vec4f color, const ShaderFont_view& shader);
+	void text(libv::vec2f pos, class LayoutText& text, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader);
+	void text(libv::vec2f pos, const class LayoutTextData& text, const Font2D_view& font, libv::vec4f color, const ShaderFont_view& shader);
 	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader);
 	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader);
 

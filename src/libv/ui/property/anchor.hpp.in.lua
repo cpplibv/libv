@@ -1,6 +1,6 @@
 -- Project: libv.ui, File: src/libv/ui/property/anchor.hpp.in.lua, Author: Császár Mátyás [Vader]
 
-enum("Anchor", "int32_t")
+enum("Anchor", "int8_t")
 namespace("libv::ui")
 
 include("libv/math/vec.hpp")

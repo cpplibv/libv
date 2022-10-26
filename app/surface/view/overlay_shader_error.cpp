@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/overlay_shader_error.cpp
+// Project: libv, File: app/surface/view/overlay_shader_error.cpp
 
 // hpp
 #include <surface/view/overlay_shader_error.hpp>

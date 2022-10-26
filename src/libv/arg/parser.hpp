@@ -433,7 +433,7 @@ public:
 			executable_path_ = argv[0];
 
 		for (int i = 1; i < argc; ++i) {
-			BaseArgument* selected;
+			BaseArgument* selected = nullptr;
 
 			// Phase: Search
 			const auto it = identifiers.find(argv[i]);
