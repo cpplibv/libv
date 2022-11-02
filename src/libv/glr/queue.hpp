@@ -177,6 +177,11 @@ public:
 	void render(Mesh mesh, uint32_t baseVertex, uint32_t baseIndex, uint32_t numIndices);
 	void render_full_screen();
 
+	void bindImageTexture(uint32_t unit, Texture texture, int32_t level, libv::gl::BufferAccessFull access);
+	void bindImageTexture(uint32_t unit, Texture texture, int32_t level, int32_t layer, libv::gl::BufferAccessFull access);
+	void dispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y = 1, uint32_t num_groups_z = 1);
+	void memoryBarrier(libv::gl::BarrierBit bits);
+
 public:
 	void execute(libv::gl::GL& gl, Remote& remote);
 };

@@ -1070,6 +1070,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_glr3
+	SOURCE sandbox/libv_glr_main3.cpp
+	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_img
 	SOURCE sandbox/libv_img_main.cpp
 	LINK   libv_img libv_utility

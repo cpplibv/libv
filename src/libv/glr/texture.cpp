@@ -449,6 +449,10 @@ void Texture::sync_might_bind(libv::gl::GL& gl, Remote& remote_) const noexcept 
 	remote->update(gl, remote_);
 }
 
+libv::gl::Format Texture::format() const noexcept {
+	return remote->format;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace glr

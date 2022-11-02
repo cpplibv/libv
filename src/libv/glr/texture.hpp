@@ -105,6 +105,8 @@ public:
 		auto& head = *static_cast<RemoteTextureHead*>(static_cast<void*>(remote.get()));
 		return head.texture;
 	}
+
+	[[nodiscard]] libv::gl::Format format() const noexcept;
 };
 
 struct AttorneyRemoteTexture {

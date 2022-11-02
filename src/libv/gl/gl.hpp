@@ -557,7 +557,7 @@ public:
 
 private:
 	template <typename T>
-	inline T get(GLenum param) const {
+	[[nodiscard]] inline T get(GLenum param) const {
 		T value;
 
 		if constexpr (std::is_same_v<GLboolean, T>)
@@ -587,7 +587,7 @@ private:
 	}
 
 private:
-	static constexpr inline std::size_t convertToTargetIndex(TextureTarget target) noexcept;
+	[[nodiscard]] static constexpr inline std::size_t convertToTargetIndex(TextureTarget target) noexcept;
 
 public:
 	[[nodiscard]] inline auto getViewport() const {
@@ -754,7 +754,7 @@ private:
 public:
 	inline void bind(const VertexArray& object) noexcept;
 	inline void unbindVertexArray() noexcept;
-	inline VertexArray boundVertexArray() noexcept;
+	[[nodiscard]] inline VertexArray boundVertexArray() noexcept;
 
 public:
 	template <TextureTarget Target>
@@ -764,13 +764,23 @@ public:
 	inline void unbind(const Texture_t<Target>& texture);
 	inline void unbind(const Texture& texture);
 
-	inline Texture boundTexture(TextureTarget target) noexcept;
+	[[nodiscard]] inline Texture boundTexture(TextureTarget target) noexcept;
 
 	inline void cleanupDestroyedTextureID(TextureTarget target, uint32_t id) noexcept;
 
 public:
 	inline void useProgram(const Program& program) noexcept;
-	inline Program boundProgram() noexcept;
+	[[nodiscard]] inline Program boundProgram() noexcept;
+
+public:
+	inline void bindImageTexture(uint32_t unit, libv::gl::Texture texture, int32_t level, libv::gl::BufferAccessFull access, libv::gl::Format format) noexcept;
+	inline void bindImageTexture(uint32_t unit, libv::gl::Texture texture, int32_t level, int32_t layer, libv::gl::BufferAccessFull access, libv::gl::Format format) noexcept;
+
+public:
+	inline void dispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y = 1, uint32_t num_groups_z = 1) noexcept;
+
+public:
+	inline void memoryBarrier(BarrierBit bits);
 
 public:
 	inline void framebuffer(Framebuffer object) noexcept;
@@ -780,8 +790,8 @@ public:
 	inline void framebuffer_default_draw() noexcept;
 	inline void framebuffer_default_read() noexcept;
 
-	inline Framebuffer framebuffer_draw() const noexcept;
-	inline Framebuffer framebuffer_read() const noexcept;
+	[[nodiscard]] inline Framebuffer framebuffer_draw() const noexcept;
+	[[nodiscard]] inline Framebuffer framebuffer_read() const noexcept;
 
 public:
 	template <typename Access = AccessUniformBuffer>
@@ -967,6 +977,43 @@ inline void GL::useProgram(const Program& program) noexcept {
 
 inline Program GL::boundProgram() noexcept {
 	return currentProgram_;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void GL::bindImageTexture(
+		uint32_t unit,
+		libv::gl::Texture texture,
+		int32_t level,
+		libv::gl::BufferAccessFull access,
+		libv::gl::Format format) noexcept {
+	glBindImageTexture(unit, texture.id, level, false, 0, libv::to_underlying(access), format.format);
+	checkGL();
+}
+
+inline void GL::bindImageTexture(
+		uint32_t unit,
+		libv::gl::Texture texture,
+		int32_t level,
+		int32_t layer,
+		libv::gl::BufferAccessFull access,
+		libv::gl::Format format) noexcept {
+	glBindImageTexture(unit, texture.id, level, true, layer, libv::to_underlying(access), format.format);
+	checkGL();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void GL::dispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y, uint32_t num_groups_z) noexcept {
+	glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+	checkGL();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void GL::memoryBarrier(BarrierBit bits) {
+	glMemoryBarrier(libv::to_underlying(bits));
+	checkGL();
 }
 
 // -------------------------------------------------------------------------------------------------

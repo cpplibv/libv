@@ -140,6 +140,35 @@ struct QueueTaskMeshFullScreen {
 	}
 };
 
+struct QueueTaskDispatchCompute {
+	SequenceNumber sequenceNumber;
+	State state;
+	std::shared_ptr<RemoteProgram> program;
+	uint32_t group_size_x;
+	uint32_t group_size_y;
+	uint32_t group_size_z;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
+		program->use(gl, remote);
+		gl.dispatchCompute(group_size_x, group_size_y, group_size_z);
+	}
+};
+
+struct QueueTaskMemoryBarrier {
+	SequenceNumber sequenceNumber;
+	libv::gl::BarrierBit bits;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		(void) remote;
+		gl.memoryBarrier(bits);
+	}
+};
+
 struct QueueTaskClear {
 	SequenceNumber sequenceNumber;
 	libv::gl::BufferBit buffers;
@@ -235,6 +264,23 @@ struct QueueTaskTexture {
 		gl.activeTexture(channel);
 		auto object = AttorneyRemoteTexture::sync_might_bind(texture, gl, remote);
 		gl.bind(object);
+	}
+};
+
+struct QueueTaskBindImageTexture {
+	SequenceNumber sequenceNumber;
+	uint32_t unit;
+	Texture texture;
+	int32_t level;
+	int32_t layer;
+	libv::gl::BufferAccessFull access;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		auto object = AttorneyRemoteTexture::sync_might_bind(texture, gl, remote);
+		if (layer < 0)
+			gl.bindImageTexture(unit, object, level, access, texture.format());
+		else
+			gl.bindImageTexture(unit, object, level, layer, access, texture.format());
 	}
 };
 
@@ -352,9 +398,21 @@ public:
 
 	std::vector<std::variant<
 			QueueTaskCallback,
-			QueueTaskClear, QueueTaskClearColor, QueueTaskViewport,
-			QueueTaskMesh, QueueTaskMeshVII, QueueTaskMeshFullScreen, QueueTaskUniformBlockUnique, QueueTaskUniformBlockShared, QueueTaskUniformBlockStream, QueueTaskTexture,
-			QueueTaskFramebuffer, QueueTaskBlit
+			QueueTaskClear,
+			QueueTaskClearColor,
+			QueueTaskViewport,
+			QueueTaskMesh,
+			QueueTaskMeshVII,
+			QueueTaskMeshFullScreen,
+			QueueTaskUniformBlockUnique,
+			QueueTaskUniformBlockShared,
+			QueueTaskUniformBlockStream,
+			QueueTaskTexture,
+			QueueTaskBindImageTexture,
+			QueueTaskDispatchCompute,
+			QueueTaskMemoryBarrier,
+			QueueTaskFramebuffer,
+			QueueTaskBlit
 	>> tasks;
 
 	SequenceNumber sequenceNumber = 0;
@@ -730,14 +788,29 @@ void Queue::render_full_screen() {
 	self->add<QueueTaskMeshFullScreen>(state.state(), self->programStack.top());
 }
 
+void Queue::bindImageTexture(uint32_t unit, Texture texture, int32_t level, libv::gl::BufferAccessFull access) {
+	self->add<QueueTaskBindImageTexture>(unit, std::move(texture), level, -1, access);
+}
+
+void Queue::bindImageTexture(uint32_t unit, Texture texture, int32_t level, int32_t layer, libv::gl::BufferAccessFull access) {
+	self->add<QueueTaskBindImageTexture>(unit, std::move(texture), level, layer, access);
+}
+
+void Queue::dispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y, uint32_t num_groups_z) {
+	self->programStack.top()->uniformStream.endBatch();
+	self->add<QueueTaskDispatchCompute>(state.state(), self->programStack.top(), num_groups_x, num_groups_y, num_groups_z);
+}
+
+void Queue::memoryBarrier(libv::gl::BarrierBit bits) {
+	self->add<QueueTaskMemoryBarrier>(bits);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Queue::execute(libv::gl::GL& gl, Remote& remote) {
 	for (const auto& task_variant : self->tasks) {
 		auto execution = [&]<typename T>(const T& task) {
-			if constexpr (std::is_base_of_v<QueueTaskMesh, T> || std::is_same_v<QueueTaskMeshFullScreen, T>)
-				task.execute(gl, remote, self->currentState);
-			else if constexpr (std::is_same_v<QueueTaskCallback, T>)
+			if constexpr ( requires { task.execute(gl, remote, self->currentState); } )
 				task.execute(gl, remote, self->currentState);
 			else
 				task.execute(gl, remote);

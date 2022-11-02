@@ -57,6 +57,7 @@ void GL::init() {
 	log_gl.debug("MaxVertexUniformComponents         [{:>8} ]", getMaxVertexUniformComponents());
 	log_gl.debug("UniformBufferOffsetAlignment       [{:>8} ]", getUniformBufferOffsetAlignment());
 	log_gl.debug("EXT_texture_filter_anisotropic     [{:>8} ]", GLEW_EXT_texture_filter_anisotropic ? "PASS" : "MISSING");
+	log_gl.debug("ARB_bindless_texture               [{:>8} ]", GLEW_ARB_bindless_texture ? "PASS" : "MISSING");
 
 	log_gl.debug("MaxComputeWorkGroupCount           [{}]", getMaxComputeWorkGroupCount());
 	log_gl.debug("MaxComputeWorkGroupSize            [{}]", getMaxComputeWorkGroupSize());
