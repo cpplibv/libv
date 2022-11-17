@@ -19,6 +19,7 @@
 !/.editorconfig
 !/.gitignore
 !/CMakeLists.txt
+!/CMakePresets.json
 !/README.md
 !/LICENSE
 

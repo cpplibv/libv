@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "ninja-base",
+			"hidden": true,
+			"generator": "Ninja",
+			"environment": {
+				"NINJA_STATUS": "%e [%f/%t] "
+			},
+			"vendor": {
+				"jetbrains.com/clion": {
+				  "toolchain": "MSYS2-MinGW64"
+				}
+			}
+		},
+		{
+			"name": "ninja-debug",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "debug",
+				"SKIP_EXTERNAL_CONFIGURES": "true",
+				"FORCE_COLORED_OUTPUT": "true"
+			}
+		},
+		{
+			"name": "ninja-release",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "release",
+				"SKIP_EXTERNAL_CONFIGURES": "false",
+				"FORCE_COLORED_OUTPUT": "true"
+			}
+		},
+		{
+			"name": "ninja-dev",
+			"inherits": "ninja-base",
+			"binaryDir": "${sourceDir}/build/dev",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "dev",
+				"SKIP_EXTERNAL_CONFIGURES": "true",
+				"FORCE_COLORED_OUTPUT": "true"
+			}
+		}
+	]
+}
