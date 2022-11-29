@@ -581,121 +581,103 @@ wish_generator(
 wish_group(group_library lib) # --- Library -------------------------------------------------------
 
 wish_create_library(
-	TARGET libv_algo STATIC
-	ALIAS  libv::algo
+	TARGET libv::algo STATIC
 	SOURCE src/libv/algo/*.cpp
 	LINK   libv::math
 	LINK   ext_boost # For small_vector in wildcard.cpp, therefore could be private
 )
 
 wish_create_library(
-	TARGET libv_arg INTERFACE
-	ALIAS  libv::arg
+	TARGET libv::arg INTERFACE
 )
 
 wish_create_library(
-	TARGET libv_color INTERFACE
-	ALIAS  libv::color
+	TARGET libv::color INTERFACE
 )
 
 wish_create_library(
-	TARGET libv_container INTERFACE
-	ALIAS  libv::container
+	TARGET libv::container INTERFACE
 	LINK   libv::math
 )
 
 wish_create_library(
-	TARGET libv_ctrl STATIC
-	ALIAS  libv::ctrl
+	TARGET libv::ctrl STATIC
 	SOURCE src/libv/ctrl/*.cpp
 	LINK   libv::math libv::input libv::utility ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
-	TARGET libv_diff STATIC
-	ALIAS  libv::diff
+	TARGET libv::diff STATIC
 	SOURCE src/libv/diff/*.cpp
 	LINK   ext_hdiffpatch libv::hash libv::algo
 )
 
 wish_create_library(
-	TARGET libv_ecs INTERFACE
-	ALIAS  libv::ecs
+	TARGET libv::ecs INTERFACE
 	LINK   ext_boost ext_range
 )
 
 wish_create_library(
-	TARGET libv_img STATIC
-	ALIAS  libv::img
+	TARGET libv::img STATIC
 	SOURCE src/libv/img/*.cpp
 	LINK   libv::math ext_soil2
 )
 
 wish_create_library(
-	TARGET libv_input STATIC
-	ALIAS  libv::input
+	TARGET libv::input STATIC
 	SOURCE src/libv/input/*.cpp
 	LINK   libv::math ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
-	TARGET libv_frame STATIC
-	ALIAS  libv::frame
+	TARGET libv::frame STATIC
 	SOURCE src/libv/frame/*.cpp
 	LINK   libv::log libv::math libv::input ext_boost ext_glfw Threads::Threads
 )
 
 wish_create_library(
-	TARGET libv_fsw STATIC
-	ALIAS  libv::fsw
+	TARGET libv::fsw STATIC
 	SOURCE src/libv/fsw/*.cpp
 	LINK   libv::utility ext_efsw
 	LINK   libv::mt
 )
 
 wish_create_library(
-	TARGET libv_fwd INTERFACE
-	ALIAS  libv::fwd
+	TARGET libv::fwd INTERFACE
 )
 
 wish_create_library(
-	TARGET libv_hash STATIC
-	ALIAS  libv::hash
+	TARGET libv::hash STATIC
 	SOURCE src/libv/hash/*.cpp
 	LINK   ext_boost libv::utility
 )
 
 wish_create_library(
-	TARGET libv_gl STATIC
-	ALIAS  libv::gl
+	TARGET libv::gl STATIC
 	SOURCE src/libv/gl/*.cpp
 	LINK   libv::log libv::math libv::utility ext_ctre ext_glew ext_boost ext_gli ext_soil2
 )
 
 wish_create_library(
-	TARGET libv_glr STATIC
-	ALIAS  libv::glr
+	TARGET libv::glr STATIC
 	SOURCE src/libv/glr/*.cpp
 	LINK   libv::gl ext_boost ext_range
 )
 
 wish_create_library(
-	TARGET libv_log INTERFACE
-	ALIAS  libv::log
+	TARGET libv::log INTERFACE
 	LINK   libv::mt ext_fmt
 )
 
 wish_create_library(
-	TARGET libv_lua STATIC
-	ALIAS  libv::lua
+	TARGET libv::lua STATIC
 	SOURCE src/libv/lua/*.cpp
 	LINK   ext_sol2 ext_lua ext_fmt libv::math
 )
 
 wish_create_library(
-#	TARGET libv_math INTERFACE
-	TARGET libv_math STATIC
-	ALIAS  libv::math
+#	TARGET libv::math INTERFACE
+	TARGET libv::math STATIC
 	SOURCE src/libv/math/*.cpp
 	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
 	LINK   ext_boost # For gradient small_vector
@@ -704,14 +686,12 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_meta INTERFACE
-	ALIAS  libv::meta
+	TARGET libv::meta INTERFACE
 	LINK   ext_boost
 )
 
 wish_create_library(
-	TARGET libv_mt STATIC
-	ALIAS  libv::mt
+	TARGET libv::mt STATIC
 	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
 	LINK   libv_utility # For unique_function and concat
@@ -719,37 +699,32 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_net STATIC
-	ALIAS  libv::net
+	TARGET libv::net STATIC
 	SOURCE src/libv/net/*.cpp
 	LINK   libv::log libv::utility libv::meta ext_boost
 #	LINK   libv::serial
 )
 
 wish_create_library(
-	TARGET libv_noise STATIC
-	ALIAS  libv::noise
+	TARGET libv::noise STATIC
 	SOURCE src/libv/noise/*.cpp
 	LINK   libv::utility libv::math
 #	LINK   libv::log
 )
 
 wish_create_library(
-	TARGET libv_parse STATIC
-	ALIAS  libv::parse
+	TARGET libv::parse STATIC
 	SOURCE src/libv/parse/*.cpp
 	LINK   libv::math ext_boost
 )
 
 wish_create_library(
-	TARGET libv_range INTERFACE
-	ALIAS  libv::range
+	TARGET libv::range INTERFACE
 	LINK   ext_boost ext_range
 )
 
 wish_create_library(
-	TARGET libv_rev STATIC
-	ALIAS  libv::rev
+	TARGET libv::rev STATIC
 	SOURCE src/libv/rev/*.cpp
 	LINK   libv::glr libv::gl libv::utility libv::fsw
 #	LINK   ext_boost
@@ -759,51 +734,44 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_security STATIC
-	ALIAS  libv::security
+	TARGET libv::security STATIC
 	SOURCE src/libv/security/*.cpp
 	LINK   ext_openssl
 #	LINK   libv::utility
 )
 
 wish_create_library(
-	TARGET libv_serial INTERFACE
-	ALIAS  libv::serial
+	TARGET libv::serial INTERFACE
 	LINK   ext_vide
 #	LINK   ext_boost # Remove
 	LINK   libv::utility # For byte streams that might be removed in the future
 )
 
 wish_create_library(
-	TARGET libv_sig STATIC
-	ALIAS  libv::sig
+	TARGET libv::sig STATIC
 	SOURCE src/libv/sig/*.cpp
 )
 
 wish_create_library(
-	TARGET libv_state INTERFACE
-	ALIAS  libv::state
+	TARGET libv::state INTERFACE
 	LINK   ext_sml # For SML based
 	LINK   ext_boost # For boost statechart based
 )
 
 wish_create_library(
-	TARGET libv_sun STATIC
-	ALIAS  libv::sun
+	TARGET libv::sun STATIC
 	SOURCE src/libv/sun/*.cpp
 	LINK   libv::math libv::ctrl libv::log
 )
 
 wish_create_library(
-	TARGET libv_sys STATIC
-	ALIAS  libv::sys
+	TARGET libv::sys STATIC
 	SOURCE src/libv/sys/*.cpp
 	LINK   libv::log ext_clip ext_fmt
 )
 
 wish_create_library(
-	TARGET libv_ui STATIC
-	ALIAS  libv::ui
+	TARGET libv::ui STATIC
 	SOURCE src/libv/ui/*.cpp
 	GENERATE enum src/libv/ui/*.in.lua
 	LINK   libv::glr libv::parse libv::lua libv::input ext_freetype ext_utf8cpp libv::sys
@@ -811,36 +779,31 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_utility STATIC
-	ALIAS  libv::utility
+	TARGET libv::utility STATIC
 	SOURCE src/libv/utility/*.cpp
 	LINK   Threads::Threads ext_function2 ext_boost
 )
 
 #wish_create_library(
-#	TARGET libv_update STATIC
-#	ALIAS  libv::update
+#	TARGET libv::update STATIC
 #	SOURCE src/libv/update/*.cpp
 #	LINK   libv::net libv::process libv::diff libv::serial libv::mt
 #)
 
 wish_create_library(
-	TARGET libv_process STATIC
-	ALIAS  libv::process
+	TARGET libv::process STATIC
 	SOURCE src/libv/process/*.cpp
 	LINK   ext_boost # For interprocess file_lock
 )
 
 wish_create_library(
-	TARGET libv_vm4 STATIC
-	ALIAS  libv::vm4
+	TARGET libv::vm4 STATIC
 	SOURCE src/libv/vm4/*.cpp
 	LINK   libv::math libv::serial ext_boost
 )
 
 wish_create_library(
-	TARGET libv_vm4imp STATIC
-	ALIAS  libv::vm4imp
+	TARGET libv::vm4imp STATIC
 	SOURCE src/libv/vm4imp/*.cpp
 	LINK   libv::log libv::vm4 ext_assimp
 )
