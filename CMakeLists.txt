@@ -102,8 +102,9 @@ wish_warning(
 wish_compiler_flags(
 	GNU -fcoroutines
 	GNU -m64
-	GNU -std=c++23
 )
+
+set(CMAKE_CXX_STANDARD 23)
 
 #wish_linker_flags(
 #	BUILD_TYPE Release GNU -mwindows
@@ -581,228 +582,267 @@ wish_group(group_library lib) # --- Library ------------------------------------
 
 wish_create_library(
 	TARGET libv_algo STATIC
+	ALIAS  libv::algo
 	SOURCE src/libv/algo/*.cpp
-	LINK   libv_math
+	LINK   libv::math
 	LINK   ext_boost # For small_vector in wildcard.cpp, therefore could be private
 )
 
 wish_create_library(
 	TARGET libv_arg INTERFACE
+	ALIAS  libv::arg
 )
 
 wish_create_library(
 	TARGET libv_color INTERFACE
+	ALIAS  libv::color
 )
 
 wish_create_library(
 	TARGET libv_container INTERFACE
-	LINK   libv_math
+	ALIAS  libv::container
+	LINK   libv::math
 )
 
 wish_create_library(
 	TARGET libv_ctrl STATIC
+	ALIAS  libv::ctrl
 	SOURCE src/libv/ctrl/*.cpp
-	LINK   libv_math libv_input libv_utility ext_fmt ext_boost ext_utf8cpp
+	LINK   libv::math libv::input libv::utility ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
 	TARGET libv_diff STATIC
+	ALIAS  libv::diff
 	SOURCE src/libv/diff/*.cpp
-	LINK   ext_hdiffpatch libv_hash libv_algo
+	LINK   ext_hdiffpatch libv::hash libv::algo
 )
 
 wish_create_library(
 	TARGET libv_ecs INTERFACE
+	ALIAS  libv::ecs
 	LINK   ext_boost ext_range
 )
 
 wish_create_library(
 	TARGET libv_img STATIC
+	ALIAS  libv::img
 	SOURCE src/libv/img/*.cpp
-	LINK   libv_math ext_soil2
+	LINK   libv::math ext_soil2
 )
 
 wish_create_library(
 	TARGET libv_input STATIC
+	ALIAS  libv::input
 	SOURCE src/libv/input/*.cpp
-	LINK   libv_math ext_fmt ext_boost ext_utf8cpp
+	LINK   libv::math ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
 	TARGET libv_frame STATIC
+	ALIAS  libv::frame
 	SOURCE src/libv/frame/*.cpp
-	LINK   libv_log libv_math libv_input ext_boost ext_glfw Threads::Threads
+	LINK   libv::log libv::math libv::input ext_boost ext_glfw Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_fsw STATIC
+	ALIAS  libv::fsw
 	SOURCE src/libv/fsw/*.cpp
-	LINK   libv_utility ext_efsw
-	LINK   libv_mt
+	LINK   libv::utility ext_efsw
+	LINK   libv::mt
 )
 
 wish_create_library(
 	TARGET libv_fwd INTERFACE
+	ALIAS  libv::fwd
 )
 
 wish_create_library(
 	TARGET libv_hash STATIC
+	ALIAS  libv::hash
 	SOURCE src/libv/hash/*.cpp
-	LINK   ext_boost libv_utility
+	LINK   ext_boost libv::utility
 )
 
 wish_create_library(
 	TARGET libv_gl STATIC
+	ALIAS  libv::gl
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math libv_utility ext_ctre ext_glew ext_boost ext_gli ext_soil2
+	LINK   libv::log libv::math libv::utility ext_ctre ext_glew ext_boost ext_gli ext_soil2
 )
 
 wish_create_library(
 	TARGET libv_glr STATIC
+	ALIAS  libv::glr
 	SOURCE src/libv/glr/*.cpp
-	LINK   libv_gl ext_boost ext_range
+	LINK   libv::gl ext_boost ext_range
 )
 
 wish_create_library(
 	TARGET libv_log INTERFACE
-	LINK   libv_mt ext_fmt
+	ALIAS  libv::log
+	LINK   libv::mt ext_fmt
 )
 
 wish_create_library(
 	TARGET libv_lua STATIC
+	ALIAS  libv::lua
 	SOURCE src/libv/lua/*.cpp
-	LINK   ext_sol2 ext_lua ext_fmt libv_math
+	LINK   ext_sol2 ext_lua ext_fmt libv::math
 )
 
 wish_create_library(
-	TARGET libv_math STATIC
-	SOURCE src/libv/math/*.cpp
 #	TARGET libv_math INTERFACE
+	TARGET libv_math STATIC
+	ALIAS  libv::math
+	SOURCE src/libv/math/*.cpp
 	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
 	LINK   ext_boost # For gradient small_vector
 	LINK   ext_fmt
-	LINK   libv_fwd
+	LINK   libv::fwd
 )
 
 wish_create_library(
 	TARGET libv_meta INTERFACE
+	ALIAS  libv::meta
 	LINK   ext_boost
 )
 
 wish_create_library(
 	TARGET libv_mt STATIC
+	ALIAS  libv::mt
 	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
 	LINK   libv_utility # For unique_function and concat
+	LINK   ext_cppcoro
 )
 
 wish_create_library(
 	TARGET libv_net STATIC
+	ALIAS  libv::net
 	SOURCE src/libv/net/*.cpp
-	LINK   libv_log libv_utility libv_meta ext_boost
-#	LINK   libv_serial
+	LINK   libv::log libv::utility libv::meta ext_boost
+#	LINK   libv::serial
 )
 
 wish_create_library(
 	TARGET libv_noise STATIC
+	ALIAS  libv::noise
 	SOURCE src/libv/noise/*.cpp
-	LINK   libv_utility libv_math
-#	LINK   libv_log
+	LINK   libv::utility libv::math
+#	LINK   libv::log
 )
 
 wish_create_library(
 	TARGET libv_parse STATIC
+	ALIAS  libv::parse
 	SOURCE src/libv/parse/*.cpp
-	LINK   libv_math ext_boost
+	LINK   libv::math ext_boost
 )
 
 wish_create_library(
 	TARGET libv_range INTERFACE
+	ALIAS  libv::range
 	LINK   ext_boost ext_range
 )
 
 wish_create_library(
 	TARGET libv_rev STATIC
+	ALIAS  libv::rev
 	SOURCE src/libv/rev/*.cpp
-	LINK   libv_glr libv_gl libv_utility libv_fsw
+	LINK   libv::glr libv::gl libv::utility libv::fsw
 #	LINK   ext_boost
-	LINK   libv_algo libv_range libv_log ext_range ext_ctre # Source include engine stuff
-	LINK   libv_vm4
+	LINK   libv::algo libv::range libv::log ext_range ext_ctre # Source include engine stuff
+	LINK   libv::vm4
+	LINK   ext_cppcoro
 )
 
 wish_create_library(
 	TARGET libv_security STATIC
+	ALIAS  libv::security
 	SOURCE src/libv/security/*.cpp
 	LINK   ext_openssl
-#	LINK   libv_utility
+#	LINK   libv::utility
 )
 
 wish_create_library(
 	TARGET libv_serial INTERFACE
+	ALIAS  libv::serial
 	LINK   ext_vide
 #	LINK   ext_boost # Remove
-	LINK   libv_utility # For byte streams that might be removed in the future
+	LINK   libv::utility # For byte streams that might be removed in the future
 )
 
 wish_create_library(
 	TARGET libv_sig STATIC
+	ALIAS  libv::sig
 	SOURCE src/libv/sig/*.cpp
 )
 
 wish_create_library(
 	TARGET libv_state INTERFACE
+	ALIAS  libv::state
 	LINK   ext_sml # For SML based
 	LINK   ext_boost # For boost statechart based
 )
 
 wish_create_library(
 	TARGET libv_sun STATIC
+	ALIAS  libv::sun
 	SOURCE src/libv/sun/*.cpp
-	LINK   libv_math libv_ctrl libv_log
+	LINK   libv::math libv::ctrl libv::log
 )
 
 wish_create_library(
 	TARGET libv_sys STATIC
+	ALIAS  libv::sys
 	SOURCE src/libv/sys/*.cpp
-	LINK   libv_log ext_clip ext_fmt
+	LINK   libv::log ext_clip ext_fmt
 )
 
 wish_create_library(
 	TARGET libv_ui STATIC
+	ALIAS  libv::ui
 	SOURCE src/libv/ui/*.cpp
 	GENERATE enum src/libv/ui/*.in.lua
-	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp libv_sys
-	LINK   libv_fsw
+	LINK   libv::glr libv::parse libv::lua libv::input ext_freetype ext_utf8cpp libv::sys
+	LINK   libv::fsw
 )
 
 wish_create_library(
 	TARGET libv_utility STATIC
+	ALIAS  libv::utility
 	SOURCE src/libv/utility/*.cpp
 	LINK   Threads::Threads ext_function2 ext_boost
 )
 
 #wish_create_library(
 #	TARGET libv_update STATIC
+#	ALIAS  libv::update
 #	SOURCE src/libv/update/*.cpp
-#	LINK   libv_net libv_process libv_diff libv_serial libv_mt
+#	LINK   libv::net libv::process libv::diff libv::serial libv::mt
 #)
 
 wish_create_library(
 	TARGET libv_process STATIC
+	ALIAS  libv::process
 	SOURCE src/libv/process/*.cpp
 	LINK   ext_boost # For interprocess file_lock
 )
 
 wish_create_library(
 	TARGET libv_vm4 STATIC
+	ALIAS  libv::vm4
 	SOURCE src/libv/vm4/*.cpp
-	LINK   libv_math libv_serial ext_boost
+	LINK   libv::math libv::serial ext_boost
 )
 
 wish_create_library(
 	TARGET libv_vm4imp STATIC
+	ALIAS  libv::vm4imp
 	SOURCE src/libv/vm4imp/*.cpp
-	LINK   libv_log libv_vm4 ext_assimp
+	LINK   libv::log libv::vm4 ext_assimp
 )
 
 wish_group(group_application app) # --- Application -----------------------------------------------
@@ -810,21 +850,21 @@ wish_group(group_application app) # --- Application ----------------------------
 wish_create_executable(
 	TARGET codegen
 	SOURCE app/codegen/codegen_main.cpp
-	LINK   ext_fmt ext_range libv_lua libv_utility libv_algo
+	LINK   ext_fmt ext_range libv::lua libv::utility libv::algo
 )
 
 wish_create_executable(
 	TARGET enum
 	SOURCE app/enum/*.cpp
-	LINK   ext_fmt ext_range libv_lua libv_utility
+	LINK   ext_fmt ext_range libv::lua libv::utility
 )
 
 wish_create_executable(
 	TARGET mimp
 	SOURCE app/mimp/*.cpp
-	LINK   libv_vm4imp libv_lua
-	LINK   libv_utility libv_algo
-#	LINK   ext_fmt ext_range libv_lua libv_utility libv_algo
+	LINK   libv::vm4imp libv::lua
+	LINK   libv::utility libv::algo
+#	LINK   ext_fmt ext_range libv::lua libv::utility libv::algo
 )
 
 #wish_create_executable(
@@ -832,9 +872,9 @@ wish_create_executable(
 #	SOURCE app/space/*.cpp
 #	GENERATE codegen app/space/message/*.in.lua
 ##	LINK   ext_fmt ext_clip ext_range
-#	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-#	LINK   libv_vm4
-#	LINK   libv_sys
+#	LINK   libv::log libv::lua libv::frame libv::ctrl libv::rev libv::glr libv::ui libv::net libv::serial libv::color
+#	LINK   libv::vm4
+#	LINK   libv::sys
 #)
 
 wish_create_executable(
@@ -842,32 +882,32 @@ wish_create_executable(
 	SOURCE app/space/*.cpp
 	GENERATE codegen app/space/message/*.in.lua
 #	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
-	LINK   libv_vm4 libv_noise libv_sun
-	LINK   libv_sys
+	LINK   libv::log libv::lua libv::frame libv::ctrl libv::rev libv::glr libv::ui libv::net libv::serial libv::color
+	LINK   libv::vm4 libv::noise libv::sun
+	LINK   libv::sys
 )
 
 wish_create_executable(
 	TARGET surface
 	SOURCE app/surface/*.cpp
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_color libv_arg
-	LINK   libv_vm4
-	LINK   libv_sys
-	LINK   libv_utility libv_math libv_noise
-#	LINK   libv_net libv_serial
+	LINK   libv::log libv::lua libv::frame libv::ctrl libv::rev libv::glr libv::ui libv::color libv::arg
+	LINK   libv::vm4
+	LINK   libv::sys
+	LINK   libv::utility libv::math libv::noise
+#	LINK   libv::net libv::serial
 )
 
 wish_create_executable(
 	TARGET star
 	SOURCE app/star/*.cpp
 #	GENERATE codegen app/star/message/*.in.lua
-	LINK   libv_log libv_sys
-	LINK   libv_frame libv_ctrl libv_ui
-	LINK   libv_sun libv_rev libv_glr libv_color
-	LINK   libv_serial
-#	LINK   libv_lua
-#	LINK   libv_net
-#	LINK   libv_vm4
+	LINK   libv::log libv::sys
+	LINK   libv::frame libv::ctrl libv::ui
+	LINK   libv::sun libv::rev libv::glr libv::color
+	LINK   libv::serial
+#	LINK   libv::lua
+#	LINK   libv::net
+#	LINK   libv::vm4
 )
 
 wish_create_executable(
@@ -877,8 +917,8 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/theme/res
 	SOURCE app/theme/*.cpp
-	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_mt
-#	LINK   libv_ctrl
+	LINK   libv::log libv::ui libv::frame libv::glr libv::utility libv::fsw libv::lua libv::mt
+#	LINK   libv::ctrl
 )
 
 ## --- Update ---
@@ -887,55 +927,55 @@ wish_create_executable(
 #	# TODO P5: Make this an object library
 #	TARGET update_common STATIC
 #	SOURCE app/update/common/*.cpp
-#	LINK   libv_update
+#	LINK   libv::update
 #
-#	LINK   libv_net libv_process
-#	LINK   libv_diff # Just for testing
-#	LINK   libv_serial # Just for testing
+#	LINK   libv::net libv::process
+#	LINK   libv::diff # Just for testing
+#	LINK   libv::serial # Just for testing
 #)
 #
 #wish_create_executable(
 #	TARGET update_server
 #	SOURCE app/update/update_server_main.cpp
-#	LINK   libv_arg update_common
+#	LINK   libv::arg update_common
 ##	SOURCE app/update/common/*.cpp
 ##	SOURCE app/update/server_main.cpp
-##	LINK   libv_arg libv_net
+##	LINK   libv::arg libv::net
 #)
 #
 #wish_create_executable(
 #	TARGET resource_server
 #	SOURCE app/update/resource_server_main.cpp
-#	LINK   libv_arg update_common
+#	LINK   libv::arg update_common
 ##	SOURCE app/update/common/*.cpp
 ##	SOURCE app/update/server_main.cpp
-##	LINK   libv_arg libv_net
+##	LINK   libv::arg libv::net
 #)
 #
 #wish_create_executable(
 #	TARGET update_client
 #	SOURCE app/update/client_main.cpp
-#	LINK   libv_arg update_common
+#	LINK   libv::arg update_common
 ##	SOURCE app/update/common/*.cpp
 ##	SOURCE app/update/client_main.cpp
-##	LINK   libv_arg libv_net
+##	LINK   libv::arg libv::net
 #)
 #
 #wish_create_executable(
 #	TARGET create_update
 #	SOURCE app/update/create_update.cpp
-#	LINK   libv_log libv_arg libv_diff
-#	LINK   libv_serial
-#	LINK   libv_process # Just for testing
+#	LINK   libv::log libv::arg libv::diff
+#	LINK   libv::serial
+#	LINK   libv::process # Just for testing
 #	LINK   update_common # Just for testing
 #)
 #
 #wish_create_executable(
 #	TARGET apply_update
 #	SOURCE app/update/apply_update.cpp
-#	LINK   libv_log libv_arg libv_diff
-#	LINK   libv_serial
-#	LINK   libv_process # Just for testing
+#	LINK   libv::log libv::arg libv::diff
+#	LINK   libv::serial
+#	LINK   libv::process # Just for testing
 #	LINK   update_common # Just for testing
 #)
 #
@@ -946,7 +986,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET app_binary_to_source
 	SOURCE app/binary_to_source.cpp
-	LINK   ext_fmt libv_utility
+	LINK   ext_fmt libv::utility
 )
 
 # app.vm4_viewer: Disable vm4_viewer build target until the project is not resurrected
@@ -958,21 +998,21 @@ wish_create_executable(
 #	#OUTPUT_RESOURCE res
 #	#RESOURCE app/vm4_viewer/res
 #	SOURCE app/vm4_viewer/*.cpp
-#	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw libv_ctrl
+#	LINK   libv::log libv::vm4imp libv::ui libv::frame libv::utility libv::fsw libv::ctrl
 ##	LINK   ext_date
 #)
 
 wish_create_executable(
 	TARGET fsw
 	SOURCE app/fsw.cpp
-	LINK   ext_fmt libv_utility libv_fsw libv_mt
-#	LINK   libv_arg
+	LINK   ext_fmt libv::utility libv::fsw libv::mt
+#	LINK   libv::arg
 )
 
 wish_create_executable(
 	TARGET lua_runner
 	SOURCE app/lua_runner.cpp
-	LINK   libv_lua
+	LINK   libv::lua
 )
 
 wish_group(group_example example) # --- Example ---------------------------------------------------
@@ -980,13 +1020,13 @@ wish_group(group_example example) # --- Example --------------------------------
 wish_create_executable(
 	TARGET example_libv_ctrl_camera
 	SOURCE example/ctrl/camera/*.cpp
-	LINK   libv_ctrl
+	LINK   libv::ctrl
 )
 
 wish_create_executable(
 	TARGET example_libv_ctrl_hello
 	SOURCE example/ctrl/hello/*.cpp
-	LINK   libv_ctrl
+	LINK   libv::ctrl
 )
 
 wish_group(group_sandbox sandbox) # --- Sandbox ---------------------------------------------------
@@ -994,13 +1034,13 @@ wish_group(group_sandbox sandbox) # --- Sandbox --------------------------------
 wish_create_executable(
 	TARGET sandbox_libv_coro
 	SOURCE sandbox/libv_coro_main.cpp
-	LINK   ext_cppcoro libv_mt libv_utility
+	LINK   ext_cppcoro libv::mt libv::utility
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_container
 	SOURCE sandbox/libv_container_main.cpp
-	LINK   ext_fmt libv_container libv_utility libv_math
+	LINK   ext_fmt libv::container libv::utility libv::math
 )
 
 wish_create_executable(
@@ -1012,73 +1052,73 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_ctrl
 	SOURCE sandbox/libv_ctrl_main.cpp
-	LINK   libv_log libv_ctrl libv_frame libv_ui libv_utility
+	LINK   libv::log libv::ctrl libv::frame libv::ui libv::utility
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_diff
 	SOURCE sandbox/libv_diff_main.cpp
-	LINK   libv_diff
+	LINK   libv::diff
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_ecs
 	SOURCE sandbox/libv_ecs_main.cpp
-	LINK   libv_log libv_ecs
+	LINK   libv::log libv::ecs
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE sandbox/libv_frame_main.cpp
-	LINK   libv_log libv_frame
+	LINK   libv::log libv::frame
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_fsw
 	SOURCE sandbox/libv_fsw_main.cpp
-	LINK   libv_fsw libv_mt Threads::Threads
+	LINK   libv::fsw libv::mt Threads::Threads
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE sandbox/libv_gl_main.cpp
-	LINK   libv_log libv_gl libv_utility ext_glfw
+	LINK   libv::log libv::gl libv::utility ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE sandbox/libv_gl_main2.cpp
-	LINK   libv_log libv_gl libv_utility ext_glfw
+	LINK   libv::log libv::gl libv::utility ext_glfw
 )
 
 #wish_create_executable(
 #	TARGET sandbox_libv_gl3
 #	SOURCE sandbox/libv_gl_main3.cpp
-#	LINK   libv_log libv_gl libv_utility ext_boost ext_glfw
+#	LINK   libv::log libv::gl libv::utility ext_boost ext_glfw
 #)
 
 wish_create_executable(
 	TARGET sandbox_libv_glr
 	SOURCE sandbox/libv_glr_main.cpp
-	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+	LINK   libv::log libv::glr libv::utility libv::math ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_glr2
 	SOURCE sandbox/libv_glr_main2.cpp
-	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+	LINK   libv::log libv::glr libv::utility libv::math ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_glr3
 	SOURCE sandbox/libv_glr_main3.cpp
-	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+	LINK   libv::log libv::glr libv::utility libv::math ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_img
 	SOURCE sandbox/libv_img_main.cpp
-	LINK   libv_img libv_utility
+	LINK   libv::img libv::utility
 )
 
 wish_create_executable(
@@ -1090,23 +1130,23 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log libv_utility
-	LINK   libv_range
-#	LINK   libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
-	LINK   libv_diff
-	LINK   libv_mt libv_process
+	LINK   libv::log libv::utility
+	LINK   libv::range
+#	LINK   libv::ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv::diff
+	LINK   libv::mt libv::process
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_log
 	SOURCE sandbox/libv_log_main.cpp
-	LINK   libv_log
+	LINK   libv::log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_lua
 	SOURCE sandbox/libv_lua_main.cpp
-	LINK   libv_log libv_lua
+	LINK   libv::log libv::lua
 )
 
 wish_create_executable(
@@ -1118,115 +1158,115 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_net
 	SOURCE sandbox/libv_net_main.cpp
-	LINK   libv_net libv_log
+	LINK   libv::net libv::log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_noise
 	SOURCE sandbox/libv_noise_main.cpp
-	LINK   libv_noise libv_utility libv_log ext_fmt
+	LINK   libv::noise libv::utility libv::log ext_fmt
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_physics
 	SOURCE sandbox/libv_physics_main.cpp
-	LINK   ext_rp3d libv_math
+	LINK   ext_rp3d libv::math
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE sandbox/libv_reflection_main.cpp
-	LINK   libv_serial
+	LINK   libv::serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE sandbox/libv_reflection2_main.cpp
-	LINK   libv_serial
+	LINK   libv::serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_rev
 	SOURCE sandbox/libv_rev_main.cpp
-	LINK   libv_log libv_rev ext_glfw #libv_utility libv_math
+	LINK   libv::log libv::rev ext_glfw #libv_utility libv::math
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_rev_res
 	SOURCE sandbox/libv_rev_res_main.cpp
-	LINK   libv_log libv_rev ext_glfw libv_img
+	LINK   libv::log libv::rev ext_glfw libv::img
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_security
 	SOURCE sandbox/libv_security_main.cpp
-	LINK   libv_security libv_utility
+	LINK   libv::security libv::utility
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE sandbox/libv_serialize_main.cpp
-	LINK   libv_serial
+	LINK   libv::serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize_vide
 	SOURCE sandbox/libv_serialize_vide_main.cpp
-	LINK   ext_boost ext_vide libv_serial
+	LINK   ext_boost ext_vide libv::serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE sandbox/libv_sig_main.cpp
-	LINK   libv_log
+	LINK   libv::log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sm
 	SOURCE sandbox/libv_sm_main.cpp
-	LINK   libv_log libv_state
+	LINK   libv::log libv::state
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sml
 	SOURCE sandbox/libv_sml_main.cpp
-	LINK   libv_log libv_state
+	LINK   libv::log libv::state
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sqlite3
 	SOURCE sandbox/libv_sqlite3_main.cpp
-	LINK   libv_utility ext_fmt ext_sqlite3
+	LINK   libv::utility ext_fmt ext_sqlite3
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sys
 	SOURCE sandbox/libv_sys_main.cpp
-	LINK   libv_sys
+	LINK   libv::sys
 )
 
 #wish_create_executable(
 #	TARGET sandbox_libv_update
 #	SOURCE sandbox/libv_update_main.cpp
-#	LINK   libv_update libv_net libv_log
+#	LINK   libv::update libv::net libv::log
 #)
 
 wish_create_executable(
 	TARGET sandbox_libv_ui
 	SOURCE sandbox/libv_ui_main.cpp
-	LINK   libv_log libv_ui libv_frame libv_utility
+	LINK   libv::log libv::ui libv::frame libv::utility
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_ui_lua
 	SOURCE sandbox/libv_ui_lua_main.cpp
-	LINK   libv_log libv_ui libv_frame libv_utility libv_lua libv_fsw
+	LINK   libv::log libv::ui libv::frame libv::utility libv::lua libv::fsw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE sandbox/libv_vm4imp_main.cpp
-	LINK   libv_log libv_vm4imp libv_utility libv_algo
+	LINK   libv::log libv::vm4imp libv::utility libv::algo
 )
 
 wish_group(group_test test) # --- Test ------------------------------------------------------------
@@ -1234,139 +1274,139 @@ wish_group(group_test test) # --- Test -----------------------------------------
 wish_create_executable(
 	TARGET test_libv_algo
 	SOURCE test/libv/algorithm/*.cpp
-	LINK   ext_catch libv_algo ext_range
+	LINK   ext_catch libv::algo ext_range
 )
 
 wish_create_executable(
 	TARGET test_libv_arg
 	SOURCE test/libv/arg/*.cpp
-	LINK   ext_catch libv_arg
+	LINK   ext_catch libv::arg
 )
 
 wish_create_executable(
 	TARGET test_libv_color
 	SOURCE test/libv/color/*.cpp
-	LINK   ext_catch libv_color libv_utility libv_math
+	LINK   ext_catch libv::color libv::utility libv::math
 )
 
 wish_create_executable(
 	TARGET test_libv_container
 	SOURCE test/libv/container/*.cpp
-	LINK   ext_catch libv_container
+	LINK   ext_catch libv::container
 )
 
 wish_create_executable(
 	TARGET test_libv_ctrl
 	SOURCE test/libv/ctrl/*.cpp
-	LINK   ext_catch libv_ctrl
+	LINK   ext_catch libv::ctrl
 )
 
 wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
-	LINK   ext_catch libv_ecs libv_range
+	LINK   ext_catch libv::ecs libv::range
 )
 
 wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
-	LINK   ext_catch libv_frame
+	LINK   ext_catch libv::frame
 )
 
 wish_create_executable(
 	TARGET test_libv_fsw
 	SOURCE test/libv/fsw/*.cpp
-	LINK   ext_catch libv_fsw ext_boost
+	LINK   ext_catch libv::fsw ext_boost
 )
 
 wish_create_executable(
 	TARGET test_libv_fwd
 	SOURCE test/libv/fwd/*.cpp
-	LINK   ext_catch libv_fwd ext_fmt
+	LINK   ext_catch libv::fwd ext_fmt
 )
 
 wish_create_executable(
 	TARGET test_libv_input
 	SOURCE test/libv/input/*.cpp
-	LINK   ext_catch libv_input libv_utility ext_glfw
+	LINK   ext_catch libv::input libv::utility ext_glfw
 )
 
 wish_create_executable(
 	TARGET test_libv_glr
 	SOURCE test/libv/glr/*.cpp
-	LINK   ext_catch libv_glr libv_math libv_meta
+	LINK   ext_catch libv::glr libv::math libv::meta
 )
 
 wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
-	LINK   ext_catch libv_log
+	LINK   ext_catch libv::log
 )
 
 wish_create_executable(
 	TARGET test_libv_lua
 	SOURCE test/libv/lua/*.cpp
-	LINK   ext_catch libv_lua libv_parse
+	LINK   ext_catch libv::lua libv::parse
 )
 
 wish_create_executable(
 	TARGET test_libv_math
 	SOURCE test/libv/math/*.cpp
-	LINK   ext_catch libv_math libv_utility
+	LINK   ext_catch libv::math libv::utility
 )
 
 wish_create_executable(
 	TARGET test_libv_mt
 	SOURCE test/libv/mt/*.cpp
-	LINK   ext_catch libv_mt
+	LINK   ext_catch libv::mt
 )
 
 wish_create_executable(
 	TARGET test_libv_net
 	SOURCE test/libv/net/*.cpp
-	LINK   ext_catch libv_net
+	LINK   ext_catch libv::net
 )
 
 wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE test/libv/parse/*.cpp
-	LINK   ext_catch libv_parse
+	LINK   ext_catch libv::parse
 )
 
 wish_create_executable(
 	TARGET test_libv_range
 	SOURCE test/libv/range/*.cpp
-	LINK   ext_catch ext_fmt libv_range
+	LINK   ext_catch ext_fmt libv::range
 )
 
 wish_create_executable(
 	TARGET test_libv_rev
 	SOURCE test/libv/rev/*.cpp
-	LINK   ext_catch libv_rev
+	LINK   ext_catch libv::rev
 )
 
 wish_create_executable(
 	TARGET test_libv_serial
 	SOURCE test/libv/serial/*.cpp
-	LINK   ext_catch libv_serial
+	LINK   ext_catch libv::serial
 )
 
 wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE test/libv/sig/*.cpp
-	LINK   ext_catch libv_sig
+	LINK   ext_catch libv::sig
 )
 
 wish_create_executable(
 	TARGET test_libv_ui
 	SOURCE test/libv/ui/*.cpp
-	LINK   ext_catch libv_ui
+	LINK   ext_catch libv::ui
 )
 
 wish_create_executable(
 	TARGET test_libv_utility
 	SOURCE test/libv/utility/*.cpp
-	LINK   ext_catch ext_fmt libv_utility
+	LINK   ext_catch ext_fmt libv::utility
 )
 
 # -------------------------------------------------------------------------------------------------
