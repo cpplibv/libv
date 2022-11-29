@@ -7,7 +7,7 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.0.2)
+set(WISH_REQUEST_VERSION v5.0.5)
 include(cmake/wish.cmake)
 
 # --------------------------------------------------------------------------------------------------
