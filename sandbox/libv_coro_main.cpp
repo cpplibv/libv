@@ -334,6 +334,12 @@ public:
 //			t.resume();
 		});
 	}
+	template <typename Coro>
+	void execute_async_coro_alternative(Coro task) {
+		threads.execute_async([t = std::move(task)] mutable {
+			t();
+		});
+	}
 //	void execute_async_coro(libv::unique_function<void()> task, std::chrono::steady_clock::duration after);
 //	void execute_async_coro(libv::unique_function<void()> task, std::chrono::steady_clock::time_point at);
 };
@@ -443,41 +449,216 @@ Flow task(int id, int count, thread_pool& tp) {
 //	co_await t;
 //}
 
-int main() {
-	std::cout << "Hello coroutines" << " Thread: " << std::this_thread::get_id() << std::endl;
-	thread_pool threads(4);
+// =================================================================================================
 
-//	cppcoro::sync_wait(consumer(threads));
-//	cppcoro::sync_wait(ticker2(500, threads));
-//	task_entry(500, threads);
+//int main() {
+//	std::cout << "Hello coroutines" << " Thread: " << std::this_thread::get_id() << std::endl;
+//	thread_pool threads(4);
+//
+////	cppcoro::sync_wait(consumer(threads));
+////	cppcoro::sync_wait(ticker2(500, threads));
+////	task_entry(500, threads);
+//
+////	auto t0 = task(0, 500, threads);
+////	auto t1 = task(1, 500, threads);
+//
+////	exec(t0);
+////	exec(t1);
+////	cppcoro::sync_wait(t0);
+////	cppcoro::sync_wait(t1);
+////	cppcoro::schedule_on();
+//
+////	cppcoro::sync_wait(task_entry(500, threads));
+//
+////	task(0, 500, threads).start();
+////	task(1, 500, threads).start();
+//
+////	auto t0 = task(0, 500, threads);
+////	auto t1 = task(1, 500, threads);
+////	t0.start();
+////	t1.start();
+//
+//	threads.execute_async_coro(task(0, 500, threads));
+//	threads.execute_async_coro(task(1, 500, threads));
+//
+//	std::this_thread::sleep_for(std::chrono::seconds(1));
+////	threads.threads.wait_for_empty();
+//
+//	std::cout << "stopping and joining" << " Thread: " << std::this_thread::get_id() << std::endl;
 
-//	auto t0 = task(0, 500, threads);
-//	auto t1 = task(1, 500, threads);
 
-//	exec(t0);
-//	exec(t1);
-//	cppcoro::sync_wait(t0);
-//	cppcoro::sync_wait(t1);
-//	cppcoro::schedule_on();
+//	for (const auto ta : alternative_idea(0, 0, 0)) {
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl;
+//	}
+//}
 
-//	cppcoro::sync_wait(task_entry(500, threads));
+// =================================================================================================
 
-//	task(0, 500, threads).start();
-//	task(1, 500, threads).start();
+//auto foo() {
+//	return [] {
+//		auto ta = it*;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl;
+//		threads.execute_async();
+//	};
+//}
 
-//	auto t0 = task(0, 500, threads);
-//	auto t1 = task(1, 500, threads);
-//	t0.start();
-//	t1.start();
+#include <libv/mt/token_machine.hpp>
+#include <libv/mt/worker_thread.hpp>
+#include <mutex>
+std::mutex cout_m;
+thread_local int call_stack_depth = 0;
+#define COUT(...) { auto lock = std::unique_lock(cout_m); std::cout << __VA_ARGS__; }
+#define COUT_B(...) { auto lock = std::unique_lock(cout_m); std::cout << std::string(call_stack_depth++ * 4, ' ') << __VA_ARGS__; }
+#define COUT_A(...) { auto lock = std::unique_lock(cout_m); std::cout << std::string(--call_stack_depth * 4, ' ') << __VA_ARGS__; }
 
-	threads.execute_async_coro(task(0, 500, threads));
-	threads.execute_async_coro(task(1, 500, threads));
 
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-//	threads.threads.wait_for_empty();
+enum class ThreadAffinity {
+	GL,
+	FS,
+	CPU,
+	Continue,
+};
 
-	std::cout << "stopping and joining" << " Thread: " << std::this_thread::get_id() << std::endl;
+cppcoro::generator<ThreadAffinity> alternative_idea(int id, int i, int count) {
+	COUT(" < Work ENTER  : " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << '-' << "/" << count << std::endl)
+
+	co_yield ThreadAffinity::CPU;
+
+	COUT(" < Work A  , ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+
+	co_yield ThreadAffinity::GL;
+
+	COUT(" < Work B  , ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+
+	co_yield ThreadAffinity::FS;
+
+	COUT(" < Work C  , ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+
+	co_yield ThreadAffinity::CPU;
+
+	COUT(" < Work D.0, ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+	co_yield ThreadAffinity::Continue;
+	COUT(" < Work D.1, ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+	co_yield ThreadAffinity::Continue;
+	COUT(" < Work D.2, ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+	co_yield ThreadAffinity::Continue;
+	COUT(" < Work D.3, ID: " << id << ", Thread: " << std::this_thread::get_id() << ", Step: " << i << "/" << count << std::endl)
+
+//	if (error)
+//		co_return;
 }
+
+struct CallFoo {
+	libv::mt::worker_thread_pool& threads_cpu;
+	libv::mt::worker_thread& threads_gl;
+	libv::mt::token token;
+	cppcoro::generator<ThreadAffinity> t;
+	cppcoro::generator<ThreadAffinity>::iterator it;
+
+	CallFoo(
+			libv::mt::worker_thread_pool& threads_cpu,
+			libv::mt::worker_thread& threads_gl,
+			libv::mt::token&& token,
+			cppcoro::generator<ThreadAffinity>&& t) :
+		threads_cpu(threads_cpu),
+		threads_gl(threads_gl),
+		token(std::move(token)),
+		t(std::move(t)) {
+
+		COUT_B("before call foo INIT" << std::endl)
+		init(); // Prime the co-routine to check what is the first thread it would like to have
+		COUT_A("after  call foo INIT" << std::endl)
+	}
+
+	void schedule(ThreadAffinity ta) {
+		switch (ta) {
+		case ThreadAffinity::CPU:
+			threads_cpu.execute_async(std::move(*this)); break;
+		case ThreadAffinity::GL:
+			threads_gl.execute_async(std::move(*this)); break;
+		case ThreadAffinity::FS:
+			threads_cpu.execute_async(std::move(*this)); break;
+		case ThreadAffinity::Continue:
+			; // Noop
+		}
+	}
+
+	void init() {
+		COUT_B("before it = t.begin()" << std::endl)
+		it = t.begin(); // Primes the co-routine
+		COUT_A("after  it = t.begin(), end: " << (it == t.end()) << std::endl)
+
+		if (it == t.end())
+			return;
+
+		COUT_B("before *it INIT" << std::endl)
+		ThreadAffinity ta = *it;
+		COUT_A("after  *it INIT, ta: " << std::to_underlying(ta) << std::endl)
+
+		schedule(ta);
+	}
+
+	void operator()() {
+		while (true) {
+			COUT_B("before *it" << std::endl)
+			ThreadAffinity ta = *it;
+			COUT_A("after  *it, ta: " << std::to_underlying(ta) << std::endl)
+			COUT_B("before ++it" << std::endl)
+			++it;
+			COUT_A("after  ++it, end: " << (it == t.end()) << std::endl)
+
+			if (it == t.end())
+				return;
+
+			if (ta == ThreadAffinity::Continue)
+				continue;
+
+			schedule(ta);
+			break;
+		}
+	}
+};
+
+int main() {
+	COUT("Hello coroutines" << " Thread: " << std::this_thread::get_id() << std::endl)
+
+	libv::mt::token_machine tm;
+	libv::mt::worker_thread_pool threads_cpu(4);
+	libv::mt::worker_thread threads_gl;
+
+	{
+		COUT_B("before task create" << std::endl)
+		cppcoro::generator<ThreadAffinity> task = alternative_idea(0, 0, 0);
+		COUT_A("after  task create" << std::endl)
+		COUT_B("before CallFoo create" << std::endl)
+		CallFoo(threads_cpu, threads_gl, tm.create_token(), std::move(task));
+		COUT_A("after  CallFoo create" << std::endl)
+	}
+
+	std::stop_source ss;
+	tm.start_async_wait(ss);
+	while (!ss.stop_requested())
+		std::this_thread::yield();
+
+//	threads.execute_async([it = task.begin(), t = std::move(task)] mutable {
+//		ThreadAffinity ta;
+//
+//		ta = *it;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl; if (++it == t.end()) return;
+//		ta = *it;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl; if (++it == t.end()) return;
+//		ta = *it;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl; if (++it == t.end()) return;
+//		ta = *it;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl; if (++it == t.end()) return;
+//		ta = *it;
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl; if (++it == t.end()) return;
+//	});
+
+//	for (const auto ta : task)
+//		std::cout << "ta:" << std::to_underlying(ta) << std::endl;
+}
+
 // =================================================================================================
 
 //template <typename C>

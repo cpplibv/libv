@@ -253,15 +253,15 @@ wish_create_external(
 wish_create_external(
 	NAME cppcoro
 #	GIT_REPOSITORY https://github.com/andreasbuhr/cppcoro.git
-#	GIT_TAG 7cc9433436fe8f2482138019cfaafce8e1d7a896
+#	GIT_TAG 10bbcdbf2be3ad3aa56febcf4c7662d771460a99
 	GIT_REPOSITORY https://github.com/VaderY/cppcoro.git
-	GIT_TAG a99556e1768b1b6b3c411b6f06e31934a5b56c26
+	GIT_TAG 67ad4993cdddc404fd2f36010ed45623181b89ed
 	CMAKE_ARGS
 		-DBUILD_TESTING=OFF
 	LINK cppcoro
-	LINK $<IF:$<BOOL:${WIN32}>,
-			Synchronization, # Win 32
-		>
+#	LINK Threads::Threads cppcoro
+#	LINK $<IF:$<BOOL:${WIN32}>, Synchronization,> # Win 32
+	LINK $<IF:$<BOOL:${WIN32}>, ws2_32,> # Win 32
 )
 
 wish_create_external(
@@ -1039,7 +1039,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_fsw
 	SOURCE sandbox/libv_fsw_main.cpp
-	LINK   libv::fsw libv::mt Threads::Threads
+	LINK   libv::fsw libv::mt
 )
 
 wish_create_executable(
