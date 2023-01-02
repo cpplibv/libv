@@ -231,10 +231,10 @@ libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& layout_env) {
 }
 
 void CoreScrollPane::doLayout2(const ContextLayout2& layout_env) {
-	hbar.value_min(0);
-	hbar.value_max(layout_env.size.x);
-	vbar.value_min(0);
-	vbar.value_max(layout_env.size.y);
+	hbar.value_low(0);
+	hbar.value_high(layout_env.size.x);
+	vbar.value_low(0);
+	vbar.value_high(layout_env.size.y);
 //	vbar.value_step(10 * 2);
 //	hbar.value_step(10 * 2);
 

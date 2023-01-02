@@ -54,11 +54,11 @@ public:
 	void value_int(int64_t value);
 	[[nodiscard]] int64_t value_int() const noexcept;
 
-	void value_max(double value);
-	[[nodiscard]] double value_max() const noexcept;
+	void value_high(double value);
+	[[nodiscard]] double value_high() const noexcept;
 
-	void value_min(double value);
-	[[nodiscard]] double value_min() const noexcept;
+	void value_low(double value);
+	[[nodiscard]] double value_low() const noexcept;
 
 	void value_range(double value);
 	[[nodiscard]] double value_range() const noexcept;

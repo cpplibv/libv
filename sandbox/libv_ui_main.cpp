@@ -457,8 +457,8 @@ private:
 		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
 		scroll_bar_x.orientation(libv::ui::Orientation::right);
-		scroll_bar_x.value_min(-500);
-		scroll_bar_x.value_max(500);
+		scroll_bar_x.value_low(-500);
+		scroll_bar_x.value_high(500);
 		scroll_bar_x.value(0);
 		scroll_bar_x.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
@@ -468,8 +468,8 @@ private:
 		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
 		scroll_bar_y.orientation(libv::ui::Orientation::up);
-		scroll_bar_y.value_min(-1000);
-		scroll_bar_y.value_max(1000);
+		scroll_bar_y.value_low(-1000);
+		scroll_bar_y.value_high(1000);
 		scroll_bar_y.value(0);
 		scroll_bar_y.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
@@ -479,8 +479,8 @@ private:
 		scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
 		scroll_bar_ix.orientation(libv::ui::Orientation::right);
-		scroll_bar_ix.value_min(-500);
-		scroll_bar_ix.value_max(500);
+		scroll_bar_ix.value_low(-500);
+		scroll_bar_ix.value_high(500);
 		scroll_bar_ix.value(0);
 		scroll_bar_ix.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
@@ -490,8 +490,8 @@ private:
 		scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
 		scroll_bar_iy.orientation(libv::ui::Orientation::up);
-		scroll_bar_iy.value_min(-1000);
-		scroll_bar_iy.value_max(1000);
+		scroll_bar_iy.value_low(-1000);
+		scroll_bar_iy.value_high(1000);
 		scroll_bar_iy.value(0);
 		scroll_bar_iy.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);

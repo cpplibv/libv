@@ -62,8 +62,8 @@ public:
 
 public:
 	double value_ = 0.0;
-	double value_max_ = 100.0;
-	double value_min_ = 0.0;
+	double value_high_ = 100.0;
+	double value_low_ = 0.0;
 	double value_range_ = 10.0;
 	double value_step_ = 0.0;
 
@@ -87,11 +87,11 @@ public:
 	void value_int(int64_t value);
 	[[nodiscard]] int64_t value_int() const noexcept;
 
-	void value_max(double value);
-	[[nodiscard]] double value_max() const noexcept;
+	void value_high(double value);
+	[[nodiscard]] double value_high() const noexcept;
 
-	void value_min(double value);
-	[[nodiscard]] double value_min() const noexcept;
+	void value_low(double value);
+	[[nodiscard]] double value_low() const noexcept;
 
 	void value_range(double value);
 	[[nodiscard]] double value_range() const noexcept;
@@ -164,15 +164,15 @@ void CoreSlider::access_properties(T& ctx) {
 			"Current value"
 	);
 	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().value_min(std::move(v)); },
-			[](const auto& c) { return c.handler().value_min(); },
-			pgr::behaviour, pnm::value_min,
+			[](auto& c, auto v) { c.handler().value_low(std::move(v)); },
+			[](const auto& c) { return c.handler().value_low(); },
+			pgr::behaviour, pnm::value_low,
 			"Minimum value"
 	);
 	ctx.synthesize(
-			[](auto& c, auto v) { c.handler().value_max(std::move(v)); },
-			[](const auto& c) { return c.handler().value_max(); },
-			pgr::behaviour, pnm::value_max,
+			[](auto& c, auto v) { c.handler().value_high(std::move(v)); },
+			[](const auto& c) { return c.handler().value_high(); },
+			pgr::behaviour, pnm::value_high,
 			"Maximum value"
 	);
 	ctx.synthesize(
@@ -214,7 +214,7 @@ static constexpr OrientationData OrientationTable[] = {
 inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
 	//
 	//                    Orientation::up
-	//          value == value_min             value == value_max
+	//          value == value_low             value == value_high
 	//
 	//         +->   |..|                     +->   |##|   <-+
 	//         |     |..|                     |     |##|     |
@@ -222,7 +222,7 @@ inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
 	//         |     |..|        value_range' |     |##|     | bar
 	//         |     |..|                     |     |##|     |
 	//    diff |     |..|                     |     |##|     |
-	//         |     |..|   <---- value_max --+->   |##|   <-+-- value
+	//         |     |..|   <--- value_high --+->   |##|   <-+-- value
 	//         |     |..|                           |..|     |
 	//         |     |..|                           |..|     |
 	//         |     |..|                           |..|     |
@@ -232,14 +232,14 @@ inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
 	//     bar |     |##|     | value_range'        |..|     |
 	//         |     |##|     |                     |..|     |
 	//         |     |##|     |                     |..|     |
-	// value --+->   |##|   <-+-- value_min ---->   |..|   <-+
+	// value --+->   |##|   <-+-- value_low ---->   |..|   <-+
 	//
-	//      value_range' = (value_range) / (value_max - value_min)
+	//      value_range' = (value_range) / (value_high - value_low)
 	//
 
 	const auto orient = OrientationTable[underlying(property.orientation())];
 
-	const auto value_extent = std::abs(value_max_ - value_min_);
+	const auto value_extent = std::abs(value_high_ - value_low_);
 
 	const auto size_x = static_cast<double>(layout_size2()[orient.dim_control]);
 	const auto size_y = static_cast<double>(layout_size2()[orient.dim_secondary]);
@@ -253,8 +253,8 @@ inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
 	const auto position_bar_x =	std::round(value_extent < value_range_ ?
 			0.0 :
 			orient.control_inverted ?
-				libv::remap(value_, value_min_, value_max_, size_x - size_bar_x, 0.0) :
-				libv::remap(value_, value_min_, value_max_, 0.0, size_x - size_bar_x)
+				libv::remap(value_, value_low_, value_high_, size_x - size_bar_x, 0.0) :
+				libv::remap(value_, value_low_, value_high_, 0.0, size_x - size_bar_x)
 	);
 	const auto position_bar_y = 0.0f;
 
@@ -282,7 +282,7 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 			drag_point = local_mouse - bar.position;
 		} else {
 			drag_mode = DragState::track;
-			const auto value_extent = std::abs(value_max_ - value_min_);
+			const auto value_extent = std::abs(value_high_ - value_low_);
 			const auto local_drag = std::floor(bar.size[orient.dim_control] * 0.5f);
 			const auto local_value = value_extent < value_range_ ?
 					value_ :
@@ -290,8 +290,8 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 						local_mouse[orient.dim_control] - local_drag,
 						0,
 						layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
-						orient.control_inverted ? value_max_ : value_min_,
-						orient.control_inverted ? value_min_ : value_max_);
+						orient.control_inverted ? value_high_ : value_low_,
+						orient.control_inverted ? value_low_ : value_high_);
 			handler().value(local_value);
 		}
 
@@ -335,13 +335,13 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 	const auto orient = OrientationTable[underlying(property.orientation())];
 	const auto bar = bar_bounds_; // Cache bar_bounds
 	const auto local_mouse = event.local_position;
-	const auto value_extent = std::abs(value_max_ - value_min_);
+	const auto value_extent = std::abs(value_high_ - value_low_);
 
 	if (value_extent < value_range_) {
 		// Handle special case with oversized (range) bar
 		const auto side_a = local_mouse[orient.dim_control] < layout_size2()[orient.dim_control] * 0.5f;
 		const auto toward_min = side_a == orient.control_inverted;
-		const auto local_value = toward_min ? value_min_ : value_max_;
+		const auto local_value = toward_min ? value_low_ : value_high_;
 		handler().value(local_value);
 		return event.stop_propagation();
 	}
@@ -354,8 +354,8 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 			local_mouse[orient.dim_control] - local_drag,
 			0,
 			layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
-			orient.control_inverted ? value_max_ : value_min_,
-			orient.control_inverted ? value_min_ : value_max_);
+			orient.control_inverted ? value_high_ : value_low_,
+			orient.control_inverted ? value_low_ : value_high_);
 
 	handler().value(local_value);
 	event.stop_propagation();
@@ -364,7 +364,7 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 void CoreSlider::onMouseScroll(const EventMouseScroll& event) {
 	const auto orient = OrientationTable[underlying(property.orientation())];
 	const auto movement = static_cast<double>(event.scroll_movement.y * orient.control_direction);
-	const auto inverse_interval = value_min_ < value_max_ ? 1.0 : -1.0;
+	const auto inverse_interval = value_low_ < value_high_ ? 1.0 : -1.0;
 	handler().make_scroll(movement * inverse_interval);
 
 	event.stop_propagation();
@@ -413,10 +413,10 @@ void CoreSlider::value(double request) {
 	if (libv::float_equal(request, value_))
 		return;
 
-	if (!libv::math::check_interval(request, value_min_, value_max_))
-		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", request, value_min_, value_max_, path());
+	if (!libv::math::check_interval(request, value_low_, value_high_))
+		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", request, value_low_, value_high_, path());
 
-	const auto var = libv::math::snap_interval(request, value_step_, value_min_, value_max_);
+	const auto var = libv::math::snap_interval(request, value_step_, value_low_, value_high_);
 
 	const auto change = var - value_;
 	value_ = var;
@@ -435,44 +435,44 @@ int64_t CoreSlider::value_int() const noexcept {
 	return std::llround(value());
 }
 
-void CoreSlider::value_max(double var) {
-	if (libv::float_equal(var, value_max_))
+void CoreSlider::value_high(double var) {
+	if (libv::float_equal(var, value_high_))
 		return;
 
 	const auto request = value_;
-	value_max_ = var;
+	value_high_ = var;
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
-	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
-		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
-		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+	if (!libv::math::check_interval(value_, value_low_, value_high_)) {
+		log_ui.warn("Assigning value_high {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_low_, value_high_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_low_, value_high_);
 		const auto change = new_value - value_;
 		value_ = new_value;
 		fire(EventScrollChange{request, change});
 	}
 }
-double CoreSlider::value_max() const noexcept {
-	return value_max_;
+double CoreSlider::value_high() const noexcept {
+	return value_high_;
 }
 
-void CoreSlider::value_min(double var) {
-	if (libv::float_equal(var, value_min_))
+void CoreSlider::value_low(double var) {
+	if (libv::float_equal(var, value_low_))
 		return;
 
 	const auto request = value_;
-	value_min_ = var;
+	value_low_ = var;
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
-	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
-		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
-		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+	if (!libv::math::check_interval(value_, value_low_, value_high_)) {
+		log_ui.warn("Assigning value_low {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_low_, value_high_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_low_, value_high_);
 		const auto change = new_value - value_;
 		value_ = new_value;
 		fire(EventScrollChange{request, change});
 	}
 }
-double CoreSlider::value_min() const noexcept {
-	return value_min_;
+double CoreSlider::value_low() const noexcept {
+	return value_low_;
 }
 
 void CoreSlider::value_range(double var) {
@@ -511,7 +511,7 @@ void CoreSlider::make_step(double amount) noexcept {
 	const auto step = libv::float_equal(value_step_, 0.0) ? 1.0 : value_step_;
 
 	const auto request = value_;
-	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_min_, value_max_);
+	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_low_, value_high_);
 	const auto change = new_value - value_;
 	value_ = new_value;
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -546,17 +546,17 @@ void Slider::value_int(int64_t request) {
 int64_t Slider::value_int() const noexcept {
 	return self().value_int();
 }
-void Slider::value_max(double var) {
-	self().value_max(var);
+void Slider::value_high(double var) {
+	self().value_high(var);
 }
-double Slider::value_max() const noexcept {
-	return self().value_max();
+double Slider::value_high() const noexcept {
+	return self().value_high();
 }
-void Slider::value_min(double var) {
-	self().value_min(var);
+void Slider::value_low(double var) {
+	self().value_low(var);
 }
-double Slider::value_min() const noexcept {
-	return self().value_min();
+double Slider::value_low() const noexcept {
+	return self().value_low();
 }
 void Slider::value_range(double var) {
 	self().value_range(var);

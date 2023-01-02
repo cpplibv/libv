@@ -61,6 +61,7 @@ libv.ui.SLC: Implement SLC - Static Layout Composition
 libv.ui.SLC: Document node function behaviours
 libv.ui: Rename scroll bar to slider
 libv.ui: style intrusive_ptr -> intrusive2_ptr
+libv.ui: Rename slider min/max to low/high
 
 
 
@@ -72,9 +73,6 @@ libv.ui: style intrusive_ptr -> intrusive2_ptr
 
 
 
-
-
-libv.ui: rename slider value_min and value_max to value_low and value_high
 
 
 
@@ -491,8 +489,8 @@ libv.ui: The UI Paper
 
 	Notes for the real scroll bar:
 		double value; // current_line
-		double value_min; // 0
-		double value_max; // num_line
+		double value_low; // 0
+		double value_high; // num_line
 		double value_range; // num_lines_displayed
 
 		double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit

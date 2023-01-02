@@ -146,8 +146,8 @@ public:
 
 				control.slider.bar_color({1, 0, 0, 1});
 				control.slider.orientation(libv::ui::Orientation::right);
-				control.slider.value_max(var.high[d]);
-				control.slider.value_min(var.low[d]);
+				control.slider.value_high(var.high[d]);
+				control.slider.value_low(var.low[d]);
 				control.slider.value_step(var.step[d]);
 				control.slider.value_range(var.step[d] != 0.0 ? var.step[d] : 1.0);
 				control.slider.value(var.value[d]);
@@ -183,10 +183,10 @@ public:
 
 					auto value = std::stod(input.text());
 
-//					if (value < slider.value_max())
+//					if (value < slider.value_high())
 //						slider.value(value);
 //
-//					if (value < slider.value_min())
+//					if (value < slider.value_low())
 //						slider.value(value);
 
 					control.requested_number = value;
@@ -195,8 +195,8 @@ public:
 				});
 
 			} else {
-				control.slider.value_max(var.high[d]);
-				control.slider.value_min(var.low[d]);
+				control.slider.value_high(var.high[d]);
+				control.slider.value_low(var.low[d]);
 				control.slider.value_step(var.step[d]);
 				control.slider.value_range(var.step[d] != 0.0 ? var.step[d] : 1.0);
 			}

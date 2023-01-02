@@ -656,8 +656,8 @@ public:
 		property_loaders.emplace(pnm::z_index_offset, convert_enum_value<ZIndexOffset>());
 		//		property_loaders.emplace(pnm::text, _______);
 		//		property_loaders.emplace(pnm::value, _______);
-		//		property_loaders.emplace(pnm::value_max, _______);
-		//		property_loaders.emplace(pnm::value_min, _______);
+		//		property_loaders.emplace(pnm::value_high, _______);
+		//		property_loaders.emplace(pnm::value_low, _______);
 		//		property_loaders.emplace(pnm::value_range, _______);
 		//		property_loaders.emplace(pnm::value_step, _______);
 

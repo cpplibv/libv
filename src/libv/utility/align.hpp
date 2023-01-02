@@ -9,6 +9,7 @@ namespace libv {
 
 template <typename T>
 [[nodiscard]] constexpr inline T align(const T value, const T alignment) noexcept {
+	// assert(alignment != 0);
 	return (alignment - 1 + value) / alignment * alignment;
 }
 
