@@ -199,7 +199,7 @@ public:
 
 public:
 	void markRemove();
-//	void style(libv::intrusive_ptr<Style> style) noexcept;
+//	void style(libv::intrusive2_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
 
 	void style_state(StyleState state, bool value) noexcept;

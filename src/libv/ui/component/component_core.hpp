@@ -7,7 +7,7 @@
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
-#include <libv/utility/memory/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
 #include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/type_key.hpp>
@@ -75,7 +75,7 @@ private:
 	/// Never null, points to the associated context
 	libv::observer_ref<ContextUI> context_;
 	/// Null if no style is assigned to the component
-	libv::intrusive_ptr<Style> style_;
+	libv::intrusive2_ptr<Style> style_;
 
 public:
 	std::string name;
@@ -297,9 +297,9 @@ public:
 	void focus() noexcept;
 	void markRemove() noexcept;
 	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
-	void style(libv::intrusive_ptr<Style> style) noexcept;
+	void style(libv::intrusive2_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
-	[[nodiscard]] constexpr inline const libv::intrusive_ptr<Style>& style() const noexcept {
+	[[nodiscard]] constexpr inline const libv::intrusive2_ptr<Style>& style() const noexcept {
 		return style_;
 	}
 

@@ -60,6 +60,7 @@ libv.ui.style: Verify that style change in child causes restyle in properties st
 libv.ui.SLC: Implement SLC - Static Layout Composition
 libv.ui.SLC: Document node function behaviours
 libv.ui: Rename scroll bar to slider
+libv.ui: style intrusive_ptr -> intrusive2_ptr
 
 
 
@@ -73,6 +74,13 @@ libv.ui: Rename scroll bar to slider
 
 
 
+libv.ui: rename slider value_min and value_max to value_low and value_high
+
+
+
+libv.ui: UI normalize contexts
+libv.ui: Expose nexus from a context
+libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
 
 
 
@@ -80,6 +88,14 @@ libv.ui: Rename scroll bar to slider
 
 
 libv.ui: Scroll pane
+		slider min - max - range values
+			might be layout issue
+		mouse scroll event
+		mouse scroll N line
+		content background is incorrect, bc content size in incorrect
+			might be layout (-1) issue
+	libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
+
 
 libv.ui: Layout env size -1 support, everywhere... oh fork...
 	limit, parent -> 2 seperate size for layout2 env
@@ -92,16 +108,8 @@ libv.ui: Layout env size -1 support, everywhere... oh fork...
 
 
 
-libv.ui: UI normalize contexts
 libv.ui: UI nexus, accept injected
-libv.ui: Expose nexus from a context
 libv.ui: Kill event_hub in favor of exposed nexus
-libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
-	style intrusive_ptr -> intrusive2_ptr
-
-
-libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
-
 
 libv.ui.SLC: Add anchor support
 libv.ui.SLC: Add alignment support
@@ -125,23 +133,19 @@ libv.ui: scroll_area only the "scroll pane" area without scroll bar
 	libv.ui: container in scroll area, nested rendering alters clipping and control
 	libv.ui: scroll area in scroll area, nested rendering alters clipping and control
 
+	libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
+	libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
+
 	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
 			component bounds
 			clip bounds
+			| texture: id, layer, mode, bounds
 
 	problem: composition of components to create complex components
 		issue: create/attach/foreach/traverse/etc function implementations
 		issue: pollutes component hierarchy
 		issue: nested properties
 		issue: scroll area size propagation: if content is 50% area has to be set to 50% and content to 100%, so the size rules are messed up | would be nice to not deal with this issue, but transparent wrapping
-
-	ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
-
-	ideas and notes
-		new component memory models allows unlimited templates
-		component decorator
-		component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
-
 
 libv.ui: scroll_pane = client area + scroll bars
 	libv.ui: clipping vertex shader (with on/off)
@@ -153,26 +157,24 @@ libv.ui: scroll_pane = client area + scroll bars
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 	libv.ui: mouse remapping regions and/or dimension and/or hubs to handle scroll panes and windows
 
-libv.ui: rename slider value_min and value_max to value_low and value_high
-libv.ui: create a real scroll_bar = slider + buttons
-libv.ui: Add support Nested-Nested-Styles for real Scroll bars in a scroll pane
+libv.ui: Create a real scroll_bar = slider + buttons
 
+libv.ui: Improve clipping
+	libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
+	libv.ui: Clip with stencil:
+			ui init
+				glEnable(GL_STENCIL_TEST);
+				glStencilMask(0xFF);
 
-libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
-libv.ui: Clip with stencil:
-		ui init
-			glEnable(GL_STENCIL_TEST);
-			glStencilMask(0xFF);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+			vertex only pass: GL_INCR the stencil on the clip region
 
-		glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-		vertex only pass: GL_INCR the stencil on the clip region
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+			glStencilFunc(GL_GEQUAL, clipDepth++, 0xFF)
+			render every child
 
-		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		glStencilFunc(GL_GEQUAL, clipDepth++, 0xFF)
-		render every child
-
-		glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-		vertex only pass: GL_DECR the stencil on the clip region
+			glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
+			vertex only pass: GL_DECR the stencil on the clip region
 
 
 -------------------------------------------------------------------------------------------------
@@ -399,8 +401,6 @@ libv.ui: set_clear_color (?) | no need, client could use a full background any t
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 libv.ui: implement base_line alignment: most likely will need a vec2 get_base_line() function
-libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
-libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
 
 libv.ui: observation: clip and scroll are two orthogonal features
 		general concept: "floating" component that effects render, mouse, (layout)

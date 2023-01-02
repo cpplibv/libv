@@ -6,7 +6,7 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/utility/function_ref.hpp>
-#include <libv/utility/memory/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/type_key.hpp>
 // std
 #include <filesystem>
@@ -81,7 +81,7 @@ public:
 	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
 	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
 	[[nodiscard]] bool texture2D_exists(const std::filesystem::path& path);
-	[[nodiscard]] libv::intrusive_ptr<Style> style(const std::string_view style_name);
+	[[nodiscard]] libv::intrusive2_ptr<Style> style(const std::string_view style_name);
 
 	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string_view name);
 	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);

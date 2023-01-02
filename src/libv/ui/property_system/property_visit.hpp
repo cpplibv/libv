@@ -35,7 +35,7 @@ template <typename F>
 void visitProperty(const PropertyDynamic& property, F&& func) {
 	if (const auto* p = std::any_cast<bool>(&property)) return func(*p);
 	if (const auto* p = std::any_cast<float>(&property)) return func(*p);
-	if (const auto* p = std::any_cast<Style_view>(&property)) return func(*p);
+	// if (const auto* p = std::any_cast<Style_view>(&property)) return func(*p);
 
 	if (const auto* p = std::any_cast<AlignHorizontal>(&property)) return func(*p);
 	if (const auto* p = std::any_cast<AlignVertical>(&property)) return func(*p);

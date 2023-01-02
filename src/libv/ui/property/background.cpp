@@ -19,37 +19,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseBackground {
-	int32_t ref_count = 0;
-	friend void intrusive_ptr_add_ref(BaseBackground*);
-	friend void intrusive_ptr_release(BaseBackground*);
-
-//public:
-//	static libv::intrusive_ptr<BaseBackground> parse_string(std::string_view);
-//	static libv::intrusive_ptr<BaseBackground> parse_lua(const sol::object& object);
-//	static Component create_edit_ui();
-
-public:
-	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
-	[[nodiscard]] virtual std::string to_string() const = 0;
-	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
-	[[nodiscard]] virtual bool equal_to(const BaseBackground& other) const noexcept = 0;
-
-public:
-	virtual ~BaseBackground() = default;
-};
-
-void intrusive_ptr_add_ref(BaseBackground* var) {
-	++var->ref_count;
-}
-
-void intrusive_ptr_release(BaseBackground* var) {
-	if (--var->ref_count == 0)
-		delete var;
-}
-
-// =================================================================================================
-
 class BackgroundNone : public BaseBackground {
 private:
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
@@ -635,7 +604,7 @@ private:
 // =================================================================================================
 
 /// BackgroundNone has only a single instance that is shared for all defaults and the 'none' itself
-const auto global_shared_none = libv::make_intrusive<BackgroundNone>();
+const auto global_shared_none = libv::make_intrusive2_ref<BackgroundNone>();
 
 Background::Background() noexcept :
 	fragment(global_shared_none) {
@@ -647,23 +616,6 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 	fragment->render(r, pos, size, component);
 }
 
-std::string Background::to_string() const {
-	return fragment->to_string();
-}
-
-libv::vec2i Background::size() const noexcept {
-	return fragment->size();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-[[nodiscard]] bool operator==(const Background& lhs, const Background& rhs) noexcept {
-	if (typeid(*lhs.fragment) != typeid(*rhs.fragment))
-		return false;
-
-	return lhs.fragment->equal_to(*rhs.fragment);
-}
-
 // -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] Background Background::none() {
@@ -671,51 +623,51 @@ libv::vec2i Background::size() const noexcept {
 }
 
 [[nodiscard]] Background Background::color(Color color) {
-	return Background{libv::make_intrusive<BackgroundColor>(color, current_thread_context().shaderQuad())};
+	return Background{libv::make_intrusive2_ref<BackgroundColor>(color, current_thread_context().shaderQuad())};
 }
 
 [[nodiscard]] Background Background::color(Color color, ShaderQuad_view shader) {
-	return Background{libv::make_intrusive<BackgroundColor>(color, std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundColor>(color, std::move(shader))};
 }
 
 [[nodiscard]] Background Background::texture(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundTexture>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundTexture>(color, std::move(texture), current_thread_context().shaderImage())};
 }
 
 [[nodiscard]] Background Background::texture(Color color, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundTexture>(color, std::move(texture), std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundTexture>(color, std::move(texture), std::move(shader))};
 }
 
 [[nodiscard]] Background Background::border(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundBorder>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundBorder>(color, std::move(texture), current_thread_context().shaderImage())};
 }
 
 [[nodiscard]] Background Background::border(Color color, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundBorder>(color, std::move(texture), std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundBorder>(color, std::move(texture), std::move(shader))};
 }
 
 [[nodiscard]] Background Background::pattern(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundPattern>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundPattern>(color, std::move(texture), current_thread_context().shaderImage())};
 }
 
 [[nodiscard]] Background Background::pattern(Color color, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundPattern>(color, std::move(texture), std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundPattern>(color, std::move(texture), std::move(shader))};
 }
 
 [[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), current_thread_context().shaderImage())};
 }
 
 [[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), std::move(shader))};
 }
 
 [[nodiscard]] Background Background::border_padding_pattern(Color color_border, Color color_pattern, Padding inner_padding, Padding border_extent, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), current_thread_context().shaderImage())};
 }
 
 [[nodiscard]] Background Background::border_padding_pattern(Color color_border, Color color_pattern, Padding inner_padding, Padding border_extent, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), std::move(shader))};
+	return Background{libv::make_intrusive2_ref<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), std::move(shader))};
 }
 
 //[[nodiscard]] static Background Background::gradient_linear(std::vector<GradientPoint> points) {

@@ -63,9 +63,9 @@ struct Theme {
 // -------------------------------------------------------------------------------------------------
 
 //struct StyleCenter {
-//	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+//	std::unordered_map<std::string, libv::intrusive2_ptr<Style>> styles;
 //
-//	libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
+//	libv::intrusive2_ptr<Style> ContextUI::style(const std::string_view style_name) {
 //		// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
 //		const auto it = self->styles.find(std::string(style_name));
 //		if (it != self->styles.end())

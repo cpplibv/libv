@@ -6,7 +6,7 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/math/vec_fwd.hpp>
-#include <libv/utility/memory/intrusive_ptr.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 // pro
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/padding.hpp>
@@ -22,28 +22,47 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseBackground;
-void intrusive_ptr_add_ref(BaseBackground*);
-void intrusive_ptr_release(BaseBackground*);
+class BaseBackground : public libv::ref_count_base<BaseBackground> {
+	friend libv::ref_count_access;
+
+public:
+	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
+	[[nodiscard]] virtual std::string to_string() const = 0;
+	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
+	[[nodiscard]] virtual bool equal_to(const BaseBackground& other) const noexcept = 0;
+//	virtual Component create_edit_ui();
+
+public:
+	virtual ~BaseBackground() = default;
+};
 
 // -------------------------------------------------------------------------------------------------
 
 class Background {
 private:
-	libv::intrusive_ptr<BaseBackground> fragment;
+	libv::intrusive2_ref<BaseBackground> fragment;
 
 public:
 	explicit Background() noexcept; // Uses none
-	explicit inline Background(intrusive_ptr<libv::ui::BaseBackground> fragment) noexcept : fragment(std::move(fragment)) {}
+	explicit inline Background(libv::intrusive2_ref<libv::ui::BaseBackground> fragment) noexcept : fragment(std::move(fragment)) {}
 
 public:
 	void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const;
-	[[nodiscard]] std::string to_string() const;
-	[[nodiscard]] libv::vec2i size() const noexcept;
+
+	[[nodiscard]] inline std::string to_string() const {
+		return fragment->to_string();
+	}
+	[[nodiscard]] inline libv::vec2i size() const noexcept {
+		return fragment->size();
+	}
 
 public:
-//	[[nodiscard]] friend bool operator==(const Background& lhs, const Background& rhs) noexcept;
-	friend bool operator==(const Background& lhs, const Background& rhs) noexcept;
+	[[nodiscard]] friend bool operator==(const Background& lhs, const Background& rhs) noexcept {
+		if (typeid(*lhs.fragment) != typeid(*rhs.fragment))
+			return false;
+
+		return lhs.fragment->equal_to(*rhs.fragment);
+	}
 	[[nodiscard]] friend inline bool operator!=(const Background& lhs, const Background& rhs) noexcept {
 		return !(lhs == rhs);
 	}

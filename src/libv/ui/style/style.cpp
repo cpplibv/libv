@@ -50,7 +50,7 @@ bool Style::detect_cycle(const Style& node, const Style& leaf) {
 	return false;
 }
 
-void Style::inherit(const libv::intrusive_ref<Style>& base) {
+void Style::inherit(const libv::intrusive2_ref<Style>& base) {
 	bool cyclic_dependency = detect_cycle(*base, *this);
 	if (cyclic_dependency) {
 		log_ui.error("Cyclic dependency found in style {} when attempting to inherit from {}. Requested inheritance is ignored", style_name, base->style_name);
@@ -118,17 +118,6 @@ void Style::clear() {
 
 	properties.clear();
 	markAsDirty();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void intrusive_ptr_add_ref(Style* style) {
-	++style->ref_count;
-}
-
-void intrusive_ptr_release(Style* style) {
-	if (--style->ref_count == 0)
-		delete style;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 #include <boost/container/flat_set.hpp>
 // libv
 #include <libv/utility/concat.hpp>
-#include <libv/utility/memory/intrusive_ref.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/memory/optional_ref.hpp>
 // std
@@ -28,7 +28,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Style {
+class Style : public libv::ref_count_base<Style> {
+	friend libv::ref_count_access;
+
+private:
 	struct PropertyEntry {
 		StyleState state_mask = StyleState::none;
 		StyleState state_value = StyleState::none;
@@ -36,21 +39,11 @@ class Style {
 	};
 
 private:
-	int32_t ref_count = 0;
-	friend void intrusive_ptr_add_ref(Style*);
-	friend void intrusive_ptr_release(Style*);
-
-private:
 	bool dirty_ = false; // Fits into padding
 
 	boost::container::flat_map<std::string, std::vector<PropertyEntry>, std::less<>> properties;
-	std::vector<libv::intrusive_ref<Style>> bases;
+	std::vector<libv::intrusive2_ref<Style>> bases;
 	boost::container::flat_set<libv::observer_ref<Style>> children;
-
-	// boost::container::flat_map<std::string, libv::intrusive_ref<Style>> nested_styles;
-
-	// boost::container::flat_map<std::string,
-	// 		boost::container::flat_map<std::string, std::vector<PropertyEntry>, std::less<>>> nested_properties;
 
 public:
 	const std::string style_name;
@@ -74,7 +67,7 @@ public:
 	//	void inherit_or_throw(const libv::intrusive_ref<Style>& parent);
 	//	bool try_inherit(const libv::intrusive_ref<Style>& parent);
 	//	bool inherit_optional(const libv::intrusive_ref<Style>& parent);
-	void inherit(const libv::intrusive_ref<Style>& parent);
+	void inherit(const libv::intrusive2_ref<Style>& parent);
 
 public:
 	void set(StyleState state_mask, StyleState state_value, const std::string& property, PropertyDynamic value);

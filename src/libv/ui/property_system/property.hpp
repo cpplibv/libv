@@ -2,23 +2,18 @@
 
 #pragma once
 
-// libv
-#include <libv/utility/memory/intrusive_ptr.hpp>
 // std
 #include <any>
 #include <string_view>
 #include <utility>
 // pro
 #include <libv/ui/component_system/flag.hpp>
-#include <libv/ui/style/style_fwd.hpp>
 
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-using Style_view = libv::intrusive_ptr<Style>;
 
 using PropertyDynamic = std::any;
 

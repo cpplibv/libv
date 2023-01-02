@@ -356,7 +356,7 @@ void CoreComponent::markInvalidLayout(bool invalidate_layout1, bool invalidate_p
 	}
 }
 
-void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
+void CoreComponent::style(libv::intrusive2_ptr<Style> newStyle) noexcept {
 	style_ = std::move(newStyle);
 	flagAuto(Flag::pendingStyle);
 }

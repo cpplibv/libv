@@ -50,7 +50,7 @@ public:
 	std::shared_ptr<Texture2D> fallback_texture2D;
 	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
 
-	std::unordered_map<std::string, libv::intrusive_ptr<Style>, libv::hash_string, std::equal_to<>> styles;
+	std::unordered_map<std::string, libv::intrusive2_ptr<Style>, libv::hash_string, std::equal_to<>> styles;
 
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
 //	std::unordered_map<TypeInfoRef, std::weak_ptr<Shader>, TypeInfoRefHasher, TypeInfoRefEqualTo> cache_typed_shader;
@@ -343,12 +343,12 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	return std::filesystem::exists(target, ignore_ec);
 }
 
-libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
+libv::intrusive2_ptr<Style> ContextUI::style(const std::string_view style_name) {
 	const auto it = self->styles.find(style_name);
 	if (it != self->styles.end())
 		return it->second;
 
-	const auto result = self->styles.emplace(style_name, libv::make_intrusive<Style>(std::string(style_name))).first->second;
+	const auto result = self->styles.emplace(style_name, libv::make_intrusive2_ptr<Style>(std::string(style_name))).first->second;
 	const auto lastDot = style_name.rfind('.');
 	const auto lastGrt = style_name.rfind('>');
 

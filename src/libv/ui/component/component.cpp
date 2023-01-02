@@ -187,7 +187,7 @@ void Component::markRemove() {
 	ptr_->markRemove();
 }
 
-//void Component::style(libv::intrusive_ptr<Style> style) noexcept {
+//void Component::style(libv::intrusive2_ptr<Style> style) noexcept {
 //	ptr_->style(std::move(style));
 //}
 
