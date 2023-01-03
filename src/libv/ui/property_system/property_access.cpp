@@ -7,6 +7,7 @@
 // pro
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/component_system/core_ptr.hpp>
+#include <libv/ui/context/context_style.hpp>
 
 
 namespace libv {
@@ -20,7 +21,7 @@ void assign_nested_style(CoreComponent& component, std::string_view nesting_name
 
 	// I don't really like this lookup/assignment solution, but it will do for now
 	component.style(
-		component.context().style(
+		component.ui().style(
 			libv::concat(component.parent()->style()->style_name, ">", nesting_name)
 		)
 	);

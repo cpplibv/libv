@@ -7,7 +7,7 @@
 // std
 #include <iostream>
 // pro
-#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/lua/script_style.hpp>
 #include <libv/ui/property_system/property_visit.hpp>
 #include <libv/ui/style/style.hpp>
@@ -62,7 +62,7 @@ int main(int, char**) {
 				});
 			});
 		};
-		ui.context().foreach_style(f);
+		ui.style().foreach_style(f);
 	};
 
 	run(42);

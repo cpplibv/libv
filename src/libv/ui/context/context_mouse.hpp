@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
@@ -17,10 +19,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreComponent;
+class ImplContextMouse;
 
 class ContextMouse {
-	std::unique_ptr<class ImplContextMouse> self;
+	std::unique_ptr<ImplContextMouse> self;
 
 public:
 	ContextMouse();

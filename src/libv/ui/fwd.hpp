@@ -9,7 +9,6 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class UI;
-
 class Settings;
 
 class Component;
@@ -21,9 +20,11 @@ class ContextLayout1;
 class ContextLayout2;
 class ContextMouse;
 class ContextRender;
+class ContextResource;
 class ContextState;
-class StyleAccess; //class ContextStyle;
+class ContextStyle;
 class ContextUI;
+class StyleAccess;
 
 class EventHub;
 

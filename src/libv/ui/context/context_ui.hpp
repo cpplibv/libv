@@ -4,18 +4,10 @@
 
 // fwd
 #include <libv/ui/fwd.hpp>
-// libv
-#include <libv/utility/function_ref.hpp>
-#include <libv/utility/memory/intrusive2_ptr.hpp>
-#include <libv/utility/type_key.hpp>
 // std
-#include <filesystem>
 #include <memory>
-#include <string_view>
 // pro
-#include <libv/ui/context/context_event.hpp>
-#include <libv/ui/settings.hpp>
-#include <libv/ui/style/style_fwd.hpp>
+#include <libv/ui/context/context_event.hpp> // Because of broadcast
 
 
 namespace libv {
@@ -23,35 +15,30 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class ImplContextUI;
+
 class ContextUI {
-	// TODO P1: The Uniform UI Resource System:
-	//			- define  - tell the system in any way you can what resource are you looking for
-	//			- resolve - normalize the resource request
-	//			- lookup  - find the resource
-	//			- cache   - cache the resource
-	//			- provide - yield the result
-	//			+ tracking
-	//			+ preprocess/include/recurse
-	// TODO P1: Implement higher level cache functions:
-	//			auto __ = cacheResolve(cacheFile, filePath);
-	//			auto __ = cacheLookup(cacheFile, filePath);
-	//			auto __ = cacheStore(cacheFile, filePath, filePath);
-	// TODO P5: cleanup weak_ptr references with intrusive ptrs
-	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
+public:
+	Settings& settings;
+
+	ContextEvent& event;
+	ContextMouse& mouse;
+	ContextState& state;
+	ContextResource& resource;
+	// ContextRender& render; // No need to expose render context for now
+	ContextStyle& style;
 
 private:
-	std::unique_ptr<class ImplContextUI> self;
-
-	UI& ui;
+	std::unique_ptr<ImplContextUI> self;
 
 public:
-	ContextEvent& event;
-	ContextState& state;
-	ContextMouse& mouse;
-	Settings settings;
-
-public:
-	explicit ContextUI(UI& ui, ContextState& state, Settings settings = Settings());
+	explicit ContextUI(UI& ui,
+			Settings& settings,
+			ContextEvent& event,
+			ContextMouse& mouse,
+			ContextState& state,
+			ContextResource& resource,
+			ContextStyle& style);
 	~ContextUI();
 
 	ContextUI(const ContextUI&) = delete;
@@ -60,40 +47,21 @@ public:
 	ContextUI& operator=(ContextUI&&) = delete;
 
 public:
+	// TODO P4: Move to the event context
 	void reentry_lock(const void* anchor);
 	void reentry_unlock(const void* anchor) noexcept;
 	[[nodiscard]] bool reentry_test(const void* anchor) const noexcept;
 
 public:
-	[[nodiscard]] bool isAnyStyleDirty() const noexcept;
-	void clearEveryStyleDirty() noexcept;
-	void foreach_style(libv::function_ref<void(std::string_view name, Style& style)> func);
-
-public:
+	// TODO P4: Move to a new focus context
 	void focus(CoreComponent& component);
 	void detachFocused(CoreComponent& component);
 	void detachFocusLinked(CoreComponent& component);
 
 public:
-	template <typename Event> inline void broadcast(const Event& event);
-
-public:
-	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
-	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
-	[[nodiscard]] bool texture2D_exists(const std::filesystem::path& path);
-	[[nodiscard]] libv::intrusive2_ptr<Style> style(const std::string_view style_name);
-
-	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
-
-public:
-	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont();
-	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage();
-	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad();
-	[[nodiscard]] std::shared_ptr<Font2D> fallbackFont() const;
-	[[nodiscard]] std::shared_ptr<Texture2D> fallbackTexture2D() const;
+	// TODO P4: Move to the event context
+	template <typename Event>
+	inline void broadcast(const Event& event);
 };
 
 // -------------------------------------------------------------------------------------------------

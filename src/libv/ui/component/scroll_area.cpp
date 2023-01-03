@@ -358,7 +358,7 @@ const Component& ScrollArea::content() const noexcept {
 void ScrollArea::area_position(libv::vec2f value) noexcept {
 	self().area_position = value;
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	self().context().mouse.update_region(self(), libv::vec::round(value));
+	ui().mouse.update_region(self(), libv::vec::round(value));
 }
 
 [[nodiscard]] libv::vec2f ScrollArea::area_position() const noexcept {

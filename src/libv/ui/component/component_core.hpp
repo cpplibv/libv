@@ -73,7 +73,7 @@ private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
 	libv::observer_ref<CoreComponent> parent_ = libv::make_observer_ref(this);
 	/// Never null, points to the associated context
-	libv::observer_ref<ContextUI> context_;
+	libv::observer_ref<ContextUI> ui_;
 	/// Null if no style is assigned to the component
 	libv::intrusive2_ptr<Style> style_;
 
@@ -97,8 +97,8 @@ public:
 
 	[[nodiscard]] std::string path() const;
 
-	[[nodiscard]] inline ContextUI& context() const noexcept {
-		return *context_;
+	[[nodiscard]] inline ContextUI& ui() const noexcept {
+		return *ui_;
 	}
 	[[nodiscard]] inline bool isAttached() const noexcept {
 		return parent_ != this;
@@ -371,7 +371,7 @@ public:
 template <typename Event>
 inline void CoreComponent::fire(const Event& event) {
 	if (flags.match_any(Flag::signal))
-		context().event.nexus.broadcast_channel<Event>(this, event);
+		ui().event.nexus.broadcast_channel<Event>(this, event);
 }
 
 // -------------------------------------------------------------------------------------------------

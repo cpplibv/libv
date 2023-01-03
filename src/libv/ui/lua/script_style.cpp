@@ -20,7 +20,8 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/context/context_resource.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/parse/parse_anchor.hpp>
@@ -382,7 +383,7 @@ std::optional<Texture2D_view> convert_texture(UI& ui, const sol::object& object)
 	if (object.get_type() != sol::type::string)
 		return std::nullopt;
 
-	return ui.context().texture2D(object.as<std::string_view>());
+	return ui.resource().texture2D(object.as<std::string_view>());
 }
 
 template <typename F, typename T>
@@ -436,28 +437,28 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 		//	texture            (Color color, Texture2D_view texture)
 		if (const auto value = chop_prefix(str, "texture:")) {
 			// TODO P2: Handle not found resource?
-			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D(*value));
 		}
 
 		//	texture            (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	border             (Color color, Texture2D_view texture)
 		if (const auto value = chop_prefix(str, "border:")) {
 			// TODO P2: Handle not found resource?
-			return libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+			return libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D(*value));
 		}
 
 		//	border             (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	pattern            (Color color, Texture2D_view texture)
 		if (const auto value = chop_prefix(str, "pattern:")) {
 			// TODO P2: Handle not found resource?
-			return libv::ui::Background::pattern({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+			return libv::ui::Background::pattern({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D(*value));
 		}
 
 		//	pattern            (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	padding_pattern    (Color color, Padding inner_padding, Texture2D_view texture)
 		if (const auto value = chop_prefix(str, "padding_pattern:")) {
 			// TODO P2: Handle not found resource?
-			return libv::ui::Background::padding_pattern({1.f, 1.f, 1.f, 1.f}, {0, 0, 0, 0}, ui.context().texture2D(*value));
+			return libv::ui::Background::padding_pattern({1.f, 1.f, 1.f, 1.f}, {0, 0, 0, 0}, ui.resource().texture2D(*value));
 		}
 		//	padding_pattern    (Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader)
 		//	gradient_linear    (std::vector<GradientPoint> points)
@@ -469,8 +470,8 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			return libv::ui::Background::color(*color);
 
 		// Last resort 2/2: try parse it as texture
-		if (ui.context().texture2D_exists(str))
-			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(str));
+		if (ui.resource().texture2D_exists(str))
+			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D(str));
 
 		return std::nullopt;
 	}
@@ -602,7 +603,7 @@ std::optional<PropertyDynamic> convert_font(UI& ui, const sol::object& object) {
 	if (object.get_type() != sol::type::string)
 		return std::nullopt;
 
-	return PropertyDynamic{ui.context().font(object.as<std::string_view>())};
+	return PropertyDynamic{ui.resource().font(object.as<std::string_view>())};
 }
 
 using load_fn = std::function<std::optional<PropertyDynamic>(UI&, const sol::object&)>;
@@ -809,7 +810,7 @@ public:
 
 				// Process sub-table as a nested property set
 				const auto nest_str = nest_name.as<std::string_view>();
-				const auto nested_style_ip = ui.context().style(libv::concat(style.style_name, ">", nest_str));
+				const auto nested_style_ip = ui.style().style(libv::concat(style.style_name, ">", nest_str));
 				nested_style_ip->clear();
 
 				load_style_table(*nested_style_ip, sub_table);
@@ -856,7 +857,7 @@ public:
 	//	});
 
 		ui_table.set_function("style", [this](const std::string_view style_name) mutable {
-			auto style_ip = ui.context().style(style_name);
+			auto style_ip = ui.style().style(style_name);
 			return [style_ip = std::move(style_ip), this](const sol::table& table) {
 				style_ip->clear();
 

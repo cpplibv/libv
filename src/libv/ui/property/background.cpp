@@ -9,6 +9,7 @@
 // pro
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/resource/texture_2D.hpp>
@@ -623,7 +624,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::color(Color color) {
-	return Background{libv::make_intrusive2_ref<BackgroundColor>(color, current_thread_context().shaderQuad())};
+	return Background{libv::make_intrusive2_ref<BackgroundColor>(color, current_thread_context().resource.shaderQuad())};
 }
 
 [[nodiscard]] Background Background::color(Color color, ShaderQuad_view shader) {
@@ -631,7 +632,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::texture(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive2_ref<BackgroundTexture>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundTexture>(color, std::move(texture), current_thread_context().resource.shaderImage())};
 }
 
 [[nodiscard]] Background Background::texture(Color color, Texture2D_view texture, ShaderImage_view shader) {
@@ -639,7 +640,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::border(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive2_ref<BackgroundBorder>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundBorder>(color, std::move(texture), current_thread_context().resource.shaderImage())};
 }
 
 [[nodiscard]] Background Background::border(Color color, Texture2D_view texture, ShaderImage_view shader) {
@@ -647,7 +648,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::pattern(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive2_ref<BackgroundPattern>(color, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundPattern>(color, std::move(texture), current_thread_context().resource.shaderImage())};
 }
 
 [[nodiscard]] Background Background::pattern(Color color, Texture2D_view texture, ShaderImage_view shader) {
@@ -655,7 +656,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture) {
-	return Background{libv::make_intrusive2_ref<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), current_thread_context().resource.shaderImage())};
 }
 
 [[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader) {
@@ -663,7 +664,7 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 }
 
 [[nodiscard]] Background Background::border_padding_pattern(Color color_border, Color color_pattern, Padding inner_padding, Padding border_extent, Texture2D_view texture) {
-	return Background{libv::make_intrusive2_ref<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), current_thread_context().shaderImage())};
+	return Background{libv::make_intrusive2_ref<BackgroundBorderPaddingPattern>(color_border, color_pattern, inner_padding, border_extent, std::move(texture), current_thread_context().resource.shaderImage())};
 }
 
 [[nodiscard]] Background Background::border_padding_pattern(Color color_border, Color color_pattern, Padding inner_padding, Padding border_extent, Texture2D_view texture, ShaderImage_view shader) {

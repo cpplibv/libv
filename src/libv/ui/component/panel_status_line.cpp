@@ -33,7 +33,7 @@ public:
 
 public:
 	virtual void doUpdate() override {
-		const auto time_of_frame = context().state.time_frame();
+		const auto time_of_frame = ui().state.time_frame();
 
 		libv::erase_if_unstable(entries, [&](LogEntry& entry) {
 			if (entry.time_of_death != time_point{} && entry.time_of_death < time_of_frame) {
@@ -73,11 +73,11 @@ bool PanelStatusLine::castable(libv::ui::core_ptr core) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void PanelStatusLine::add(EntryID id, Component component, time_duration lifetime) {
-	add(id, std::move(component), self().context().state.time_frame() + lifetime);
+	add(id, std::move(component), ui().state.time_frame() + lifetime);
 }
 
 void PanelStatusLine::add(EntryID id, Component component, time_point time_of_death) {
-	const auto time_of_frame = self().context().state.time_frame();
+	const auto time_of_frame = ui().state.time_frame();
 	const auto already_dead = time_of_death == time_point{} ? false : time_of_death < time_of_frame;
 
 	const auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);

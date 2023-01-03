@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
@@ -65,6 +67,9 @@ public:
 	[[nodiscard]] constexpr inline bool operator!() const noexcept {
 		return ptr_ == nullptr;
 	}
+
+public:
+	[[nodiscard]] ContextUI& ui() const noexcept;
 
 public:
 	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {

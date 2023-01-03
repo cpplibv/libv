@@ -30,6 +30,7 @@
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/ui/component_system/attach_state.hpp>
 #include <libv/ui/context/context_mouse.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/settings.hpp>
@@ -374,7 +375,7 @@ private:
 
 		button0.text("Button 0!");
 		button1.text("Button 1!");
-		button1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+		button1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("separator_bar_256x16.png")));
 
 		button2.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
 		button2.text("Button 2!");
@@ -389,24 +390,24 @@ private:
 		button4.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
 		button4.text("Button 4!");
 		button4.size(libv::ui::parse_size_or_throw("D, D"));
-		button4.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+		button4.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("separator_bar_256x16.png")));
 
 		label.text("Label");
 		label.align_horizontal(libv::ui::AlignHorizontal::center);
 		label.align_vertical(libv::ui::AlignVertical::center);
 
 		label_image1.text("Label image");
-		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.0f}, ui.context().texture2D("separator_bar_256x16.png")));
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.0f}, ui.resource().texture2D("separator_bar_256x16.png")));
 
 		label_image2.text("Label image2");
-		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 0.5f}, ui.context().texture2D("separator_bar_256x16.png")));
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 0.5f}, ui.resource().texture2D("separator_bar_256x16.png")));
 
-		image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
+		image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
-		input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
-		input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
-		input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
+		input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
+		input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
 
 		input_field0.text("Input field 0");
 		input_field0.event().change([](auto& component, const auto&) {
@@ -445,7 +446,7 @@ private:
 		});
 		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
 
-		stretch.background(libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("stretch_border.png")));
+		stretch.background(libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("stretch_border.png")));
 
 		quad.background(libv::ui::Background::color({.8f, .5f, .5f, 1.f}));
 		quad.anchor(libv::ui::Anchor::center_center);
@@ -454,7 +455,7 @@ private:
 		panel_line_scrolled.orientation(libv::ui::Orientation::down);
 		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
 
-		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_x.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
 		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
 		scroll_bar_x.orientation(libv::ui::Orientation::right);
 		scroll_bar_x.value_low(-500);
@@ -465,7 +466,7 @@ private:
 			scroll_area_outer.area_position({static_cast<float>(component.value()), scroll_area_outer.area_position().y});
 		});
 
-		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_y.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
 		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
 		scroll_bar_y.orientation(libv::ui::Orientation::up);
 		scroll_bar_y.value_low(-1000);
@@ -476,7 +477,7 @@ private:
 			scroll_area_outer.area_position({scroll_area_outer.area_position().x, static_cast<float>(component.value())});
 		});
 
-		scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_ix.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
 		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
 		scroll_bar_ix.orientation(libv::ui::Orientation::right);
 		scroll_bar_ix.value_low(-500);
@@ -487,7 +488,7 @@ private:
 			scroll_area_inner.area_position({static_cast<float>(component.value()), scroll_area_inner.area_position().y});
 		});
 
-		scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_iy.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
 		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
 		scroll_bar_iy.orientation(libv::ui::Orientation::up);
 		scroll_bar_iy.value_low(-1000);
@@ -860,9 +861,9 @@ public:
 //		label2->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 //
 //		quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));
-//		stretch0->image(ui.context().texture2D("stretch_border.png"));
+//		stretch0->image(ui.resource().texture2D("stretch_border.png"));
 //		stretch0->color(libv::parse::parse_color_or_throw("rgba(183, 190, 135, 100%)"));
-//		image0->image(ui.context().texture2D("atlas_ui_slate.png"));
+//		image0->image(ui.resource().texture2D("atlas_ui_slate.png"));
 //		image0->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 //
 //		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;

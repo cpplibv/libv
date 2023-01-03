@@ -6,7 +6,7 @@
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/noise/white.hpp>
-#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/ui.hpp>
@@ -627,7 +627,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 
 Renderer::Renderer(libv::ui::UI& ui) {
 	resource_context.loader.shader.attach_libv_ui_hub(ui.event_hub());
-	text.font = ui.context().font("consola.ttf");
+	text.font = ui.resource().font("consola.ttf");
 }
 
 void Renderer::prepare_for_render(libv::glr::Queue& glr) {

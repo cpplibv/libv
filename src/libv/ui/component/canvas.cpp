@@ -66,7 +66,7 @@ void CoreCanvasAdaptor::doUpdate() {
 	if (not canvas_object)
 		return;
 
-	canvas_object->update(context().state.time_delta());
+	canvas_object->update(ui().state.time_delta());
 }
 
 void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
@@ -74,7 +74,7 @@ void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
 		return;
 
 	// NOTE: canvas_position is used for view porting so it has to account for global position
-	const auto global_pos = context().mouse.get_global_position(*this);
+	const auto global_pos = ui().mouse.get_global_position(*this);
 
 	canvas_object->canvas_position = global_pos + padding_LB();
 	canvas_object->canvas_size = xy(environment.size) - padding_size();

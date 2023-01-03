@@ -186,7 +186,7 @@ void CoreOverlayZoom::update() {
 }
 
 void CoreOverlayZoom::update_cursor() {
-	const auto mouse_position = context().state.mouse_position();
+	const auto mouse_position = ui().state.mouse_position();
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
 
@@ -226,7 +226,7 @@ void CoreOverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 	if (!control_)
 		return;
 
-	if (context().state.mouse_pressed(libv::input::MouseButton::Left)) {
+	if (ui().state.mouse_pressed(libv::input::MouseButton::Left)) {
 		displayPosition -= event.mouse_movement / zoom_;
 		update();
 	}
@@ -248,7 +248,7 @@ void CoreOverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 	//	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 	//	displayPosition += fboSize / old_zoom / 2.0f - fboSize / new_zoom / 2.0f;
 	// Zoom to cursor:
-	displayPosition += context().state.mouse_position() / old_zoom - context().state.mouse_position() / new_zoom;
+	displayPosition += ui().state.mouse_position() / old_zoom - ui().state.mouse_position() / new_zoom;
 	update();
 
 	event.stop_propagation();
@@ -264,7 +264,7 @@ void CoreOverlayZoom::doAttach() {
 	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
 	// vvv Start of workaround (More below)
 	if (control_)
-		context().mouse.acquire(*this);
+		ui().mouse.acquire(*this);
 	// ^^^ End of workaround
 }
 
@@ -336,23 +336,23 @@ bool OverlayZoom::castable(libv::ui::core_ptr core) noexcept {
 
 void OverlayZoom::control() {
 	self().control_ = true;
-	self().context().broadcast(EventOverlay(true));
+	ui().broadcast(EventOverlay(true));
 	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
 	// vvv Start of workaround (comment / uncomment) (More above)
-	//self().context().mouse.acquire(self());
+	//ui().mouse.acquire(self());
 	// ^^^ Stop of workaround
 }
 
 void OverlayZoom::view() {
 	self().control_ = false;
-	self().context().mouse.release(self());
-	self().context().broadcast(EventOverlay(false));
+	ui().mouse.release(self());
+	ui().broadcast(EventOverlay(false));
 }
 
 void OverlayZoom::disable() {
 	self().control_ = false;
-	self().context().mouse.release(self());
-	self().context().broadcast(EventOverlay(false));
+	ui().mouse.release(self());
+	ui().broadcast(EventOverlay(false));
 }
 
 libv::vec2f OverlayZoom::screen_BL() const {

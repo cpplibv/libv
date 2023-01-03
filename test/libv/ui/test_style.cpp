@@ -26,7 +26,7 @@ TEST_CASE("Style supports set and get property", "[libv.ui]") {
 }
 
 TEST_CASE("Style single inheritance", "[libv.ui]") {
-	auto style_base = libv::make_intrusive<libv::ui::Style>("base");
+	auto style_base = libv::make_intrusive2_ptr<libv::ui::Style>("base");
 	libv::ui::Style style_derived{"derived"};
 	style_derived.inherit(style_base);
 
@@ -53,9 +53,9 @@ TEST_CASE("Style single inheritance", "[libv.ui]") {
 }
 
 TEST_CASE("Style multiple inheritance", "[libv.ui]") {
-	auto style_base_a = libv::make_intrusive<libv::ui::Style>("base-a");
-	auto style_base_b = libv::make_intrusive<libv::ui::Style>("base-b");
-	auto style_derived = libv::make_intrusive<libv::ui::Style>("derived");
+	auto style_base_a = libv::make_intrusive2_ptr<libv::ui::Style>("base-a");
+	auto style_base_b = libv::make_intrusive2_ptr<libv::ui::Style>("base-b");
+	auto style_derived = libv::make_intrusive2_ptr<libv::ui::Style>("derived");
 	style_derived->inherit(style_base_a);
 	style_derived->inherit(style_base_b);
 
@@ -79,9 +79,9 @@ TEST_CASE("Style multiple inheritance", "[libv.ui]") {
 }
 
 TEST_CASE("Style transitive inheritance", "[libv.ui]") {
-	auto style_base = libv::make_intrusive<libv::ui::Style>("base");
-	auto style_middle = libv::make_intrusive<libv::ui::Style>("middle");
-	auto style_derived = libv::make_intrusive<libv::ui::Style>("derived");
+	auto style_base = libv::make_intrusive2_ptr<libv::ui::Style>("base");
+	auto style_middle = libv::make_intrusive2_ptr<libv::ui::Style>("middle");
+	auto style_derived = libv::make_intrusive2_ptr<libv::ui::Style>("derived");
 	style_middle->inherit(style_base);
 	style_derived->inherit(style_middle);
 
@@ -105,10 +105,10 @@ TEST_CASE("Style transitive inheritance", "[libv.ui]") {
 }
 
 TEST_CASE("Style multiple transitive inheritance", "[libv.ui]") {
-	auto style_base_a = libv::make_intrusive<libv::ui::Style>("base-a");
-	auto style_base_b = libv::make_intrusive<libv::ui::Style>("base-b");
-	auto style_middle = libv::make_intrusive<libv::ui::Style>("middle");
-	auto style_derived = libv::make_intrusive<libv::ui::Style>("derived");
+	auto style_base_a = libv::make_intrusive2_ptr<libv::ui::Style>("base-a");
+	auto style_base_b = libv::make_intrusive2_ptr<libv::ui::Style>("base-b");
+	auto style_middle = libv::make_intrusive2_ptr<libv::ui::Style>("middle");
+	auto style_derived = libv::make_intrusive2_ptr<libv::ui::Style>("derived");
 	style_middle->inherit(style_base_a);
 	style_middle->inherit(style_base_b);
 	style_derived->inherit(style_middle);

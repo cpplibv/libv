@@ -14,6 +14,7 @@
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -295,12 +296,12 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 			handler().value(local_value);
 		}
 
-		context().mouse.acquire(*this);
+		ui().mouse.acquire(*this);
 		return event.stop_propagation();
 	}
 
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::release) {
-		context().mouse.release(*this);
+		ui().mouse.release(*this);
 		drag_mode = DragState::idle;
 		return event.stop_propagation();
 	}

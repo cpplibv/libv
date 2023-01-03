@@ -7,6 +7,7 @@
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/property_system/property_access.hpp>
 #include <libv/ui/resource/font_2D.hpp>

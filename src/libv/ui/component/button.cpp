@@ -8,6 +8,7 @@
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>

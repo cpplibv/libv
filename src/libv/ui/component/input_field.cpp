@@ -10,6 +10,7 @@
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp> // Only debug actions
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
@@ -20,6 +21,7 @@
 #include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/resource/shader_font.hpp>
 #include <libv/ui/resource/shader_quad.hpp>
+#include <libv/ui/settings.hpp>
 
 
 namespace libv {
@@ -206,8 +208,8 @@ void CoreInputField::onKey(const EventKey& event) {
 	}
 
 	// TODO P2: libv.ui: better access to modifiers
-	const auto shift = context().state.key_pressed(libv::input::Keycode::ShiftLeft) || context().state.key_pressed(libv::input::Keycode::ShiftRight);
-	const auto ctrl = context().state.key_pressed(libv::input::Keycode::ControlLeft) || context().state.key_pressed(libv::input::Keycode::ControlRight);
+	const auto shift = ui().state.key_pressed(libv::input::Keycode::ShiftLeft) || ui().state.key_pressed(libv::input::Keycode::ShiftRight);
+	const auto ctrl = ui().state.key_pressed(libv::input::Keycode::ControlLeft) || ui().state.key_pressed(libv::input::Keycode::ControlRight);
 
 	// === TEMP ========================================================================================
 
@@ -234,9 +236,9 @@ void CoreInputField::onKey(const EventKey& event) {
 		return handler().align_horizontal(AlignHorizontal::justify_all), event.stop_propagation();
 
 	if (ctrl && event.keycode == libv::input::Keycode::Num6 && event.action == libv::input::Action::press)
-		return handler().font(context().font("Achafexp.ttf")), event.stop_propagation();
+		return handler().font(ui().resource.font("Achafexp.ttf")), event.stop_propagation();
 	if (ctrl && event.keycode == libv::input::Keycode::Num7 && event.action == libv::input::Action::press)
-		return handler().font(context().font("consola.ttf")), event.stop_propagation();
+		return handler().font(ui().resource.font("consola.ttf")), event.stop_propagation();
 
 	if (ctrl && event.keycode == libv::input::Keycode::Num8 && event.action == libv::input::Action::press)
 		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) + 3)), event.stop_propagation();
@@ -390,13 +392,13 @@ void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 //		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	// === TEMP ========================================================================================
-	if (context().state.key_pressed(libv::input::Keycode::F1)) {
+	if (ui().state.key_pressed(libv::input::Keycode::F1)) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position - padding_LB()));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
 	}
-	if (context().state.key_pressed(libv::input::Keycode::F2)) {
+	if (ui().state.key_pressed(libv::input::Keycode::F2)) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -451,14 +453,14 @@ void CoreInputField::doRender(Renderer& r) {
 			text_.font(),
 			property.font_shader());
 
-	const auto caret_flash_iteration = time_mod(r.time_frame() - caretStartTime, context().settings.caret_flash_period);
+	const auto caret_flash_iteration = time_mod(r.time_frame() - caretStartTime, ui().settings.caret_flash_period);
 
-	if (isFocused() && caret_flash_iteration < context().settings.caret_show_period) {
+	if (isFocused() && caret_flash_iteration < ui().settings.caret_show_period) {
 		const auto lineHeight = text_.font()->getLineAdvance(text_.size());
-		const auto max = context().settings.caret_width_max;
-		const auto min = context().settings.caret_width_min;
-		const auto offset = context().settings.caret_width_offset;
-		const auto scale = context().settings.caret_width_scale;
+		const auto max = ui().settings.caret_width_max;
+		const auto min = ui().settings.caret_width_min;
+		const auto offset = ui().settings.caret_width_offset;
+		const auto scale = ui().settings.caret_width_scale;
 		const auto caretWidth = std::floor(std::clamp((lineHeight + offset) / scale, min, max));
 
 		r.quad(padding_LB() + caretPosition, {caretWidth, lineHeight},

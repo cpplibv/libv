@@ -10,6 +10,7 @@
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_component.hpp>
@@ -27,7 +28,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 libv::Nexus& get_nexus(const Component& component) noexcept {
-	return get_core(component)->context().event.nexus;
+	return get_core(component)->ui().event.nexus;
 }
 
 void mark_as_signal(Component& component) noexcept {
@@ -55,7 +56,7 @@ libv::Nexus& get_nexus(...) noexcept {
 // =================================================================================================
 
 CoreComponent::CoreComponent(std::string name) :
-	context_(&current_thread_context()),
+	ui_(&current_thread_context()),
 	name(std::move(name)) { }
 
 CoreComponent::~CoreComponent() {
@@ -169,7 +170,7 @@ void CoreComponent::watchFocus(bool value) noexcept {
 		flagPurge(Flag::focusable | Flag::watchFocus);
 
 	if (isAttached() && flags.match_any(Flag::focused)) {
-		context().detachFocused(*this);
+		ui().detachFocused(*this);
 	}
 }
 
@@ -179,11 +180,11 @@ void CoreComponent::watchMouse(bool value) noexcept {
 
 	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
 		if (value) {
-			context().mouse.subscribe(*this);
+			ui().mouse.subscribe(*this);
 			if (flags.match_any(Flag::disabled))
-				context().mouse.enable(*this, false);
+				ui().mouse.enable(*this, false);
 		} else {
-			context().mouse.unsubscribe(*this);
+			ui().mouse.unsubscribe(*this);
 		}
 	}
 
@@ -196,11 +197,11 @@ void CoreComponent::floatRegion(bool value) noexcept {
 
 	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
 		if (value) {
-			context().mouse.subscribe_region(*this);
+			ui().mouse.subscribe_region(*this);
 			if (flags.match_any(Flag::disabled))
-				context().mouse.enable(*this, false);
+				ui().mouse.enable(*this, false);
 		} else {
-			context().mouse.unsubscribe_region(*this);
+			ui().mouse.unsubscribe_region(*this);
 		}
 	}
 
@@ -253,7 +254,7 @@ void CoreComponent::auxEnableScan(bool value) noexcept {
 
 	if (isAttached()) {
 		if (flags.match_any(Flag::watchMouse | Flag::floatRegion))
-			context().mouse.enable(*this, value);
+			ui().mouse.enable(*this, value);
 
 		fire(EventEnable{value});
 	}
@@ -275,7 +276,7 @@ void CoreComponent::enable(bool value) noexcept {
 
 	if (isAttached()) {
 		if (flags.match_any(Flag::watchMouse | Flag::floatRegion))
-			context().mouse.enable(*this, value);
+			ui().mouse.enable(*this, value);
 
 		fire(EventEnable{value});
 	}
@@ -299,7 +300,7 @@ void CoreComponent::focus() noexcept {
 		log_ui.error("Attempted to focus a non-focusable component. Attempt ignored. {}", path());
 
 	else
-		context().focus(*this);
+		ui().focus(*this);
 }
 
 void CoreComponent::markRemove() noexcept {
@@ -362,7 +363,7 @@ void CoreComponent::style(libv::intrusive2_ptr<Style> newStyle) noexcept {
 }
 
 void CoreComponent::style(std::string_view style_name) {
-	style(context().style(style_name));
+	style(ui().style(style_name));
 }
 
 void CoreComponent::style_state(StyleState state_mask, bool value) noexcept {
@@ -378,8 +379,8 @@ void CoreComponent::style_state(StyleState state_mask, bool value) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f CoreComponent::calculate_local_mouse_coord() const noexcept {
-	const auto mouse_global_coord = context().state.mouse_position();
-	const auto mouse_global_offset = context().mouse.get_global_position(*this);
+	const auto mouse_global_coord = ui().state.mouse_position();
+	const auto mouse_global_offset = ui().mouse.get_global_position(*this);
 	const auto mouse_local_coord = mouse_global_coord - mouse_global_offset;
 	return mouse_local_coord;
 }
@@ -490,13 +491,13 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 
 		// Attach to mouse context
 		if (flags.match_any(Flag::watchMouse))
-			context().mouse.subscribe(*this);
+			ui().mouse.subscribe(*this);
 
 		if (flags.match_any(Flag::floatRegion))
-			context().mouse.subscribe_region(*this);
+			ui().mouse.subscribe_region(*this);
 
 		if (flags.match_any(Flag::watchMouse | Flag::floatRegion) && flags.match_any(Flag::disabled))
-			context().mouse.enable(*this, false);
+			ui().mouse.enable(*this, false);
 
 		// Broadcast events
 		doAttach();
@@ -555,23 +556,23 @@ void CoreComponent::detach() {
 	});
 
 	if (flags.match_any(Flag::watchMouse))
-		context().mouse.unsubscribe(*this);
+		ui().mouse.unsubscribe(*this);
 
 	if (flags.match_any(Flag::floatRegion))
-		context().mouse.unsubscribe_region(*this);
+		ui().mouse.unsubscribe_region(*this);
 
 	if (flags.match_any(Flag::focused)) {
 		flagPurge(Flag::focusable);
-		context().detachFocused(*this);
+		ui().detachFocused(*this);
 	}
 
 //	if (flags.match_any(Flag::focusLinked))
-//		context().detachFocusLinked(*this);
+//		uixt().detachFocusLinked(*this);
 
 	fire(EventDetach{});
 
 	if (flags.match_any(Flag::signal | Flag::slot))
-		context().event.nexus.disconnect_all(this);
+		ui().event.nexus.disconnect_all(this);
 
 	doDetach();
 
@@ -661,7 +662,7 @@ void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, in
 		const auto childDepth = parentDepth + 1;
 
 		if (child_core.flags.match_any(Flag::watchMouse | Flag::floatRegion))
-			child_core.context().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth + child_core.property.z_index_offset()});
+			child_core.ui().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth + child_core.property.z_index_offset()});
 
 		child_core.layout2FloatPositionUpdateScan(childFloatPosition, childDepth);
 	});
@@ -689,7 +690,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 
 	if ((changedFloatPosition || changedBounds) && flags.match_any(Flag::watchMouse | Flag::floatRegion))
 		// We update the mouse context
-		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth + property.z_index_offset()});
+		ui().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth + property.z_index_offset()});
 
 	if (!changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout))
 		// No need to re-layout this component sub-tree

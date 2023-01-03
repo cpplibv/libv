@@ -19,6 +19,7 @@
 #include <mutex>
 #include <optional>
 #include <ostream>
+#include <utility>
 #include <variant>
 #include <vector>
 // pro
@@ -30,13 +31,16 @@
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_state.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/lua/script_style.hpp>
+#include <libv/ui/settings.hpp>
 
 
 namespace libv {
@@ -104,19 +108,32 @@ public:
 	libv::glr::Remote remote;
 
 public:
+	UI& ui;
+	Settings settings;
+
+	ContextEvent context_event;
+	ContextMouse context_mouse;
 	ContextState context_state;
-	ContextUI context;
+	ContextResource context_resource{settings};
 	ContextRender context_render;
+	ContextStyle context_style;
+
+	ContextUI context_ui{ui, settings, context_event, context_mouse, context_state, context_resource, context_style};
+
 	bool context_render_created = false;
 
+public:
 	std::vector<EventVariant> event_queue;
 	std::mutex event_queue_m;
 
+public:
 	std::vector<std::function<void()>> loop_tasks;
 	std::mutex loop_tasks_m;
 
+public:
 	libv::fsw::Watcher fsw;
 
+public:
 	Root root;
 
 public:
@@ -136,14 +153,15 @@ public:
 
 public:
 	ImplUI(UI& ui) :
-		context(ui, context_state),
+		ui(ui),
 		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
-		root((current_thread_context(context), "")) { }
+		root((current_thread_context(context_ui), "")) { }
 
-	ImplUI(UI& ui, const Settings& settings) :
-		context(ui, context_state, settings),
+	ImplUI(UI& ui, Settings settings) :
+		ui(ui),
+		settings(std::move(settings)),
 		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
-		root((current_thread_context(context), "")) { }
+		root((current_thread_context(context_ui), "")) { }
 
 	~ImplUI() {
 		clear_current_thread_context();
@@ -241,7 +259,7 @@ public:
 	}
 
 	void event(const libv::input::EventMouseButton& event) {
-		context.mouse.event_button(event.button, event.action);
+		context_mouse.event_button(event.button, event.action);
 		if (event.action != libv::input::Action::release)
 			context_state.pressed_mouses.insert(event.button);
 		else
@@ -250,10 +268,10 @@ public:
 
 	void event(const libv::input::EventMouseEnter& event) {
 		if (event.entered) {
-			context.mouse.event_enter();
+			context_mouse.event_enter();
 			context_state.mouse_over_ = true;
 		} else {
-			context.mouse.event_leave();
+			context_mouse.event_leave();
 			context_state.mouse_over_ = false;
 		}
 	}
@@ -265,13 +283,13 @@ public:
 			// Floor is used as mouse position are in pixel center coordinates
 			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.layout_size2(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
 
-		context.mouse.event_position(position);
+		context_mouse.event_position(position);
 		context_state.mouse_position_ = position;
 	}
 
 	void event(const libv::input::EventMouseScroll& event) {
 		const auto offset = libv::vec::cast<float>(event.offset);
-		context.mouse.event_scroll(offset);
+		context_mouse.event_scroll(offset);
 		context_state.scroll_position_ = offset;
 	}
 
@@ -294,7 +312,7 @@ public:
 		// - Render
 		// - Detach
 
-		current_thread_context(context);
+		current_thread_context(context_ui);
 
 		auto glr = remote.queue();
 
@@ -395,9 +413,9 @@ public:
 
 			// --- Style ---
 			try {
-				if (context.isAnyStyleDirty()) {
+				if (context_style.isAnyStyleDirty()) {
 					AccessRoot::styleScanAll(root.core());
-					context.clearEveryStyleDirty();
+					context_style.clearEveryStyleDirty();
 					stat.styleScan.sample(timer.time_ns());
 				} else {
 					AccessRoot::styleScan(root.core());
@@ -417,7 +435,7 @@ public:
 
 			// --- Mouse Update Layout ---
 			try {
-				context.mouse.event_update_layout();
+				context_mouse.event_update_layout();
 				stat.mouse.sample(timer.time_ns());
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during virtual events in UI: {}. Discarding rest of the virtual events", ex.what());
@@ -483,7 +501,7 @@ public:
 		{
 			auto glr = remote.queue();
 
-			current_thread_context(context);
+			current_thread_context(context_ui);
 
 			root.markRemove();
 
@@ -521,8 +539,8 @@ UI::UI() {
 	self = std::make_shared<ImplUI>(*this);
 }
 
-UI::UI(const Settings& settings) {
-	self = std::make_shared<ImplUI>(*this, settings);
+UI::UI(Settings settings) {
+	self = std::make_shared<ImplUI>(*this, std::move(settings));
 }
 
 UI::~UI() {
@@ -626,8 +644,8 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 // -------------------------------------------------------------------------------------------------
 
 EventHub UI::event_hub() {
-	auto sp = std::shared_ptr<ContextEvent>(self, &self->context.event);
-	return EventHub(&self->context, std::weak_ptr<ContextEvent>(sp));
+	auto sp = std::shared_ptr<ContextEvent>(self, &self->context_event);
+	return EventHub(&self->context_ui, std::weak_ptr<ContextEvent>(sp));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -637,11 +655,19 @@ libv::gl::GL& UI::gl() {
 }
 
 ContextUI& UI::context() {
-	return self->context;
+	return self->context_ui;
 }
 
 ContextState& UI::state() {
 	return self->context_state;
+}
+
+ContextResource& UI::resource() {
+	return self->context_resource;
+}
+
+ContextStyle& UI::style() {
+	return self->context_style;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -94,11 +94,11 @@ public:
 	}
 
 	template <typename Access, typename Init>
-			requires (std::is_invocable_v<Init, ContextUI&>)
+			requires (std::is_invocable_v<Init, ContextResource&>)
 	void property(Access&& access, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
 		// static_assert(Access yields PropertyA);
-		// static_assert(Init invoke with ContextUI& result can be assigned to property);
-		static_assert(std::is_convertible_v<std::invoke_result_t<Init, ContextUI&>, access_value_type_t<Access>>, "Init function object has incorrect return type");
+		// static_assert(Init invoke with ContextResource& result can be assigned to property);
+		static_assert(std::is_convertible_v<std::invoke_result_t<Init, ContextResource&>, access_value_type_t<Access>>, "Init function object has incorrect return type");
 
 		(void) group;
 		(void) description;
@@ -117,7 +117,7 @@ public:
 			}
 		}
 
-		auto value = init(owner.context());
+		auto value = init(owner.ui().resource);
 		AccessProperty::value(owner, property, std::move(value));
 	}
 
@@ -155,12 +155,12 @@ public:
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>
-			requires (std::is_invocable_v<Init, ContextUI&>)
+			requires (std::is_invocable_v<Init, ContextResource&>)
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
 		// static_assert(Access yields Property<void|T>);
 		// static_assert(Set is callable with invoke result of Get + driver);
 		// static_assert(Get yields a non void);
-		// static_assert(Init invoke with ContextUI& result can be passed to Set);
+		// static_assert(Init invoke with ContextResource& result can be passed to Set);
 
 		(void) group;
 		(void) description;
@@ -182,7 +182,7 @@ public:
 			}
 		}
 
-		auto value = init(owner.context());
+		auto value = init(owner.ui().resource);
 		if (value != get(owner)) {
 			set(owner, std::move(value));
 			AccessProperty::changed(owner, property);

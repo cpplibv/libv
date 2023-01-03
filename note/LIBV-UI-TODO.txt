@@ -62,6 +62,8 @@ libv.ui.SLC: Document node function behaviours
 libv.ui: Rename scroll bar to slider
 libv.ui: style intrusive_ptr -> intrusive2_ptr
 libv.ui: Rename slider min/max to low/high
+libv.ui: Normalize and cleanup UI contexts
+libv.ui: Expose nexus from a context
 
 
 
@@ -76,18 +78,13 @@ libv.ui: Rename slider min/max to low/high
 
 
 
-libv.ui: UI normalize contexts
-libv.ui: Expose nexus from a context
-libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill context misery
-
-
 
 
 
 
 libv.ui: Scroll pane
 		slider min - max - range values
-			might be layout issue
+			might be layout (-1) issue
 		mouse scroll event
 		mouse scroll N line
 		content background is incorrect, bc content size in incorrect
@@ -106,7 +103,17 @@ libv.ui: Layout env size -1 support, everywhere... oh fork...
 
 
 
-libv.ui: UI nexus, accept injected
+libv.ui: Nested style = Style as a property
+
+
+
+
+
+
+
+libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
+
+libv.ui: Accept injected Nexus
 libv.ui: Kill event_hub in favor of exposed nexus
 
 libv.ui.SLC: Add anchor support

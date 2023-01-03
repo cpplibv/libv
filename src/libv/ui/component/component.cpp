@@ -71,8 +71,14 @@ Component::~Component() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+ContextUI& Component::ui() const noexcept {
+	return ptr_->ui();
+}
+
+// -------------------------------------------------------------------------------------------------
+
 ReentryGuard Component::event_reentry_guard(const void* source, const void* target) const noexcept {
-	return ReentryGuard{ptr_->context(), source, target};
+	return ReentryGuard{ptr_->ui(), source, target};
 }
 
 // -------------------------------------------------------------------------------------------------

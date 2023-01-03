@@ -33,15 +33,17 @@ namespace ui {
 // TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
 // TODO P5: libv.ui: (?) void setFocusPolicy(...);
 
+class ImplUI;
+
 class UI {
-	friend class ContextUI;
+	friend ContextUI;
 
 private:
-	std::shared_ptr<class ImplUI> self;
+	std::shared_ptr<ImplUI> self;
 
 public:
 	UI();
-	explicit UI(const Settings& setting);
+	explicit UI(Settings setting);
 	~UI();
 
 public:
@@ -64,7 +66,7 @@ public:
 	void load_style_script_file(std::string path);
 
 public:
-	EventHostUI<Component> event();
+	[[nodiscard]] EventHostUI<Component> event();
 
 public:
 	void event(const libv::input::EventChar& event);
@@ -75,12 +77,17 @@ public:
 	void event(const libv::input::EventMouseScroll& event);
 
 public:
-	EventHub event_hub();
+	[[nodiscard]] EventHub event_hub();
 
 public:
-	libv::gl::GL& gl();
-	ContextState& state();
-	ContextUI& context();
+	[[nodiscard]] libv::gl::GL& gl();
+
+	[[nodiscard]] ContextState& state();
+	[[nodiscard]] ContextResource& resource();
+	[[nodiscard]] ContextStyle& style();
+
+	[[nodiscard]] ContextUI& context();
+
 	template <typename Frame> void attach(Frame& frame);
 
 public:

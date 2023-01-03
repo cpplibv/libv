@@ -28,9 +28,11 @@ class Renderer;
 
 // -------------------------------------------------------------------------------------------------
 
+class ImplContextRender;
+
 class ContextRender {
 private:
-	std::unique_ptr<class ImplContextRender> self;
+	std::unique_ptr<ImplContextRender> self;
 
 public:
 	ContextRender();
