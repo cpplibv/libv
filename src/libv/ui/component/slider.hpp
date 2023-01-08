@@ -74,14 +74,8 @@ public:
 //	[[nodiscard]] bool is_at_min() const noexcept;
 
 public:
-	void bar_color(Color value);
-	[[nodiscard]] const Color& bar_color() const noexcept;
-
-	void bar_image(Texture2D_view value);
-	[[nodiscard]] const Texture2D_view& bar_image() const noexcept;
-
-	void bar_shader(ShaderImage_view value);
-	[[nodiscard]] const ShaderImage_view& bar_shader() const noexcept;
+	void bar_visual(Background value);
+	[[nodiscard]] const Background& bar_visual() const noexcept;
 
 	void background(Background value);
 	[[nodiscard]] const Background& background() const noexcept;

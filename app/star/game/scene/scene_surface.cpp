@@ -302,6 +302,7 @@ private:
 //			glr.framebuffer_draw(renderTarget.framebuffer());
 //		}
 
+		glr.setClearColor(0, 0, 0, 0);
 		glr.clearColor();
 		glr.clearDepth();
 

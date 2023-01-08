@@ -64,6 +64,7 @@ libv.ui: style intrusive_ptr -> intrusive2_ptr
 libv.ui: Rename slider min/max to low/high
 libv.ui: Normalize and cleanup UI contexts
 libv.ui: Expose nexus from a context
+libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
 
 
 
@@ -78,18 +79,111 @@ libv.ui: Expose nexus from a context
 
 
 
+Slider value change should not invalidate layout
+	(make it a float region if it must)
+	mouse context range remap might be needed!
+
+Slider Bar "hover" style/state: separate  for the track and for the bar
+
+
+place.it: "Well behaved layout" flag bit could be also used for mouse events
+libv.ui: Hover and focus styles state should be auto handled
+
+
+
+
+
+
+Whaaaat, should be the size of scrollable lists?
+	limit, parent -> 2 seperate size for layout2 env
+	-1 size in a dim = no anchor or alignment in that dimension
+	also, I need a back channel to fetch scroll area final virtual size
+
+
+Another size type?
+	S = Stretch
+	S = Scroll
+	F = Flow
+
+	Upon encountering such an object, recurse into it without
+	consideration to the size, but the issue is, size should be known
+	before we call the object in case it need to be anchored/aligned
+	in its parent and currently pos/size are mouse-region abs
+		... unless we say, that flow objects just cannot be anchored
+		... or unless scroll area just layouts like that
+		...
+	But... Long lists, I dont wanna precalc everything
+
+
+
+Pagination
+		Pagination support
+
+		Pagination API
+			dynamic change of max size of the components
+				and that information should be traficed back to the scroll pane
+
+			struct MyPagedEntryComponent {
+				void on_screen();
+				void off_screen();
+
+				void assign(MyObject);
+			};
+
+			struct PaginationController {
+				using entry = MyPagedEntryComponent;
+
+				std::vector<float> entry_positions;
+				libv::vec2f position;
+				libv::vec2f size;
+
+				libv::vec2f max_extent;
+				libv::vec2f trigger_distance;
+
+				int num_loaded;
+				int num_keepalive;
+
+				virtual void trigger_load();
+				virtual void trigger_load(index);
+				virtual void trigger_unload();
+				virtual void trigger_seek();
+				virtual void trigger_visible_area_changed();
+			};
+
+			Pagination<PaginationController, MyPagedEntryComponent> list;
+
+			keep alive with a ring buffer
+
+			on variable item sizes
+				store/keep track of every item position that was already loaded
+				1 float / item
+
+			on fix item sized, jump around
+
+
+		Pagination List Component
+
+		But: Pagination != Scroll size solution
+
+
 
 
 
 
 libv.ui: Scroll pane
-		slider min - max - range values
-			might be layout (-1) issue
-		mouse scroll event
-		mouse scroll N line
+	libv.ui: Implement scroll pane anchor behaviour
+			anchor = "top-left"
+
+	libv.ui: Ensure that scroll pane scrolling doent causes any layout invalidation
+		if the content of the scroll area size is Dynamic then it causes a Dynamic
+		layout query. Otherwise, its good
+
 		content background is incorrect, bc content size in incorrect
 			might be layout (-1) issue
-	libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
+
+		libv.ui: Scroll speed (user setting (3 line) and discovery (which font and which size))
+				mouse scroll N line
+				should scroll pane have a dummy font and font size just so it can have a config for "3 line"
 
 
 libv.ui: Layout env size -1 support, everywhere... oh fork...
@@ -100,17 +194,18 @@ libv.ui: Layout env size -1 support, everywhere... oh fork...
 	also, I need a back channel to fetch scroll area final virtual size
 
 
+libv.ui.SLC: BUG: line.assign_ratio_size is incorrect for:
+		area 1r,1r vbar 25px,1r hbar 200px,25px
+
+
+
+
+
+
 
 
 
 libv.ui: Nested style = Style as a property
-
-
-
-
-
-
-
 libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
 
 libv.ui: Accept injected Nexus
@@ -365,10 +460,7 @@ libv.ui: Fix layout invalidation up propagation possibility (remove access to fl
 		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
 
 
-
 --- Theme ---
-
-
 
 https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html
 table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

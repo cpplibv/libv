@@ -123,6 +123,14 @@ void CoreScrollPane::access_layout(Access&& access) {
 	//		)
 	//	)
 
+	// +------------+---+
+	// |            | v |
+	// |    area    | . |
+	// |            | b |
+	// +------------+ a |
+	// |    hbar    | r |
+	// +------------+---+
+
 	const auto is_vertical = info(mode()).vertical();
 	const auto is_horizontal = info(mode()).horizontal();
 
@@ -183,7 +191,13 @@ void CoreScrollPane::doStyle(StyleAccess& access) {
 //}
 
 void CoreScrollPane::onMouseScroll(const EventMouseScroll& event) {
-	// <<< Event into h/v bar
+	// This is not all
+
+	// if (vbar.onEdge())
+	// 	return;
+
+	vbar.make_scroll(-event.scroll_movement.y * 50.f);
+	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -194,20 +208,22 @@ void CoreScrollPane::doAttach() {
 	hbar.orientation(Orientation::right);
 
 	// <<< value_range s
-	vbar.value_range(1);
-	hbar.value_range(1);
+	// vbar.value_range(10);
+	// hbar.value_range(10);
 	vbar.value(0);
 	hbar.value(0);
 
 	// <<< Event reentry loops
 	auto handler = ScrollPane{this};
-	vbar.event().change.connect_system(handler, [this](const EventScrollChange& event) {
-		area.area_position({area.area_position().x, static_cast<float>(event.request)});
+	vbar.event().change.connect_system(handler, [this](const Slider& slider) {
+		area.area_position({area.area_position().x, static_cast<float>(slider.value())});
 	});
-	hbar.event().change.connect_system(handler, [this](const EventScrollChange& event) {
-//		area.area_position({-static_cast<float>(event.request), area.area_position().y});
-		area.area_position({static_cast<float>(event.request), area.area_position().y});
+	hbar.event().change.connect_system(handler, [this](const Slider& slider) {
+//		area.area_position({-static_cast<float>(slider.value()), area.area_position().y});
+		area.area_position({static_cast<float>(slider.value()), area.area_position().y});
 	});
+
+	watchMouse(true);
 }
 
 void CoreScrollPane::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
@@ -215,14 +231,6 @@ void CoreScrollPane::doDetachChildren(libv::function_ref<bool(Component&)> callb
 }
 
 libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& layout_env) {
-	// +------------+---+
-	// |            | v |
-	// |    area    | . |
-	// |            | b |
-	// +------------+ a |
-	// |    hbar    | r |
-	// +------------+---+
-
 	libv::vec2f result;
 	access_layout([&](auto&& plan) {
 		result = libv::ui::layoutSLCPass1(layout_env.size, plan);
@@ -231,16 +239,25 @@ libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& layout_env) {
 }
 
 void CoreScrollPane::doLayout2(const ContextLayout2& layout_env) {
-	hbar.value_low(0);
-	hbar.value_high(layout_env.size.x);
-	vbar.value_low(0);
-	vbar.value_high(layout_env.size.y);
+	// hbar.value_high(layout_env.size.x);
+	// vbar.value_high(layout_env.size.y);
 //	vbar.value_step(10 * 2);
 //	hbar.value_step(10 * 2);
 
 	access_layout([&](auto&& plan) {
 		libv::ui::layoutSLCPass2(layout_env.size, layout_env, plan);
 	});
+
+	hbar.value_low(0);
+	vbar.value_low(0);
+
+	if (area.content()) {
+		hbar.value_high(area.content().layout_size2().x - area.content().padding_extent().size().x);
+		vbar.value_high(area.content().layout_size2().y - area.content().padding_extent().size().y);
+	}
+
+	hbar.value_range(area.layout_size2().x);
+	vbar.value_range(area.layout_size2().y);
 }
 
 void CoreScrollPane::doRender(Renderer& r) {

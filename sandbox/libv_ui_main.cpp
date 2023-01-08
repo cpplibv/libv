@@ -455,8 +455,7 @@ private:
 		panel_line_scrolled.orientation(libv::ui::Orientation::down);
 		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
 
-		scroll_bar_x.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
-		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
+		scroll_bar_x.bar_visual(libv::ui::Background::texture({0.8f, 0.2f, 0.2f, 1.0f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		scroll_bar_x.orientation(libv::ui::Orientation::right);
 		scroll_bar_x.value_low(-500);
 		scroll_bar_x.value_high(500);
@@ -466,8 +465,7 @@ private:
 			scroll_area_outer.area_position({static_cast<float>(component.value()), scroll_area_outer.area_position().y});
 		});
 
-		scroll_bar_y.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
-		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
+		scroll_bar_y.bar_visual(libv::ui::Background::texture({0.2f, 0.8f, 0.2f, 1.0f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		scroll_bar_y.orientation(libv::ui::Orientation::up);
 		scroll_bar_y.value_low(-1000);
 		scroll_bar_y.value_high(1000);
@@ -477,8 +475,7 @@ private:
 			scroll_area_outer.area_position({scroll_area_outer.area_position().x, static_cast<float>(component.value())});
 		});
 
-		scroll_bar_ix.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
-		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
+		scroll_bar_ix.bar_visual(libv::ui::Background::texture({0.8f, 0.2f, 1.0f, 1.0f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		scroll_bar_ix.orientation(libv::ui::Orientation::right);
 		scroll_bar_ix.value_low(-500);
 		scroll_bar_ix.value_high(500);
@@ -488,8 +485,7 @@ private:
 			scroll_area_inner.area_position({static_cast<float>(component.value()), scroll_area_inner.area_position().y});
 		});
 
-		scroll_bar_iy.bar_image(ui.resource().texture2D("separator_bar_256x16.png"));
-		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
+		scroll_bar_iy.bar_visual(libv::ui::Background::texture({0.2f, 0.8f, 1.0f, 1.0f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		scroll_bar_iy.orientation(libv::ui::Orientation::up);
 		scroll_bar_iy.value_low(-1000);
 		scroll_bar_iy.value_high(1000);

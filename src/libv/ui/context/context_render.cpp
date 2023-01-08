@@ -128,7 +128,7 @@ public:
 
 private:
 	void init() {
-		libv::vec4uc white_zero_texture_data = {255, 255, 255, 255};
+		static constexpr auto white_zero_texture_data = libv::vec4uc{255, 255, 255, 255};
 		libv::glr::Texture2D::R8_G8_B8_A8 texture;
 		texture.storage(1, {1, 1});
 		texture.image(0, {0, 0}, {1, 1}, &white_zero_texture_data);
@@ -307,16 +307,16 @@ bool Renderer::cull_test(libv::vec2f pos, libv::vec2f size, float threshold) con
 //	const auto x_pass = min.x <= limit.x && max.x >= 0;
 //	const auto y_pass = min.y <= limit.y && max.y >= 0;
 
-	// !!! Clip space is wierd, I have to add min to it to be in 'screen' stuffy space
+	// Clip space is wierd, I have to add 'min' to it to be in 'screen' space
 	const auto limit_min = libv::max(min + clip_pos, libv::vec2f(0, 0));
 	const auto limit_max = libv::min(min + clip_pos + clip_size, context.ui_size);
 
-	const auto x_pass = min.x <= limit_max.x && max.x >= limit_min.x;
-	const auto y_pass = min.y <= limit_max.y && max.y >= limit_min.y;
+	const auto x_pass = min.x < limit_max.x && max.x > limit_min.x;
+	const auto y_pass = min.y < limit_max.y && max.y > limit_min.y;
 
 	const auto pass = x_pass && y_pass;
-	context.stat_cull_pass += pass;
-	context.stat_cull_fail += !pass;
+	context.stat_cull_pass += pass ? 1 : 0;
+	context.stat_cull_fail += pass ? 0 : 1;
 
 //	log_ui.info("{}:{} -> {}:{}, | Limit {} - {} | {}", pos, pos + size, min, max, limit_min, limit_max, pass ? "PASS" : "FAIL");
 
@@ -583,7 +583,7 @@ void Renderer::text(libv::vec2f pos, const LayoutTextData& vd, const Font2D_view
 
 	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp().translate({pos, 0});
 	task.uniform_block[layout_UIInfo.matM] = glr.model.top().translate_copy({pos, 0});
-	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos;
+	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos - pos;
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
 	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
 	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();

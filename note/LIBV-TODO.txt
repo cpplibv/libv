@@ -657,6 +657,11 @@ What do I need from libv to make a 'minimal' working iris program?
 			Rate Limiting (per connection, [per group], per global)
 			NAT punching
 
+	libv.random:
+		The std uniform_int_distribution and uniform_real_distribution
+		might not be portable across compilers, pick an implementation and
+		use a fix libv version of it
+
 	libv.update
 		Resource
 			1 Working resource download protocol

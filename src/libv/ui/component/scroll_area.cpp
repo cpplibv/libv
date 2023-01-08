@@ -86,7 +86,7 @@ void CoreScrollArea::access_properties(Access& access) {
 	access.property(
 			[](auto& c) -> auto& { return c.mode; },
 			ScrollMode::vertical,
-			pgr::appearance, pnm::scroll_mode,
+			pgr::behaviour, pnm::scroll_mode,
 			"Scroll area mode"
 	);
 //	access.synthesize(
@@ -226,7 +226,7 @@ void CoreScrollArea::doLayout2(const ContextLayout2& layout_env) {
 
 	const auto position =
 			+ padding_LB3()
-			+ client_area_anchor * layout_env.size
+			+ client_area_anchor * (layout_env.size - padding_size3())
 			- client_area_anchor * client_area_size
 			+ client_anchor * client_area_size
 			- client_anchor * size; // NOTE: Anchor uses layout env size and client size
@@ -245,7 +245,7 @@ void CoreScrollArea::doRender(Renderer& r) {
 
 	r.clip(padding_extent().left_bottom(), layout_size2() - padding_extent().size());
 
-	const auto rounded_area_position = libv::vec3f(libv::vec::round(area_position - padding_extent().left_bottom()), 0.f);
+	const auto rounded_area_position = libv::vec3f(libv::vec::round(area_position), 0.f);
 	r.translate(rounded_area_position);
 
 	Renderer rc = r.enter(*client);

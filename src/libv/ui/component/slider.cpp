@@ -50,10 +50,7 @@ public:
 	};
 
 	struct Properties {
-		PropertyR<Color> bar_color;
-		PropertyL1<Texture2D_view> bar_image;
-		PropertyR<ShaderImage_view> bar_shader;
-
+		PropertyR<Background> bar_visual;
 		PropertyR<Background> background;
 
 		PropertyL1L2<Orientation> orientation;
@@ -70,7 +67,7 @@ public:
 
 public:
 	libv::vec2f drag_point;
-	DragState drag_mode = DragState::idle;
+	DragState drag_state = DragState::idle;
 
 	BarBounds bar_bounds_;
 
@@ -126,22 +123,10 @@ public:
 template <typename T>
 void CoreSlider::access_properties(T& ctx) {
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.bar_color; },
-			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::bar_color,
-			"Bar color"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bar_image; },
-			[](auto& u) { return u.fallbackTexture2D(); },
-			pgr::appearance, pnm::bar_image,
-			"Bar image"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bar_shader; },
-			[](auto& u) { return u.shaderImage(); },
-			pgr::appearance, pnm::bar_shader,
-			"Bar shader"
+			[](auto& c) -> auto& { return c.property.bar_visual; },
+			Background::color({1, 1, 1, 1}),
+			pgr::appearance, pnm::bar_visual,
+			"Bar visualization render fragment"
 	);
 
 	ctx.property(
@@ -279,10 +264,10 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 		const auto local_mouse = event.local_position;
 
 		if (libv::vec::within(local_mouse, bar.position, bar.position + bar.size - 1.0f)) {
-			drag_mode = DragState::bar;
+			drag_state = DragState::bar;
 			drag_point = local_mouse - bar.position;
 		} else {
-			drag_mode = DragState::track;
+			drag_state = DragState::track;
 			const auto value_extent = std::abs(value_high_ - value_low_);
 			const auto local_drag = std::floor(bar.size[orient.dim_control] * 0.5f);
 			const auto local_value = value_extent < value_range_ ?
@@ -302,7 +287,7 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::release) {
 		ui().mouse.release(*this);
-		drag_mode = DragState::idle;
+		drag_state = DragState::idle;
 		return event.stop_propagation();
 	}
 
@@ -316,6 +301,18 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 }
 
 void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
+	if (event.enter)
+		style_state(StyleState::hover, true);
+
+	if (event.leave)
+		style_state(StyleState::hover, false);
+
+	// TODO P1: style_state(StyleState::active, false); after the mouse leaves the component area (while it was active): maybe it has to acquire or soft acquire the mouse? so it can track the release (ergo deactivate) event
+	//		style_state(StyleState::active, false);
+
+	// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+
+
 //	if (event.enter) {
 ////		set(property.bg_color, property.bg_color() + 0.2f);
 //		set(property.bar_color, property.bar_color() + 0.2f);
@@ -330,7 +327,7 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 //		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 //	}
 
-	if (drag_mode == DragState::idle)
+	if (drag_state == DragState::idle)
 		return;
 
 	const auto orient = OrientationTable[underlying(property.orientation())];
@@ -347,7 +344,7 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 		return event.stop_propagation();
 	}
 
-	const auto local_drag = drag_mode == DragState::track ?
+	const auto local_drag = drag_state == DragState::track ?
 			std::floor(bar.size[orient.dim_control] * 0.5f) : // DragState::track
 			drag_point[orient.dim_control];                   // DragState::bar
 
@@ -374,7 +371,7 @@ void CoreSlider::onMouseScroll(const EventMouseScroll& event) {
 // -------------------------------------------------------------------------------------------------
 
 void CoreSlider::doAttach() {
-	drag_mode = DragState::idle;
+	drag_state = DragState::idle;
 
 	watchMouse(true);
 }
@@ -386,11 +383,12 @@ void CoreSlider::doStyle(StyleAccess& access) {
 libv::vec3f CoreSlider::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
+// const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
 //	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
 
 //	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
-	return {dynamic_size_bar, 0.f};
+// 	return {dynamic_size_bar, 0.f};
+	return {property.bar_visual().size(), 0.f};
 }
 
 void CoreSlider::doLayout2(const ContextLayout2& environment) {
@@ -402,10 +400,7 @@ void CoreSlider::doLayout2(const ContextLayout2& environment) {
 void CoreSlider::doRender(Renderer& r) {
 	property.background().render(r, {0, 0}, layout_size2(), *this);
 
-	r.texture_2D(bar_bounds_.position, bar_bounds_.size, {0, 0}, {1, 1},
-			property.bar_color(),
-			property.bar_image(),
-			property.bar_shader());
+	property.bar_visual().render(r, bar_bounds_.position, bar_bounds_.size, *this);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -511,8 +506,8 @@ void CoreSlider::make_step(double amount) noexcept {
 	//		Fixing this rounding behaviour would result in more oddities than what it would solve
 	const auto step = libv::float_equal(value_step_, 0.0) ? 1.0 : value_step_;
 
-	const auto request = value_;
-	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_low_, value_high_);
+	const auto request = value_ + amount * step;
+	const auto new_value = libv::math::snap_interval(request, value_step_, value_low_, value_high_);
 	const auto change = new_value - value_;
 	value_ = new_value;
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -583,28 +578,12 @@ void Slider::make_scroll(double amount) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void Slider::bar_color(Color value) {
-	AccessProperty::manual(self(), self().property.bar_color, value);
+void Slider::bar_visual(Background value) {
+	AccessProperty::manual(self(), self().property.bar_visual, std::move(value));
 }
 
-const Color& Slider::bar_color() const noexcept {
-	return self().property.bar_color();
-}
-
-void Slider::bar_image(Texture2D_view value) {
-	AccessProperty::manual(self(), self().property.bar_image, std::move(value));
-}
-
-const Texture2D_view& Slider::bar_image() const noexcept {
-	return self().property.bar_image();
-}
-
-void Slider::bar_shader(ShaderImage_view value) {
-	AccessProperty::manual(self(), self().property.bar_shader, std::move(value));
-}
-
-const ShaderImage_view& Slider::bar_shader() const noexcept {
-	return self().property.bar_shader();
+[[nodiscard]] const Background& Slider::bar_visual() const noexcept {
+	return self().property.bar_visual();
 }
 
 void Slider::background(Background value) {

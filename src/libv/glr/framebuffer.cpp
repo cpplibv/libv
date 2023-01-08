@@ -156,6 +156,7 @@ void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		return a.attachment;
 	};
 
+	drawAttachmentCount = 0;
 	for (Attachment& item : pendingAttachments) {
 		const auto attachmentCode = std::visit(visitor, item);
 		if (attachmentCode != libv::gl::Attachment::Depth && attachmentCode != libv::gl::Attachment::DepthStencil) {
