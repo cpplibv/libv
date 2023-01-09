@@ -149,23 +149,6 @@ wish_create_external(
 	LINK zlibstatic
 )
 
-wish_create_external(
-	NAME libbacktrace
-	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
-	GIT_TAG d0f5e95a87a4d3e0a1ed6c069b5dae7cbab3ed2a
-	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND
-		COMMAND ${CMAKE_COMMAND} -E rm -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/config.status # Workaround, sometimes it stucks and configure fails
-		COMMAND bash -C ./configure # 'bash' is used for Windows cmd to not fail
-	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT}
-	INSTALL_COMMAND
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/include/libbacktrace/
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/lib/
-		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/backtrace.h ${PATH_EXT}/libbacktrace/include/libbacktrace/backtrace.h
-		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/.libs/libbacktrace.a ${PATH_EXT}/libbacktrace/lib/libbacktrace.a
-	LINK backtrace
-)
-
 set(Boost_Version 1.77.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
@@ -428,6 +411,23 @@ wish_create_external(
 	NAME immer
 	GIT_REPOSITORY https://github.com/arximboldi/immer.git
 	GIT_TAG 559ab37543a7076f9cfe9002720b0d5ad6ffc12a
+)
+
+wish_create_external(
+	NAME libbacktrace
+	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
+	GIT_TAG d0f5e95a87a4d3e0a1ed6c069b5dae7cbab3ed2a
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND
+		COMMAND ${CMAKE_COMMAND} -E rm -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/config.status # Workaround, sometimes it stucks and configure fails
+		COMMAND bash -C ./configure # 'bash' is used for Windows cmd to not fail
+	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT}
+	INSTALL_COMMAND
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/include/libbacktrace/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/lib/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/backtrace.h ${PATH_EXT}/libbacktrace/include/libbacktrace/backtrace.h
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/.libs/libbacktrace.a ${PATH_EXT}/libbacktrace/lib/libbacktrace.a
+	LINK backtrace
 )
 
 wish_create_external(
