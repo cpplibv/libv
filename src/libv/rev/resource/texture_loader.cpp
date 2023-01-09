@@ -16,8 +16,8 @@ TextureLoader::TextureLoader(const std::shared_ptr<InternalResourceManager>& irm
 	self(std::make_shared<InternalTextureLoader>(irm)) {
 }
 
-Texture TextureLoader::load(std::string_view name) {
-	return Texture{self->load(name)};
+Texture TextureLoader::load(std::string_view name, Swizzle swizzle) {
+	return Texture{self->load(name, swizzle)};
 }
 
 Texture TextureLoader::fallback() const {

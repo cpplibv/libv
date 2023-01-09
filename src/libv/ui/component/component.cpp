@@ -129,6 +129,10 @@ void Component::size(const Size& value) noexcept {
 	ptr_->size(value);
 }
 
+void Component::size(const SizeDim& x, const SizeDim& y) noexcept {
+	ptr_->size(Size{x, y});
+}
+
 const Size& Component::size() const noexcept {
 	return ptr_->size();
 }

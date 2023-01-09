@@ -77,6 +77,12 @@ libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
 
 
 
+libv.ui: style script loading should match the way other resources are loaded
+		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
+
+libv.ui: Implement built-in support for child properties in BasePanel
+libv.ui: Cleanup child property access in Tooltip Container
+
 
 
 Slider value change should not invalidate layout

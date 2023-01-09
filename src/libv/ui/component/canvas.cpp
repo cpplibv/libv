@@ -5,6 +5,7 @@
 // libv
 #include <libv/glr/queue.hpp>
 // pro
+#include <libv/ui/log.hpp>
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -85,7 +86,22 @@ void CoreCanvasAdaptor::doCreate(Renderer& r) {
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
+		auto events = CanvasAdaptor{this}.event();
+		events.before_create.fire(glr.out_of_order_gl());
 		canvas_object->create(glr);
+		events.after_create.fire(glr.out_of_order_gl());
+	});
+}
+
+void CoreCanvasAdaptor::doDestroy(Renderer& r) {
+	if (not canvas_object)
+		return;
+
+	r.native([this](libv::glr::Queue& glr) {
+		auto events = CanvasAdaptor{this}.event();
+		events.before_destroy.fire(glr.out_of_order_gl());
+		canvas_object->destroy(glr);
+		events.after_destroy.fire(glr.out_of_order_gl());
 	});
 }
 
@@ -99,6 +115,9 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		// 				or use a framebuffer for this and render with UI texture shader
 		//				(Matrix stacks reset view and discards the UI's current view, fine for now, but with clipping support it will break)
 
+		auto events = CanvasAdaptor{this}.event();
+		events.before_render.fire(glr.out_of_order_gl());
+
 		const auto prev_view_pos = glr.viewport_position();
 		const auto prev_view_size = glr.viewport_size();
 
@@ -110,15 +129,8 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		canvas_object->render(glr);
 
 		glr.viewport(prev_view_pos, prev_view_size);
-	});
-}
 
-void CoreCanvasAdaptor::doDestroy(Renderer& r) {
-	if (not canvas_object)
-		return;
-
-	r.native([this](libv::glr::Queue& glr) {
-		canvas_object->destroy(glr);
+		events.after_render.fire(glr.out_of_order_gl());
 	});
 }
 
@@ -126,6 +138,10 @@ void CoreCanvasAdaptor::doDestroy(Renderer& r) {
 
 libv::vec2f CanvasBase::calculate_local_mouse_coord() const noexcept {
 	return core->calculate_local_mouse_coord();
+}
+
+libv::ui::ContextUI& CanvasBase::ui() const noexcept {
+	return core->ui();
 }
 
 // -------------------------------------------------------------------------------------------------

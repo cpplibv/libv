@@ -33,8 +33,8 @@ private:
 		return "none";
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return libv::vec2i{0, 0};
+	virtual libv::vec2f size() const noexcept override {
+		return libv::vec2f{0, 0};
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -67,8 +67,8 @@ private:
 		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return libv::vec2i{0, 0};
+	virtual libv::vec2f size() const noexcept override {
+		return libv::vec2f{0, 0};
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -103,8 +103,8 @@ private:
 		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return texture->size();
+	virtual libv::vec2f size() const noexcept override {
+		return texture->size().cast<float>();
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -190,8 +190,8 @@ private:
 		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return texture->size();
+	virtual libv::vec2f size() const noexcept override {
+		return texture->size().cast<float>();
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -228,8 +228,8 @@ private:
 		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return texture->size();
+	virtual libv::vec2f size() const noexcept override {
+		return texture->size().cast<float>();
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -324,8 +324,8 @@ private:
 		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return texture->size();
+	virtual libv::vec2f size() const noexcept override {
+		return texture->size().cast<float>();
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
@@ -484,8 +484,8 @@ private:
 		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
-	virtual libv::vec2i size() const noexcept override {
-		return texture->size();
+	virtual libv::vec2f size() const noexcept override {
+		return texture->size().cast<float>();
 	}
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {

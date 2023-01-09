@@ -25,11 +25,11 @@ namespace arg {
 //	auto args = libv::arg::Parser("Program Name", "Program Description");
 //
 //	const auto input_file = args.required<std::string>
-//			("input_file", "File path of the binary input file")
+//			("input-file", "File path of the binary input file")
 //			["-i"]["--input"];
 //
 //	const auto output_file = args.optional<std::string>
-//			("output_file", "File path of the generated C++ output")
+//			("output-file", "File path of the generated C++ output")
 //			["-o"]["--output"]
 //			= input_file;
 //
@@ -67,10 +67,10 @@ namespace arg {
 // S - skeleton done, F - functionality done, D - usage reporting done,  E - error reporting done
 //	S	args.flag               (name, aliases...)(description)? = value|args
 //	S	args.optional<T>        (name                      )[flag]+(description)? = value|args
-//	S	args.require<T>         (name                      )[flag]+(description)?
+//	S	args.require<T>         (name, "reason"            )[flag]+(description)?
 //		args.multiple
 //			args.multiple<T>        (name, min_count, max_count)[flag]+(description)? = value|args
-//			args.alternate<K, V>    (name                      )[flag]+(description)? = values...|args...
+//			args.alternate<T...>    (name                      )[flag]+(description)? = values...|args...
 //			args.composite<T...>    (name                      )[flag]+(description)? = values...|args...
 //	    args.<generic_args_type>.hidden()                     // Makes the argument hidden and does not include it in usage
 //		args.command            (...)
@@ -100,7 +100,7 @@ namespace arg {
 //		args.error_message      (width)                    // Generates the error report
 //		args.error_message      (os, width)                // Generates the error report
 //		args.debug              (width)                    // Provides information which index set via which flag, default values, includes overrides, original input, parsed value
-//		args.debug              (os, width)                    // Provides information which index set via which flag, default values, includes overrides, original input, parsed value
+//		args.debug              (os, width)                // Provides information which index set via which flag, default values, includes overrides, original input, parsed value
 //	S	args.report             (width)
 //	S	args.report             (os, width)
 //	S	args.usage              (width)

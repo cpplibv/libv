@@ -2,11 +2,14 @@
 
 #pragma once
 
+// fwd
+#include <libv/gl/enum_fwd.hpp>
+// libv
+#include <libv/meta/always.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cassert>
 #include <cstdint>
-// libv
-#include <libv/utility/to_underlying.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -742,21 +745,46 @@ enum class AttributeType : GLenum {
 
 template <typename T>
 [[nodiscard]] constexpr inline AttributeType toAttributeType() noexcept {
-//		if constexpr (std::is_same_v<T, bool>)
-//			return to_underlying(AttributeType::INT);
+	// if constexpr (std::is_same_v<T, bool>)
+	// 	return to_underlying(AttributeType::INT);
 	// Bool cannot be just mapped for int, what about the sizes?
 
 	if constexpr (std::is_same_v<T, uint32_t>)
 		return AttributeType::UINT;
 
-	if constexpr (std::is_same_v<T, int32_t>)
+	else if constexpr (std::is_same_v<T, int32_t>)
 		return AttributeType::INT;
 
-	if constexpr (std::is_same_v<T, float>)
+	else if constexpr (std::is_same_v<T, float>)
 		return AttributeType::FLOAT;
 
-	if constexpr (std::is_same_v<T, double>)
+	else if constexpr (std::is_same_v<T, double>)
 		return AttributeType::DOUBLE;
+
+	else
+		static_assert(libv::meta::always_false_v<T>, "Not supported attribute type");
+}
+
+[[nodiscard]] constexpr inline std::size_t attributeTypeSize(AttributeType type) noexcept {
+	switch (type) {
+		case AttributeType::BYTE: return 1;
+		case AttributeType::UBYTE: return 1;
+		case AttributeType::SHORT: return 2;
+		case AttributeType::USHORT: return 2;
+		case AttributeType::INT: return 4;
+		case AttributeType::UINT: return 4;
+
+		case AttributeType::HFLOAT: return 2;
+		case AttributeType::FLOAT: return 4;
+		case AttributeType::FIXED: return 4;
+		case AttributeType::INT_2_10_10_10_REV: return 4;
+		case AttributeType::UNSIGNED_INT_2_10_10_10_REV: return 4;
+		case AttributeType::UNSIGNED_INT_10F_11F_11F_REV: return 4;
+
+		case AttributeType::DOUBLE: return 8;
+	}
+	assert(false && "Invalid AttributeType enum value");
+	return 0;
 }
 
 // -------------------------------------------------------------------------------------------------

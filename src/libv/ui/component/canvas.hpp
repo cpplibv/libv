@@ -12,6 +12,7 @@
 // pro
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component_system/component_api.hpp>
+#include <libv/ui/fwd.hpp>
 
 
 namespace libv {
@@ -33,16 +34,17 @@ protected:
 
 public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
+	[[nodiscard]] libv::ui::ContextUI& ui() const noexcept;
 
 public:
 	void focus();
 
 protected:
 	virtual void attach() { }
+	virtual void update(libv::ui::time_duration delta_time) { (void) delta_time; }
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
-	virtual void update(time_duration delta_time) { (void) delta_time; }
-	virtual void render(libv::glr::Queue& glr) = 0;
 	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }
+	virtual void render(libv::glr::Queue& glr) = 0;
 
 public:
 	virtual ~CanvasBase() = default;
@@ -50,7 +52,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-class CanvasAdaptor : public ComponentAPI<Component, CanvasAdaptor, CoreCanvasAdaptor, EventHostGeneral> {
+class CanvasAdaptor : public ComponentAPI<Component, CanvasAdaptor, CoreCanvasAdaptor, EventHostCanvas> {
 public:
 	using ComponentAPI::ComponentAPI;
 
@@ -63,9 +65,11 @@ protected:
 	[[nodiscard]] const CanvasBase& object_base() const noexcept;
 };
 
+// -------------------------------------------------------------------------------------------------
+
 template <typename T>
-class CanvasAdaptorT : public ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostGeneral> {
-	using BaseAPI = ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostGeneral>;
+class CanvasAdaptorT : public ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostCanvas> {
+	using BaseAPI = ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostCanvas>;
 
 public:
 	explicit CanvasAdaptorT(core_ptr ptr) :

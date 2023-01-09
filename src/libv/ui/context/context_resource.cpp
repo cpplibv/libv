@@ -5,12 +5,14 @@
 // libv
 #include <libv/gl/load_image.hpp>
 #include <libv/utility/generic_path.hpp>
+#include <libv/utility/hash_string.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <filesystem>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 // pro
@@ -30,15 +32,206 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+// struct Traits {
+// 	static constexpr std::string_view resource_name;
+// 	[[nullable]] std::shared_ptr<T> create(Args&&...);
+// };
+
+template <typename T, typename CRTP>
+class ResourceCache {
+private:
+	mutable std::mutex mutex;
+	std::shared_ptr<T> fallback_;
+	std::unordered_map<std::string, std::weak_ptr<T>, libv::hash_string, std::equal_to<>> map;
+
+public:
+	explicit ResourceCache(std::shared_ptr<T>&& fallback_) : fallback_(std::move(fallback_)) {}
+
+private:
+	[[nodiscard]] constexpr inline bool isNormalizedKey(std::string_view key) const {
+		return !key.contains('\\') &&
+				!key.starts_with("../") &&
+				!key.starts_with("./") &&
+				!key.starts_with('/') &&
+				!key.contains("/../") &&
+				!key.contains(':');
+	}
+
+public:
+	[[nodiscard]] std::shared_ptr<T> load(std::string_view key) {
+		auto& self = static_cast<CRTP&>(*this);
+		auto lock = std::unique_lock(mutex);
+
+		auto it = map.find(key);
+		if (it != map.end()) {
+			if (auto sp = it->second.lock()) { // Cache hit
+				return sp;
+			} else { // Cache expired
+				log_ui.trace("{} cache expired: {}", self.resource_Name, key);
+			}
+		} else { // Cache miss
+			log_ui.trace("{} cache miss: {}", self.resource_Name, key);
+			it = map.emplace(key, std::weak_ptr<T>()).first;
+		}
+
+		const auto normalized = isNormalizedKey(key);
+		if (!normalized) {
+			if (self.res_settings().restrict_under_base) {
+				log_ui.error("{} request is not normalized: {}. Using fallback {}", self.resource_Name, key, self.resource_name);
+				return nullptr;
+			} else {
+				log_ui.warn("{} request is not normalized: {}", self.resource_Name, key);
+			}
+		}
+
+		const auto filepath_str = self.res_settings().base_path + std::string(key);
+
+		std::filesystem::path filepath;
+		if (!self.settings.res_resolve) {
+			filepath = filepath_str;
+		} else {
+			try {
+				const auto resolved_str = self.settings.res_resolve(filepath_str);
+				log_ui.trace_if(filepath_str != resolved_str, "{} mapping: {} to {}", self.resource_Name, filepath_str, resolved_str);
+				filepath = std::filesystem::path(resolved_str);
+			} catch (const std::exception& ex) {
+				log_ui.error("{} resolve failed: {}. Using fallback {}", self.resource_Name, filepath_str, self.resource_name);
+				return nullptr;
+			}
+		}
+
+		auto sp = self.create(filepath);
+		if (!sp)
+			sp = fallback_;
+		it->second = sp;
+		return sp;
+	}
+
+	[[nodiscard]] bool exists(std::string_view key) const {
+		auto& self = static_cast<const CRTP&>(*this);
+		auto lock = std::unique_lock(mutex);
+
+		if (self.res_settings().restrict_under_base && !isNormalizedKey(key))
+			return false;
+
+		const auto filepath_str = self.res_settings().base_path + std::string(key);
+		try {
+			const auto resolved_str = self.settings.res_resolve(filepath_str);
+
+			std::error_code ignore_ec;
+			return std::filesystem::exists(resolved_str, ignore_ec);
+		} catch (const std::exception& ex) {
+			return false;
+		}
+	}
+
+	[[nodiscard]] inline const std::shared_ptr<T>& fallback() const {
+		return fallback_;
+	}
+};
+
+// =================================================================================================
+
+class FontCache : public ResourceCache<Font2D, FontCache> {
+public:
+	static constexpr const std::string_view resource_name = "font";
+	static constexpr const std::string_view resource_Name = "Font";
+	const Settings& settings;
+
+public:
+	explicit constexpr inline FontCache(Settings& settings) :
+			ResourceCache<Font2D, FontCache>([]{
+				const auto fallback_font_data = raw_font_consolas_min();
+				return std::make_shared<Font2D>(
+						std::string{reinterpret_cast<const char*>(fallback_font_data.first), fallback_font_data.second});
+			}()),
+	        settings(settings) {}
+
+	[[nodiscard]] const ResourceSettings& res_settings() const {
+		return settings.res_font;
+	}
+
+	[[nodiscard]] std::shared_ptr<Font2D> create(const std::filesystem::path& filepath) {
+		// TODO P1: Detect isLoadedAlready
+		// log_ui.warn_if(isLoadedAlready(filepath), "the same resource loaded multiple times with different name");
+
+		libv::Timer timer;
+		auto file = libv::read_file_ec(filepath);
+		if (file.ec) {
+			log_ui.error("{} load failed: IO Failure: {}: {} - {}. Using fallback {}", resource_Name, filepath.generic_string(), file.ec, file.ec.message(), resource_name);
+			return nullptr;
+		}
+		const auto time_read = timer.timef_ms();
+
+		try {
+			auto sp = std::make_shared<Font2D>(std::move(file.data));
+			const auto time_load = timer.timef_ms();
+			log_ui.trace("{} loaded: read:{:5.1f}ms, load:{:5.1f}ms for {}",
+					resource_Name, time_read.count(), time_load.count(), filepath.generic_string());
+			return sp;
+		} catch (const std::exception& ex) {
+			log_ui.error("{} load failed: {}. Using fallback {}", resource_Name, filepath.generic_string(), resource_name);
+			return nullptr;
+		}
+	}
+};
+
+// =================================================================================================
+
+class Texture2DCache : public ResourceCache<Texture2D, Texture2DCache> {
+public:
+	static constexpr const std::string_view resource_name = "texture";
+	static constexpr const std::string_view resource_Name = "Texture";
+	const Settings& settings;
+
+public:
+	explicit constexpr inline Texture2DCache(Settings& settings) :
+			ResourceCache<Texture2D, Texture2DCache>([]{
+				const auto fallback_texture2D_data = raw_texture2D_white256();
+				return std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
+						{reinterpret_cast<const char*>(fallback_texture2D_data.first), fallback_texture2D_data.second})
+				);
+			}()),
+	        settings(settings) {}
+
+	[[nodiscard]] const ResourceSettings& res_settings() const {
+		return settings.res_texture;
+	}
+
+	std::shared_ptr<Texture2D> create(const std::filesystem::path& filepath) {
+		// TODO P1: Detect isLoadedAlready
+		// log_ui.warn_if(isLoadedAlready(filepath), "the same resource loaded multiple times with different name");
+
+		libv::Timer timer;
+		auto file = libv::read_file_ec(filepath);
+		if (file.ec) {
+			log_ui.error("{} load failed: IO Failure: {}: {} - {}. Using fallback {}", resource_Name, filepath.generic_string(), file.ec, file.ec.message(), resource_name);
+			return nullptr;
+		}
+		const auto time_read = timer.timef_ms();
+
+		auto image = libv::gl::load_image(file.data);
+		if (!image) {
+			log_ui.error("{} load failed: {}. Using fallback {}", resource_Name, filepath.generic_string(), resource_name);
+			return nullptr;
+		}
+		const auto time_load = timer.timef_ms();
+
+		log_ui.trace("{} loaded: read:{:5.1f}ms, load:{:5.1f}ms for {}",
+				resource_Name, time_read.count(), time_load.count(), filepath.generic_string());
+
+		return std::make_shared<Texture2D>(std::move(*image));
+	}
+};
+
+// =================================================================================================
+
 class ImplContextResource {
 public:
 	Settings& settings;
 
-	std::shared_ptr<Font2D> fallback_font;
-	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;
-
-	std::shared_ptr<Texture2D> fallback_texture2D;
-	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
+	FontCache cacheFont;
+	Texture2DCache cacheTexture2D;
 
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
 //	std::unordered_map<TypeInfoRef, std::weak_ptr<Shader>, TypeInfoRefHasher, TypeInfoRefEqualTo> cache_typed_shader;
@@ -49,7 +242,9 @@ public:
 
 public:
 	explicit ImplContextResource(Settings& settings) :
-		settings(settings) {}
+		settings(settings),
+		cacheFont(settings),
+		cacheTexture2D(settings) {}
 
 public:
 	template <typename T>
@@ -70,60 +265,6 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-bool secure_path(const std::filesystem::path& base, bool restict_under_base, const std::filesystem::path& target, const std::filesystem::path& path) {
-	std::error_code ec;
-
-	// TODO P1: Nicer file not found error (it will be detected with the canonical call)
-	const auto canonical = std::filesystem::canonical(target, ec);
-	if (ec) {
-		log_ui.error("Failed to determine canonical target path: {} {}"
-				"\n\tPath:      {}"
-				"\n\tTarget:    {}"
-				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
-		return false;
-	}
-
-	const auto relative_to_current = std::filesystem::relative(canonical, ec);
-	if (ec) {
-		log_ui.error("Failed to determine relative target path: {} {}"
-				"\n\tPath:      {}"
-				"\n\tTarget:    {}"
-				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
-		return false;
-	}
-
-	const auto is_parent = !restict_under_base || libv::is_parent_folder_of(base, relative_to_current);
-	if (!is_parent) {
-		log_ui.error("Canonical path is expected to be under the base folder:"
-				"\n\tPath:      {}"
-				"\n\tCanonical: {}"
-				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
-		return false;
-	}
-
-	const auto relative_to_base = std::filesystem::relative(relative_to_current, base, ec);
-	if (ec) {
-		log_ui.error("Failed to determine relative path: {} {}"
-				"\n\tPath:      {}"
-				"\n\tCanonical: {}"
-				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
-		return false;
-	}
-
-	if (relative_to_base != path) {
-		log_ui.error("Canonical relative path does not matches path"
-				"\n\tPath:      {}"
-				"\n\tCanonical: {}"
-				"\n\tRelative:  {}"
-				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(relative_to_base), libv::generic_path(base));
-		return false;
-	}
-
-	return true;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 ContextResource::ContextResource(Settings& settings) :
 	self(std::make_unique<ImplContextResource>(settings)) {
 
@@ -131,16 +272,6 @@ ContextResource::ContextResource(Settings& settings) :
 	log_ui.info("Resource base font:    {}", libv::generic_path(self->settings.res_font.base_path));
 	log_ui.info("Resource base shader:  {}", libv::generic_path(self->settings.res_shader.base_path));
 	log_ui.info("Resource base texture: {}", libv::generic_path(self->settings.res_texture.base_path));
-
-	const auto fallback_font_data = raw_font_consolas_min();
-	self->fallback_font = std::make_shared<Font2D>(
-			std::string{reinterpret_cast<const char*>(fallback_font_data.first), fallback_font_data.second}
-	);
-
-	const auto fallback_texture2D_data = raw_texture2D_white256();
-	self->fallback_texture2D = std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
-			{reinterpret_cast<const char*>(fallback_texture2D_data.first), fallback_texture2D_data.second})
-	);
 }
 
 ContextResource::~ContextResource() {
@@ -149,133 +280,16 @@ ContextResource::~ContextResource() {
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<Font2D> ContextResource::font(const std::filesystem::path& path) {
-	std::shared_ptr<Font2D> sp;
-
-	const auto lexically_normal = path.lexically_normal();
-	auto key = libv::generic_path(lexically_normal);
-
-	const auto it = self->cache_font.find(key);
-	if (it != self->cache_font.end()) {
-		sp = it->second.lock();
-		if (sp) {
-			// Cache hit
-//			log_ui.trace("Font cache hit for: {} as {}", libv::generic_path(path), key);
-			return sp;
-
-		} else {
-			// Cache expired
-			log_ui.trace("Font cache expired for: {} as {}", libv::generic_path(path), key);
-			self->cache_font.erase(it);
-		}
-	} else {
-		// Cache miss
-		log_ui.trace("Font cache miss for: {} as {}", libv::generic_path(path), key);
-	}
-
-	libv::Timer timer;
-
-	const auto target = self->settings.res_font.base_path / lexically_normal;
-
-	if (!secure_path(self->settings.res_font.base_path, self->settings.res_font.restict_under_base, target, lexically_normal)) {
-		log_ui.error("Path validation failed. Using fallback font");
-		sp = self->fallback_font;
-		return sp;
-	}
-
-	const auto time_scan = timer.timef_ms();
-
-	auto file = libv::read_file_ec(target);
-	if (file.ec) {
-		log_ui.error("Failed to read font file: {}: {} {}. Using fallback font", libv::generic_path(target), fmt::streamed(file.ec), file.ec.message());
-		sp = self->fallback_font;
-		return sp;
-	}
-
-	const auto time_read = timer.timef_ms();
-
-	sp = std::make_shared<Font2D>(std::move(file.data));
-
-	const auto time_load = timer.timef_ms();
-	log_ui.trace("Font loaded: scan:{:5.1f}ms, read:{:5.1f}ms, load:{:5.1f}ms for {} as {}",
-			time_scan.count(), time_read.count(), time_load.count(), libv::generic_path(path), key);
-
-	self->cache_font.emplace(std::move(key), sp);
-	return sp;
+std::shared_ptr<Font2D> ContextResource::font(std::string_view key) {
+	return self->cacheFont.load(key);
 }
 
-std::shared_ptr<Texture2D> ContextResource::texture2D(const std::filesystem::path& path) {
-	std::shared_ptr<Texture2D> sp;
-
-	const auto lexically_normal = path.lexically_normal();
-//	auto key = lexically_normal.generic_u8string();
-	auto key = libv::generic_path(lexically_normal);
-
-	const auto it = self->cache_texture2D.find(key);
-	if (it != self->cache_texture2D.end()) {
-		sp = it->second.lock();
-		if (sp) {
-			// Cache hit
-//			log_ui.trace("Texture2D cache hit for: {} as {}", libv::generic_path(path), key);
-			return sp;
-
-		} else {
-			// Cache expired
-			log_ui.trace("Texture2D cache expired for: {} as {}", libv::generic_path(path), key);
-			self->cache_texture2D.erase(it);
-		}
-	} else {
-		// Cache miss
-		log_ui.trace("Texture2D cache miss for: {} as {}", libv::generic_path(path), key);
-	}
-
-	libv::Timer timer;
-
-	const auto target = self->settings.res_texture.base_path / lexically_normal;
-
-	if (!secure_path(self->settings.res_texture.base_path, self->settings.res_texture.restict_under_base, target, lexically_normal)) {
-		log_ui.error("Path validation failed. Using fallback texture2D");
-		sp = self->fallback_texture2D;
-		return sp;
-	}
-
-	const auto time_scan = timer.timef_ms();
-
-	auto file = libv::read_file_ec(target);
-	if (file.ec) {
-		log_ui.error("Failed to read texture2D file: {}: {} {}. Using fallback texture2D", libv::generic_path(target), fmt::streamed(file.ec), file.ec.message());
-		sp = self->fallback_texture2D;
-		return sp;
-	}
-
-	const auto time_read = timer.timef_ms();
-
-	auto image = libv::gl::load_image(file.data);
-	if (!image) {
-		log_ui.error("Failed to load texture2D file: {}. Using fallback texture2D", libv::generic_path(target));
-		sp = self->fallback_texture2D;
-		return sp;
-	}
-
-	sp = std::make_shared<Texture2D>(std::move(*image));
-
-	const auto time_load = timer.timef_ms();
-	log_ui.trace("Texture2D loaded: scan:{:5.1f}ms, read:{:5.1f}ms, create:{:5.1f}ms for {} as {}",
-			time_scan.count(), time_read.count(), time_load.count(), libv::generic_path(path), key);
-
-	self->cache_texture2D.emplace(std::move(key), sp);
-	return sp;
+std::shared_ptr<Texture2D> ContextResource::texture2D(std::string_view key) {
+	return self->cacheTexture2D.load(key);
 }
 
-[[nodiscard]] bool ContextResource::texture2D_exists(const std::filesystem::path& path) {
-	const auto lexically_normal = path.lexically_normal();
-	const auto target = self->settings.res_texture.base_path / lexically_normal;
-
-	if (!secure_path(self->settings.res_texture.base_path, self->settings.res_texture.restict_under_base, target, lexically_normal))
-		return false;
-
-	std::error_code ignore_ec;
-	return std::filesystem::exists(target, ignore_ec);
+[[nodiscard]] bool ContextResource::texture2D_exists(std::string_view key) {
+	return self->cacheTexture2D.exists(key);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -313,11 +327,11 @@ std::shared_ptr<ShaderQuad> ContextResource::shaderQuad() {
 // -------------------------------------------------------------------------------------------------
 
 std::shared_ptr<Font2D> ContextResource::fallbackFont() const {
-	return self->fallback_font;
+	return self->cacheFont.fallback();
 }
 
 std::shared_ptr<Texture2D> ContextResource::fallbackTexture2D() const {
-	return self->fallback_texture2D;
+	return self->cacheTexture2D.fallback();
 }
 
 // -------------------------------------------------------------------------------------------------

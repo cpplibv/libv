@@ -29,6 +29,22 @@ namespace gl {
 /// @context ANY
 [[nodiscard]] Image load_image_or_throw(const std::string_view data);
 
+// TODO P5: Implement image loading extension_hint
+// /// @supported GLI backend: KTX 1.0, KMG, DDS
+// /// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR, GIF, PIC, PKM, PVR
+// /// @context ANY
+// [[nodiscard]] std::optional<Image> load_image(const std::string_view data, const std::string_view extension_hint) noexcept;
+//
+// /// @supported GLI backend: KTX 1.0, KMG, DDS
+// /// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR, GIF, PIC, PKM, PVR
+// /// @context ANY
+// [[nodiscard]] Image load_image_or(const std::string_view data, const std::string_view extension_hint, const Image& fallback) noexcept;
+//
+// /// @supported GLI backend: KTX 1.0, KMG, DDS
+// /// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR, GIF, PIC, PKM, PVR
+// /// @context ANY
+// [[nodiscard]] Image load_image_or_throw(const std::string_view data, const std::string_view extension_hint);
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace gl

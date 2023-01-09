@@ -6,6 +6,7 @@
 #include <libv/serial/reflection.hpp>
 #include <libv/serial/serial.hpp>
 // std
+#include <cstdint>
 #include <functional>
 #include <iomanip>
 #include <iostream>

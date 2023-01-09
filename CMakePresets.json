@@ -2,7 +2,7 @@
 	"version": 3,
 	"configurePresets": [
 		{
-			"name": "ninja-base",
+			"name": "gcc-base",
 			"hidden": true,
 			"generator": "Ninja",
 			"environment": {
@@ -15,8 +15,8 @@
 			}
 		},
 		{
-			"name": "ninja-debug",
-			"inherits": "ninja-base",
+			"name": "gcc-debug",
+			"inherits": "gcc-base",
 			"binaryDir": "${sourceDir}/build/debug",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "debug",
@@ -25,8 +25,18 @@
 			}
 		},
 		{
-			"name": "ninja-release",
-			"inherits": "ninja-base",
+			"name": "gcc-dev",
+			"inherits": "gcc-base",
+			"binaryDir": "${sourceDir}/build/dev",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "dev",
+				"SKIP_EXTERNAL_CONFIGURES": "true",
+				"FORCE_COLORED_OUTPUT": "true"
+			}
+		},
+		{
+			"name": "gcc-release",
+			"inherits": "gcc-base",
 			"binaryDir": "${sourceDir}/build/release",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "release",
@@ -35,11 +45,11 @@
 			}
 		},
 		{
-			"name": "ninja-dev",
-			"inherits": "ninja-base",
-			"binaryDir": "${sourceDir}/build/dev",
+			"name": "gcc-package",
+			"inherits": "gcc-base",
+			"binaryDir": "${sourceDir}/build/package",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "dev",
+				"CMAKE_BUILD_TYPE": "package",
 				"SKIP_EXTERNAL_CONFIGURES": "true",
 				"FORCE_COLORED_OUTPUT": "true"
 			}

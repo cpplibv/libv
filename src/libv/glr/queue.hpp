@@ -61,6 +61,7 @@ public:
 
 public:
 	void callback(std::function<void(libv::gl::GL&)>);
+	void callbackProgram(std::function<void(libv::gl::GL&)>);
 	libv::gl::GL& out_of_order_gl() noexcept;
 
 public:
@@ -175,6 +176,7 @@ public:
 	void program(Program program_);
 	void render(Mesh mesh);
 	void render(Mesh mesh, uint32_t baseVertex, uint32_t baseIndex, uint32_t numIndices);
+	void render_instanced(Mesh mesh, int32_t count);
 	void render_full_screen();
 
 	void bindImageTexture(uint32_t unit, Texture texture, int32_t level, libv::gl::BufferAccessFull access);

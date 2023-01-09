@@ -266,8 +266,97 @@ public:
 	//	void remove_signal(Component& signal);
 };
 
-template <typename ComponentT>
+template <typename ComponentT, typename EventT>
 class BasicEventProxyGlobal : public detail::BaseBasicEventProxy<ComponentT> {
+public:
+	using detail::BaseBasicEventProxy<ComponentT>::BaseBasicEventProxy;
+
+public:
+	template <typename F>
+	LIBV_FORCE_INLINE void operator()(F&& func) {
+		connect(std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void operator()(Component& slot, F&& func) {
+		connect(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect(F&& func) {
+		connect(this->component, std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, false>(slot_ptr, std::forward<F>(func)));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_front(F&& func) {
+		connect_front(this->component, std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_front(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global_front<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, false>(slot_ptr, std::forward<F>(func)));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_system(F&& func) {
+		connect_system(this->component, std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_system(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, true>(slot_ptr, std::forward<F>(func)));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_system_front(F&& func) {
+		connect_system_front(this->component, std::forward<F>(func));
+	}
+
+	template <typename F>
+	LIBV_FORCE_INLINE void connect_system_front(Component& slot, F&& func) {
+		mark_as_slot(slot);
+		const auto slot_ptr = get_core(slot);
+		get_nexus(this->component).template connect_global_front<EventT>(
+				slot_ptr,
+				detail::internal_callback_global<ComponentT, EventT, true>(slot_ptr, std::forward<F>(func)));
+	}
+
+	LIBV_FORCE_INLINE void fire(const EventT& event) {
+		// NOTE: Always fire, global events cannot be checked on the slot side
+		get_nexus(this->component).template broadcast_global<EventT>(event);
+	}
+
+	template <typename... Args>
+	LIBV_FORCE_INLINE void fire(Args&&... args) {
+		EventT event{std::forward<Args>(args)...};
+		fire(const_cast<const EventT&>(event));
+	}
+
+	//	event_connection_handler connect(...); // Hand back a handler: (?) 2 ptr: std::function ptr + slot ptr
+	//	void remove(event_connection_handler handler);
+	//	void remove_slot(Component& slot);
+	//	void remove_signal(Component& signal);
+};
+
+template <typename ComponentT>
+class BasicEventProxyGlobalCustom : public detail::BaseBasicEventProxy<ComponentT> {
 public:
 	using detail::BaseBasicEventProxy<ComponentT>::BaseBasicEventProxy;
 

@@ -7,12 +7,12 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.1.0)
+set(WISH_REQUEST_VERSION v5.2.2)
 include(cmake/wish.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
-wish_configurations(DEFAULT Release Dev Debug)
+wish_configurations(debug dev DEFAULT release package)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
@@ -26,10 +26,6 @@ message(STATUS "CXX compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 set(PATH_EXT_IDE ext)
 set(PATH_EXT     ${CMAKE_SOURCE_DIR}/ext)
 set(PATH_EXT_SRC ${CMAKE_SOURCE_DIR}/ext_src)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
 
 # --- Options --------------------------------------------------------------------------------------
 
@@ -108,9 +104,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 #wish_linker_flags(
 #	BUILD_TYPE Release GNU -mwindows
-#)
-#add_link_options(
-#	-mwindows
 #)
 
 wish_optimization_flags()
@@ -201,7 +194,7 @@ wish_create_library(
 wish_create_external(
 	NAME catch
 	GIT_REPOSITORY https://github.com/catchorg/Catch2
-	GIT_TAG v3.0.1
+	GIT_TAG v3.3.2
 	CMAKE_ARGS
         -DCATCH_INSTALL_DOCS=OFF
         -DCATCH_INSTALL_EXTRAS=OFF
@@ -279,7 +272,7 @@ wish_create_external(
 	CMAKE_ARGS
 		-DHDIFF_VERSION_TAG="v0"
 	LINK hdiffpatch
-#	LINK z bz2 # compressors are not used
+	# LINK z bz2 # compressors are not used
 )
 
 wish_create_external(
@@ -304,22 +297,19 @@ wish_create_external(
 
 wish_create_external(
 	NAME freetype
-	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
-	GIT_TAG f686ad46a3a9801ffa78063202250c68276330cb
-
-#	GIT_REPOSITORY https://github.com/freetype/freetype
-#	GIT_TAG VER-2-11-0
-#	CMAKE_ARGS
-#		-DFT_DISABLE_ZLIB=ON
-#		-DFT_DISABLE_BZIP2=ON
-#		-DFT_DISABLE_PNG=ON
-#		-DFT_DISABLE_HARFBUZZ=ON
-#		-DFT_DISABLE_BROTLI=ON
-#	LINK freetype
-#	LINK freetype bz2 zlibstatic ibs
+	GIT_REPOSITORY https://github.com/freetype/freetype
+	GIT_TAG VER-2-13-0
+	# GIT_TAG 4d8db130ea4342317581bab65fc96365ce806b77
+	CMAKE_ARGS
+		-DFT_ENABLE_ERROR_STRINGS=ON # ON = Enable support for meaningful error descriptions.
+		-DFT_DISABLE_ZLIB=OFF # OFF = System wise zlib can be used
+		-DFT_DISABLE_BZIP2=OFF # OFF = Enable support of bzip2 compressed fonts
+		-DFT_DISABLE_PNG=ON # ON = Disable support of PNG compressed OpenType embedded bitmaps
+		-DFT_DISABLE_HARFBUZZ=OFF # OFF = Used for improving auto-hinting of OpenType fonts
+		-DFT_DISABLE_BROTLI=ON # ON = Disable support of compressed WOFF2 fonts
 
 	# TODO P5: Create dedicated external target for bz2
-	# TODO P3: Create dedicated external target for zlibstatic
+	# TODO P5: Create dedicated external target for zlibstatic
 	LINK freetype bz2 zlibstatic
 	INCLUDE_DIR include/freetype2
 )
@@ -470,13 +460,14 @@ wish_create_external(
 wish_create_external(
 	NAME rp3d
 #	GIT_REPOSITORY https://github.com/DanielChappuis/reactphysics3d
-#	GIT_TAG c237cecf6871af44d54fc641af6f0dea15dd3187
-#	Main reason for the fork is long namespace if not the monolith header is used
+#	GIT_TAG c1053dfdb3ac15928e0ba1698991ae7cb2eec628
+	# Reasons for the fork:
+	#	- Build errors on GCC 13
+	#	- Long namespace if not the monolith header is used
 	GIT_REPOSITORY https://github.com/VaderY/reactphysics3d.git
-	GIT_TAG patched_c237cecf
+	GIT_TAG 5f4eb548ced585a1f185d534146b86cd9b896b1e
 	CMAKE_ARGS
 		-DCMAKE_BUILD_TYPE=RELEASE
-#	LINK reactphysics3d
 	LINK rp3d
 )
 
@@ -773,13 +764,13 @@ wish_create_library(
 wish_create_library(
 	TARGET libv::sun STATIC
 	SOURCE src/libv/sun/*.cpp
-	LINK   libv::math libv::ctrl libv::log
+	LINK   libv::math libv::ctrl libv::log libv::rev libv::ui
 )
 
 wish_create_library(
 	TARGET libv::sys STATIC
 	SOURCE src/libv/sys/*.cpp
-	LINK   libv::log ext_clip ext_fmt
+	LINK   libv::log ext_clip ext_fmt ext_boost
 )
 
 wish_create_library(
@@ -872,28 +863,12 @@ wish_create_executable(
 #	LINK   libv::net libv::serial
 )
 
-wish_create_executable(
-	TARGET star
-	SOURCE app/star/*.cpp
-#	GENERATE codegen app/star/message/*.in.lua
-	LINK   libv::log libv::sys
-	LINK   libv::frame libv::ctrl libv::ui
-	LINK   libv::sun libv::rev libv::glr libv::color
-	LINK   libv::serial
-#	LINK   libv::lua
-#	LINK   libv::net
-#	LINK   libv::vm4
-)
+add_subdirectory(app/star)
 
 wish_create_executable(
 	TARGET theme
-	#OUTPUT_FOLDER theme
-	#OUTPUT_NAME theme
-	#OUTPUT_RESOURCE res
-	#RESOURCE app/theme/res
 	SOURCE app/theme/*.cpp
 	LINK   libv::log libv::ui libv::frame libv::glr libv::utility libv::fsw libv::lua libv::mt
-#	LINK   libv::ctrl
 )
 
 ## --- Update ---
@@ -964,19 +939,6 @@ wish_create_executable(
 	LINK   ext_fmt libv::utility
 )
 
-# app.vm4_viewer: Disable vm4_viewer build target until the project is not resurrected
-#
-#wish_create_executable(
-#	TARGET app_vm4_viewer
-#	#OUTPUT_FOLDER vm4_viewer
-#	#OUTPUT_NAME vm4_viewer
-#	#OUTPUT_RESOURCE res
-#	#RESOURCE app/vm4_viewer/res
-#	SOURCE app/vm4_viewer/*.cpp
-#	LINK   libv::log libv::vm4imp libv::ui libv::frame libv::utility libv::fsw libv::ctrl
-##	LINK   ext_date
-#)
-
 wish_create_executable(
 	TARGET fsw
 	SOURCE app/fsw.cpp
@@ -1005,6 +967,12 @@ wish_create_executable(
 )
 
 wish_group(group_sandbox sandbox) # --- Sandbox ---------------------------------------------------
+
+wish_create_executable(
+	TARGET sandbox_libv_benchmark
+	SOURCE sandbox/libv_benchmark_main.cpp
+	LINK   libv::mt libv::utility libv::rev ext_fmt
+)
 
 wish_create_executable(
 	TARGET sandbox_libv_coro
@@ -1111,6 +1079,7 @@ wish_create_executable(
 	LINK   libv::diff
 	LINK   libv::mt libv::process
 	LINK   ext_zstd
+	LINK   libv::sys
 )
 
 wish_create_executable(
@@ -1166,6 +1135,8 @@ wish_create_executable(
 	SOURCE sandbox/libv_rev_main.cpp
 	LINK   libv::log libv::rev ext_glfw #libv_utility libv::math
 )
+
+add_subdirectory(sandbox/rev_particle)
 
 wish_create_executable(
 	TARGET sandbox_libv_rev_res

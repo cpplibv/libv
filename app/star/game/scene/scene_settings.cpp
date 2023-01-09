@@ -11,11 +11,12 @@
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/selection_group.hpp>
+#include <libv/ui/component_system/switch_scene.hpp>
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/utility/parse_number.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
-#include <star/game/scene/utility.hpp>
+#include <star/game/scene/bean.hpp>
 
 
 namespace star {
@@ -184,7 +185,7 @@ struct SettingsBuilder {
 		{
 			auto btn = libv::ui::Button::sa("settings.ctrl", "Back");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
-				switchParentScene("main", source, createSceneMainMenu(nexus_));
+				libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus_));
 			});
 			ctrl.add(std::move(btn));
 
@@ -210,7 +211,7 @@ struct SettingsBuilder {
 			auto btn = libv::ui::Button::sa("settings.ctrl", "Save");
 			btn.event().submit.connect([nexus_ = nexus](libv::ui::Button& source) mutable {
 //				active_config.assign(local_config);
-				switchParentScene("main", source, createSceneMainMenu(nexus_));
+				libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus_));
 			});
 
 			ctrl.add(std::move(btn));

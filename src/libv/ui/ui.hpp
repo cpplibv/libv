@@ -9,6 +9,7 @@
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -66,9 +67,6 @@ public:
 	void load_style_script_file(std::string path);
 
 public:
-	[[nodiscard]] EventHostUI<Component> event();
-
-public:
 	void event(const libv::input::EventChar& event);
 	void event(const libv::input::EventKey& event);
 	void event(const libv::input::EventMouseButton& event);
@@ -77,10 +75,12 @@ public:
 	void event(const libv::input::EventMouseScroll& event);
 
 public:
+	[[nodiscard]] EventHostGlobal<Component> event();
 	[[nodiscard]] EventHub event_hub();
 
 public:
 	[[nodiscard]] libv::gl::GL& gl();
+	[[nodiscard]] libv::Nexus& nexus();
 
 	[[nodiscard]] ContextState& state();
 	[[nodiscard]] ContextResource& resource();

@@ -625,8 +625,8 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 
 // -------------------------------------------------------------------------------------------------
 
-Renderer::Renderer(libv::ui::UI& ui) {
-	resource_context.loader.shader.attach_libv_ui_hub(ui.event_hub());
+Renderer::Renderer(libv::ui::UI& ui) :
+		resource_context(ui.nexus()) {
 	text.font = ui.resource().font("consola.ttf");
 }
 

@@ -16,7 +16,7 @@ struct ResourceLoaderSettings {
 
 	// bool track_files = true; /// Track every resource and reload resource upon file change
 	// bool relative_path_only = true; /// Forbid requests with absolute path
-	// bool restict_under_base = true; /// Forbid requests that would leave the base path
+	// bool restrict_under_base = true; /// Forbid requests that would leave the base path
 	// bool cache_fallback = true; /// Insert failed resource lookups into cache as the fallback value
 	// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
 };

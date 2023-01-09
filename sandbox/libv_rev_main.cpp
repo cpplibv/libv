@@ -3,10 +3,11 @@
 // hpp
 #include "libv_gl_runner.hpp"
 // libv
-//#include <libv/gl/gl.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/utility/chrono.hpp>
-//#include <libv/utility/read_file.hpp>
+#include <libv/utility/nexus.hpp>
+//#include <libv/gl/gl.hpp>
+//#include <libv/utility/read_file.hpp>>
 // std
 #include <chrono>
 #include <iostream>
@@ -95,6 +96,7 @@ struct UniformsOnlyMatrixBlock {
 struct Sandbox {
 	int debug_view_bloom_step = 0;
 	std::chrono::duration<float> running_time{0};
+	libv::Nexus nexus;
 
 	libv::vec2i window_size = {WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -104,7 +106,7 @@ struct Sandbox {
 	libv::glr::Mesh mesh_color_bar{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
-	libv::rev::ShaderLoader shader_loader{"../res/shader/"};
+	libv::rev::ShaderLoader shader_loader{nexus, "../../res/shader/"};
 	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere.fs"};
 	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
 
@@ -165,7 +167,7 @@ struct Sandbox {
 		(void) scancode;
 		(void) mods;
 
-		if (action != GLFW_PRESS)
+		if (action != GLFW_PRESS && action != GLFW_REPEAT)
 			return;
 
 		if (key == GLFW_KEY_GRAVE_ACCENT) {
@@ -183,6 +185,27 @@ struct Sandbox {
 			--debug_view_bloom_step; std::cout << "debug_view_bloom_step: " << debug_view_bloom_step << std::endl;
 		} else if (key == GLFW_KEY_W) {
 			++debug_view_bloom_step; std::cout << "debug_view_bloom_step: " << debug_view_bloom_step << std::endl;
+
+		} else if (key == GLFW_KEY_U) {
+			post_processing.bloomThreshold(post_processing.bloomThreshold() * 1.1f);
+			std::cout << "Bloom Threshold: " << post_processing.bloomThreshold() << std::endl;
+		} else if (key == GLFW_KEY_J) {
+			post_processing.bloomThreshold(post_processing.bloomThreshold() * 0.9f);
+			std::cout << "Bloom Threshold: " << post_processing.bloomThreshold() << std::endl;
+
+		} else if (key == GLFW_KEY_I) {
+			post_processing.bloomIntensity(post_processing.bloomIntensity() * 1.1f);
+			std::cout << "Bloom Intensity: " << post_processing.bloomIntensity() << std::endl;
+		} else if (key == GLFW_KEY_K) {
+			post_processing.bloomIntensity(post_processing.bloomIntensity() * 0.9f);
+			std::cout << "Bloom Intensity: " << post_processing.bloomIntensity() << std::endl;
+
+		} else if (key == GLFW_KEY_O) {
+			post_processing.bloomKnee(post_processing.bloomKnee() * 1.1f);
+			std::cout << "Bloom Knee: " << post_processing.bloomKnee() << std::endl;
+		} else if (key == GLFW_KEY_L) {
+			post_processing.bloomKnee(post_processing.bloomKnee() * 0.9f);
+			std::cout << "Bloom Knee: " << post_processing.bloomKnee() << std::endl;
 		}
 	}
 
@@ -299,5 +322,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.rev", WINDOW_HEIGHT, WINDOW_WIDTH, 0, 0);
+	return run_sandbox<Sandbox>("Sandbox libv.rev", WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
 }

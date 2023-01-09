@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 // pro
+#include <libv/rev/gl/swizzle.hpp>
 #include <libv/rev/resource/basic_resource.hpp>
 #include <libv/rev/resource/texture_internal.hxx>
 
@@ -53,7 +54,7 @@ public:
 	std::mutex includeDirectories_m;
 	std::vector<std::string> includeDirectories;
 
-	libv::glr::Texture glrDefault;
+	libv::glr::Texture defaultGLR;
 	InternalTexture_ptr fallback_;
 	boost::container::flat_set<InternalTexture_ptr, InternalTexturePtrNameComp> builtins;
 
@@ -67,12 +68,12 @@ private:
 	void initBuiltin(std::string name, libv::vec4uc color);
 
 public:
-	InternalTexture_ptr load(std::string_view name);
+	InternalTexture_ptr load(std::string_view name, Swizzle swizzle);
 	InternalTexture_ptr fallback() const;
 	void unload(InternalTexture* resource);
 
 private:
-	InternalTexture_ptr create_resource(std::string_view name);
+	InternalTexture_ptr create_resource(std::string_view name, Swizzle swizzle);
 	void process_fs(InternalTexture_ptr&& res);
 	void process_cpu(InternalTexture_ptr&& res, std::string&& data);
 	void process_res(InternalTexture_ptr&& resource, libv::gl::Image&& image);

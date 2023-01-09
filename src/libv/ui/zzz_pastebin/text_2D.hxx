@@ -86,7 +86,7 @@ void String2D::render(Context& context) {
 			context.gl.activeTexture(gl::TextureChannel::diffuse);
 			auto txGuard = segment.font->bindGuard();
 
-			context.gl.drawArrays(vao, gl::Primitive::Triangles, segment.vertexCount, segment.vertexStart);
+			context.gl.drawArrays(vao, gl::Primitive::Triangles, segment.vertexStart, segment.vertexCount);
 		}
 	}
 	glUseProgram(0);

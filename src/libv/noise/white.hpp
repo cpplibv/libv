@@ -13,8 +13,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-//std::vector<double> noise_white_2D_1d(uint64_t seed, uint32_t X, uint32_t Y);
-std::vector<libv::vec3uc> noise_white_2D_3uc(uint64_t seed, uint32_t X, uint32_t Y);
+//std::vector<double> noise_white_2D_1d(uint64_t seed, uint32_t x, uint32_t y);
+std::vector<libv::vec3uc> noise_white_2D_3uc(uint64_t seed, uint32_t x, uint32_t y);
 
 // -------------------------------------------------------------------------------------------------
 

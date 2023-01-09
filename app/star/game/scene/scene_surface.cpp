@@ -5,10 +5,14 @@
 // libv
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/create_scene.hpp>
+#include <libv/ui/component_system/switch_scene.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 // pro
 //#include <star/game/scene/surface/camera.hpp>
-#include <star/game/scene/utility.hpp>
+#include <star/game/scene/bean.hpp>
 //#include <star/game/config/client_config.hpp>
 
 
@@ -103,21 +107,23 @@ using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 // -------------------------------------------------------------------------------------------------
 
 struct RendererResourceContext {
-	libv::rev::ResourceManager loader{[] {
-		libv::rev::Settings settings;
-		settings.texture.base_path = "../../res/texture/";
-		settings.shader.base_path = "../../res/shader/";
-		settings.model.base_path = "../../res/model/";
-//		settings.texture.base_path = "res/texture/";
-//		settings.shader.base_path = "res/shader/";
-//		settings.model.base_path = "res/model/";
-		return settings;
-	}()};
+	libv::rev::ResourceManager loader;
 //	libv::rev::ShaderLoader shader_loader{"shader/"};
 //	libv::rev::ModelLoader model_loader{"model/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
-	RendererResourceContext() {
+	RendererResourceContext(libv::Nexus& nexus) :
+			loader([] {
+				libv::rev::Settings settings;
+				settings.texture.base_path = "../../res/texture/";
+				settings.shader.base_path = "../../res/shader/";
+				settings.model.base_path = "../../res/model/";
+		//		settings.texture.base_path = "res/texture/";
+		//		settings.shader.base_path = "res/shader/";
+		//		settings.model.base_path = "res/model/";
+				return settings;
+			}(), nexus)
+	{
 		// Include the res/shader/ folder from libv
 //		loader.shader.add_include_directory("", "../../res/shader/");
 //		loader.shader.add_include_directory("", "res/shader/");
@@ -177,15 +183,12 @@ struct Renderer {
 //	RendererSprite sprite{resource_context.loader};
 
 public:
-//	explicit Renderer(libv::ui::UI& ui);
-	explicit Renderer();
+	explicit Renderer(libv::Nexus& nexus);
 	void prepare_for_render(libv::glr::Queue& gl);
 };
 
 //Renderer::Renderer(libv::ui::UI& ui) {
-Renderer::Renderer() {
-//	resource_context.loader.shader.attach_libv_ui_hub(ui.event_hub());
-//	resource_context.loader.shader.attach_nexus(nexus);
+Renderer::Renderer(libv::Nexus& nexus) : resource_context(nexus) {
 //	text.font = ui.context().font("consola.ttf");
 }
 
@@ -216,11 +219,9 @@ private:
 //	float time = 0.0f;
 
 public:
-//	CanvasSurface(libv::ui::UI& ui) :
-//		renderer(ui) {
-	explicit CanvasSurface(libv::ctrl::Controls& controls) :
+	explicit CanvasSurface(libv::Nexus& nexus, libv::ctrl::Controls& controls) :
 		controls(controls),
-		renderer(),
+		renderer(nexus),
 		screen_picker(camera.picker({100, 100})) { // <<< 100 100
 		camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
@@ -404,11 +405,13 @@ private:
 struct SceneSurface {
 	std::string some_data;
 
-	[[nodiscard]] libv::ui::Component create_scene(libv::Nexus& nexus) const {
+	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) const {
 		auto layers = libv::ui::PanelAnchor::n("layers");
 
 		layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas",
-				requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls"));
+				nexus,
+				requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls")
+		);
 
 		auto line = layers.add_n<libv::ui::PanelLine>("line");
 		line.anchor(libv::ui::Anchor::bottom_center);
@@ -424,7 +427,7 @@ struct SceneSurface {
 		auto btn = line.add_a<libv::ui::Button>("Back to Main Menu");
 		btn.size(libv::ui::Size{libv::ui::dynamic(), libv::ui::dynamic()});
 		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-			switchParentScene("main", source, createSceneMainMenu(nexus));
+			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
 		});
 
 		return layers;
@@ -432,7 +435,7 @@ struct SceneSurface {
 };
 
 libv::ui::Component createSceneSurface(libv::Nexus& nexus) {
-	return assembleScene<SceneSurface>("Hi")(nexus);
+	return libv::ui::createScene<SceneSurface>("Hi")(nexus);
 }
 
 // -------------------------------------------------------------------------------------------------

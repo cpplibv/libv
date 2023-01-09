@@ -22,8 +22,10 @@ namespace rev {
 
 class ImplRenderTarget {
 //	using MSTexture = libv::glr::Texture2DMultisample::RGBA32F;
-	using MSTexture = libv::glr::Texture2DMultisample::R11F_G11F_B10F;
-	using SSTexture = libv::glr::Texture2D::R11F_G11F_B10F;
+// 	using MSTexture = libv::glr::Texture2DMultisample::R11F_G11F_B10F;
+// 	using SSTexture = libv::glr::Texture2D::R11F_G11F_B10F;
+	using MSTexture = libv::glr::Texture2DMultisample::R16G16B16_SFloat;
+	using SSTexture = libv::glr::Texture2D::R16G16B16_SFloat;
 
 public:
 	libv::glr::Framebuffer ms_framebuffer;

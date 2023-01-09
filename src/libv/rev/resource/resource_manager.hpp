@@ -6,6 +6,7 @@
 #include <libv/rev/fwd.hpp>
 // libv
 #include <libv/gl/gl_fwd.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 // pro
 #include <libv/rev/resource/material_loader.hpp>
 #include <libv/rev/resource/model_loader.hpp>
@@ -29,8 +30,8 @@ public:
 	ModelLoader model;
 
 public:
-	ResourceManager();
-	explicit ResourceManager(Settings settings);
+	explicit ResourceManager(libv::Nexus& nexus);
+	explicit ResourceManager(Settings settings, libv::Nexus& nexus);
 
 	ResourceManager(const ResourceManager&) = delete;
 	ResourceManager& operator=(const ResourceManager&) & = delete;

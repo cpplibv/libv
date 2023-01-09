@@ -61,7 +61,6 @@ public:
 	inline void execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at);
 	inline void stop();
 	inline void join();
-	[[nodiscard]] inline bool wait_for_empty() const;
 
 public:
 	[[nodiscard]] inline const std::string& name() const noexcept {
@@ -112,10 +111,7 @@ inline void basic_worker_thread<Threads>::execute_async(libv::unique_function<vo
 	assert(!terminate && "Queueing task after worker thread has been stopped");
 
 	queue.emplace(at, next_index++, std::move(func));
-	work_cv.notify_all();
-	// NOTE: notify_all will wake up every thread for the next task
-	//      because wait_for_empty thread could steal the notify_one
-	//      (there could be workaround like: wait_for_empty could notify_all if it stole the 'notify_one' on accident)
+	work_cv.notify_one(); // On work_cv only worker threads should be waiting, notify_one will suffice
 }
 
 template <typename Threads>
@@ -133,19 +129,6 @@ inline void basic_worker_thread<Threads>::join() {
 		} catch (const std::system_error&) {
 			// It's not an error, ignore it
 		}
-}
-
-template <typename Threads>
-inline bool basic_worker_thread<Threads>::wait_for_empty() const {
-	std::unique_lock lock(queue_m);
-
-	bool had_work = false;
-	work_cv.wait(lock, [&] {
-		const auto finished_waiting = queue.empty() || queue.top().time > std::chrono::steady_clock::now();
-		had_work |= !finished_waiting;
-		return finished_waiting;
-	});
-	return had_work;
 }
 
 // -------------------------------------------------------------------------------------------------

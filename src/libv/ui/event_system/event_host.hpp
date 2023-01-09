@@ -3,6 +3,8 @@
 #pragma once
 
 // pro
+#include <libv/gl/gl_fwd.hpp>
+#include <libv/ui/chrono.hpp>
 #include <libv/ui/event/base_event.hpp>
 #include <libv/ui/event/event_component.hpp>
 #include <libv/ui/event/event_enable.hpp>
@@ -63,9 +65,42 @@ public:
 	}
 };
 
+struct EventBeforeUpdate : BaseEvent  {
+	time_point frame_time;
+	time_duration delta_time;
+
+	constexpr inline EventBeforeUpdate(time_point frameTime, time_duration deltaTime) noexcept :
+			frame_time(frameTime), delta_time(deltaTime) {}
+};
+
+struct EventAfterUpdate : BaseEvent  {
+	time_point frame_time;
+	time_duration delta_time;
+
+	constexpr inline EventAfterUpdate(time_point frameTime, time_duration deltaTime) noexcept :
+			frame_time(frameTime), delta_time(deltaTime) {}
+};
+
+// struct EventBeforeCreate : BaseEvent {
+// 	libv::gl::GL& gl;
+// 	explicit inline EventBeforeCreate(gl::GL& gl) : gl(gl) {}
+// };
+struct EventBeforeRender : BaseEvent {
+	libv::gl::GL& gl;
+	explicit inline EventBeforeRender(gl::GL& gl) : gl(gl) {}
+};
+// struct EventBeforeDestroy : BaseEvent {
+// 	libv::gl::GL& gl;
+// 	explicit inline EventBeforeDestroy(gl::GL& gl) : gl(gl) {}
+// };
+// struct EventAfterDestroy : BaseEvent {
+// 	libv::gl::GL& gl;
+// 	explicit inline EventAfterDestroy(gl::GL& gl) : gl(gl) {}
+// };
+
 // -------------------------------------------------------------------------------------------------
 
-// NOTE: EventHost system's convenience API has no/low run-time overhead
+// NOTE: EventHost system's convenience API has low/no run-time overhead
 // Creating a temporary host object with proxy members that point to the component can be optimized away
 // Proof: https://godbolt.org/z/vM5zhf3Yf
 
@@ -77,17 +112,14 @@ public:
 	ComponentT& owner;
 
 public:
-	BasicEventProxyGlobal<ComponentT> global{owner};
-};
+	BasicEventProxyGlobalCustom<ComponentT> global{owner};
 
-// -------------------------------------------------------------------------------------------------
-
-template <typename ComponentT>
-struct EventHostUI : EventHostGlobal<ComponentT> {
-	struct EventBeforeUpdate{};
-	BasicEventProxy<ComponentT, EventBeforeUpdate> before_update{this->owner};
-	struct EventAfterUpdate{};
-	BasicEventProxy<ComponentT, EventAfterUpdate> after_update{this->owner};
+	BasicEventProxyGlobal<ComponentT, EventBeforeUpdate> global_before_update{owner};
+	BasicEventProxyGlobal<ComponentT, EventAfterUpdate> global_after_update{owner};
+	// BasicEventProxyGlobal<ComponentT, EventBeforeCreate> global_before_create{owner};
+	BasicEventProxyGlobal<ComponentT, EventBeforeRender> global_before_render{owner};
+	// BasicEventProxyGlobal<ComponentT, EventBeforeDestroy> global_before_destroy{owner};
+	// BasicEventProxyGlobal<ComponentT, EventAfterDestroy> global_after_destroy{owner};
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -105,7 +137,6 @@ template <typename ComponentT>
 struct EventHostGeneral : EventHostGlobal<ComponentT> {
 	BasicEventProxy<ComponentT, EventChar> char_{this->owner};
 	BasicEventProxy<ComponentT, EventKey> key{this->owner};
-
 	BasicEventProxy<ComponentT, EventMouseButton> mouse_button{this->owner};
 	BasicEventProxy<ComponentT, EventMouseMovement> mouse_movement{this->owner};
 	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll{this->owner};
@@ -115,6 +146,29 @@ struct EventHostGeneral : EventHostGlobal<ComponentT> {
 
 	BasicEventProxy<ComponentT, EventEnable> enable{this->owner};
 	BasicEventProxy<ComponentT, EventFocus> focus{this->owner};
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct BaseEventCanvasGL : BaseEvent {
+	libv::gl::GL& gl;
+	explicit inline BaseEventCanvasGL(gl::GL& gl) : gl(gl) {}
+};
+struct EventCanvasBeforeCreate : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+struct EventCanvasAfterCreate : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+struct EventCanvasBeforeDestroy : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+struct EventCanvasAfterDestroy : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+struct EventCanvasBeforeRender : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+struct EventCanvasAfterRender : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
+
+template <typename ComponentT>
+struct EventHostCanvas : EventHostGeneral<ComponentT> {
+	BasicEventProxy<ComponentT, EventCanvasBeforeCreate> before_create{this->owner};
+	BasicEventProxy<ComponentT, EventCanvasAfterCreate> after_create{this->owner};
+	BasicEventProxy<ComponentT, EventCanvasBeforeDestroy> before_destroy{this->owner};
+	BasicEventProxy<ComponentT, EventCanvasAfterDestroy> after_destroy{this->owner};
+	BasicEventProxy<ComponentT, EventCanvasBeforeRender> before_render{this->owner};
+	BasicEventProxy<ComponentT, EventCanvasAfterRender> after_render{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

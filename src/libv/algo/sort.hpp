@@ -4,30 +4,32 @@
 
 // std
 #include <algorithm>
+#include <functional>
 
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Range>
-constexpr inline void sort_stable(Range& range) {
-	std::stable_sort(range.begin(), range.end());
+template <typename Range, typename Comp = std::less<>, typename Proj = std::identity>
+[[nodiscard]] constexpr inline bool is_sorted(const Range& range, Comp&& comp = {}, Proj&& proj = {}) {
+	return std::is_sorted(std::begin(range), std::end(range), [&](const auto& lhs, const auto& rhs) {
+		return comp(std::invoke(proj, lhs), std::invoke(proj, rhs));
+	});
 }
 
-template <typename Range, typename Compare>
-constexpr inline void sort_stable(Range& range, Compare&& compare) {
-	std::stable_sort(range.begin(), range.end(), std::forward<Compare>(compare));
+template <typename Range, typename Comp = std::less<>, typename Proj = std::identity>
+constexpr inline void sort_stable(Range& range, Comp&& comp = {}, Proj&& proj = {}) {
+    return std::stable_sort(std::begin(range), std::end(range), [&](const auto& lhs, const auto& rhs) {
+        return comp(std::invoke(proj, lhs), std::invoke(proj, rhs));
+    });
 }
 
-template <typename Range>
-constexpr inline void sort_unstable(Range& range) {
-	std::sort(range.begin(), range.end());
-}
-
-template <typename Range, typename Compare>
-constexpr inline void sort_unstable(Range& range, Compare&& compare) {
-	std::sort(range.begin(), range.end(), std::forward<Compare>(compare));
+template <typename Range, typename Comp = std::less<>, typename Proj = std::identity>
+constexpr inline void sort_unstable(Range& range, Comp&& comp = {}, Proj&& proj = {}) {
+    return std::sort(std::begin(range), std::end(range), [&](const auto& lhs, const auto& rhs) {
+        return comp(std::invoke(proj, lhs), std::invoke(proj, rhs));
+    });
 }
 
 // -------------------------------------------------------------------------------------------------

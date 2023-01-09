@@ -5,7 +5,9 @@
 // fwd
 #include <star/game/fwd.hpp>
 // libv
+#include <libv/ui/fwd.hpp>
 #include <libv/utility/nexus_fwd.hpp>
+// #include <libv/ui/component/component_fwd.hpp>
 //#include <libv/ctrl/controls.hpp>
 // std
 #include <filesystem>
@@ -30,8 +32,11 @@ private:
 	void register_nexus();
 	void register_controls();
 	void unregister_nexus();
-	void init_ui(bool devMode);
 //	void update();
+
+	[[nodiscard]] libv::ui::Component overlay_version(bool devMode);
+	[[nodiscard]] libv::ui::Component overlay_fps();
+	void init_ui(bool devMode);
 
 public:
 	void run();

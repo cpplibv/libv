@@ -17,6 +17,21 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
+// Improve naming with explicit "wait_" on any possibly blocking operation
+// void queue::push(const Element&);
+// void queue::push(Element&&);
+// queue_op_status queue::wait_push(const Element&);
+// queue_op_status queue::wait_push(Element&&);
+// queue_op_status queue::try_push(const Element&);
+// queue_op_status queue::try_push(Element&&);
+// Element queue::value_pop();
+// queue_op_status queue::try_pop(Element&);
+// void queue::close() noexcept;
+// void queue::open();
+// bool queue::is_closed() const noexcept;
+// bool queue::is_empty() const noexcept;
+// bool queue::is_full() const noexcept;
+
 template <typename T>
 class queue_concurrent {
 	mutable libv::mutex_spinlock queue_m;
@@ -31,6 +46,30 @@ public:
 	inline explicit queue_concurrent(std::size_t limit) noexcept : limit(limit) { }
 
 public:
+	void push(const T& value) {
+		std::unique_lock lock(queue_m);
+
+		while (queue.size() >= limit)
+			consumed_cv.wait(lock);
+
+		queue.push(value);
+
+		lock.unlock();
+		received_cv.notify_one();
+	}
+
+	void push(T&& value) {
+		std::unique_lock lock(queue_m);
+
+		while (queue.size() >= limit)
+			consumed_cv.wait(lock);
+
+		queue.push(std::move(value));
+
+		lock.unlock();
+		received_cv.notify_one();
+	}
+
 	template <typename... Args>
 	void emplace(Args&&... args) {
 		std::unique_lock lock(queue_m);
@@ -45,19 +84,19 @@ public:
 	}
 
 	T pop() {
-		T result; // Could be temporary std::optional if default constructability is impossible
+		std::optional<T> result;
 
 		std::unique_lock lock(queue_m);
 		while (queue.empty())
 			received_cv.wait(lock);
 
-		result = std::move(queue.front());
+		result.emplace(std::move(queue.front()));
 		queue.pop();
 
 		lock.unlock();
-		consumed_cv.notify_all(); // notify_all to ensure that wait_empty would work
+		consumed_cv.notify_one();
 
-		return result;
+		return std::move(result.value());
 	}
 
 	std::optional<T> pop(const std::stop_token& stop_token) {
@@ -73,7 +112,7 @@ public:
 		queue.pop();
 
 		lock.unlock();
-		consumed_cv.notify_all(); // notify_all to ensure that wait_empty would work
+		consumed_cv.notify_one();
 
 		return result;
 	}
@@ -89,15 +128,15 @@ public:
 		queue.pop();
 
 		lock.unlock();
-		consumed_cv.notify_all(); // notify_all to ensure that wait_empty would work
+		consumed_cv.notify_one();
 
 		return result;
 	}
 
-	void wait_empty() const {
+	/// A not-necessarily-accurate count of the total number of elements
+	std::size_t size_approx() const noexcept {
 		std::unique_lock lock(queue_m);
-		while (!queue.empty())
-			consumed_cv.wait(lock);
+		return queue.size();
 	}
 };
 

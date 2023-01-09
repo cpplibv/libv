@@ -5,7 +5,6 @@
 // fwd
 #include <libv/ui/fwd.hpp>
 // std
-#include <filesystem>
 #include <memory>
 #include <string_view>
 
@@ -14,19 +13,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-// TODO P1: The Uniform UI Resource System:
-//			- define  - tell the system in any way you can what resource are you looking for
-//			- resolve - normalize the resource request
-//			- lookup  - find the resource
-//			- cache   - cache the resource
-//			- provide - yield the result
-//			+ tracking
-//			+ preprocess/include/recurse
-// TODO P1: Implement higher level cache functions:
-//			auto __ = cacheResolve(cacheFile, filePath);
-//			auto __ = cacheLookup(cacheFile, filePath);
-//			auto __ = cacheStore(cacheFile, filePath, filePath);
 
 class ImplContextResource;
 
@@ -44,14 +30,14 @@ public:
 	ContextResource& operator=(ContextResource&&) = delete;
 
 public:
-	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
-	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
-	[[nodiscard]] bool texture2D_exists(const std::filesystem::path& path);
+	[[nodiscard]] std::shared_ptr<Font2D> font(std::string_view key);
+	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(std::string_view key);
+	[[nodiscard]] bool texture2D_exists(std::string_view key);
 
-	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
-	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
+	// [[nodiscard]] std::shared_ptr<Shader> shader(const std::string_view name);
+	// [[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
+	// [[nodiscard]] std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
+	// [[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
 
 public:
 	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont();

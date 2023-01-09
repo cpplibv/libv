@@ -51,10 +51,10 @@ public:
 	[[nodiscard]] float vignetteSmoothness() const noexcept;
 
 public:
-	void pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11F_G11F_B10F& input);
+	void pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16G16B16_SFloat& input);
 
 public:
-	const libv::glr::Texture2D::R11F_G11F_B10F& view(libv::glr::Queue& glr, int step);
+	const libv::glr::Texture2D::R16G16B16_SFloat& view(libv::glr::Queue& glr, int step);
 };
 
 // -------------------------------------------------------------------------------------------------

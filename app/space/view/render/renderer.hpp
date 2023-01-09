@@ -39,11 +39,12 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 struct RendererResourceContext {
-	libv::rev::ShaderLoader shader_loader{"shader/"};
+	libv::rev::ShaderLoader shader_loader;
 //	libv::rev::ModelLoader model_loader{"model/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
-	RendererResourceContext() {
+	RendererResourceContext(libv::Nexus& nexus) :
+		shader_loader(nexus, "shader/") {
 		// Include the res/shader/ folder from libv
 		shader_loader.add_include_directory("", "../../res/shader/");
 //		// Include the res/model/ folder from libv

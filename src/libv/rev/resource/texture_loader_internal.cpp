@@ -32,8 +32,8 @@ InternalTextureLoader::~InternalTextureLoader() {
 // -------------------------------------------------------------------------------------------------
 
 void InternalTextureLoader::initDefaultGLR() {
-	glrDefault = createColorTextureGLR({255, 0, 255, 255});
-	fallback_ = libv::make_intrusive2_ptr<InternalTexture>(std::weak_ptr<InternalTextureLoader>{}, "<<fallback>>", glrDefault);
+	defaultGLR = createColorTextureGLR({255, 0, 255, 255});
+	fallback_ = libv::make_intrusive2_ptr<InternalTexture>(std::weak_ptr<InternalTextureLoader>{}, "<<fallback>>", defaultGLR, defaultSwizzle);
 
 	initBuiltin("builtin:up",          libv::vec4uc{127, 127, 255, 255});
 	initBuiltin("builtin:down",        libv::vec4uc{127, 127,   0, 255});
@@ -69,13 +69,14 @@ void InternalTextureLoader::initBuiltin(std::string name, libv::vec4uc color) {
 	builtins.emplace(libv::make_intrusive2_ptr<InternalTexture>(
 			std::weak_ptr<InternalTextureLoader>{}, // Builtins are not tracked: loader can be null
 			name,
-			createColorTextureGLR(color)
+			createColorTextureGLR(color),
+			defaultSwizzle
 	));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-InternalTexture_ptr InternalTextureLoader::load(std::string_view name) {
+InternalTexture_ptr InternalTextureLoader::load(std::string_view name, Swizzle swizzle) {
 	auto lock = std::unique_lock(mutex);
 
 	if (name.starts_with("builtin:")) {
@@ -88,10 +89,10 @@ InternalTexture_ptr InternalTextureLoader::load(std::string_view name) {
 		return *it;
 	}
 
-	auto& ptr = cache.lookup(name);
+	auto& ptr = cache.lookup(name, swizzle);
 
 	if (!ptr)
-		ptr = create_resource(name);
+		ptr = create_resource(name, swizzle);
 
 	return ptr;
 }
@@ -111,14 +112,14 @@ void InternalTextureLoader::unload(InternalTexture* resource) {
 
 // -------------------------------------------------------------------------------------------------
 
-InternalTexture_ptr InternalTextureLoader::create_resource(std::string_view path) {
+InternalTexture_ptr InternalTextureLoader::create_resource(std::string_view path, Swizzle swizzle) {
 	log_rev.trace("Create new texture: {}", path);
 
 	auto loader_sp = shared_from_this();
 
 	// --- Start of real work
 
-	auto res = libv::make_intrusive2_ptr<InternalTexture>(weak_from_this(), std::string(path), glrDefault);
+	auto res = libv::make_intrusive2_ptr<InternalTexture>(weak_from_this(), std::string(path), defaultGLR, swizzle);
 
 	// --- End of real work
 
@@ -197,6 +198,13 @@ void InternalTextureLoader::process_res(InternalTexture_ptr&& res, libv::gl::Ima
 //	res->texture.set(libv::gl::MinFilter::Nearest);
 	res->texture.generate_mipmaps();
 
+	if (res->swizzle_ != defaultSwizzle)
+		res->texture.set(
+				to_libv_gl_swizzle(res->swizzle_.r),
+				to_libv_gl_swizzle(res->swizzle_.g),
+				to_libv_gl_swizzle(res->swizzle_.b),
+				to_libv_gl_swizzle(res->swizzle_.a)
+		);
 }
 
 // -------------------------------------------------------------------------------------------------

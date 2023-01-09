@@ -7,6 +7,7 @@
 // libv
 #include <libv/fsw/watcher.hpp>
 #include <libv/mt/queue_unique.hpp>
+#include <libv/utility/nexus.hpp>
 #include <libv/utility/type_uid.hpp>
 // std
 #include <mutex>
@@ -38,22 +39,21 @@ public:
 	libv::mt::queue_unique<std::shared_ptr<InternalShader>> queue_shader_failed_load;
 	libv::mt::queue_unique<std::shared_ptr<InternalShader>> queue_shader_update;
 
-	std::vector<shader_load_success_cb> success_cbs;
-	std::vector<shader_load_failure_cb> failure_cbs;
-	std::vector<shader_unload_cb> unload_cbs;
+	libv::Nexus nexus;
+
+public:
+	explicit InternalShaderLoader(Nexus& nexus) :
+		nexus(nexus) {}
 
 public:
 	inline void _broadcast(const ShaderLoadSuccess& e) {
-		for (auto& cb : success_cbs)
-			cb(e);
+		nexus.broadcast_global(e);
 	}
 	inline void _broadcast(const ShaderLoadFailure& e) {
-		for (auto& cb : failure_cbs)
-			cb(e);
+		nexus.broadcast_global(e);
 	}
 	inline void _broadcast(const ShaderUnload& e) {
-		for (auto& cb : unload_cbs)
-			cb(e);
+		nexus.broadcast_global(e);
 	}
 
 public:

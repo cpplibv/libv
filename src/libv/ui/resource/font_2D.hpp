@@ -8,10 +8,10 @@
 #include <libv/glr/texture.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/guard.hpp>
-//#include <libv/glr/fwd.hpp>
 // std
 #include <array>
 #include <mutex>
+#include <stdexcept>
 #include <string>
 // pro
 #include <libv/ui/property/font_size.hpp>
@@ -65,6 +65,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+struct Font2DCreateException : public std::exception {
+	explicit inline Font2DCreateException() {}
+	[[nodiscard]] virtual const char* what() const noexcept override {
+		return "Failed to create Font2D";
+	}
+};
+
 /// Font2D is responsibly to providing character information, glyph texture
 /// Font2D is NOT responsibly to rendering, aligning, laying out or shading.
 /// @context ANY
@@ -110,6 +117,7 @@ private:
 
 public:
 	/// @param fontData the content of the font file
+	/// @throw Font2DCreateException on FT_New_Memory_Face failure
 	explicit Font2D(std::string fontData);
 	~Font2D();
 

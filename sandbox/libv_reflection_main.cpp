@@ -7,6 +7,7 @@
 #include <libv/serial/serial.hpp>
 #include <libv/utility/member_offset.hpp>
 // std
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <optional>

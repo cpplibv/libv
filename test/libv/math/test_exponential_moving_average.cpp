@@ -3,7 +3,7 @@
 // hpp
 #include <catch2/catch_test_macros.hpp>
 // pro
-#include <libv/math/exponential_moving_average.hpp>
+#include <libv/math/exp_moving_avg.hpp>
 #include <libv/utility/approx.hpp>
 
 
@@ -14,18 +14,12 @@
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("exponential_moving_average", "[libv.utility.exponential_moving_average]") {
-	libv::exponential_moving_average<double, 10> avg01{0};
-	libv::exponential_moving_average<double, 10> avg02{0};
-	libv::exponential_moving_average<double, 10> avg05{0};
-	libv::exponential_moving_average<double, 10> avg10{0};
-	libv::exponential_moving_average<double, 10> avg20{0};
-	libv::exponential_moving_average<double, 10> avg50{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg01{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg02{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg05{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg10{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg20{0};
-//	libv::exponential_moving_average<double, 10.0, 0.8> avg50{0};
+	libv::exp_moving_avg<double> avg01{0, 10.0, 0.8};
+	libv::exp_moving_avg<double> avg02{0, 10.0, 0.8};
+	libv::exp_moving_avg<double> avg05{0, 10.0, 0.8};
+	libv::exp_moving_avg<double> avg10{0, 10.0, 0.8};
+	libv::exp_moving_avg<double> avg20{0, 10.0, 0.8};
+	libv::exp_moving_avg<double> avg50{0, 10.0, 0.8};
 
 	CHECK(avg01.value() == libv::approx(0.0));
 	CHECK(avg02.value() == libv::approx(0.0));

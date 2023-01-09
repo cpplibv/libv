@@ -78,6 +78,7 @@ public:
 //	double scroll_hold_scroll;
 //	double scroll_hold_track;
 
+
 public:
 	void value(double value);
 	[[nodiscard]] double value() const noexcept;

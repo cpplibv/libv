@@ -822,99 +822,172 @@
 // =================================================================================================
 // zstd
 
+// #include <iostream>
+// #include <string_view>
+// #include <vector>
+// // #include <expected>
+// #include <zstd.h>
+// #include <cassert>
+// #include <span>
+//
+//
+// std::vector<std::byte> compress(std::string_view data, int level) {
+// 	assert(level >= 1 && level <= 22);
+//
+// 	std::vector<std::byte> result;
+// 	result.resize(ZSTD_compressBound(data.size()));
+//
+// 	std::cout << "bound:       " << result.size() << std::endl;
+//
+// 	const auto cSize = ZSTD_compress(result.data(), result.size(), data.data(), data.size(), level);
+// 	// CHECK_ZSTD(cSize);
+// 	// auto code = ZSTD_isError(cSize);
+// 	// if (code) {
+// 	// 	return code;
+// 	// 	ZSTD_getErrorName
+// 	// }
+// 	result.erase(result.begin() + cSize, result.end());
+//
+// 	return result;
+// }
+//
+// std::string decompress(std::span<const std::byte> data) {
+// 	std::string result;
+//
+// 	const auto rSize = ZSTD_getFrameContentSize(data.data(), data.size());
+// 	// CHECK(rSize != ZSTD_CONTENTSIZE_ERROR, "%s: not compressed by zstd!", fname);
+//  	// CHECK(rSize != ZSTD_CONTENTSIZE_UNKNOWN, "%s: original size unknown!", fname);
+// 	// auto code = ZSTD_isError(rSize); ?
+// 	// if (code) {
+// 	// 	return code;
+// 	// 	ZSTD_getErrorName
+// 	// }
+// 	result.resize(rSize);
+//
+// 	const auto dSize = ZSTD_decompress(result.data(), result.size(), data.data(), data.size());
+// 	(void) dSize;
+// 	// CHECK_ZSTD(dSize);
+// 	// CHECK(dSize == rSize, "Impossible because zstd will check this condition!");
+// 	// auto code = ZSTD_isError(dSize);
+// 	// if (code) {
+// 	// 	return code;
+// 	// 	ZSTD_getErrorName
+// 	// }
+//
+// 	return result;
+// }
+//
+// int main() {
+// 	const std::string_view data = "No plan of operations extends with certainty beyond the first encounter with the enemy's main strength";
+//
+// 	std::cout << "ZSTD" << std::endl;
+// 	std::cout << "size:        " << data.size() << std::endl;
+//
+// 	{
+// 		const auto compressedData = compress(data, 1);
+// 		std::cout << "com size  1: " << compressedData.size() << std::endl;
+//
+// 		std::cout << "com data  1: ";
+// 		for (const auto& byte : compressedData)
+// 			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+// 		std::cout << std::endl;
+//
+// 		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+// 	} {
+// 		const auto compressedData = compress(data, 9);
+// 		std::cout << "com size  9: " << compressedData.size() << std::endl;
+//
+// 		std::cout << "com data  9: ";
+// 		for (const auto& byte : compressedData)
+// 			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+// 		std::cout << std::endl;
+//
+// 		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+// 	} {
+// 		const auto compressedData = compress(data, 22);
+// 		std::cout << "com size 22: " << compressedData.size() << std::endl;
+//
+// 		std::cout << "com data 22: ";
+// 		for (const auto& byte : compressedData)
+// 			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+// 		std::cout << std::endl;
+//
+// 		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+// 	}
+//
+//
+// 	return EXIT_SUCCESS;
+// }
+
+// =================================================================================================
+// Unicode IO
+//
+// // So the solution on Windows is SetConsoleOutputCP(CP_UTF8), but it only works for output
+// // Could not find a reliable was to handle stdin
+//
+// #include <cstdio>
+// #include <fmt/printf.h>
+// #include <fmt/ostream.h>
+// #include <iostream>
+// #include <io.h>
+// #include <fcntl.h>
+// #include <Windows.h>
+//
+//
+// int main() {
+// 	constexpr auto specimen = "кошка日本";
+//
+// 	std::cout << "std::cout             : " << specimen << std::endl;
+// 	std::printf("std::printf           : %s\n", specimen);
+// 	fmt::print("fmt::printf           : {}\n", specimen);
+// 	fmt::print(std::cout, "fmt::printf(std::cout): {}\n", specimen);
+//
+// 	std::cout << "==========" << std::endl;
+// 	// Set console code page to UTF-8 so console known how to interpret string data
+// 	SetConsoleOutputCP(CP_UTF8);
+// 	// SetConsoleCP(CP_UTF8);
+// 	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
+// 	// setvbuf(stdout, nullptr, _IOFBF, 1000);
+// 	// setvbuf(stdout, nullptr, _IOFBF, 0);
+//
+// 	std::cout << "std::cout             : " << specimen << std::endl;
+// 	std::printf("std::printf           : %s\n", specimen);
+// 	fmt::print("fmt::printf           : {}\n", specimen);
+// 	fmt::print(std::cout, "fmt::printf(std::cout): {}\n", specimen);
+//
+// 	std::string x;
+// 	std::cin >> x;
+// 	std::cout << "echo: " << x.size() << std::endl;
+// 	std::cout << x << std::endl;
+// 	std::cout << "end" << std::endl;
+//
+// 	// _setmode for stdout is just broken on Win 11
+//
+// 	// std::cout << "==========" << std::endl;
+// 	// if (const int result = _setmode(_fileno(stdout), _O_U8TEXT); result == -1) {
+// 	// 	std::cerr << "Cannot set mode" << std::endl;
+// 	// 	return EXIT_FAILURE;
+// 	// }
+// 	//
+// 	// std::cout << "std::cout             : " << specimen << std::endl;
+// 	// std::printf("std::printf           : %s\n", specimen);
+// 	// fmt::print("fmt::printf           : {}\n", specimen);
+// 	// fmt::print(std::cout, "fmt::printf(std::cout): {}\n", specimen);
+//
+// 	return EXIT_SUCCESS;
+// }
+
+// =================================================================================================
+// Resource
+
 #include <iostream>
-#include <string_view>
-#include <vector>
-// #include <expected>
-#include <zstd.h>
-#include <cassert>
-#include <span>
+#include <filesystem>
+#include <libv/sys/executable_path.hpp>
 
-
-std::vector<std::byte> compress(std::string_view data, int level) {
-	assert(level >= 1 && level <= 22);
-
-	std::vector<std::byte> result;
-	result.resize(ZSTD_compressBound(data.size()));
-
-	std::cout << "bound:       " << result.size() << std::endl;
-
-	const auto cSize = ZSTD_compress(result.data(), result.size(), data.data(), data.size(), level);
-	// CHECK_ZSTD(cSize);
-	// auto code = ZSTD_isError(cSize);
-	// if (code) {
-	// 	return code;
-	// 	ZSTD_getErrorName
-	// }
-	result.erase(result.begin() + cSize, result.end());
-
-	return result;
-}
-
-std::string decompress(std::span<const std::byte> data) {
-	std::string result;
-
-	const auto rSize = ZSTD_getFrameContentSize(data.data(), data.size());
-	// CHECK(rSize != ZSTD_CONTENTSIZE_ERROR, "%s: not compressed by zstd!", fname);
- 	// CHECK(rSize != ZSTD_CONTENTSIZE_UNKNOWN, "%s: original size unknown!", fname);
-	// auto code = ZSTD_isError(rSize); ?
-	// if (code) {
-	// 	return code;
-	// 	ZSTD_getErrorName
-	// }
-	result.resize(rSize);
-
-	const auto dSize = ZSTD_decompress(result.data(), result.size(), data.data(), data.size());
-	(void) dSize;
-	// CHECK_ZSTD(dSize);
-	// CHECK(dSize == rSize, "Impossible because zstd will check this condition!");
-	// auto code = ZSTD_isError(dSize);
-	// if (code) {
-	// 	return code;
-	// 	ZSTD_getErrorName
-	// }
-
-	return result;
-}
-
-int main() {
-	const std::string_view data = "No plan of operations extends with certainty beyond the first encounter with the enemy's main strength";
-
-	std::cout << "ZSTD" << std::endl;
-	std::cout << "size:        " << data.size() << std::endl;
-
-	{
-		const auto compressedData = compress(data, 1);
-		std::cout << "com size  1: " << compressedData.size() << std::endl;
-
-		std::cout << "com data  1: ";
-		for (const auto& byte : compressedData)
-			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
-		std::cout << std::endl;
-
-		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
-	} {
-		const auto compressedData = compress(data, 9);
-		std::cout << "com size  9: " << compressedData.size() << std::endl;
-
-		std::cout << "com data  9: ";
-		for (const auto& byte : compressedData)
-			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
-		std::cout << std::endl;
-
-		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
-	} {
-		const auto compressedData = compress(data, 22);
-		std::cout << "com size 22: " << compressedData.size() << std::endl;
-
-		std::cout << "com data 22: ";
-		for (const auto& byte : compressedData)
-			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
-		std::cout << std::endl;
-
-		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
-	}
-
+int main(int, char** argv) {
+	std::cout << "cur: " << std::filesystem::current_path().generic_string() << std::endl;
+	std::cout << "exe: " << libv::sys::executable_path_fs().generic_string() << std::endl;
+	std::cout << "arg: " << std::filesystem::path(argv[0]).generic_string() << std::endl;
 
 	return EXIT_SUCCESS;
 }

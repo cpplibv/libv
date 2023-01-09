@@ -28,7 +28,21 @@ node('Win11') {
 
     stage('Build star') {
         sh "ninja -C build/release star"
+        sh "ninja -C build/release test_libv_algo"
+        def issuesGCC = scanForIssues tool: gcc()
+		publishIssues issues: [issuesGCC], name: 'GCC'
     }
+
+    stage('Tests') {
+        sh "mkdir -p report"
+        sh "bin/release/test_libv_algo.exe -r junit > report/test_libv_algo.xml"
+        def issuesUnit = scanForIssues tool: junitParser(pattern: 'report/**.xml')
+		publishIssues issues: [issuesUnit], publishAllIssues: true, name: 'test_libv_algo'
+    }
+
+//     stage('Package') {
+//         archiveArtifacts artifacts: 'bin/release/star.exe'
+//     }
 
     stage('Archive') {
         archiveArtifacts artifacts: 'bin/release/star.exe'

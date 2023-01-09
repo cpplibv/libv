@@ -3,9 +3,10 @@
 #pragma once
 
 // std
-#include <filesystem>
-//#include <string>
 #include <chrono>
+#include <functional>
+#include <string>
+#include <vector>
 // pro
 #include <libv/ui/chrono.hpp>
 
@@ -16,9 +17,9 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct ResourceSettings {
-	std::filesystem::path base_path; /// Relative resource path base
+	std::string base_path; /// Relative resource path base
 	// bool relative_path_only = true; /// Forbid requests with absolute path
-	 bool restict_under_base = true; /// Forbid requests that would leave the base path
+	 bool restrict_under_base = true; /// Forbid requests that would leave the base path
 	// bool cache_fallback = true; /// Insert failed resource lookups into cache as the fallback value
 	// bool track_every = false; /// Track every resource and reload resource upon file change
 	// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
@@ -35,9 +36,11 @@ struct Settings {
 
 	// bool enable_lcd_font = true;
 
-	ResourceSettings res_font = {"res/font"};
-	ResourceSettings res_shader = {"res/shader"};
-	ResourceSettings res_texture = {"res/texture"};
+	std::function<std::string(std::string)> res_resolve; /// Migration path
+
+	ResourceSettings res_font = {"res/font/"};
+	ResourceSettings res_shader = {"res/shader/"};
+	ResourceSettings res_texture = {"res/texture/"};
 
 	double scroll_step_button = 3.0;
 	double scroll_step_scroll = 3.0;

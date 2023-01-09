@@ -1,12 +1,13 @@
-// Project: libv, File: app/star/game/view/icon_set.cpp
+// Project: libv, File: app/surface/view/icon_set.cpp
 
 // hpp
-#include <star/game/view/icon_set.hpp>
+#include <libv/frame/icon_set.hpp>
 // libv
 #include <libv/math/vec.hpp>
 
 
-namespace star {
+namespace libv {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -129,4 +130,5 @@ std::vector<libv::frame::Icon> icon_set_iris_cyan() {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace star
+} // namespace frame
+} // namespace libv

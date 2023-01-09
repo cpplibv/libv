@@ -400,5 +400,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.GLR3 - Compute Shader", WINDOW_HEIGHT, WINDOW_WIDTH);
+	return run_sandbox<Sandbox>("Sandbox libv.GLR3 - Compute Shader", WINDOW_WIDTH, WINDOW_HEIGHT);
 }

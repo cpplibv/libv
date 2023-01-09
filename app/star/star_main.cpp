@@ -4,6 +4,7 @@
 #include <libv/arg/arg.hpp>
 #include <libv/sys/os_version.hpp>
 #include <libv/utility/last_write_time.hpp>
+#include <wish/resource_path.hpp>
 //#include <libv/utility/read_file.hpp>
 // std
 #include <filesystem>
@@ -34,6 +35,11 @@ int main(int argc, const char** argv) {
 			("-v", "--verbose")
 			("verbose", "Enables verbose mode");
 
+	// const auto arg_verbose = args.flag
+	// 		("-d", "--dev")
+	// 		("dev-mode", "Enables developer mode")
+	// 		.hidden(true);
+
 	const auto arg_help = args.flag
 			("-h", "--help", "?", "-?")
 			("help", "Display the help message");
@@ -53,7 +59,7 @@ int main(int argc, const char** argv) {
 
 	// -------------------------------------------------------------------------------------------------
 
-	const auto devMode = std::filesystem::exists("../../CMakeLists.txt");
+	const auto devMode = !WISH_BUILD_PACKAGE;
 
 	if (arg_verbose.value()) {
 		libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
@@ -73,9 +79,9 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 
 	try {
-		// Change working directory
-		if (devMode) // During development, binary artifacts created under /bin/build_type
-			std::filesystem::current_path("../../app/star/");
+		// Change the working directory to match the source directory during development or to
+		// match the executable directory for deployed packages
+		wish::change_current_path(argc, argv);
 
 		const auto path = std::filesystem::path(argv[0]);
 		const auto path_bin = path.filename();

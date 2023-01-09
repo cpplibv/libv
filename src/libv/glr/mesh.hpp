@@ -26,7 +26,7 @@ namespace glr {
 // -------------------------------------------------------------------------------------------------
 
 using VertexIndex = uint32_t;
-using AttributeChannel = uint32_t;
+using AttributeChannel = int32_t;
 struct DestroyQueues;
 struct Remote;
 struct RemoteMesh;
@@ -44,14 +44,16 @@ struct RemoteMesh;
 class RemoteMeshAttribute {
 public:
 	libv::gl::ArrayBuffer buffer;
+	// libv::gl::BaseAttribute = channel + type + dim
 	AttributeChannel channel;
 	libv::gl::AttributeType type;
 	int dim;
+	int divisor;
 	std::vector<std::byte, boost::alignment::aligned_allocator<std::byte, 32>> data_;
 
 public:
-	RemoteMeshAttribute(AttributeChannel channel, libv::gl::AttributeType type, int dim) :
-		channel(channel), type(type), dim(dim) { }
+	RemoteMeshAttribute(AttributeChannel channel, libv::gl::AttributeType type, int dim, int divisor) :
+		channel(channel), type(type), dim(dim), divisor(divisor) { }
 
 public:
 	template <typename T>
@@ -107,7 +109,8 @@ struct RemoteMesh {
 	//uint32_t ref_count = 0;
 
 	VertexIndex start = 0;
-	VertexIndex count = 0;
+	VertexIndex indexCount = 0;
+	VertexIndex vertexCount = 0;
 
 	libv::gl::VertexArray vao;
 	RemoteMeshIndices indices;
@@ -125,6 +128,8 @@ private:
 public:
 	void render(libv::gl::GL& gl, Remote& remote_) noexcept;
 	void render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept;
+	void renderArraysInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
+	void renderElementsInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
 
 	inline RemoteMesh(libv::gl::Primitive primitive, libv::gl::BufferUsage usage) noexcept :
 		primitive(primitive),
@@ -374,25 +379,28 @@ public:
 
 public:
 	template <typename T>
-	[[nodiscard]] MeshAttribute<typename T::value_type> attribute(T) {
+	[[nodiscard]] MeshAttribute<typename T::value_type> attribute(T, int divisor = 0) {
 		using attribute_type = typename T::value_type;
 		using underlying_type = typename T::underlying_type;
-
-		remote->dirty = true;
-		auto it = libv::linear_find_iterator(remote->attributes, T::channel, &RemoteMeshAttribute::channel);
-
-		if (it != remote->attributes.end())
-			return MeshAttribute<attribute_type>{remote->attributes, static_cast<std::size_t>(std::distance(remote->attributes.begin(), it))};
 
 		static_assert(std::is_integral_v<underlying_type>
 				|| std::is_same_v<underlying_type, float>
 				|| std::is_same_v<underlying_type, double>,
 				"bindAttribute underlying_type template parameter not supported. Expected float, double or integral");
 
+		remote->dirty = true;
+		auto it = libv::linear_find_iterator(remote->attributes, T::channel, &RemoteMeshAttribute::channel);
+
+		if (it != remote->attributes.end()) {
+			it->divisor = divisor;
+			return MeshAttribute<attribute_type>{remote->attributes, static_cast<std::size_t>(std::distance(remote->attributes.begin(), it))};
+		}
+
 		remote->attributes.emplace_back(
 				T::channel,
 				libv::gl::toAttributeType<underlying_type>(),
-				T::dim);
+				T::dimension,
+				divisor);
 
 		return MeshAttribute<attribute_type>{remote->attributes, remote->attributes.size() - 1};
 	}

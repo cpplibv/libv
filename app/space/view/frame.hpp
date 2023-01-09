@@ -6,7 +6,7 @@
 #include <libv/frame/frame.hpp>
 //#include <libv/frame/monitor.hpp>
 // pro
-#include <space/view/icon_set.hpp>
+#include <libv/frame/icon_set.hpp>
 //#include <space/log.hpp>
 
 
@@ -23,7 +23,7 @@ struct SpaceFrame : public libv::Frame {
 		setOpenGLVersion(3, 3);
 		setOpenGLSamples(libv::Frame::OpenGLSamples{0});
 		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
-		setIcon(icon_set_iris_cyan());
+		setIcon(libv::frame::icon_set_iris_cyan());
 
 		onKey.output([this](const libv::input::EventKey& e) {
 			if (e.keycode == libv::input::Keycode::Escape)

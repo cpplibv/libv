@@ -206,14 +206,17 @@ struct live_state : T {
 	alignas(8)
 //	alignas(128)
 	[[no_unique_address]] char sub_storage[state_traits<T>::sizeof_largest_live_substate];
+	// alignas(T) std::byte storage[sizeof(T)];
 
 	template <typename SubState>
 	void create_substate() {
+		// Use std::destroy_at and std::construct_at to allow constexpr-ness
 		::new(sub_storage) live_state<SubState>();
 	}
 
 	template <typename SubState>
 	void destroy_substate() {
+		// Use std::destroy_at and std::construct_at to allow constexpr-ness
 		reinterpret_cast<SubState*>(sub_storage)->~live_state<SubState>();
 	}
 

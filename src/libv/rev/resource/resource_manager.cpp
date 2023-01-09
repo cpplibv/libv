@@ -11,12 +11,12 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-ResourceManager::ResourceManager() : ResourceManager(Settings{}) {
+ResourceManager::ResourceManager(libv::Nexus& nexus) : ResourceManager(Settings{}, nexus) {
 }
 
-ResourceManager::ResourceManager(Settings settings) :
+ResourceManager::ResourceManager(Settings settings, libv::Nexus& nexus) :
 	self(std::make_shared<InternalResourceManager>(std::move(settings))),
-	shader(self->settings.shader.base_path),
+	shader(nexus, self->settings.shader.base_path),
 	texture(self),
 	material(shader, texture),
 	model(self, material) {

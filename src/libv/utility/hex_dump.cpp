@@ -3,6 +3,7 @@
 // hpp
 #include <libv/utility/hex_dump.hpp>
 // std
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 

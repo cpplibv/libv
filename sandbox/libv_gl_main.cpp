@@ -31,9 +31,9 @@ struct Sandbox {
 
 	libv::gl::GL gl;
 
-	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition{0};
-	libv::gl::AttributeFixLocation<libv::vec4f> attributeColor{2};
-	libv::gl::AttributeFixLocation<libv::vec2f> attributeTex0{8};
+	libv::gl::Attribute<0, libv::vec3f> attributePosition;
+	libv::gl::Attribute<2, libv::vec4f> attributeColor;
+	libv::gl::Attribute<8, libv::vec2f> attributeTex0;
 
 	libv::gl::Shader shaderTest0Frag;
 	libv::gl::Shader shaderTest0Vert;
@@ -241,7 +241,7 @@ struct Sandbox {
 			gl(programTest0).use();
 			uniformTest0matMVP = gl.mvp();
 			gl(vertexArray).bind();
-			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 6);
 			gl(vertexArray).unbind();
 		}
 
@@ -255,7 +255,7 @@ struct Sandbox {
 			uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
 
 			gl(vertexArray).bind();
-			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 6);
 			gl(vertexArray).unbind();
 		}
 
@@ -271,7 +271,7 @@ struct Sandbox {
 			uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
 
 			gl(vertexArray).bind();
-			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 6);
 			gl(vertexArray).unbind();
 		}
 
@@ -283,5 +283,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.GL1", WINDOW_HEIGHT, WINDOW_WIDTH);
+	return run_sandbox<Sandbox>("Sandbox libv.GL1", WINDOW_WIDTH, WINDOW_HEIGHT);
 }

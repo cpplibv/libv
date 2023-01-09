@@ -236,7 +236,7 @@ public:
 	UniformBlockStreamView_std140(
 			UniformBlockBindingLocation binding,
 			UniformDataBlock block,
-			std::shared_ptr<RemoteUniformBuffer>  remote) :
+			std::shared_ptr<RemoteUniformBuffer> remote) :
 		binding(binding),
 		block(block),
 		remote(std::move(remote)) { }

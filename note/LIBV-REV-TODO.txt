@@ -59,11 +59,361 @@ libv.glr: Add support for glDrawBuffers
 
 
 
-vec2 dirToRectilinear(vec3 dir) {
-	float x = atan2(dir.y, dir.x) / tau + 0.5;
-	float y = dir.z * 0.5 + 0.5;
-	return vec2(x, y);
-}
+
+
+
+Resource mapping another idea:
+	use dummy link files
+	enable link follow on dev builds
+
+
+Packaging
+	Resource mapping
+		resource_path_fallthrough()
+		proper exception type with proper details
+		libv.res: It needs to be a thing
+			include directories
+			virtual mapping
+
+	RC
+		icon for executables on windows
+
+	Strip symbols
+		wish: package strip debug information:
+			objcopy --only-keep-debug "${tostripfile}" "${debugdir}/${debugfile}"
+			strip --strip-debug --strip-unneeded "${tostripfile}"
+			objcopy --add-gnu-debuglink="${debugdir}/${debugfile}" "${tostripfile}"
+
+		GDB:
+			gdb -s sandbox_libv_rev_par.debug -e sandbox_libv_rev_par.exe
+		or
+			symbol-file debug/sandbox_libv_rev_par.debug
+
+	Installer
+		...
+
+	Signing
+		...
+
+
+
+
+-------------------------------------------------------------------------------------------------
+
+
+
+
+Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
+
+
+
+
+
+
+
+shader block generation
+
+
+
+
+
+
+
+
+rev render pass:
+	objects should be able to access their renderer
+	or reference it
+	or select it
+	or auto select it
+
+
+
+
+
+
+If I want to debug anything particle related:
+	! Camera Controls
+
+If I wanna implement effects
+	lua effect def
+
+
+
+
+
+https://docs.gl/gl4/glMultiDrawElementsIndirect#
+https://docs.gl/gl4/glMultiDrawArraysIndirect
+
+
+
+
+
+
+
+engine, rev, scheduling, renderers tldr:
+	model does not directly own or access any GL state
+	model uses renderers in immediate mode with preloaded assets
+	model can request special render where it can direct access GL state
+	custom colors, instantiation parameters?
+		\ Most of there are just material instance, aka dumb data
+	what about animation states?
+
+
+Main
+	- Frame
+	> [Self-Update]
+	> Create SandboxFrame
+
+SandboxFrame
+	- UI
+	> Setup Frame
+	> Setup UI and Overlays
+	> Create SandboxScene
+
+SandboxScene
+	- rev::Engine
+	- Game state
+	> Create SandboxCanvas
+
+
+
+camera -> canvas
+canvas -> scene
+scene -> engine
+game -> scene
+
+game state is seprate from rendering state and scenes
+(not mandatory) camera is separately live from scene/canvas
+
+
+
+
+named_data(nullptr, sizeProperties,
+	// system.numParticle()
+
+		keep sizeProperties the same as long as possible
+		shrink on 1/4
+
+		call named_subData range and drawArraysInstanced with fever instance
+
+		worth only to not reallocate if the GPU not uses it
+
+
+
+
+
+
+
+Effects system
+	Effects will consist of multiple effect type: haze, particles, timing, transform manipulation, physical forces
+
+Particle system classes
+				system of systems
+				particle system manager
+				particle system
+				particle effect
+				particle effect "definition"
+				particle effect "instance"
+				particle effect shared buffer (but can have multiple instance of this)
+				if a particle effect is culled, do not upload its memory
+				if a particle effect is off-screen sleep
+
+		Particle System Manager - ("1" instance)
+			Knows about a worker thread
+			Knows about every system
+			Knows when to update
+			Updates every system
+
+		Particle Library (and/or User Particle Library for hardcoded Effect Definition lookup)
+			Handles LUA for Effect Definitions loading and reloading
+			Handles Effect Definitions
+
+		Particle System - Multiple system can be present, but usually only one system is displayed
+
+		Particle Renderer
+			GPU Buffers
+
+		Particle Effect Definition
+			Parameterization ? How
+			Stores list of Modules and their settings
+
+		Particle Effect
+			Instantiated list of Modules
+			vector<Particles>
+
+		Particle Effect Handler
+			Light weight
+
+		Game Object ("Map" is also a game object for fire and forget effects)
+			Owns a "Particle Effect" handler ? (and/or a way to self cleanup effect)
+
+
+
+
+
+libv.rev: Particle System First scope
+		emitter shape/overall effect:
+			cone - fountain
+			sphere - burst of explosion
+			cylinder/disc
+			box - static rain dusts
+			square - building placement dust effect
+
+		facing:
+			3d object
+			billboard texture (locked Z)
+			billboard texture (free follow)
+			billboard texture (locked to direction)
+			face to direction
+
+		velocity based elongation
+
+		texture selection
+
+		multi texture
+
+		sub particle (rain impact, rain steam, fireworks)
+			particles spawn particles in another particle system
+
+		Smooth particles
+			on/off per effect
+
+		Improving fillrate
+			on/off per texture
+
+		Particle GPU Memory update with mapped memory
+
+		Particle efficient storage and maximize gpu copy memory layout
+
+		Bounding box culling
+
+		LOD
+
+
+
+
+libv.rev: --- Particle System ---
+		http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
+		Particle System using Transform Feedback: https://ogldev.org/www/tutorial28/tutorial28.html
+		https://docs.unity3d.com/ScriptReference/ParticleSystem.html
+
+		Composition on modules which are driven by (L1 Cache size) batches of particles
+
+		Update and sort on a different thread
+
+		3 GPU Buffer
+			instanced mesh data - never updated
+			position (particle center) - updated every frame
+			color, age, other particle properties - updated every frame / once the particle is created
+
+
+
+
+
+libv.ui: Adopt libv.rev
+libv.ui: Move libv.sun overlay_shader_error.hpp to ui
+libv.ui: Accept injected Nexus
+
+!!! libv.ui: Style state (inheritance) ACL solution:
+		Go backward (?) (forward can also work?), use first match (dont inspect specificness)
+		this is how CSS does it too (just to order if first match and not last)
+libv.ui: "State" property: focus-within
+libv.ui: "State" property: nth (2nd 3rd is enough for now)
+
+
+cmake: Change from ${CMAKE_SOURCE_DIR}
+		to ${CMAKE_CURRENT_SOURCE_DIR}
+		wherever it makes sense
+
+place.it:
+	http://www.opengl.org/wiki/Buffer_Object_Streaming
+	#include <fmt/os.h> // For std::error_code
+
+	Models:
+		https://polyhaven.com/models/nature
+		https://free3d.com/3d-models/tree
+	Blender:
+		Custom pie menu: https://www.youtube.com/watch?v=S7lyISR1RDs
+		Awkward angles: https://www.youtube.com/watch?v=QwLMk_tFvfU
+		Spider legs, IK: https://www.youtube.com/watch?v=ktXD_WRMY8E
+		Addons Hard surface 1: https://www.youtube.com/watch?v=0qVqk0slIio
+			Starship Generator
+			Grid Modeler
+			Simple Scifi Pro
+			P Cutter
+		Addons Hard surface 2: https://www.youtube.com/watch?v=AT_8DU7DKUE
+		Models:
+			blenderkit.com
+	StableDiffusion:
+		Examples: https://lexica.art
+		Models: https://stable-diffusion-art.com/models/#DreamShaper
+
+place.it:
+	ext: Adopt zstd / Zstandard for compression (its better than ZLIB on all account)
+	libv: (million lambda + ui + nexus) std::function instantiation with fewer types would be nice
+	libv.vm4: File format signature
+	libv.update: File format signature
+			Example for PNG file signature:
+			The first eight bytes of a PNG file always contain the following values:
+			   (decimal)              137  80  78  71  13  10  26  10
+			   (hexadecimal)           89  50  4e  47  0d  0a  1a  0a
+			   (ASCII C notation)    \211   P   N   G  \r  \n \032 \n
+			This signature both identifies the file as a PNG file and provides for immediate detection of common file-transfer problems.
+			The first two bytes distinguish PNG files on systems that expect the first two bytes to identify the file type uniquely.
+			The first byte is chosen as a non-ASCII value to reduce the probability that a text file may be misrecognized as a PNG file; also, it catches bad file transfers that clear bit 7.
+			Bytes two through four name the format.
+			The CR-LF sequence catches bad file transfers that alter newline sequences.
+			The control-Z character stops file display under MS-DOS.
+			The final line feed checks for the inverse of the CR-LF translation problem.
+
+libv.glr: MAYOR OVERHAUL: remove the queue
+		use thread local GLR context variable access
+		remove the idea of sorting
+		switch to immediate mode
+		| NOTE: uniform streams do rely on the queue
+				so any code using them will have to change
+
+libv.glr: Cleanup includes for:
+			libv/glr/mesh.cpp
+			libv/glr/mesh.hpp
+			libv/glr/program.cpp
+			libv/glr/program.hpp
+			libv/glr/uniform_buffer.cpp
+			libv/glr/uniform_buffer.hpp
+			libv/glr/uniform_stream.hpp
+libv.glr: Implement head pattern for:
+			libv/glr/mesh.cpp
+			libv/glr/mesh.hpp
+			libv/glr/program.cpp
+			libv/glr/program.hpp
+			libv/glr/uniform_buffer.cpp
+			libv/glr/uniform_buffer.hpp
+			libv/glr/uniform_stream.hpp
+			libv/glr/framebuffer.cpp
+			libv/glr/framebuffer.hpp
+			libv/glr/texture.cpp
+			libv/glr/texture.hpp
+libv.glr: GLR User facing API shall not expose to the OpenGL header
+libv.glr: better name for DestroyQueue (? and use thread local acces for it)
+libv.glr: libv/glr/remote.hpp only included in glr files to fetch DestroyQueue, pass that around instead (with a better name), could be boundeled with the gl reference.
+libv.glr: create bool -> remote == nullptr | or negative index
+
+libv.glr: too many variant, function / arg streams?, uniform_stream has a similar pattern that could be generalized
+
+libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
+
 
 read:
 	https://open.gl/feedback
@@ -93,7 +443,6 @@ libv.rev.res: Events
 	libv.rev.res: Model loading events: load, update/reload, unload (or as: create, update, destroy)
 	libv.rev.res: Texture loading events: load, update/reload, unload (or as: create, update, destroy)
 	libv.rev.res: Material loading events, but it should be a noop
-	libv.rev.res: void attach_libv_ui_hub(Hub&& hub);
 
 libv.rev.res: Extended loader API
 	libv.rev.res: Model better error messages for include directories passes

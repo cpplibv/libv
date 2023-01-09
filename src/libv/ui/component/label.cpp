@@ -217,6 +217,9 @@ const Color& Label::font_color() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void Label::text(std::string value) {
+	if (value == self().text_.string())
+		return;
+
 	self().text_.string(std::move(value));
 	self().markInvalidLayout(true, false);
 	self().flagAuto(Flag::pendingRender);

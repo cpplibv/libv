@@ -14,6 +14,7 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/attribute.hpp>
 #include <libv/gl/check.hpp>
+#include <libv/gl/gl.hpp>
 #include <libv/gl/vertex_array_object.hpp>
 
 
@@ -64,102 +65,119 @@ public:
 		});
 	}
 
-	// TODO P4: reverse the order of offset and count (for all overload)
-	inline void drawArrays(Primitive mode, std::size_t vertexCount, std::size_t vertexOffset) noexcept {
+	inline void drawArrays(Primitive mode, int32_t vertexOffset, int32_t vertexCount) const noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glDrawArrays(to_value(mode), static_cast<GLint>(vertexOffset), static_cast<GLsizei>(vertexCount));
+		glDrawArrays(to_value(mode), vertexOffset, vertexCount);
 		checkGL();
 	}
 
-	inline void drawElements(Primitive mode, std::size_t vertexCount, std::size_t indexOffset) noexcept {
+	inline void drawElements(Primitive mode, std::size_t indexOffset, int32_t indexCount) const noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<const void*>(sizeof (GLuint) * indexOffset));
+		glDrawElements(to_value(mode), indexCount, GL_UNSIGNED_INT, std::bit_cast<const void*>(sizeof (GLuint) * indexOffset));
 		checkGL();
 	}
 
-	inline void drawElementsBaseVertex(Primitive mode, std::size_t vertexCount, std::size_t indexOffset, std::size_t vertexOffset) noexcept {
+	inline void drawElementsBaseVertex(Primitive mode, int32_t vertexOffset, std::size_t indexOffset, int32_t indexCount) const noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<void*>(sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
+		glDrawElementsBaseVertex(to_value(mode), indexCount, GL_UNSIGNED_INT, std::bit_cast<void*>(sizeof(GLuint) * indexOffset), vertexOffset);
 		checkGL();
 	}
 
-	template <typename T>
-	inline void bindAttribute(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
+	inline void drawArraysInstanced(Primitive mode, int32_t vertexOffset, int32_t vertexCount, int32_t instanceCount) const noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glDrawArraysInstanced(to_value(mode), vertexOffset, vertexCount, instanceCount);
+		checkGL();
+	}
+
+	inline void drawElementsInstanced(Primitive mode, std::size_t indexOffset, int32_t indexCount, int32_t instanceCount) const noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glDrawElementsInstanced(to_value(mode), indexCount, GL_UNSIGNED_INT, std::bit_cast<const void*>(sizeof (GLuint) * indexOffset), instanceCount);
+		checkGL();
+	}
+
+	inline void drawElementsInstancedBaseVertex(Primitive mode, int32_t vertexOffset, std::size_t indexOffset, int32_t indexCount, int32_t instanceCount) const noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glDrawElementsInstancedBaseVertex(to_value(mode), indexCount, GL_UNSIGNED_INT, std::bit_cast<void*>(sizeof(GLuint) * indexOffset), vertexOffset, instanceCount);
+		checkGL();
+	}
+
+	inline void bindAttribute(const ArrayBuffer& buffer, const BaseAttribute& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
-		if (attribute.id() == -1)
+		if (attribute.channel == -1)
 			return;
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
-		glEnableVertexAttribArray(attribute);
-		glVertexAttribPointer(attribute,
-				BaseAttribute<T>::attributeSize,
-				BaseAttribute<T>::attributeType,
+		glEnableVertexAttribArray(attribute.channel);
+		glVertexAttribPointer(
+				attribute.channel,
+				attribute.dimension,
+				libv::to_underlying(attribute.type),
 				false,
 				stride,
 				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
-	template <typename T>
-	inline void bindAttributeInt(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
+	inline void bindAttributeInt(const ArrayBuffer& buffer, const BaseAttribute& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
-		if (attribute.id() == -1)
+		if (attribute.channel == -1)
 			return;
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
-		glEnableVertexAttribArray(attribute);
-		glVertexAttribIPointer(attribute,
-				BaseAttribute<T>::attributeSize,
-				BaseAttribute<T>::attributeType,
+		glEnableVertexAttribArray(attribute.channel);
+		glVertexAttribIPointer(
+				attribute.channel,
+				attribute.dimension,
+				libv::to_underlying(attribute.type),
 				stride,
 				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
-	template <typename T>
-	inline void bindAttributeDouble(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
+	inline void bindAttributeDouble(const ArrayBuffer& buffer, const BaseAttribute& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
-		LIBV_GL_DEBUG_ASSERT_STATIC(BaseAttribute<T>::attributeType == to_value(AttributeType::DOUBLE), "");
-		if (attribute.id() == -1)
+		LIBV_GL_DEBUG_ASSERT(attribute.type == AttributeType::DOUBLE);
+		if (attribute.channel == -1)
 			return;
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
-		glEnableVertexAttribArray(attribute);
-		glVertexAttribLPointer(attribute,
-				BaseAttribute<T>::attributeSize,
-				BaseAttribute<T>::attributeType,
+		glEnableVertexAttribArray(attribute.channel);
+		glVertexAttribLPointer(
+				attribute.channel,
+				attribute.dimension,
+				libv::to_underlying(attribute.type),
 				stride,
 				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
 	template <typename T, typename M>
-	inline void bindAttribute(const ArrayBuffer& buffer, GLint attribute, M T::* member) noexcept {
+	inline void bindAttribute(const ArrayBuffer& buffer, const BaseAttribute& attribute, M T::* member) noexcept {
 		bindAttribute(
 				buffer,
-				AttributeFixLocation<M>(attribute),
-				sizeof (T),
+				attribute,
+				sizeof(T),
 				libv::member_offset(member));
 	}
 
 	template <typename T, typename M>
-	inline void bindAttributeInt(const ArrayBuffer& buffer, GLint attribute, M T::* member) noexcept {
+	inline void bindAttributeInt(const ArrayBuffer& buffer, const BaseAttribute& attribute, M T::* member) noexcept {
 		bindAttributeInt(
 				buffer,
-				AttributeFixLocation<M>(attribute),
-				sizeof (T),
+				attribute,
+				sizeof(T),
 				libv::member_offset(member));
 	}
 
 	template <typename T, typename M>
-	inline void bindAttributeDouble(const ArrayBuffer& buffer, GLint attribute, M T::* member) noexcept {
+	inline void bindAttributeDouble(const ArrayBuffer& buffer, const BaseAttribute& attribute, M T::* member) noexcept {
 		bindAttributeDouble(
 				buffer,
-				AttributeFixLocation<M>(attribute),
-				sizeof (T),
+				attribute,
+				sizeof(T),
 				libv::member_offset(member));
 	}
 
@@ -229,6 +247,18 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.id);
+		checkGL();
+	}
+
+	inline void attributeDivisor(GLuint channel, int32_t divisor) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glVertexAttribDivisor(channel, divisor);
+		checkGL();
+	}
+
+	inline void attributeDivisor(const BaseAttribute& attribute, int32_t divisor) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glVertexAttribDivisor(attribute.channel, divisor);
 		checkGL();
 	}
 };

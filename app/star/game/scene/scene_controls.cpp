@@ -7,9 +7,10 @@
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_board.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/switch_scene.hpp>
 // pro
 #include <star/game/scene/controls_layout.hpp>
-#include <star/game/scene/utility.hpp>
+#include <star/game/scene/bean.hpp>
 //#include <star/game/config/client_config.hpp>
 
 
@@ -77,7 +78,7 @@ libv::ui::Component createSceneControls(libv::Nexus& nexus) {
 
 	auto btn = line.add_sa<libv::ui::Button>("settings.ctrl", "Back");
 	btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-		switchParentScene("main", source, createSceneMainMenu(nexus));
+		libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
 	});
 
 	return line;

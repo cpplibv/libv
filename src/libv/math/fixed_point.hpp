@@ -3,10 +3,36 @@
 #pragma once
 
 // std
+// #include <cassert>
 #include <cmath>
+#include <cstdint>
 
 
 namespace libv {
+
+// -------------------------------------------------------------------------------------------------
+
+// template <typename T>
+// [[nodiscard]] constexpr inline T extract_bits(const void* data, uint32_t offset, uint32_t numBits) {
+// 	assert(numBits <= sizeof(T) * 8);
+//
+// 	const auto* source = static_cast<const uint8_t*>(data);
+// 	uint8_t target[sizeof(T)]{0};
+//
+// 	for (uint32_t i = 0; i < numBits; ++i) {
+// 		const auto sourceBitIndex = offset + i;
+// 		const auto sourceByteIndex = sourceBitIndex / 8;
+// 		const auto sourceBitSubByteIndex = sourceBitIndex % 8;
+// 		const auto sourceBitSubByteMask = 1u << sourceBitSubByteIndex;
+// 		const auto sourceBitValue = (source[sourceByteIndex] & sourceBitSubByteMask) != 0;
+// 		const auto targetBitIndex = i;
+// 		const auto targetByteIndex = targetBitIndex / 8;
+// 		const auto targetBitSubByteIndex = targetBitIndex % 8;
+// 		target[targetByteIndex] |= sourceBitValue ? 1u << targetBitSubByteIndex : 0u;
+// 	}
+//
+// 	return std::bit_cast<T>(target);
+// }
 
 // -------------------------------------------------------------------------------------------------
 

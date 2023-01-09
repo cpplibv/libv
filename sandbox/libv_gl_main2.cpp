@@ -94,8 +94,8 @@ struct Sandbox {
 
 	libv::gl::GL gl;
 
-	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition;
-	libv::gl::AttributeFixLocation<libv::vec2f> attributeUV;
+	libv::gl::Attribute<0, libv::vec3f> attributePosition;
+	libv::gl::Attribute<8, libv::vec2f> attributeUV;
 
 	int32_t sample_count = 4;
 	libv::vec2i sizeFBOMS = libv::vec2i{WINDOW_WIDTH, WINDOW_HEIGHT} / 8;
@@ -218,9 +218,6 @@ struct Sandbox {
 		uint32_t dataIndicesQuad[]{
 			 0,  1,  2,  0,  2,  3
 		};
-
-		attributePosition = 0;
-		attributeUV = 8;
 
 		{
 			gl(textureFBOColor).create();
@@ -453,7 +450,7 @@ struct Sandbox {
 			uniformTest2EyePosW = eye;
 
 			gl(vertexArray).bind();
-			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 36, 0);
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 36);
 		}
 
 		// Draw world
@@ -464,7 +461,7 @@ struct Sandbox {
 			uniformTest1matMVP = gl.mvp();
 
 			gl(vertexArray).bind();
-			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 36, 0);
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 36);
 		}
 		libv::gl::checkGL();
 	}
@@ -478,7 +475,7 @@ struct Sandbox {
 			gl(textureFBOColor).bind();
 
 			gl(vertexArrayQuad).bind();
-			gl(vertexArrayQuad).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArrayQuad).drawElements(libv::gl::Primitive::Triangles, 0, 6);
 		}
 		libv::gl::checkGL();
 	}
@@ -488,5 +485,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.GL2", WINDOW_HEIGHT, WINDOW_WIDTH);
+	return run_sandbox<Sandbox>("Sandbox libv.GL2", WINDOW_WIDTH, WINDOW_HEIGHT);
 }

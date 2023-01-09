@@ -30,6 +30,25 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
+ImplPostProcessing::ImplPostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebufferSize) :
+	framebufferSize(framebufferSize),
+	shaderDownsamplePrefilter{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_prefilter.fs"},
+	shaderDownsampleBlurH{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_h.fs"},
+	shaderDownsampleBlurV{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_v.fs"},
+	shaderUpsample{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_up.fs"},
+	shaderCombine{shaderLoader, "post_process/full_screen.vs", "post_process/pp_combine.fs"} {
+
+	const auto mipCount = calculateMipCount(framebufferSize);
+
+	auto mipSize = framebufferSize / 2;
+	for (int i = 0; i < mipCount; ++i) {
+		bloomMips.emplace_back(mipSize);
+		mipSize /= 2;
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
 PostProcessing::PostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebufferSize) :
 	self(std::make_unique<ImplPostProcessing>(shaderLoader, framebufferSize)) {
 }
@@ -121,7 +140,7 @@ float PostProcessing::vignetteSmoothness() const noexcept {
 	return self->vignetteSmoothness_;
 }
 
-void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11F_G11F_B10F& input) {
+void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16G16B16_SFloat& input) {
 
 	// Bloom: Downsample and Prefilter on the first MIP
 	glr.framebuffer_draw(self->bloomMips[0].main.framebuffer());
@@ -183,7 +202,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11
 	glr.render_full_screen();
 }
 
-const libv::glr::Texture2D::R11F_G11F_B10F& PostProcessing::view(libv::glr::Queue& glr, int step) {
+const libv::glr::Texture2D::R16G16B16_SFloat& PostProcessing::view(libv::glr::Queue& glr, int step) {
 	const auto size = static_cast<int>(self->bloomMips.size());
 	const auto ref_step = step < 0 ? std::abs(step + size) : step;
 	const auto bound_step = static_cast<std::size_t>(ref_step % size);
@@ -194,25 +213,6 @@ const libv::glr::Texture2D::R11F_G11F_B10F& PostProcessing::view(libv::glr::Queu
 
 //	return mips[bound_step].resolve(glr);
 	return self->bloomMips[bound_step].temp.resolve(glr);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-ImplPostProcessing::ImplPostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebufferSize) :
-	framebufferSize(framebufferSize),
-	shaderDownsamplePrefilter{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_prefilter.fs"},
-	shaderDownsampleBlurH{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_h.fs"},
-	shaderDownsampleBlurV{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_v.fs"},
-	shaderUpsample{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_up.fs"},
-	shaderCombine{shaderLoader, "post_process/full_screen.vs", "post_process/pp_combine.fs"} {
-
-	const auto mipCount = calculateMipCount(framebufferSize);
-
-	auto mipSize = framebufferSize / 2;
-	for (int i = 0; i < mipCount; ++i) {
-		bloomMips.emplace_back(mipSize);
-		mipSize /= 2;
-	}
 }
 
 // -------------------------------------------------------------------------------------------------

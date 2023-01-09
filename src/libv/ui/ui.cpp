@@ -26,7 +26,8 @@
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/component/overlay/overlay_zoom.hxx>
-#include <libv/ui/component/panel_full.hpp>
+// #include <libv/ui/component/panel_full.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -48,7 +49,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-using Root = PanelFull;
+using Root = PanelAnchor;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -152,11 +153,6 @@ public:
 //	std::shared_ptr<OverlayStack> overlayStack = std::make_shared<OverlayStack>(root);
 
 public:
-	ImplUI(UI& ui) :
-		ui(ui),
-		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
-		root((current_thread_context(context_ui), "")) { }
-
 	ImplUI(UI& ui, Settings settings) :
 		ui(ui),
 		settings(std::move(settings)),
@@ -316,7 +312,7 @@ public:
 
 		auto glr = remote.queue();
 
-		auto events = EventHostUI<Component>{root};
+		auto events = EventHostGlobal<Component>{root};
 
 		{
 			// --- Frame state roll ---
@@ -368,9 +364,9 @@ public:
 
 			// --- Update ---
 			try {
-				events.before_update.fire({});
+				events.global_before_update.fire(context_state.time_frame(), context_state.time_delta());
 				AccessRoot::update(root.core());
-				events.after_update.fire({});
+				events.global_after_update.fire(context_state.time_frame(), context_state.time_delta());
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during update in UI: {}", ex.what());
 			}
@@ -443,6 +439,8 @@ public:
 
 			// --- Render ---
 			try {
+				events.global_before_render.fire(glr.out_of_order_gl());
+
 				glr.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
 				glr.clearColor();
 				glr.clearDepth();
@@ -498,10 +496,10 @@ public:
 	}
 
 	void destroy() {
+		current_thread_context(context_ui);
+
 		{
 			auto glr = remote.queue();
-
-			current_thread_context(context_ui);
 
 			root.markRemove();
 
@@ -535,15 +533,16 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-UI::UI() {
-	self = std::make_shared<ImplUI>(*this);
+UI::UI() : UI(Settings{}) {
 }
 
 UI::UI(Settings settings) {
 	self = std::make_shared<ImplUI>(*this, std::move(settings));
+	nexus().object_view_set<libv::ui::UI>(this);
 }
 
 UI::~UI() {
+	nexus().object_view_remove<libv::ui::UI>();
 }
 
 void UI::add(Component component) {
@@ -605,12 +604,6 @@ void UI::load_style_script_file(std::string path) {
 
 // -------------------------------------------------------------------------------------------------
 
-EventHostUI<Component> UI::event() {
-	return EventHostUI<Component>{self->root};
-}
-
-// -------------------------------------------------------------------------------------------------
-
 void UI::event(const libv::input::EventChar& event) {
 	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
@@ -643,6 +636,10 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 
 // -------------------------------------------------------------------------------------------------
 
+EventHostGlobal<Component> UI::event() {
+	return EventHostGlobal<Component>{self->root};
+}
+
 EventHub UI::event_hub() {
 	auto sp = std::shared_ptr<ContextEvent>(self, &self->context_event);
 	return EventHub(&self->context_ui, std::weak_ptr<ContextEvent>(sp));
@@ -652,6 +649,10 @@ EventHub UI::event_hub() {
 
 libv::gl::GL& UI::gl() {
 	return self->remote.gl();
+}
+
+[[nodiscard]] libv::Nexus& UI::nexus() {
+	return self->context_event.nexus;
 }
 
 ContextUI& UI::context() {

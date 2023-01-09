@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/math/exponential_moving_average.hpp>
+#include <libv/math/exp_moving_avg.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/codec.hpp>
@@ -53,7 +53,7 @@ private:
 //	std::chrono::system_clock::time_point last_data_transfer;
 	libv::Timer last_data_transfer;
 	/// Transfer rate of data messages in the last 10 second in byte per second
-	libv::exponential_moving_average<double, 10> transfer_rate_avg_bps{libv::KB(256)};
+	libv::exp_moving_avg<double, 10> transfer_rate_avg_bps{libv::KB(256)};
 //	libv::exponential_moving_average<double, 10, 0.8> transfer_rate_avg_bps{libv::KB(256)}; // TODO P4: GCC 11 NTTP adjust match to 0.8
 
 	std::shared_ptr<TaskPool> task_pool;

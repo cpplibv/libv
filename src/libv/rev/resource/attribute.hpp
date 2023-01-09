@@ -16,13 +16,23 @@ namespace rev {
 constexpr auto attribute_position   = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal     = libv::glr::Attribute<1, libv::vec3f>{};
 constexpr auto attribute_color0     = libv::glr::Attribute<2, libv::vec4f>{};
+// constexpr auto attribute_reserved3  = libv::glr::Attribute<3, T>{};
 constexpr auto attribute_bondID     = libv::glr::Attribute<4, libv::vec4i>{};
 constexpr auto attribute_bondWeight = libv::glr::Attribute<5, libv::vec4f>{};
 constexpr auto attribute_tangent    = libv::glr::Attribute<6, libv::vec3f>{};
 constexpr auto attribute_bitangent  = libv::glr::Attribute<7, libv::vec3f>{};
 constexpr auto attribute_texture0   = libv::glr::Attribute<8, libv::vec2f>{};
+// constexpr auto attribute_reserved9  = libv::glr::Attribute<9, T>{};
+// constexpr auto attribute_custom10   = libv::glr::Attribute<10, T>{};
+// constexpr auto attribute_custom11   = libv::glr::Attribute<11, T>{};
+// constexpr auto attribute_custom12   = libv::glr::Attribute<12, T>{};
+// constexpr auto attribute_custom13   = libv::glr::Attribute<13, T>{};
+// constexpr auto attribute_custom14   = libv::glr::Attribute<14, T>{};
+// constexpr auto attribute_custom15   = libv::glr::Attribute<15, T>{};
 constexpr auto attribute_custom1    = libv::glr::Attribute<14, libv::vec4f>{};
 constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};
+
+
 
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};

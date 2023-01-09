@@ -17,28 +17,43 @@ struct CoreSceneContainer : CorePanelAnchor {
 
 public:
 	std::string identifier;
-	libv::ui::Component primaryScene;
+	Component currentScene;
 };
 
 // =================================================================================================
 
-libv::ui::core_ptr SceneContainer::create_core(std::string name) {
-	return libv::ui::create_core_ptr<CoreType>(std::move(name));
+core_ptr SceneContainer::create_core(std::string name) {
+	return create_core_ptr<CoreType>(std::move(name));
 }
 
-bool SceneContainer::castable(libv::ui::core_ptr core) noexcept {
+core_ptr SceneContainer::create_core(std::string name, std::string identifier) {
+	auto p = create_core_ptr<CoreType>(std::move(name));
+	p->identifier = std::move(identifier);
+	return p;
+}
+
+core_ptr SceneContainer::create_core(std::string name, std::string identifier, Component scene) {
+	auto p = create_core_ptr<CoreType>(std::move(name));
+	p->identifier = std::move(identifier);
+	p->currentScene = std::move(scene);
+	if (p->currentScene)
+		p->add_front(p->currentScene);
+	return p;
+}
+
+bool SceneContainer::castable(core_ptr core) noexcept {
 	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void SceneContainer::assign(libv::ui::Component scene) {
-	if (self().primaryScene)
-		self().remove(self().primaryScene);
-	self().primaryScene = std::move(scene);
-	if (self().primaryScene)
-//		self().add(self().primaryScene);
-		self().add_front(self().primaryScene);
+void SceneContainer::assign(Component scene) {
+	if (self().currentScene)
+		self().remove(self().currentScene);
+	self().currentScene = std::move(scene);
+	if (self().currentScene)
+//		self().add(self().currentScene);
+		self().add_front(self().currentScene);
 }
 
 void SceneContainer::identifier(std::string id) noexcept {

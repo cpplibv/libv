@@ -120,7 +120,7 @@ float noise_simplex(Seed seed, float x, float y) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-// Only baseline for glsl, remove it
+// Only baseline for glsl, remove noise_simplex_g version
 float noise_simplex_g(float x, float y) noexcept {
 	//  https://github.com/BrianSharpe/Wombat/blob/master/SimplexPerlin2D.glsl
 

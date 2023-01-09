@@ -29,6 +29,7 @@
 #include <libv/ui/component/slider.hpp>
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/ui/component_system/attach_state.hpp>
+#include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
@@ -993,7 +994,7 @@ public:
 
 			if (e.keycode == libv::input::Keycode::KPNum0) {
 				button.event().submit.fire({});
-				ui.context().broadcast(std::string("Test string passed as global event"));
+				ui.context().event.broadcast(std::string("Test string passed as global event"));
 			}
 		});
 		label.event().global.connect<std::string>([](const std::string& e) {

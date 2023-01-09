@@ -28,7 +28,7 @@ class BaseBackground : public libv::ref_count_base<BaseBackground> {
 public:
 	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
 	[[nodiscard]] virtual std::string to_string() const = 0;
-	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
+	[[nodiscard]] virtual libv::vec2f size() const noexcept = 0;
 	[[nodiscard]] virtual bool equal_to(const BaseBackground& other) const noexcept = 0;
 //	virtual Component create_edit_ui();
 
@@ -52,7 +52,7 @@ public:
 	[[nodiscard]] inline std::string to_string() const {
 		return fragment->to_string();
 	}
-	[[nodiscard]] inline libv::vec2i size() const noexcept {
+	[[nodiscard]] inline libv::vec2f size() const noexcept {
 		return fragment->size();
 	}
 

@@ -19,8 +19,8 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
-	self(std::make_shared<InternalShaderLoader>()) {
+ShaderLoader::ShaderLoader(libv::Nexus& nexus, std::filesystem::path base_include_directory) :
+	self(std::make_shared<InternalShaderLoader>(nexus)) {
 
 //	self->glsl_source_loader.add_include_directory("block/", lookup_block_source);
 	add_include_directory("", base_include_directory.generic_string());
@@ -319,28 +319,6 @@ void ShaderLoader::foreach_shader(libv::function_ref<void(BaseShader)> func) {
 
 		func(BaseShader(std::move(internal_sp)));
 	}
-}
-
-void ShaderLoader::on_success(shader_load_success_cb success_cb) {
-	const auto lock = std::unique_lock(self->mutex);
-	self->success_cbs.emplace_back(std::move(success_cb));
-}
-
-void ShaderLoader::on_failure(shader_load_failure_cb failure_cb) {
-	const auto lock = std::unique_lock(self->mutex);
-	self->failure_cbs.emplace_back(std::move(failure_cb));
-}
-
-void ShaderLoader::on_unload(shader_unload_cb unload_cb) {
-	const auto lock = std::unique_lock(self->mutex);
-	self->unload_cbs.emplace_back(std::move(unload_cb));
-}
-
-void ShaderLoader::clear_on_updates() {
-	const auto lock = std::unique_lock(self->mutex);
-	self->success_cbs.clear();
-	self->failure_cbs.clear();
-	self->unload_cbs.clear();
 }
 
 // -------------------------------------------------------------------------------------------------

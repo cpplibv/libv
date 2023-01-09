@@ -5,7 +5,6 @@
 // fwd
 #include <libv/rev/fwd.hpp>
 // libv
-#include <functional>
 #include <optional>
 #include <string>
 
@@ -16,8 +15,10 @@ namespace rev {
 // -------------------------------------------------------------------------------------------------
 
 struct ShaderLoadSuccess {
-	ShaderID id;
+	ShaderID id = 0;
 	const BaseShader& shader;
+
+public:
 	// What triggered the (re)load (first reason)
 };
 
@@ -42,22 +43,20 @@ struct ShaderLoadFailure {
 		std::string message; /// Failure reason
 	};
 
-	ShaderID id;
+public:
+	ShaderID id = 0;
 	const BaseShader& shader;
 	// What triggered the (re)load (first reason)
 
+public:
 	std::optional<IncludeFailure> include_failure;
 	std::optional<CompileFailure> compile_failure;
 	std::optional<LinkFailure> link_failure;
 };
 
 struct ShaderUnload {
-	ShaderID id;
+	ShaderID id = 0;
 };
-
-using shader_load_success_cb = std::function<void(const ShaderLoadSuccess&)>;
-using shader_load_failure_cb = std::function<void(const ShaderLoadFailure&)>;
-using shader_unload_cb = std::function<void(const ShaderUnload&)>;
 
 // -------------------------------------------------------------------------------------------------
 

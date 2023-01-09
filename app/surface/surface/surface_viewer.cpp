@@ -29,9 +29,9 @@ SurfaceViewer::SurfaceViewer(const std::string& configPath, const std::string& c
 			settings.res_shader.base_path = "res/shader/";
 			settings.res_texture.base_path = "res/texture/";
 
-			settings.res_font.restict_under_base = false; // TODO P1: Should go away with proper res folder
-			settings.res_shader.restict_under_base = false; // TODO P1: Should go away with proper res folder
-			settings.res_texture.restict_under_base = false; // TODO P1: Should go away with proper res folder
+			settings.res_font.restrict_under_base = false; // TODO P1: Should go away with proper res folder
+			settings.res_shader.restrict_under_base = false; // TODO P1: Should go away with proper res folder
+			settings.res_texture.restrict_under_base = false; // TODO P1: Should go away with proper res folder
 
 			settings.track_style_scripts = true;
 			return settings;

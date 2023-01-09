@@ -428,7 +428,7 @@ struct vec_t : vec_base_t<N, T> {
 		return &this->data()[0];
 	}
 
-	[[nodiscard]] constexpr LIBV_FORCE_INLINE T* ptr() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE const T* ptr() const noexcept {
 		return &this->data()[0];
 	}
 

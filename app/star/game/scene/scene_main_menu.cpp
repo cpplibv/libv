@@ -8,10 +8,11 @@
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/switch_scene.hpp>
 #include <libv/utility/nexus.hpp>
 // pro
 #include <star/game/control/requests.hpp>
-#include <star/game/scene/utility.hpp>
+#include <star/game/scene/bean.hpp>
 
 
 namespace star {
@@ -33,7 +34,7 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 			btn.enable(false);
 		else
 			btn.event().submit.connect([nexus, createFn](libv::ui::Button& source) mutable {
-				switchParentScene("main", source, createFn(nexus));
+				libv::ui::switchParentScene("main", source, createFn(nexus));
 			});
 
 		return btn;

@@ -92,7 +92,7 @@ libv::vec2i RenderTarget::size() const noexcept {
 	return self->framebufferSize;
 }
 
-const libv::glr::Texture2D::R11F_G11F_B10F& RenderTarget::resolve(libv::glr::Queue& glr) {
+const libv::glr::Texture2D::R16G16B16_SFloat& RenderTarget::resolve(libv::glr::Queue& glr) {
 	if (self->sampleCount_ > 1) {
 		glr.blit(self->ms_framebuffer, self->ss_framebuffer,
 				{}, self->framebufferSize,

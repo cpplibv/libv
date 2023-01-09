@@ -6,13 +6,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
-#include FT_MODULE_H
-#include FT_OUTLINE_H
-#include FT_TRIGONOMETRY_H
+// #include FT_OUTLINE_H
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/to_underlying.hpp>
 // std
 #include <atomic>
 #include <mutex>
@@ -63,15 +60,16 @@ Font2D::Font2D(std::string fontData) :
 	{
 		std::lock_guard lock(freetype_lib_m);
 		_incFreetypeLibRef();
-		if (const auto err = FT_New_Memory_Face(
+		const auto err = FT_New_Memory_Face(
 				freetype_lib,
 				reinterpret_cast<const FT_Byte*>(this->fontData.data()),
 				static_cast<FT_Long>(this->fontData.size()),
 				0,
-				&face))
-			log_ui_ft.error("FT_New_Memory_Face failed: {}", err);
-		// TODO P5: FT error code to error message if possible.
-		//			https://www.freetype.org/freetype2/docs/reference/ft2-error_code_values.html
+				&face);
+		if (err) {
+			log_ui_ft.error("FT_New_Memory_Face failed: {} - {}", err, FT_Error_String(err));
+			throw Font2DCreateException();
+		}
 	}
 
 	texture_.storage(1, textureSize);
@@ -131,7 +129,7 @@ vec2f Font2D::getKerning(uint32_t left, uint32_t right, FontSize size) {
 		int rightID = FT_Get_Char_Index(face, right);
 
 		if (const auto err = FT_Get_Kerning(face, leftID, rightID, FT_KERNING_DEFAULT, &kerning))
-			log_ui_ft.error("FT_Get_Kerning failed: {}", err);
+			log_ui_ft.error("FT_Get_Kerning failed: {} - {}", err, FT_Error_String(err));
 	}
 
 	// 26.6 fixed point
@@ -169,19 +167,19 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, FontSize size) {
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
 	if (const auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT)) {
-		log_ui_ft.error("FT_Load_Glyph failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		log_ui_ft.error("FT_Load_Glyph failed (unicode: {}, size: {}): {} - {}", unicode, +currentSize, err, FT_Error_String(err));
 		return _getFallbackCharacter();
 	}
 	if (const auto err = FT_Get_Glyph(face->glyph, &glyph)) {
-		log_ui_ft.error("FT_Get_Glyph failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		log_ui_ft.error("FT_Get_Glyph failed (unicode: {}, size: {}): {} - {}", unicode, +currentSize, err, FT_Error_String(err));
 		return _getFallbackCharacter();
 	}
 	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_LCD, nullptr, true)) {
-		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		log_ui_ft.error("FT_Glyph_To_Bitmap failed (unicode: {}, size: {}): {} - {}", unicode, +currentSize, err, FT_Error_String(err));
 		return _getFallbackCharacter();
 	}
 //	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_SDF, nullptr, true)) {
-//		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+//		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, +currentSize);
 //		return _getFallbackCharacter();
 //	}
 
@@ -196,7 +194,7 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, FontSize size) {
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
 		log_ui_ft.error("Failed to render character: Not enough space in font texture: "
 				"unicode: {} size: {} bitmap size: {} {}, pen pos: {}",
-				unicode, libv::to_value(currentSize), bitmapWidth, bitmapHeight, texturePen);
+				unicode, +currentSize, bitmapWidth, bitmapHeight, texturePen);
 		FT_Done_Glyph(glyph);
 		return _getFallbackCharacter();
 	}
@@ -241,7 +239,7 @@ void Font2D::_changeSizeOnDemand(FontSize size) {
 	if (currentSize != size) {
 		// 26.6 fixed point
 		if (const auto err = FT_Set_Char_Size(face, libv::to_value(size) << 6, libv::to_value(size) << 6, 96, 96))
-			log_ui_ft.error("FT_Set_Char_Size failed: {}", err);
+			log_ui_ft.error("FT_Set_Char_Size failed: {} - {}", err, FT_Error_String(err));
 		else
 			currentSize = size;
 	}

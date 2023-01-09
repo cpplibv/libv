@@ -2,8 +2,8 @@
 
 // hpp
 #include <star/game/game_client_frame.hpp>
-// pro
-#include <star/game/view/icon_set.hpp>
+// libv
+#include <libv/frame/icon_set.hpp>
 
 
 namespace star {
@@ -23,7 +23,7 @@ GameClientFrame::GameClientFrame() :
 	setOpenGLVersion(4, 5);
 	setOpenGLSamples(libv::Frame::OpenGLSamples{0});
 	setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
-	setIcon(icon_set_iris_cyan());
+	setIcon(libv::frame::icon_set_iris_cyan());
 
 	onKey.output([this](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)

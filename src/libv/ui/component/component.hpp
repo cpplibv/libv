@@ -84,7 +84,7 @@ public:
 	[[nodiscard]] Component parent() const noexcept;
 
 	template <typename T>
-		requires (std::derived_from<T, Component> || std::derived_from<Component, T>)
+		requires (std::derived_from<T, Component>)
 		// TODO P5: Use deducing this to check for static castability
 	[[nodiscard]] inline T cast() noexcept {
 		return T::castable(ptr_) ? T{ptr_} : T{nullptr};
@@ -105,6 +105,7 @@ public:
 
 public:
 	void size(const Size& value) noexcept;
+	void size(const SizeDim& x, const SizeDim& y) noexcept;
 	[[nodiscard]] const Size& size() const noexcept;
 
 	void anchor(Anchor value) noexcept;

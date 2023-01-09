@@ -13,6 +13,7 @@
 #include <libv/glr/uniform.hpp>
 // pro
 #include <libv/ui/component/component_core.hpp>
+#include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
@@ -336,7 +337,7 @@ bool OverlayZoom::castable(libv::ui::core_ptr core) noexcept {
 
 void OverlayZoom::control() {
 	self().control_ = true;
-	ui().broadcast(EventOverlay(true));
+	ui().event.broadcast(EventOverlay(true));
 	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
 	// vvv Start of workaround (comment / uncomment) (More above)
 	//ui().mouse.acquire(self());
@@ -346,13 +347,13 @@ void OverlayZoom::control() {
 void OverlayZoom::view() {
 	self().control_ = false;
 	ui().mouse.release(self());
-	ui().broadcast(EventOverlay(false));
+	ui().event.broadcast(EventOverlay(false));
 }
 
 void OverlayZoom::disable() {
 	self().control_ = false;
 	ui().mouse.release(self());
-	ui().broadcast(EventOverlay(false));
+	ui().event.broadcast(EventOverlay(false));
 }
 
 libv::vec2f OverlayZoom::screen_BL() const {

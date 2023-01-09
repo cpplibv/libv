@@ -14,6 +14,7 @@ void main() {
 //	result = vec4(1, pow(fragmentTexture0, vec2(2.0)) * 2, 1);
 
 
+//	vec2 cross_mask = vec2(1, 1);
 	vec2 cross_mask = step(0.45, fragmentTexture0) * step(0.45, 1.0 - fragmentTexture0);
 
 //	result = vec4(0, 4.0 * cross_mask, 1);
@@ -25,6 +26,7 @@ void main() {
 
 	result = vec4(1, fragmentTexture0 + 4.0 * cross_mask, 1);
 //	result = vec4(1, fragmentTexture0 + 2.0 * cross_mask, 1);
+//	result = vec4(1, fragmentTexture0 + 1.0 * cross_mask, 1);
 //	result = vec4(1, fragmentTexture0 + 0.1 * cross_mask, 1);
 //	result = vec4(cross_mask.x * vec3(2), 1);
 

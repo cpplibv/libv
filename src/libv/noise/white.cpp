@@ -26,14 +26,14 @@ namespace libv {
 //	return result;
 //}
 
-std::vector<libv::vec3uc> noise_white_2D_3uc(uint64_t seed, uint32_t X, uint32_t Y) {
+std::vector<libv::vec3uc> noise_white_2D_3uc(uint64_t seed, uint32_t x, uint32_t y) {
 	std::mt19937_64 rng(seed);
 	auto dist = libv::make_uniform_distribution_inclusive(uint8_t(0), uint8_t(255));
 
 	std::vector<libv::vec3uc> result;
-	result.resize(X * Y);
+	result.resize(x * y);
 
-	for (uint32_t i = 0; i < X * Y; i++) {
+	for (uint32_t i = 0; i < x * y; i++) {
 		result[i].x = dist(rng);
 		result[i].y = dist(rng);
 		result[i].z = dist(rng);

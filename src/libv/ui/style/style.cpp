@@ -86,12 +86,11 @@ libv::optional_ref<const PropertyDynamic> Style::get_optional(StyleState state, 
 		for (const PropertyEntry& entry : it->second | std::views::reverse)
 			if (state_matches_requirement(state, entry.state_mask, entry.state_value))
 				return libv::make_optional_ref(entry.value);
-
-	} else {
-		for (const auto& base : bases)
-			if (auto result = base->get_optional(state, property); result)
-				return result;
 	}
+
+	for (const auto& base : bases)
+		if (auto result = base->get_optional(state, property); result)
+			return result;
 
 	return libv::opt_ref_none;
 }

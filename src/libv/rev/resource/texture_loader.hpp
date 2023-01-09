@@ -7,6 +7,8 @@
 // std
 #include <memory>
 #include <string_view>
+// pro
+#include <libv/rev/gl/swizzle.hpp>
 
 
 namespace libv {
@@ -28,7 +30,7 @@ public:
 	inline ~TextureLoader() = default;
 
 public:
-	[[nodiscard]] Texture load(std::string_view name);
+	[[nodiscard]] Texture load(std::string_view name, Swizzle swizzle = {});
 	[[nodiscard]] Texture fallback() const;
 };
 

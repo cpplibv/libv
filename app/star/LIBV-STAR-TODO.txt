@@ -9,8 +9,14 @@ Star - System integration demo
 
 
 
-credits scroll pane
--> libv.ui notes for scroll pane
+
+
+
+ > ui > Slider value change should not invalidate layout
+			(make it a float region if it must)
+			mouse context range remap might be needed!
+
+
 
 
 compute test these noises:

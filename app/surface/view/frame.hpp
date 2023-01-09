@@ -6,7 +6,7 @@
 #include <libv/frame/frame.hpp>
 //#include <libv/frame/monitor.hpp>
 // pro
-#include <surface/view/icon_set.hpp>
+#include <libv/frame/icon_set.hpp>
 //#include <surface/log.hpp>
 
 
@@ -24,7 +24,7 @@ struct SurfaceFrame : public libv::Frame {
 		setOpenGLVersion(3, 3);
 		setOpenGLSamples(libv::Frame::OpenGLSamples{4});
 		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
-		setIcon(icon_set_iris_cyan());
+		setIcon(libv::frame::icon_set_iris_cyan());
 //		setSwapInterval(0);
 
 		onKey.output([this](const libv::input::EventKey& e) {

@@ -9,9 +9,10 @@
 #include <libv/ui/component/image.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/switch_scene.hpp>
 // pro
 #include <star/game/scene/controls_layout.hpp>
-#include <star/game/scene/utility.hpp>
+#include <star/game/scene/bean.hpp>
 
 #include <libv/ui/component/scroll_area.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
@@ -71,7 +72,7 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 
 	auto btn = line.add_sa<libv::ui::Button>("settings.ctrl", "Back");
 	btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-		switchParentScene("main", source, createSceneMainMenu(nexus));
+		libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
 	});
 
 	return line;
@@ -93,7 +94,43 @@ std::vector<PersonnelDescription> makePersonnelList() {
 std::vector<ThirdPartyDescription> makeThirdPartyList() {
 	std::vector<ThirdPartyDescription> list;
 
-	//	TODO License: There is more at the end of the file VVV :)
+	// static constexpr ThirdPartyDescription array[] = {
+	// 	{
+	// 		.title = "assimp - Open Asset Import Library",
+	// 		.url = "https://www.assimp.org/",
+	// 		.license_short = "3-clause BSD-License (Modified)",
+	// 		.license_text =
+	// 		"Open Asset Import Library (assimp)\n"
+	// 		"\n"
+	// 		"Copyright (c) 2006-2021, assimp team\n"
+	// 		"All rights reserved.\n"
+	// 		"\n"
+	// 		"Redistribution and use of this software in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n"
+	// 		"* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.\n"
+	// 		"* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
+	// 		"* Neither the name of the assimp team, nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission of the assimp team.\n"
+	// 		"\n"
+	// 		"THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+	// 		"\n"
+	// 		"******************************************************************************\n"
+	// 		"\n"
+	// 		"AN EXCEPTION applies to all files in the ./test/models-nonbsd folder. These are 3d models for testing purposes, from various free sources on the internet. They are - unless otherwise stated - copyright of their respective creators, which may impose additional requirements on the use of their work. For any of these models, see <model-name>.source.txt for more legal information. Contact us if you are a copyright holder and believe that we credited you inproperly or if you don't want your files to appear in the repository.\n"
+	// 		"\n"
+	// 		"******************************************************************************\n"
+	// 		"\n"
+	// 		"Poly2Tri Copyright (c) 2009-2010, Poly2Tri Contributors\n"
+	// 		"http://code.google.com/p/poly2tri/\n"
+	// 		"\n"
+	// 		"All rights reserved.\n"
+	// 		"Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n"
+	// 		"\n"
+	// 		"* Redistributions of source code must retain the above copyright notice this list of conditions and the following disclaimer.\n"
+	// 		"* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
+	// 		"* Neither the name of Poly2Tri nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.\n"
+	// 		"\n"
+	// 		"THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+	// 	}
+	// };
 
 	list.emplace_back(
 			"assimp - Open Asset Import Library",

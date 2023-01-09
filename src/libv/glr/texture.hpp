@@ -224,7 +224,18 @@ private:
 	using FD = libv::gl::FormatDepth;
 	using FDS = libv::gl::FormatDepthStencil;
 
-public:
+public: // New naming conventions (VkFormat like):
+	// C++20: short float
+	// using R16_SFloat          = TS<Params<FS::R16F,       libv::gl::DataType::F32, short float>>;
+	// using R16G16_SFloat       = TS<Params<FS::RG16F,      libv::gl::DataType::F32, short float>>;
+	// using R16G16B16_SFloat    = TS<Params<FS::RGB16F,     libv::gl::DataType::F32, short float>>;
+	// using R16G16B16A16_SFloat = TS<Params<FS::RGBA16F,    libv::gl::DataType::F32, short float>>;
+	using R16_SFloat          = TS<Params<FS::R16F,       libv::gl::DataType::F32, float>>;
+	using R16G16_SFloat       = TS<Params<FS::RG16F,      libv::gl::DataType::F32, libv::vec2f>>;
+	using R16G16B16_SFloat    = TS<Params<FS::RGB16F,     libv::gl::DataType::F32, libv::vec3f>>;
+	using R16G16B16A16_SFloat = TS<Params<FS::RGBA16F,    libv::gl::DataType::F32, libv::vec4f>>;
+
+public: // Old naming conventions:
 	using R8          = TS<Params<FS::R8,                 libv::gl::DataType::U8, uint8_t>>;
 	using R8_G8       = TS<Params<FS::RG8,                libv::gl::DataType::U8, libv::vec2uc>>;
 	using R8_G8_B8    = TS<Params<FS::RGB8,               libv::gl::DataType::U8, libv::vec3uc>>;
@@ -232,15 +243,10 @@ public:
 
 	using R8_G8_B8_S  = TS<Params<FS::RGB8I,              libv::gl::DataType::I8, libv::vec3c>>;
 
-	// C++20: short float
-//	using R16F        = TS<Params<FS::R16F,               libv::gl::DataType::F16, short float>>;
-//	using RG16F       = TS<Params<FS::RG16F,              libv::gl::DataType::F16, libv::vec2sf>>;
-//	using RGB16F      = TS<Params<FS::RGB16F,             libv::gl::DataType::F16, libv::vec3sf>>;
-//	using RGBA16F     = TS<Params<FS::RGBA16F,            libv::gl::DataType::F16, libv::vec4sf>>;
-	using R16F        = TS<Params<FS::R16F,               libv::gl::DataType::F32, float>>;
-	using RG16F       = TS<Params<FS::RG16F,              libv::gl::DataType::F32, libv::vec2f>>;
-	using RGB16F      = TS<Params<FS::RGB16F,             libv::gl::DataType::F32, libv::vec3f>>;
-	using RGBA16F     = TS<Params<FS::RGBA16F,            libv::gl::DataType::F32, libv::vec4f>>;
+	// using R16F        = R16_SFloat;
+	// using RG16F       = R16G16_SFloat;
+	// using RGB16F      = R16G16B16_SFloat;
+	// using RGBA16F     = R16G16B16A16_SFloat;
 
 	using R32F        = TS<Params<FS::R32F,               libv::gl::DataType::F32, float>>;
 	using RG32F       = TS<Params<FS::RG32F,              libv::gl::DataType::F32, libv::vec2f>>;

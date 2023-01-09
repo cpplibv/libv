@@ -23,10 +23,6 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-using SequenceNumber = uint32_t;
-
-// -------------------------------------------------------------------------------------------------
-
 static inline void changeState(libv::gl::GL& gl, State target) {
 	gl.capability.blend.set(target.capabilityBlend != 0);
 	gl.capability.cullFace.set(target.capabilityCullFace != 0);
@@ -90,7 +86,6 @@ static inline void changeState(libv::gl::GL& gl, State target) {
 // -------------------------------------------------------------------------------------------------
 
 struct QueueTaskMesh {
-	SequenceNumber sequenceNumber;
 	State state;
 	std::shared_ptr<RemoteProgram> program;
 	std::shared_ptr<RemoteMesh> mesh;
@@ -122,8 +117,21 @@ struct QueueTaskMeshVII : QueueTaskMesh {
 	}
 };
 
+struct QueueTaskMeshInstanced : QueueTaskMesh {
+	int32_t instanceCount;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
+		program->use(gl, remote);
+		mesh->renderArraysInstanced(gl, remote, instanceCount);
+	}
+};
+
 struct QueueTaskMeshFullScreen {
-	SequenceNumber sequenceNumber;
 	State state;
 	std::shared_ptr<RemoteProgram> program;
 
@@ -141,7 +149,6 @@ struct QueueTaskMeshFullScreen {
 };
 
 struct QueueTaskDispatchCompute {
-	SequenceNumber sequenceNumber;
 	State state;
 	std::shared_ptr<RemoteProgram> program;
 	uint32_t group_size_x;
@@ -160,7 +167,6 @@ struct QueueTaskDispatchCompute {
 };
 
 struct QueueTaskMemoryBarrier {
-	SequenceNumber sequenceNumber;
 	libv::gl::BarrierBit bits;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -170,7 +176,6 @@ struct QueueTaskMemoryBarrier {
 };
 
 struct QueueTaskClear {
-	SequenceNumber sequenceNumber;
 	libv::gl::BufferBit buffers;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -201,7 +206,6 @@ struct QueueTaskClear {
 };
 
 struct QueueTaskCallback {
-	SequenceNumber sequenceNumber;
 	State state;
 	std::function<void(libv::gl::GL&)> callback;
 
@@ -216,8 +220,23 @@ struct QueueTaskCallback {
 	}
 };
 
+struct QueueTaskCallbackProgram {
+	State state;
+	std::function<void(libv::gl::GL&)> callback;
+	std::shared_ptr<RemoteProgram> program;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
+		program->use(gl, remote);
+		callback(gl);
+	}
+};
+
 struct QueueTaskClearColor {
-	SequenceNumber sequenceNumber;
 	libv::vec4f color;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -227,7 +246,6 @@ struct QueueTaskClearColor {
 };
 
 struct QueueTaskUniformBlockUnique {
-	SequenceNumber sequenceNumber;
 	UniformBlockUniqueView_std140 view;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -236,7 +254,6 @@ struct QueueTaskUniformBlockUnique {
 };
 
 struct QueueTaskUniformBlockShared {
-	SequenceNumber sequenceNumber;
 	UniformBlockSharedView_std140 view;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -245,7 +262,6 @@ struct QueueTaskUniformBlockShared {
 };
 
 struct QueueTaskUniformBlockStream {
-	SequenceNumber sequenceNumber;
 	UniformBlockStreamView_std140 view;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
@@ -254,7 +270,6 @@ struct QueueTaskUniformBlockStream {
 };
 
 struct QueueTaskTexture {
-	SequenceNumber sequenceNumber;
 	Texture texture;
 	libv::gl::TextureChannel channel;
 
@@ -268,7 +283,6 @@ struct QueueTaskTexture {
 };
 
 struct QueueTaskBindImageTexture {
-	SequenceNumber sequenceNumber;
 	uint32_t unit;
 	Texture texture;
 	int32_t level;
@@ -285,7 +299,6 @@ struct QueueTaskBindImageTexture {
 };
 
 struct QueueTaskViewport {
-	SequenceNumber sequenceNumber;
 	libv::vec2i position;
 	libv::vec2i size;
 
@@ -296,7 +309,6 @@ struct QueueTaskViewport {
 };
 
 struct QueueTaskFramebuffer {
-	SequenceNumber sequenceNumber;
 	std::optional<Framebuffer> framebuffer;
 	enum class Mode {
 		both,
@@ -308,11 +320,11 @@ struct QueueTaskFramebuffer {
 		default_read,
 	} mode;
 
-	QueueTaskFramebuffer(SequenceNumber sequenceNumber, Framebuffer&& framebuffer, Mode mode) :
-		sequenceNumber(sequenceNumber), framebuffer(std::move(framebuffer)), mode(mode) { }
+	QueueTaskFramebuffer(Framebuffer&& framebuffer, Mode mode) :
+		framebuffer(std::move(framebuffer)), mode(mode) { }
 
-	QueueTaskFramebuffer(SequenceNumber sequenceNumber, Mode mode) :
-		sequenceNumber(sequenceNumber), mode(mode) { }
+	QueueTaskFramebuffer(Mode mode) :
+		mode(mode) { }
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
 		switch (mode) {
@@ -338,7 +350,6 @@ struct QueueTaskFramebuffer {
 };
 
 struct QueueTaskBlit {
-	SequenceNumber sequenceNumber;
 	std::optional<Framebuffer> framebuffer_src;
 	std::optional<Framebuffer> framebuffer_dst;
 	std::optional<libv::gl::Attachment> attachment_src;
@@ -398,11 +409,13 @@ public:
 
 	std::vector<std::variant<
 			QueueTaskCallback,
+			QueueTaskCallbackProgram,
 			QueueTaskClear,
 			QueueTaskClearColor,
 			QueueTaskViewport,
 			QueueTaskMesh,
 			QueueTaskMeshVII,
+			QueueTaskMeshInstanced,
 			QueueTaskMeshFullScreen,
 			QueueTaskUniformBlockUnique,
 			QueueTaskUniformBlockShared,
@@ -415,7 +428,6 @@ public:
 			QueueTaskBlit
 	>> tasks;
 
-	SequenceNumber sequenceNumber = 0;
 	State currentState{};
 
 	libv::gl::GL& gl;
@@ -432,7 +444,7 @@ public:
 public:
 	template <typename T, typename... Args>
 	inline void add(Args&&... args) {
-		tasks.emplace_back(std::in_place_type<T>, T{sequenceNumber, std::forward<Args>(args)...});
+		tasks.emplace_back(std::in_place_type<T>, T{std::forward<Args>(args)...});
 	}
 };
 
@@ -449,10 +461,6 @@ Queue::~Queue() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Queue::sequencePoint() noexcept {
-	self->sequenceNumber++;
-}
-
 //	void Queue::sort() {
 //		// Preferred sorting order would be:
 //		// pass >> target >> capabilities >> programs >> texture >> uniform >> z_hint >> buffer
@@ -461,9 +469,12 @@ void Queue::sequencePoint() noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void Queue::callback(std::function<void(libv::gl::GL&)> func) {
-	sequencePoint();
 	self->add<QueueTaskCallback>(state.state(), std::move(func));
-	sequencePoint();
+}
+
+void Queue::callbackProgram(std::function<void(libv::gl::GL&)> func) {
+	self->programStack.top()->uniformStream.endBatch();
+	self->add<QueueTaskCallbackProgram>(state.state(), std::move(func), self->programStack.top());
 }
 
 libv::gl::GL& Queue::out_of_order_gl() noexcept {
@@ -473,7 +484,6 @@ libv::gl::GL& Queue::out_of_order_gl() noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void Queue::setClearColor(const libv::vec4f rgba) {
-	sequencePoint();
 	self->add<QueueTaskClearColor>(rgba);
 }
 
@@ -481,9 +491,7 @@ void Queue::clearColor() {
 	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
 		task->buffers = task->buffers | libv::gl::BufferBit::Color;
 	} else {
-		sequencePoint();
 		self->add<QueueTaskClear>(libv::gl::BufferBit::Color);
-		sequencePoint();
 	}
 }
 
@@ -491,9 +499,7 @@ void Queue::clearColorDepth() {
 	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
 		task->buffers = task->buffers | libv::gl::BufferBit::Color | libv::gl::BufferBit::Depth;
 	} else {
-		sequencePoint();
 		self->add<QueueTaskClear>(libv::gl::BufferBit::Color | libv::gl::BufferBit::Depth);
-		sequencePoint();
 	}
 }
 
@@ -501,9 +507,7 @@ void Queue::clearDepth() {
 	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
 		task->buffers = task->buffers | libv::gl::BufferBit::Depth;
 	} else {
-		sequencePoint();
 		self->add<QueueTaskClear>(libv::gl::BufferBit::Depth);
-		sequencePoint();
 	}
 }
 
@@ -517,9 +521,7 @@ void Queue::viewport(libv::vec2i position, libv::vec2i size) {
 		task->size = size;
 		task->position = position;
 	} else {
-		sequencePoint();
 		self->add<QueueTaskViewport>(position, size);
-		sequencePoint();
 	}
 }
 
@@ -534,77 +536,53 @@ libv::vec2i Queue::viewport_size() const {
 // -------------------------------------------------------------------------------------------------
 
 void Queue::framebuffer(Framebuffer framebuffer) {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(std::move(framebuffer), QueueTaskFramebuffer::Mode::both);
-	sequencePoint();
 }
 
 void Queue::framebuffer_draw(Framebuffer framebuffer) {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(std::move(framebuffer), QueueTaskFramebuffer::Mode::draw);
-	sequencePoint();
 }
 
 void Queue::framebuffer_read(Framebuffer framebuffer) {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(std::move(framebuffer), QueueTaskFramebuffer::Mode::read);
-	sequencePoint();
 }
 
 void Queue::framebuffer_default() {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_both);
-	sequencePoint();
 }
 
 void Queue::framebuffer_draw_default() {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_draw);
-	sequencePoint();
 }
 
 void Queue::framebuffer_read_default() {
-	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_read);
-	sequencePoint();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Queue::blit(Framebuffer src, Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::move(src), std::move(dst), std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 void Queue::blit(Framebuffer src, Framebuffer dst, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::gl::Attachment dst_att, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::move(src), std::move(dst), src_att, dst_att, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 void Queue::blit_to_default(Framebuffer src, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::move(src), std::nullopt, std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 void Queue::blit_to_default(Framebuffer src, libv::gl::Attachment src_att, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::move(src), std::nullopt, src_att, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 void Queue::blit_from_default(Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::nullopt, std::move(dst), std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 void Queue::blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
-	sequencePoint();
 	self->add<QueueTaskBlit>(std::nullopt, std::nullopt, std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
-	sequencePoint();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -781,6 +759,11 @@ void Queue::render(Mesh mesh) {
 void Queue::render(Mesh mesh, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) {
 	self->programStack.top()->uniformStream.endBatch();
 	self->add<QueueTaskMeshVII>(state.state(), self->programStack.top(), AttorneyMeshRemote::remote(mesh), baseVertex, baseIndex, numIndices);
+}
+
+void Queue::render_instanced(Mesh mesh, int32_t count) {
+	self->programStack.top()->uniformStream.endBatch();
+	self->add<QueueTaskMeshInstanced>(state.state(), self->programStack.top(), AttorneyMeshRemote::remote(mesh), count);
 }
 
 void Queue::render_full_screen() {

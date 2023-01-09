@@ -15,17 +15,16 @@ Delaunay triangulation
 	Could solve biome generation (smooth/blended voronoi)
 
 
-Grass
-	https://www.youtube.com/watch?v=Y0Ko0kvwfgA
-	https://www.youtube.com/watch?v=jw00MbIJcrk
-	https://www.youtube.com/watch?v=PNvlqsXdQic
-
-	Procedural Grass in 'Ghost of Tsushima' - https://www.youtube.com/watch?v=Ibe1JBF5i5Y
-
-
 Vegetation
-	when glsl generation is online, use compute shader to place vegetation (and handle instancing)
+	When glsl generation is online, use compute shader to place vegetation (and handle instancing)
 	GDC - Between Tech and Art: The Vegetation of Horizon Zero Dawn - https://www.youtube.com/watch?v=wavnKZNSYqU
+
+	Grass
+		https://www.youtube.com/watch?v=Y0Ko0kvwfgA
+		https://www.youtube.com/watch?v=jw00MbIJcrk
+		https://www.youtube.com/watch?v=PNvlqsXdQic
+
+		Procedural Grass in 'Ghost of Tsushima' - https://www.youtube.com/watch?v=Ibe1JBF5i5Y
 
 
 
@@ -426,3 +425,31 @@ vec2 identity( vec2 value, WarpParams warp ) { return value; }
 --- Art collection ---------------------------------------------------------------------------------
 
 Sand Dunes: https://www.artstation.com/artwork/9NOvbo
+
+
+
+--- ChatGPT prompts for surface --------------------------------------------------------------------
+
+let us define PLANET as a hypothetical planet where beside earth like biomes there are many more scifi biomes like lava lake or crystal river
+
+let us define PROPS as properties of a name, temperature, precipitation and colors of a biome.
+temperature in PROPS must be represented as a min and max float value in celsius.
+precipitation in PROPS must be represented as a min and max float value.
+colors in PROPS must be a list of 4 hex colors that describes the given biome the best.
+
+json list of 5 PROPS
+
+---
+
+PLANET := a hypothetical planet where beside earth like biomes there are more hypothetical scifi themed biomes like lava lake or crystal river
+PLANET has no underground biome
+
+PROPS := properties of a biome:
+PROPS.name must be the name of the biome
+PROPS.temperature must be represented as a min and max float value in celsius.
+PROPS.precipitation must be represented as a min and max float value.
+PROPS.colors must be a list of 4 hex colors that describes the given biome the best.
+
+json list the PROPS of 5 biomes on PLANET
+
+===

@@ -35,7 +35,7 @@ public:
 	[[nodiscard]] libv::vec2i size() const noexcept;
 
 public:
-	const libv::glr::Texture2D::R11F_G11F_B10F& resolve(libv::glr::Queue& glr);
+	const libv::glr::Texture2D::R16G16B16_SFloat& resolve(libv::glr::Queue& glr);
 
 	[[nodiscard]] const libv::glr::Framebuffer& framebuffer() const noexcept;
 };

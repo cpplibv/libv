@@ -626,11 +626,17 @@ libv.glr: UniformBlockSharedView_std140
 
 
 
+wish: Exclude generated files from clean target (add_custom_target instead of add_custom_command, and/or use depends, and/or use dummy targets/files)
+
+wish: update cmake version and use add_compile_definitions() instead of add_definitions()
+wish: target_link_directories()
+wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
+wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
 
 
 What do I need from libv to make a 'minimal' working iris program?
 	libv.ui
-		2 List component
+		2 List component (and Pagination)
 		3 Scroll pane = scroll area + scroll bar + connecting them
 		5 Font outline render
 			freetype2 Now has an SDF render option
@@ -653,7 +659,7 @@ What do I need from libv to make a 'minimal' working iris program?
 	libv.net
 		UDP Communication
 			Reliable
-			QoS (Redundancy levels, and prioritaziations)
+			QoS (Redundancy levels, and prioritization)
 			Rate Limiting (per connection, [per group], per global)
 			NAT punching
 
@@ -672,60 +678,8 @@ What do I need from libv to make a 'minimal' working iris program?
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
 
-
-
 libv: Implement a dynamic library build variant (dev build type ++)
 
-
-
-
-
-
-Create CMake Presets:
-
-{
-	"version": 6,
-	"configurePresets": [
-		{
-			"name": "ninja-base",
-			"hidden": true,
-			"generator": "Ninja",
-//"architecture": "x64",
-			"cacheVariables": {
-				"SKIP_EXTERNAL_CONFIGURES": "true",
-				"FORCE_COLORED_OUTPUT": "true"
-			},
-			"environment": {
-				"NINJA_STATUS": "%e [%f/%t] "
-			}
-		},
-		{
-			"name": "ninja-debug",
-			"inherits": "ninja-base",
-			"binaryDir": "${sourceDir}/build/debug",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "debug",
-			}
-		},
-		{
-			"name": "ninja-release",
-			"inherits": "ninja-base",
-			"binaryDir": "${sourceDir}/build/release",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "release",
-				"SKIP_EXTERNAL_CONFIGURES": "false",
-			}
-		},
-		{
-			"name": "ninja-dev",
-			"inherits": "ninja-base",
-			"binaryDir": "${sourceDir}/build/dev",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "dev",
-			}
-		}
-	]
-}
 
 
 ext: lexy https://github.com/foonathan/lexy
@@ -743,13 +697,61 @@ libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesyste
 
 libv: Remove friend class X; and use friend X; and ensure that X is fwd declared in the proper scope
 
+
+GCC 13.1
+	<stacktrace> with --enable-libstdcxx-backtrace=yes
+	[[assume(expr)]] (next to [[likely]], [[unlikely]])
+	std::float16_t and std::bfloat16_t
+	#warning
+	\o123 \u0100 \xAB \N{LATIN CAPITAL LETTER A WITH MACRON}
+	static operator()
+	static operator[]
+
+	std::reference_constructs_from_temporary
+	std::reference_converts_from_temporary
+
+	<format> header and std::format
+	chrono
+		std::chrono::utc_clock and other clocks,
+		time zones
+		std::format support in the <chrono> header
+	ranges
+	 	views::zip
+	 	views::zip_transform
+	 	views::adjacent
+	 	views::adjacent_transform
+	 	views::pairwise
+	 	views::slide
+	 	views::chunk
+	 	views::chunk_by
+	 	views::repeat
+	 	views::chunk_by
+	 	views::cartesian_product
+	 	views::as_rvalue
+	 	views::enumerate
+	 	views::as_const
+	algorithm
+		ranges::contains
+		ranges::contains_subrange
+		ranges::iota
+		ranges::find_last
+		ranges::find_last_if
+		ranges::find_last_if_not
+		ranges::fold_left
+		ranges::fold_left_first
+		ranges::fold_right
+		ranges::fold_right_last
+		ranges::fold_left_with_iter
+		ranges::fold_left_first_with_iter
+	Monadic operations for std::expected
+	Constexpr std::bitset, std::to_chars and std::from_chars
+
 C++20
 	Look into: <syncstream> https://en.cppreference.com/w/cpp/io/basic_syncbuf
 	Check on: Calendar additions to <chrono>
 	Atomic wait and notify operations.
 	<barrier>, <latch>, and <semaphore>
 
-	Immediate functions (consteval)
 	Standard library header units
 
 
@@ -836,7 +838,6 @@ place.it:
 	tool.profiler: https://github.com/bombomby/optick - But it doesnt support OpenGL
 	tool.profiler: https://github.com/wolfpld/tracy
 	tool.audio: https://non.tuxfamily.org/
-
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
@@ -864,7 +865,12 @@ place.it:
 	cpp.modules: https://blog.feabhas.com/2021/08/c20-modules-with-gcc11/
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	cpp: Cursed idea: #define implicit explicit(false)
+	cpp: Unicode round-trip support: argv, stdin, stdout utf8 support:
+			_setmode(_fileno(stdin), _O_U8TEXT);
+			_setmode(_fileno(stdout), _O_U8TEXT);
+			-municode (GCC compiler flag on Windows)
 	ext: For utf ranges check out: https://github.com/tcbrindle/utf_ranges
+	ext: lib for bloom filter and an even better fuse filter: https://github.com/FastFilter/xor_singleheader // to read more about them: https://lemire.me/blog/2023/05/26/expected-performance-of-a-bloom-filter/
 	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend
 	ide.clion: console colored log workaround with: disable run.processes.with.pty in CLion (or with system(("chcp "s + std::to_string(CP_UTF8)).c_str());)
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
@@ -1394,19 +1400,10 @@ libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly w
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
-libv.sig: merge back the sig codebase rework a lighter version of the lib
 libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
 libv.glr: (?) (if passible) std140 implementation should be moved to libv.gl
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
-
-wish: update cmake version and use add_compile_definitions() instead of add_definitions()
-wish: target_link_directories()
-wish: add support for OUTPUT_NAME and use it for the apps https://cmake.org/cmake/help/latest/prop_tgt/OUTPUT_NAME.html
-wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
-wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
-wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
-wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
 
 libv.ppc: new Pre-Processor Compiler library, a cpp "like" pre-processor implementation for shader loading
 
@@ -1414,40 +1411,9 @@ libv.color: New libv.color library, color space conversion and manipulations, te
 libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
 libv.ui: Color picker
 
-libv.glr: MAYOR OVERHAUL: remove the queue, use thread local GLR context variable access, remove the idea of sorting, switch to immediate mode
-		| NOTE: uniform streams do rely on the queue, so any code using them will have to change
-
-libv.glr: Cleanup includes for:
-			libv/glr/mesh.cpp
-			libv/glr/mesh.hpp
-			libv/glr/program.cpp
-			libv/glr/program.hpp
-			libv/glr/uniform_buffer.cpp
-			libv/glr/uniform_buffer.hpp
-			libv/glr/uniform_stream.hpp
-libv.glr: Implement head pattern for:
-			libv/glr/mesh.cpp
-			libv/glr/mesh.hpp
-			libv/glr/program.cpp
-			libv/glr/program.hpp
-			libv/glr/uniform_buffer.cpp
-			libv/glr/uniform_buffer.hpp
-			libv/glr/uniform_stream.hpp
-			libv/glr/framebuffer.cpp
-			libv/glr/framebuffer.hpp
-			libv/glr/texture.cpp
-			libv/glr/texture.hpp
-libv.glr: GLR User facing API shall not expose to the OpenGL header
-libv.glr: better name for DestroyQueue (? and use thread local acces for it)
-libv.glr: libv/glr/remote.hpp only included in glr files to fetch DestroyQueue, pass that around instead (with a better name), could be boundeled with the gl reference.
-libv.glr: create bool -> remote == nullptr | or negative index
-
-libv.glr: too many variant, function / arg streams?, uniform_stream has a similar pattern that could be generalized
-
 libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
 
-libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
-libv.glr: Mesh attributes should use a single VBO
+libv.glr: Mesh attributes should use a single VBO | false: for shadow casters it should be position 1 VBO, everything else another 1 VBO
 
 libv.glr: Procedural gizmo mesh
 
@@ -1616,7 +1582,6 @@ cpp.proposal: P3 generalized type pack "using... ", type pack in non template pa
 		Open question: issue of pack disambiguation in dependent name context: "dependent::pack types", "dependent::... types", "dependent::typepack types"
 cpp.proposal: P3 structured binding pack
 		auto& [...members] = object;
-cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P3 template specialization without opening a namespace
 		issue: inline namespace, namespace/class scope disambiguation
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
@@ -1635,9 +1600,11 @@ ext.mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-
 ext: adopt a better hash_map and remove every std::unordered container
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
-gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
+fmt: https://www.youtube.com/watch?v=EQELdyecZlU
+gold: Architecture and code structure/organization are two separate concepts
+gold: Existence / super-position based predication
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
-gold: existence / super-position based predication
+gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
 math: blue noise, a stable uniform noise https://gist.github.com/pixelmager/5d25fa32987273b9608a2d2c6cc74bfa
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
@@ -1658,7 +1625,6 @@ libv.log: log thread naming
 libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
 libv.range: view::input_pass resumable range pass: auto pass = range | view::input_pass; for (auto i : pass) fooA(i) if (i % 2) break; for (auto i : pass) fooB(i);
-libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, it is too many template)
 libv.ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 libv.ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
 libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources

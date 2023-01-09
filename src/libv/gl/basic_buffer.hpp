@@ -69,6 +69,12 @@ public:
 		checkGL();
 	}
 
+	inline void named_data(const void* ptr, GLsizeiptr length, BufferUsage usage) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glNamedBufferData(object.id, length, ptr, to_value(usage));
+		checkGL();
+	}
+
 	template <typename Range>
 	inline void data(const Range& data, BufferUsage usage) noexcept {
 		this->data(std::data(data), std::size(data) * sizeof(data[0]), usage);
@@ -83,6 +89,17 @@ public:
 	template <typename Range>
 	inline void subData(const Range& data, GLintptr offset) noexcept {
 		this->subData(std::data(data), offset, std::size(data) * sizeof(data[0]));
+	}
+
+	inline void named_subData(GLintptr offset, const void* ptr, GLsizeiptr length) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glNamedBufferSubData(object.id, offset, length, ptr);
+		checkGL();
+	}
+
+	template <typename Range>
+	inline void named_subData(GLintptr offset, const Range& data) noexcept {
+		this->named_subData(offset, std::data(data), std::size(data) * sizeof(data[0]));
 	}
 
 	inline void getSubData(void* ptr, GLintptr offset, GLsizeiptr length) noexcept {

@@ -97,7 +97,7 @@ auto running = std::atomic_bool{true};
 ///		void render();
 ///	};
 template <typename Sandbox>
-int run_sandbox(const std::string& title, const uint32_t window_height, const uint32_t window_width, int samples = 4, int depth_bits = 32) {
+int run_sandbox(const std::string& title, const uint32_t window_width, const uint32_t window_height, int samples = 4, int depth_bits = 32) {
 	glfwSetErrorCallback([](int code, const char* description) {
 		log_sandbox.error("GLFW {}: {}", code, description);
 	});
@@ -250,6 +250,9 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 		libv::Timer timer_print;
 		std::chrono::seconds print_interval{10};
 
+		if constexpr (requires { sandbox.create(); })
+			sandbox.create();
+
 		while (running && !glfwWindowShouldClose(window)) {
 			libv::gl::checkGL();
 			time_outside.record(timer.time());
@@ -308,6 +311,9 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 				time_poll.reset();
 			}
 		}
+
+		if constexpr (requires { sandbox.destroy(); })
+			sandbox.destroy();
 
 	} catch (const std::system_error& e) {
 		log_sandbox.fatal("Exception caught: {} - {}: {}", e.what(), fmt::streamed(e.code()), e.code().message());

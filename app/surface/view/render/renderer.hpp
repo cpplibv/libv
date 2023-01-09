@@ -15,6 +15,7 @@
 #include <libv/rev/settings.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/layout/layout_text.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 //#include <libv/meta/reflection_access.hpp>
 //#include <libv/ui/component/canvas.hpp>
@@ -50,21 +51,22 @@ using Mesh = libv::glr::Mesh;
 // -------------------------------------------------------------------------------------------------
 
 struct RendererResourceContext {
-	libv::rev::ResourceManager loader{[] {
-		libv::rev::Settings settings;
-//		settings.texture.base_path = "../../res/texture/";
-//		settings.texture.base_path = "../../res/shader/";
-//		settings.model.base_path = "../../res/model/";
-		settings.texture.base_path = "res/texture/";
-		settings.shader.base_path = "res/shader/";
-		settings.model.base_path = "res/model/";
-		return settings;
-	}()};
+	libv::rev::ResourceManager loader;
 //	libv::rev::ShaderLoader shader_loader{"shader/"};
 //	libv::rev::ModelLoader model_loader{"model/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
-	RendererResourceContext() {
+	RendererResourceContext(libv::Nexus& nexus) :
+			loader([] {
+				libv::rev::Settings settings;
+				// settings.texture.base_path = "../../res/texture/";
+				// settings.texture.base_path = "../../res/shader/";
+				// settings.model.base_path = "../../res/model/";
+				settings.texture.base_path = "res/texture/";
+				settings.shader.base_path = "res/shader/";
+				settings.model.base_path = "res/model/";
+				return settings;
+			}(), nexus) {
 		// Include the res/shader/ folder from libv
 //		loader.shader.add_include_directory("", "../../res/shader/");
 //		loader.shader.add_include_directory("", "res/shader/");

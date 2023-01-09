@@ -6,8 +6,6 @@
 #include <libv/ui/fwd.hpp>
 // std
 #include <memory>
-// pro
-#include <libv/ui/context/context_event.hpp> // Because of broadcast
 
 
 namespace libv {
@@ -47,29 +45,11 @@ public:
 	ContextUI& operator=(ContextUI&&) = delete;
 
 public:
-	// TODO P4: Move to the event context
-	void reentry_lock(const void* anchor);
-	void reentry_unlock(const void* anchor) noexcept;
-	[[nodiscard]] bool reentry_test(const void* anchor) const noexcept;
-
-public:
 	// TODO P4: Move to a new focus context
 	void focus(CoreComponent& component);
 	void detachFocused(CoreComponent& component);
 	void detachFocusLinked(CoreComponent& component);
-
-public:
-	// TODO P4: Move to the event context
-	template <typename Event>
-	inline void broadcast(const Event& event);
 };
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename Event>
-inline void ContextUI::broadcast(const Event& event) {
-	this->event.nexus.broadcast_global<Event>(event);
-}
 
 // -------------------------------------------------------------------------------------------------
 

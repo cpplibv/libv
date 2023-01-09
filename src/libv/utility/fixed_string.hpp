@@ -18,12 +18,12 @@ private:
 
 public:
 	template <typename T>
-	constexpr inline fixed_string(const T (&input)[N + 1]) noexcept {
+	explicit(false) constexpr inline fixed_string(const T (&input)[N + 1]) noexcept {
 		for (std::size_t i = 0; i != N; ++i)
 			content[i] = input[i];
 		content[N] = 0;
 	}
-	constexpr inline fixed_string(const char* const input) noexcept {
+	explicit(false) constexpr inline fixed_string(const char* const input) noexcept {
 		for (std::size_t i = 0; i != N; ++i)
 			content[i] = input[i];
 		content[N] = 0;
@@ -34,22 +34,22 @@ public:
 		content[N] = 0;
 	}
 
-	constexpr inline std::size_t size() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size() const noexcept {
 		return N;
 	}
-	constexpr inline const char* begin() const noexcept {
+	[[nodiscard]] constexpr inline const char* begin() const noexcept {
 		return content;
 	}
-	constexpr inline const char* end() const noexcept {
+	[[nodiscard]] constexpr inline const char* end() const noexcept {
 		return content + N;
 	}
 	constexpr inline char operator[](std::size_t i) const noexcept {
 		return content[i];
 	}
-	constexpr inline operator const char*() const noexcept {
+	explicit(false) constexpr inline operator const char*() const noexcept {
 		return content;
 	}
-    constexpr inline operator std::string_view() const noexcept {
+	explicit(false) constexpr inline operator std::string_view() const noexcept {
 		return std::string_view{content, N};
 	}
 

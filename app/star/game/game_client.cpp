@@ -8,8 +8,9 @@
 #include <libv/ctrl/binding_register.hpp>
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
-#include <libv/math/exponential_moving_average.hpp>
+#include <libv/math/exp_moving_avg.hpp>
 #include <libv/sun/camera_control.hpp>
+#include <libv/sun/ui/overlay_shader_error.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/scene_container.hpp>
@@ -18,6 +19,7 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
 #include <libv/utility/timer.hpp>
+#include <wish/resource_path.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
@@ -25,7 +27,6 @@
 #include <star/game/scene/scenes.hpp>
 #include <star/log.hpp>
 #include <star/version.hpp>
-
 
 //#include <libv/mt/worker_thread.hpp>
 //#include <libv/ui/event/event_overlay.hpp>
@@ -72,9 +73,9 @@ struct ImplGameClient {
 				settings.res_shader.base_path = "../../res/shader/";
 				settings.res_texture.base_path = "../../res/texture/";
 
-				settings.res_font.restict_under_base = false; // TODO P1: Should go away with proper res folder
-				settings.res_shader.restict_under_base = false; // TODO P1: Should go away with proper res folder
-				settings.res_texture.restict_under_base = false; // TODO P1: Should go away with proper res folder
+				settings.res_font.restrict_under_base = false; // TODO P1: Should go away with proper res folder
+				settings.res_shader.restrict_under_base = false; // TODO P1: Should go away with proper res folder
+				settings.res_texture.restrict_under_base = false; // TODO P1: Should go away with proper res folder
 
 				settings.track_style_scripts = true;
 				return settings;
@@ -91,8 +92,7 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	register_nexus();
 
 	self->ui.attach(self->frame);
-
-	self->ui.load_style_script_file("style.lua");
+	self->ui.load_style_script_file(wish::resource_path("res/style.lua"));
 
 	init_ui(devMode);
 }
@@ -149,26 +149,56 @@ void GameClient::unregister_nexus() {
 	assert(self->nexus_.num_object() == 0);
 }
 
+libv::ui::Component GameClient::overlay_version(bool devMode) {
+	return libv::ui::Label::nsa("version", "overlay.version", fmt::format("Star {}{}", build.version_number, devMode ? " [Dev]" : ""));
+}
+
+libv::ui::Component GameClient::overlay_fps() {
+	static constexpr auto fpsUpdatePeriod = std::chrono::milliseconds{250};
+
+	// TODO P4: Implement proper frame statistics
+	//			min, max, avg, window min, window max, window avg, 1% low
+	//  		(including integration with UI and Game state statistics)
+	auto fps = libv::ui::Label::ns("fps", "overlay.fps");
+	self->ui.event().global_before_update([
+			fps,
+			frameTimer = libv::Timer{},
+			updateTimer = libv::Timer{},
+			avg = libv::exp_moving_avgf(60, 1, 0.8f)] mutable {
+		const auto dt = frameTimer.timef_s().count();
+		avg.add(1.0f / dt, dt);
+		if (updateTimer.elapsed() < fpsUpdatePeriod)
+			return;
+		updateTimer.reset();
+		fps.text(fmt::format("{:6.1f} FPS", avg.value()));
+	});
+	return fps;
+}
+
 void GameClient::init_ui(bool devMode) {
 	auto layers = libv::ui::PanelAnchor("layers");
 
 	auto msc = layers.add_n<libv::ui::SceneContainer>("sc-main");
 	msc.identifier("main");
 	// msc.assign(createSceneMainMenu(self->nexus_));
-	msc.assign(createSceneCredits(self->nexus_));
+	// msc.assign(createSceneCredits(self->nexus_));
+	msc.assign(createSceneSurface(self->nexus_));
 
-	layers.add_nsa<libv::ui::Label>("version", "overlay.version", fmt::format("Star {}{}", build.version_number, devMode ? " [Dev]" : ""));
-	auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
+	// auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
 
 	self->ui.add(std::move(layers));
-	self->ui.event().before_update([this, fps, t = libv::Timer{}, avg = libv::exponential_moving_average<float, 1>(0)] mutable {
-		self->config_->update();
+	self->ui.add(overlay_version(devMode));
+	self->ui.add(overlay_fps());
+	self->ui.add(libv::sun::overlay_shader_error(true));
+	// self->ui.event().global_before_update([this, fps, t = libv::Timer{}, avg = libv::exp_moving_avg<float>(60, 1, 0.8f)] mutable {
+	// 	self->config_->update();
+	//
+	// 	// TODO P4: Implement proper statistics gathering (including integration with UI and Game state statistics)
+	// 	const auto dt = t.timef_s().count();
+	// 	avg.add(1.0f / dt, dt);
+	// 	fps.text(fmt::format("{:6.1f} FPS", avg.value()));
+	// });
 
-		// TODO P4: Implement proper statistics gathering (including integration with UI and Game state statistics)
-		const auto dt = t.timef_s().count();
-		avg.add(1.0f / dt, dt);
-		fps.text(fmt::format("{:6.1f} FPS", avg.value()));
-	});
 //	frame.onKey.output([&](const libv::input::EventKey& e) {
 //		if (e.keycode == libv::input::Keycode::F2 && e.action == libv::input::Action::press)
 //			ui.foreach_recursive_component([](const libv::ui::Component& component) {
