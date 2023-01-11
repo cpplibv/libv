@@ -141,9 +141,9 @@ TEST_CASE("Test flag_enum OStream", "[libv.utility.flag_enum]") {
 	constexpr test_flag flag_2{2};
 	constexpr test_flag flag_128{128};
 
-	CHECK(fmt::format("{}", flag_1) == "1");
-	CHECK(fmt::format("{}", flag_2) == "2");
-	CHECK(fmt::format("{}", flag_128) == "128");
+	CHECK(fmt::format("{}", fmt::streamed(flag_1)) == "1");
+	CHECK(fmt::format("{}", fmt::streamed(flag_2)) == "2");
+	CHECK(fmt::format("{}", fmt::streamed(flag_128)) == "128");
 }
 
 TEST_CASE("Test flag_enum Mix operations with bit", "[libv.utility.flag_enum]") {

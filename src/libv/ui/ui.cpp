@@ -579,7 +579,7 @@ void UI::load_style_script_file(std::string path) {
 	execute_in_ui_loop([this, path] {
 		auto script = libv::read_file_str_ec(path);
 		if (script.ec)
-			return log_ui.error("Failed to reload style script {}: {}: {}", path, script.ec, script.ec.message());
+			return log_ui.error("Failed to reload style script {}: {}: {}", path, fmt::streamed(script.ec), script.ec.message());
 
 		// TODO P4: Persist/reuse lua state, make sure sandboxing happens
 		auto lua = libv::lua::create_state(libv::lua::lualib::base);
@@ -593,7 +593,7 @@ void UI::load_style_script_file(std::string path) {
 			execute_in_ui_loop([this, path] {
 				auto script = libv::read_file_str_ec(path);
 				if (script.ec)
-					return log_ui.error("Failed to reload style script {}: {}: {}", path, script.ec, script.ec.message());
+					return log_ui.error("Failed to reload style script {}: {}: {}", path, fmt::streamed(script.ec), script.ec.message());
 
 				// TODO P4: Persist/reuse lua state, make sure sandboxing happens
 				auto lua = libv::lua::create_state(libv::lua::lualib::base);

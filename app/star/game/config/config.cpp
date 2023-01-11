@@ -58,7 +58,7 @@ public:
 			saveFile();
 
 		} else {
-			log_star.error("Failed to load config file {}: {} - {}. Falling back to default config", configFilepath.generic_string(), configFileString.ec, configFileString.ec.message());
+			log_star.error("Failed to load config file {}: {} - {}. Falling back to default config", configFilepath.generic_string(), fmt::streamed(configFileString.ec), configFileString.ec.message());
 		}
 	}
 
@@ -67,7 +67,7 @@ public:
 
 		try {
 			const auto ec = libv::write_file_ec(configFilepath, config.saveJSON());
-			log_star.error_if(ec, "Failed to save config file {}: {} - {}", configFilepath.generic_string(), ec, ec.message());
+			log_star.error_if(ec, "Failed to save config file {}: {} - {}", configFilepath.generic_string(), fmt::streamed(ec), ec.message());
 			log_star.info_if(!ec, "Saved config file {}", configFilepath.generic_string());
 
 		} catch (const std::exception& ex) {

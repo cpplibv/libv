@@ -4,6 +4,7 @@
 #include <libv/rev/resource/shader_loader.hpp>
 // libv
 #include <libv/algo/erase_stable.hpp>
+#include <libv/fsw/event.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/program.hpp>
 // pro
@@ -55,7 +56,7 @@ void ShaderLoader::add_include_directory(std::string include_dir, std::string fi
 			if (!loader_sp)
 				return; // Loader was destroyed in the meantime
 
-			log_rev.info("Requesting shader reload for {} because: {}", internal_sp->name_, e);
+			log_rev.info("Requesting shader reload for {} because: {}", internal_sp->name_, fmt::streamed(e));
 			loader_sp->queue_source_reload.push_back(std::move(internal_sp));
 		};
 
@@ -149,7 +150,7 @@ void InternalShaderLoader::update_fs() {
 
 			} catch (const glsl_failed_include_exception& e) {
 				log_rev.error("--- Failed to load shader: {} v{} ({}) ---", internal->name_, internal->load_version, internal->id());
-				log_rev.error("Failed to include: \"{}\" from file: {} - {}: {}", e.include_path, e.file_path, e.ec, e.ec.message());
+				log_rev.error("Failed to include: \"{}\" from file: {} - {}: {}", e.include_path, e.file_path, fmt::streamed(e.ec), e.ec.message());
 				for (const auto& [file, line] : e.include_stack)
 					log_rev.error("    Included from: {}:{}", file, line);
 

@@ -4,7 +4,7 @@
 
 
 namespace fmt {
-inline namespace v8 {
+inline namespace v9 {
 
 // NOTE: inline namespace version has to be manually updated if it changes in fmt
 // (test_fmt_fwd.cpp does have an automated test for this)
@@ -18,5 +18,5 @@ struct formatter;
 
 // -------------------------------------------------------------------------------------------------
 
-} // inline namespace v8
+} // inline namespace v9
 } // namespace fmt

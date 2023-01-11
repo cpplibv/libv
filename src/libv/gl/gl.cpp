@@ -13,7 +13,7 @@ namespace gl {
 // -------------------------------------------------------------------------------------------------
 
 void logGLError(libv::source_location loc, GLenum err) noexcept {
-	log_gl.error({"OpenGL: {}: {}", loc}, err, glewGetErrorString(err));
+	log_gl.error({"OpenGL: {}: {}", loc}, err, reinterpret_cast<const char*>(glewGetErrorString(err)));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void GL::init() {
 	glewExperimental = true;
 
 	if (GLenum err = glewInit() != GLEW_OK) {
-		log_gl.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", glewGetErrorString(err));
+		log_gl.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", reinterpret_cast<const char*>(glewGetErrorString(err)));
 		return;
 	}
 
@@ -30,10 +30,10 @@ void GL::init() {
 	versionMinor = get<GLint>(GL_MINOR_VERSION);
 
 	// Log capabilities
-	log_gl.debug("GL Vendor     {}", glGetString(GL_VENDOR));
-	log_gl.debug("GL Renderer   {}", glGetString(GL_RENDERER));
-	log_gl.debug("GL Version    {}", glGetString(GL_VERSION));
-	log_gl.debug("GLSL Version  {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	log_gl.debug("GL Vendor     {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+	log_gl.debug("GL Renderer   {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+	log_gl.debug("GL Version    {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+	log_gl.debug("GLSL Version  {}", reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
 
 	if (const auto curr_mem = getCurrentAvailableVideoMemory(); curr_mem >= 0)
 		log_gl.debug("CurrentAvailableVideoMemory        [{:>8} ]", curr_mem);

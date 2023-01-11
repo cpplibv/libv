@@ -51,7 +51,7 @@ libv::ui::Component overlay_shader_error() {
 		if (e.include_failure) {
 			std::string message;
 			message += fmt::format("[{:%H:%M:%S}] Failed to load shader: {} v{} ({}) using v{}\n", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id, e.shader.current_version());
-			message += fmt::format("Failed to include: \"{}\" from file: {} - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
+			message += fmt::format("Failed to include: \"{}\" from file: {} - {}: {}", e.include_failure->include_path, e.include_failure->file_path, fmt::streamed(e.include_failure->ec), e.include_failure->ec.message());
 			for (const auto& [file, line] : e.include_failure->include_stack)
 				message += fmt::format("\n    Included from: {}:{}", file, line);
 			label.text(message);

@@ -127,7 +127,7 @@ public:
 
 		acceptor.bind(endpoint, ec);
 		if (ec) {
-			log_net.error("Acceptor failed to bind to {} - {}", endpoint, libv::net::to_string(ec));
+			log_net.error("Acceptor failed to bind to {} - {}", fmt::streamed(endpoint), libv::net::to_string(ec));
 			return ec;
 		}
 
@@ -139,7 +139,7 @@ public:
 
 		state = State::Listening;
 
-		log_net.info("Acceptor listening on {}...", endpoint);
+		log_net.info("Acceptor listening on {}...", fmt::streamed(endpoint));
 		return ec;
 	}
 

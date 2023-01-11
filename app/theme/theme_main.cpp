@@ -144,7 +144,7 @@ public:
 				control.line.size({libv::ui::ratio(), libv::ui::pixel(20)});
 				var_panel.add(control.line);
 
-				control.slider.bar_color({1, 0, 0, 1});
+				// control.slider.bar_color({1, 0, 0, 1});
 				control.slider.orientation(libv::ui::Orientation::right);
 				control.slider.value_high(var.high[d]);
 				control.slider.value_low(var.low[d]);

@@ -67,7 +67,7 @@ int main(int argc, const char** argv) {
 
 	const auto [content, ec_read] = libv::read_file_ec(input_file);
 	if (ec_read) {
-		fmt::print("Failed to read file: {}: {} - {}\n", input_file, ec_read, ec_read.message());
+		fmt::print("Failed to read file: {}: {} - {}\n", input_file, fmt::streamed(ec_read), ec_read.message());
 		return EXIT_FAILURE;
 	}
 
@@ -95,7 +95,7 @@ int main(int argc, const char** argv) {
 	));
 
 	if (ec_write_hpp) {
-		fmt::print("Failed to write file: {}: {} - {}\n", output_file, ec_write_hpp, ec_write_hpp.message());
+		fmt::print("Failed to write file: {}: {} - {}\n", output_file, fmt::streamed(ec_write_hpp), ec_write_hpp.message());
 		return EXIT_FAILURE;
 	}
 
@@ -108,7 +108,7 @@ int main(int argc, const char** argv) {
 	));
 
 	if (ec_write_cpp) {
-		fmt::print("Failed to write file: {}: {} - {}\n", output_file, ec_write_cpp, ec_write_cpp.message());
+		fmt::print("Failed to write file: {}: {} - {}\n", output_file, fmt::streamed(ec_write_cpp), ec_write_cpp.message());
 		return EXIT_FAILURE;
 	}
 

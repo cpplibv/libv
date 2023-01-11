@@ -274,7 +274,7 @@ inline void ImplBaseConnectionAsyncHE::connect_sync(detail::Socket&& socket) noe
 
 inline void ImplBaseConnectionAsyncHE::connect_async(Address address) noexcept {
 	auto lock = std::unique_lock(mutex);
-	log_net.debug("MTCP-{} connect_async(address) to {}", id, address);
+	log_net.debug("MTCP-{} connect_async(address) to {}", id, fmt::streamed(address));
 
 	if (state != State::Constructed)
 		return log_net.error("MTCP-{} Logic error: Called connect on connect_async(address) in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::Constructed));

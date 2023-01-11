@@ -79,7 +79,7 @@ bool secure_path(const std::filesystem::path& base, bool restict_under_base, con
 		log_ui.error("Failed to determine canonical target path: {} {}"
 				"\n\tPath:      {}"
 				"\n\tTarget:    {}"
-				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
+				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
 		return false;
 	}
 
@@ -88,7 +88,7 @@ bool secure_path(const std::filesystem::path& base, bool restict_under_base, con
 		log_ui.error("Failed to determine relative target path: {} {}"
 				"\n\tPath:      {}"
 				"\n\tTarget:    {}"
-				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
+				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
 		return false;
 	}
 
@@ -106,7 +106,7 @@ bool secure_path(const std::filesystem::path& base, bool restict_under_base, con
 		log_ui.error("Failed to determine relative path: {} {}"
 				"\n\tPath:      {}"
 				"\n\tCanonical: {}"
-				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
+				"\n\tBase:      {}", fmt::streamed(ec), ec.message(), libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
 		return false;
 	}
 
@@ -187,7 +187,7 @@ std::shared_ptr<Font2D> ContextResource::font(const std::filesystem::path& path)
 
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
-		log_ui.error("Failed to read font file: {}: {} {}. Using fallback font", libv::generic_path(target), file.ec, file.ec.message());
+		log_ui.error("Failed to read font file: {}: {} {}. Using fallback font", libv::generic_path(target), fmt::streamed(file.ec), file.ec.message());
 		sp = self->fallback_font;
 		return sp;
 	}
@@ -243,7 +243,7 @@ std::shared_ptr<Texture2D> ContextResource::texture2D(const std::filesystem::pat
 
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
-		log_ui.error("Failed to read texture2D file: {}: {} {}. Using fallback texture2D", libv::generic_path(target), file.ec, file.ec.message());
+		log_ui.error("Failed to read texture2D file: {}: {} {}. Using fallback texture2D", libv::generic_path(target), fmt::streamed(file.ec), file.ec.message());
 		sp = self->fallback_texture2D;
 		return sp;
 	}

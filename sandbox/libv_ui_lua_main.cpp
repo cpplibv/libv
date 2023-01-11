@@ -54,7 +54,7 @@ int main(int, char**) {
 			style.foreach([](std::string_view key, const libv::ui::PropertyDynamic& property, libv::ui::StyleState mask, libv::ui::StyleState state) {
 				libv::ui::visitProperty(property, [&](auto& v) {
 					if constexpr (requires { std::cout << v; })
-						log_sandbox.info("        {} = {} mask: {} state: {} [{}]", key, v, +mask, +state, typeid(v).name());
+						log_sandbox.info("        {} = {} mask: {} state: {} [{}]", key, fmt::streamed(v), +mask, +state, typeid(v).name());
 					else if constexpr (std::is_enum_v<decltype(v)>)
 						log_sandbox.info("        {} = {} mask: {} state: {} [{}]", key, libv::to_underlying(v), +mask, +state, typeid(v).name());
 					else

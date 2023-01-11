@@ -201,7 +201,7 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	// -------------------------------------------------------------------------------------------------
 
 	if (GLenum err = glewInit() != GLEW_OK) {
-		log_sandbox.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", glewGetErrorString(err));
+		log_sandbox.error("Failed to initialize glew: {} (Does the current thread has an OpenGL context?)", reinterpret_cast<const char*>(glewGetErrorString(err)));
 		return EXIT_FAILURE;
 	}
 
@@ -310,7 +310,7 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 		}
 
 	} catch (const std::system_error& e) {
-		log_sandbox.fatal("Exception caught: {} - {}: {}", e.what(), e.code(), e.code().message());
+		log_sandbox.fatal("Exception caught: {} - {}: {}", e.what(), fmt::streamed(e.code()), e.code().message());
 		return EXIT_FAILURE;
 
 	} catch (const std::exception& e) {
