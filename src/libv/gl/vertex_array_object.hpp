@@ -4,6 +4,8 @@
 
 // std
 #include <cstdint>
+// pro
+#include <libv/gl/gl_fwd.hpp>
 
 
 namespace libv {

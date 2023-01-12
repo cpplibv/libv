@@ -2,6 +2,11 @@
 
 #pragma once
 
+
+// #define LIBV_ENABLE_GL_CHECK
+
+#ifdef LIBV_ENABLE_GL_CHECK
+
 // libv
 #include <libv/utility/source_location.hpp>
 // ext
@@ -24,3 +29,25 @@ inline void checkGL(libv::source_location loc = libv::source_location::current()
 
 } // namespace gl
 } // namespace libv
+
+#else // ===========================================================================================
+
+// libv
+#include <libv/meta/force_inline.hpp>
+
+
+namespace libv {
+namespace gl {
+
+// -------------------------------------------------------------------------------------------------
+
+LIBV_FORCE_INLINE void checkGL() {
+	// Noop
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace gl
+} // namespace libv
+
+#endif
