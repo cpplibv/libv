@@ -26,6 +26,24 @@ void CoreBasePanel::add(Component component) {
 	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
 }
 
+void CoreBasePanel::add(Component component, std::size_t index) {
+	if (index > children.size()) {
+		log_ui.warn("Attempted to insert a component at an invalid index: {} component at index of {}", component.parent().path(), index);
+		children.emplace_back(std::move(component));
+	} else {
+		const auto it = children.begin() + index;
+		children.emplace(it, std::move(component));
+	}
+
+	// Reassign IDs
+	int32_t id = 0;
+	for (auto i = index; i < children.size(); ++i)
+		AccessParent::childID(children[i].core()) = ChildID{id++};
+
+	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
+	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
+}
+
 void CoreBasePanel::add_front(Component component) {
 	children.emplace(children.begin(), std::move(component));
 
@@ -63,6 +81,10 @@ void CoreBasePanel::remove(std::string_view component_name) {
 void CoreBasePanel::clear() {
 	for (auto& child : children)
 		child.markRemove();
+}
+
+size_t CoreBasePanel::children_size() const {
+	return children.size();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -162,6 +184,10 @@ void BasePanel::add(Component component) {
 	self().add(std::move(component));
 }
 
+void BasePanel::add(Component component, std::size_t index) {
+	self().add(std::move(component), index);
+}
+
 void BasePanel::add_front(Component component) {
 	self().add_front(std::move(component));
 }
@@ -176,6 +202,10 @@ void BasePanel::remove(std::string_view component_name) {
 
 void BasePanel::clear() {
 	self().clear();
+}
+
+size_t BasePanel::children_size() const {
+	return self().children_size();
 }
 
 // -------------------------------------------------------------------------------------------------

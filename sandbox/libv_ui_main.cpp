@@ -151,6 +151,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 libv::ui::Component createTabScroll();
+libv::ui::Component createTabTooltip(libv::ui::UI& ui);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -651,6 +652,7 @@ public:
 		tabs.addTab("Scroll", createTabScroll());
 		tabs.addTab("Card layout", createTabCards());
 		tabs.addTab("Tab #3", createTab3());
+		tabs.addTab("Tooltip", createTabTooltip(ui));
 		tabs.addTab("Legacy", createTabLegacy());
 
 		ui.add(tabs.main);

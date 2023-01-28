@@ -352,6 +352,65 @@ public:
 	}
 };
 
+template <typename T>
+struct SLC_Anchor : SLC_Node {
+
+	Anchor source_anchor;
+	Anchor target_anchor;
+
+	Component& target;
+	T child;
+
+public:
+	constexpr LIBV_FORCE_INLINE SLC_Anchor(Anchor source_anchor, Anchor target_anchor,
+		Component& target, T child) :
+		source_anchor(source_anchor),
+		target_anchor(target_anchor),
+		target(target),
+		child(std::move(child)) {}
+
+public:
+	[[nodiscard]] constexpr libv::vec2f calculate_ratio() {
+		return ratio_sum = child.calculate_ratio();
+	}
+
+	[[nodiscard]] constexpr libv::vec2f assign_pixel_size(libv::vec2f area_size) {
+		const auto change = child.assign_pixel_size(area_size);
+		current_size += change;
+		return change;
+	}
+	[[nodiscard]] constexpr libv::vec2f assign_percent_size(libv::vec2f area_size) {
+		const auto change = child.assign_percent_size(area_size);
+		current_size += change;
+		return change;
+	}
+	[[nodiscard]] constexpr libv::vec2f assign_dynamic_size(libv::vec2f area_size) {
+		const auto change = child.assign_dynamic_size(area_size);
+		current_size += change;
+		return change;
+	}
+	[[nodiscard]] constexpr libv::vec2f assign_ratio_size(libv::vec2f area_size) {
+		const auto change = child.assign_ratio_size(area_size);
+		current_size += change;
+		return change;
+	}
+
+
+
+	void assign_position(libv::vec2f area_position, libv::vec2f area_size, const ContextLayout2& environment) {
+		(void) area_position;
+		(void) area_size;
+
+		// Tooltip TODO P2: fetch absolute position, layout invalidation and movement tracking
+
+		const auto target_pos = target.layout_position2_absolute();
+		const auto target_size = target.layout_size2();
+		const auto position = target_pos + target_size * xy(info(target_anchor).rate()) - current_size * xy(info(source_anchor).rate());
+
+		child.assign_position(position, current_size, environment);
+	}
+};
+
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>

@@ -53,8 +53,6 @@ void CoreButton::onMouseButton(const EventMouseButton& event) {
 		style_state(StyleState::active, true);
 		routineSubmit();
 	}
-
-	event.stop_propagation();
 }
 
 void CoreButton::onMouseMovement(const EventMouseMovement& event) {
@@ -69,14 +67,10 @@ void CoreButton::onMouseMovement(const EventMouseMovement& event) {
 
 	// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 	fire(EventMouseMovement{event});
-
-	event.stop_propagation();
 }
 
 void CoreButton::onMouseScroll(const EventMouseScroll& event) {
 	fire(EventMouseScroll{event});
-
-	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------

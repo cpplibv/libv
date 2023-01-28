@@ -493,15 +493,35 @@ libv.ui: progressbar
 
 --- libv.ui MVP checkpoint ------------
 
-
+libv.ui: Tooltips
+		UI wide overlay
+		Options:
+			anchor:
+				relative to mouse 1..9 corner
+				relative to mouse no follow 1..9 corner
+				relative to component 1..9 corner
+				relative to screen 1..9 corner
+				relative to callback (for 3D objects) 1..9 corner
+			anchor clearance:
+				left/right/bottom/top pixel count
+				? could clearance be solved with tooltip component margin
+			alignment:
+				1..9 corner
+			edge:
+				(scroll pane) clipping space
+				window
+			edge behaviour (per axis):
+				overhang
+				clipped
+				push in axis
+				flip to opposite side
+			issue: libv.ui: Card layout doesn't call detach when switching between tabs
+			DONE issue: Tooltip doesnt relayout when owner relayouts
 
 libv.ui: tab layout = card layout + header buttons
 libv.ui: window
 		contain other elements. They have a caption (and, just like flows, they lay out children either horizontally or vertically)
-libv.ui: popup / tooltip
-		? tooltip is a layout
-		Its possilbe to implement tooltip container with hierarchy, context.storage.treeget/treeset could use that
-		context().tooltip(Component, tooltip_for_pos, tooltip_for_size, preferred_corner)
+
 libv.ui: menu bar / menu / popup menu
 libv.ui: separator / group (bordered and captioned)
 

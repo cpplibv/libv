@@ -25,6 +25,7 @@ public:
 	ContextResource& resource;
 	// ContextRender& render; // No need to expose render context for now
 	ContextStyle& style;
+	ContextTooltip& tooltip;
 
 private:
 	std::unique_ptr<ImplContextUI> self;
@@ -36,7 +37,8 @@ public:
 			ContextMouse& mouse,
 			ContextState& state,
 			ContextResource& resource,
-			ContextStyle& style);
+			ContextStyle& style,
+			ContextTooltip& tooltip);
 	~ContextUI();
 
 	ContextUI(const ContextUI&) = delete;

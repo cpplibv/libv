@@ -100,6 +100,7 @@ public:
 
 	[[nodiscard]] libv::vec3f layout_position() const noexcept;
 	[[nodiscard]] libv::vec2f layout_position2() const noexcept;
+	[[nodiscard]] libv::vec2f layout_position2_absolute() const noexcept;
 	[[nodiscard]] libv::vec3f layout_size() const noexcept;
 	[[nodiscard]] libv::vec2f layout_size2() const noexcept;
 
@@ -217,8 +218,10 @@ public:
 	[[nodiscard]] bool enable() const;
 	void show(bool value);
 	[[nodiscard]] bool show() const;
+	void show_tooltip(Component tooltip);
 
 public:
+	void foreach_children(libv::function_ref<bool(Component&)> callback);
 	void foreach_children(libv::function_ref<void(Component&)> callback);
 	void foreach_recursive_children(libv::function_ref<void(Component&)> callback);
 

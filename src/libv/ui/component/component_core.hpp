@@ -53,7 +53,7 @@ private:
 	ChildID childID = 0;
 	uint32_t ref_count = 0;
 
-	libv::vec3f layout_position_; /// Component position relative to parent in pixels
+	libv::vec3f layout_position_; /// Component position relative to parent in pixels, bottom_left corner
 	libv::vec3f layout_size_;     /// Component size in pixels
 
 //protected:
@@ -131,6 +131,17 @@ public:
 	}
 	[[nodiscard]] inline libv::vec2f layout_position2() const noexcept {
 		return libv::vec2f{layout_position_.x, layout_position_.y};
+	}
+	libv::vec2f layout_position2_absolute() const noexcept {
+		libv::vec2f result;
+
+		for (auto it = this; true; it = it->parent_) {
+			result += it->layout_position2();
+			if (it == it->parent_)
+				break;
+		}
+
+		return result;
 	}
 	[[nodiscard]] inline libv::vec3f layout_size() const noexcept {
 		return layout_size_;

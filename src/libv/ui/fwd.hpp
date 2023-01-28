@@ -8,6 +8,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class ImplUI;
 class UI;
 class Settings;
 
@@ -23,6 +24,7 @@ class ContextRender;
 class ContextResource;
 class ContextState;
 class ContextStyle;
+class ContextTooltip;
 class ContextUI;
 class StyleAccess;
 
@@ -42,6 +44,8 @@ class Shader;
 class ShaderFont;
 class ShaderImage;
 class ShaderQuad;
+
+class OverlayTooltip;
 
 // -------------------------------------------------------------------------------------------------
 

@@ -210,30 +210,6 @@ libv.ui: Setting: Do not clear buffer during render (Useful if there is a canvas
 
 ----------
 
-libv.ui: Tooltips
-		UI wide overlay
-		Options:
-			anchor:
-				relative to mouse 1..9 corner
-				relative to mouse no follow 1..9 corner
-				relative to component 1..9 corner
-				relative to screen 1..9 corner
-			anchor clearance:
-				left/right/bottom/top pixel count
-				? could clearance be solved with tooltip component margin
-			alignment:
-				1..9 corner
-			edge:
-				(scroll pane) clipping space
-				window
-			edge behaviour (per axis):
-				overhang
-				push in axis
-				flip to opposite side
-			clipping:
-				use (scroll pane) clipping
-				render above everything
-
 place.it:
 	idea: tracked entities as "sleeping ones", not 2 but 3 update state
 		sleeping, awake, tracked

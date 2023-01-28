@@ -31,10 +31,13 @@ public:
 
 public:
 	void add(Component component);
+	void add(Component component, std::size_t index);
 	void add_front(Component component);
 	void remove(Component& component);
 	void remove(std::string_view component_name);
 	void clear();
+
+	[[nodiscard]] size_t children_size() const;
 
 public:
 	virtual void doStyle(StyleAccess& access) override;

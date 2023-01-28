@@ -6,6 +6,7 @@
 #include <libv/utility/concat.hpp>
 // pro
 #include <libv/ui/component/component_core.hpp>
+#include <libv/ui/context/context_tooltip.hpp>
 
 
 namespace libv {
@@ -113,6 +114,10 @@ libv::vec3f Component::layout_position() const noexcept {
 
 libv::vec2f Component::layout_position2() const noexcept {
 	return ptr_->layout_position2();
+}
+
+libv::vec2f Component::layout_position2_absolute() const noexcept {
+	return ptr_->layout_position2_absolute();
 }
 
 libv::vec3f Component::layout_size() const noexcept {
@@ -227,8 +232,15 @@ void Component::show(bool value) {
 bool Component::show() const {
 	return ptr_->show();
 }
+void Component::show_tooltip(Component tooltip) {
+	ui().tooltip.show_tooltip(*this, std::move(tooltip));
+}
 
 // -------------------------------------------------------------------------------------------------
+
+void Component::foreach_children(libv::function_ref<bool(Component&)> callback) {
+	ptr_->doForeachChildren(callback);
+}
 
 void Component::foreach_children(libv::function_ref<void(Component&)> callback) {
 	ptr_->doForeachChildren(callback);

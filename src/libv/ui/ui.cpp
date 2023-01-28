@@ -25,9 +25,10 @@
 // pro
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/component_core.hpp>
+#include <libv/ui/component/overlay/overlay_tooltip.hpp>
 #include <libv/ui/component/overlay/overlay_zoom.hxx>
-// #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
+#include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -35,6 +36,7 @@
 #include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
+#include <libv/ui/context/context_tooltip.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
@@ -117,9 +119,9 @@ public:
 	ContextResource context_resource{settings};
 	ContextRender context_render;
 	ContextStyle context_style;
+	ContextTooltip context_tooltip;
 
-	ContextUI context_ui{ui, settings, context_event, context_mouse, context_state, context_resource, context_style};
-
+	ContextUI context_ui{ui, settings, context_event, context_mouse, context_state, context_resource, context_style, context_tooltip};
 	bool context_render_created = false;
 
 public:
@@ -157,7 +159,13 @@ public:
 		settings(std::move(settings)),
 		context_event(std::move(nexus)),
 		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
-		root((current_thread_context(context_ui), "")) { }
+		root((current_thread_context(context_ui), "")) {
+
+		// Delayed initialization necessary because context_tooltip contains a Component, and it requires the contexts
+		context_tooltip.init();
+
+		root.add(context_tooltip.overlay());
+	}
 
 	~ImplUI() {
 		clear_current_thread_context();
@@ -554,7 +562,16 @@ UI::~UI() {
 }
 
 void UI::add(Component component) {
-	self->root.add(std::move(component));
+	size_t index = 0;
+	self->root.foreach_children(libv::function_ref<bool(Component&)>([&index](Component& child) -> bool {
+		/// Tooltip TODO P3: Use a generic overlay class for casting
+		if(child.cast<OverlayTooltip>())
+			return false;
+		++index;
+		return true;
+	}));
+
+	self->root.add(std::move(component), index);
 }
 
 void UI::remove(Component component) {

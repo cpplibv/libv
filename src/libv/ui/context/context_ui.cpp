@@ -28,13 +28,15 @@ ContextUI::ContextUI(UI& ui,
 			ContextMouse& mouse,
 			ContextState& state,
 			ContextResource& resource,
-			ContextStyle& style) :
+			ContextStyle& style,
+			ContextTooltip& tooltip) :
 	settings(settings),
 	event(event),
 	mouse(mouse),
 	state(state),
 	resource(resource),
 	style(style),
+	tooltip(tooltip),
 	self(std::make_unique<ImplContextUI>(ui)) {
 }
 
