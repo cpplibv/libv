@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/int_ceil_div.hpp
+// Project: libv.utility, File: src/libv/utility/ceil_div.hpp
 
 #pragma once
 
@@ -7,8 +7,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// Integer division with ceil instead of floor if there is any remainder
 template <typename T>
-[[nodiscard]] constexpr inline T int_ceil_div(const T x, const T y) noexcept {
+[[nodiscard]] constexpr inline T ceil_div(const T x, const T y) noexcept {
 	return (x + y - 1) / y;
 }
 

@@ -28,7 +28,7 @@ BaseContextBlockArenaMemoryChunk BaseContextBlockArena::allocateAndInitMemoryChu
 
 	const auto block_size = block_size_and_alignment;
 	const auto block_alignment = block_size_and_alignment;
-	const auto block_capacity = block_size / object_size - libv::int_ceil_div(block_header_size, object_size);
+	const auto block_capacity = block_size / object_size - libv::ceil_div(block_header_size, object_size);
 
 	// Allocate memory
 	const auto memory_size = block_size * block_count;
@@ -52,13 +52,13 @@ BaseContextBlockArenaMemoryChunk BaseContextBlockArena::allocateAndInitMemoryChu
 	//
 	// Fill in the free list (Creating in forward order, so as_aligned used to promise the objects that are not there yet)
 
-	auto prev_entry_ptr = result.memory_chunk_ptr + libv::int_ceil_div(block_header_size, object_size) * object_size;
+	auto prev_entry_ptr = result.memory_chunk_ptr + libv::ceil_div(block_header_size, object_size) * object_size;
 	result.first_fl_entry = as_aligned<FLEntry>(prev_entry_ptr);
 
 	for (auto block_index = 0uz; block_index < block_count; ++block_index) {
 		const auto block_start_ptr = result.memory_chunk_ptr + block_index * block_size;
 
-		auto entry_offset = libv::int_ceil_div(block_header_size, object_size) * object_size;
+		auto entry_offset = libv::ceil_div(block_header_size, object_size) * object_size;
 		for (; entry_offset + object_size < block_size; entry_offset += object_size) {
 			auto entry_ptr = block_start_ptr + entry_offset;
 			createFLEntryAt(prev_entry_ptr, as_aligned<FLEntry>(entry_ptr));
@@ -76,8 +76,8 @@ void BaseContextBlockArena::allocateMoreMemory() {
 	const auto prev_first_block_header = as_aligned<BlockHeader>(prev_first_memory_chunk);
 	const auto context_ptr = prev_first_block_header->context_ptr;
 
-	const auto block_capacity = block_size_and_alignment_ / object_size_ - libv::int_ceil_div(BaseContextBlockArena::block_header_size, object_size_);
-	const auto new_chunk_count = libv::int_ceil_div(libv::max(capacity_ / 2, 1uz), block_capacity);
+	const auto block_capacity = block_size_and_alignment_ / object_size_ - libv::ceil_div(BaseContextBlockArena::block_header_size, object_size_);
+	const auto new_chunk_count = libv::ceil_div(libv::max(capacity_ / 2, 1uz), block_capacity);
 
 	auto m = allocateAndInitMemoryChunk(context_ptr, block_size_and_alignment_, new_chunk_count, object_size_, prev_first_memory_chunk, prev_first_block_header, prev_free_list_head);
 	free_list_head = m.first_fl_entry;

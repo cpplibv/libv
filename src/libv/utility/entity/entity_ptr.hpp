@@ -11,7 +11,7 @@
 #include <new>
 #include <utility>
 // libv
-#include <libv/utility/int_ceil_div.hpp>
+#include <libv/utility/ceil_div.hpp>
 #include <libv/utility/min_max.hpp>
 
 
@@ -374,7 +374,7 @@ private:
 	static constexpr std::size_t entry_size = sizeof(T);
 	static constexpr std::size_t block_size = libv::max(std::bit_ceil(entry_size * 256 + BaseContextBlockArena::block_header_size), 64uz * 1024uz);
 	static constexpr std::size_t block_alignment = block_size;
-	static constexpr std::size_t block_capacity = block_size / entry_size - libv::int_ceil_div(BaseContextBlockArena::block_header_size, entry_size);
+	static constexpr std::size_t block_capacity = block_size / entry_size - libv::ceil_div(BaseContextBlockArena::block_header_size, entry_size);
 
 public:
 	[[nodiscard]] static constexpr inline entity_store* context_from_pointer(T* ptr) noexcept {
@@ -390,7 +390,7 @@ public:
 		BaseContextBlockArena(
 				this,
 				block_alignment,
-				libv::int_ceil_div(requested_capacity, block_capacity), // block_count
+				libv::ceil_div(requested_capacity, block_capacity), // block_count
 				entry_size) {
 	}
 
