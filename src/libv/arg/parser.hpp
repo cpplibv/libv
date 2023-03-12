@@ -54,6 +54,7 @@ private:
 	std::string name_;
 	std::string description_;
 	bool found_ = false;
+	bool hidden_ = false;
 
 public:
 	explicit inline BaseArgument(std::vector<std::string> aliases) :
@@ -77,6 +78,15 @@ public:
 
 	inline void mark_as_found() noexcept {
 		found_ = true;
+	}
+
+	/// Hides the argument from usage and from print unless it is specified
+	constexpr inline void hidden(bool value) noexcept {
+		hidden_ = value;
+	}
+
+	[[nodiscard]] constexpr inline bool hidden() const noexcept {
+		return hidden_;
 	}
 
 	virtual bool consume() = 0;
@@ -299,6 +309,11 @@ public:
 		argument->value(std::forward<T>(value));
 		return *this;
 	}
+
+	constexpr inline auto& hidden(bool value) noexcept {
+		argument->hidden(value);
+		return *this;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -331,7 +346,7 @@ class Parser {
 	std::vector<std::shared_ptr<BaseArgument>> positionals;
 //	std::shared_ptr<BaseArgument> arg_exe;
 	std::vector<std::pair<int, std::string>> unused;
-	bool require_no_unused_ = true;
+	bool allow_unused_ = false;
 
 private:
 	template <typename T, typename... Aliases>
@@ -408,11 +423,11 @@ public:
 
 public:
 	inline void require_no_unused() noexcept {
-		require_no_unused_ = true;
+		allow_unused_ = false;
 	}
 
 	inline void allow_unused() noexcept {
-		require_no_unused_ = false;
+		allow_unused_ = true;
 	}
 
 public:
@@ -480,7 +495,7 @@ public:
 			if (!require->fulfilled())
 				return false;
 
-		if (require_no_unused_ && !unused.empty())
+		if (!allow_unused_ && !unused.empty())
 			return false;
 
 		return true;
@@ -491,7 +506,7 @@ public:
 
 		os << "Failed to parse parameters:\n";
 
-		if (require_no_unused_)
+		if (!allow_unused_)
 			for (const auto& [i, v] : unused)
 				os << "  Argument \"" << v << "\" at index " << i << " was not used\n";
 
@@ -522,6 +537,9 @@ public:
 			os << "No argument were parsed\n";
 
 		for (const auto& argument : arguments) {
+			if (argument->hidden() && !argument->found())
+				continue;
+
 			os << "  " << argument->name();
 			argument->ostream(os);
 			os << '\n';
@@ -547,6 +565,9 @@ public:
 		os << "Usage:\n";
 
 		for (const auto& argument : arguments) {
+			if (argument->hidden() && !argument->found())
+				continue;
+
 			os << "  ";
 
 			const auto& aliases = argument->aliases();
@@ -556,7 +577,8 @@ public:
 				os << ", " << aliases[i];
 
 			os << "  " << argument->name();
-
+			if (argument->hidden())
+				os << " [hidden]";
 			os << ": " << argument->description() << '\n';
 		}
 		return os;

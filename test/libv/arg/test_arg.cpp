@@ -419,4 +419,61 @@ TEST_CASE("parser: argument typed multiple positional", "[libv.arg.parser]") {
 	SECTION("string") { test(std::string{"1"}, std::string{"2"}); }
 }
 
+TEST_CASE("parser: hidden arguments", "[libv.arg.parser]") {
+	libv::arg::Parser args;
+
+	const auto argv = std::array{"path/exe", "-0", "-1", "-4", "400", "-5", "500"};
+
+	const auto a0 = args.flag("-0", "--a0")("a0", "a0 desc");
+	const auto a1 = args.flag("-1", "--a1")("a1", "a1 desc").hidden(true);
+	const auto a2 = args.flag("-2", "--a2")("a2", "a2 desc");
+	const auto a3 = args.flag("-3", "--a3")("a3", "a3 desc").hidden(true);
+	const auto a4 = args.optional<int>("-4", "--a4")("a4", "a4 desc");
+	const auto a5 = args.optional<int>("-5", "--a5")("a5", "a5 desc").hidden(true);
+	const auto a6 = args.optional<int>("-6", "--a6")("a6", "a6 desc");
+	const auto a7 = args.optional<int>("-7", "--a7")("a7", "a7 desc").hidden(true);
+
+	REQUIRE(args.parse(std::size(argv), argv.data()));
+
+	CHECK(a0.value());
+	CHECK(a1.value());
+	CHECK(not a2.value());
+	CHECK(not a3.value());
+	CHECK(a4.value() == 400);
+	CHECK(a5.value() == 500);
+	CHECK(not a6.value());
+	CHECK(not a7.value());
+
+	const auto report = args.report();
+
+	CHECK(report.find("a0") != std::string::npos);
+	CHECK(report.find("a1") != std::string::npos); // Hidden but specified: Include in report
+	CHECK(report.find("a2") != std::string::npos);
+	CHECK(report.find("a3") == std::string::npos); // Hidden and not specified: Hide
+	CHECK(report.find("a4") != std::string::npos);
+	CHECK(report.find("a5") != std::string::npos); // Hidden but specified: Include in report
+	CHECK(report.find("a6") != std::string::npos);
+	CHECK(report.find("a7") == std::string::npos); // Hidden and not specified: Hide
+
+	const auto usage = args.usage();
+
+	CHECK(usage.find("-0, --a0") != std::string::npos);
+	CHECK(usage.find("-1, --a1") != std::string::npos); // Hidden but specified: Include in usage
+	CHECK(usage.find("-2, --a2") != std::string::npos);
+	CHECK(usage.find("-3, --a3") == std::string::npos); // Hidden and not specified: Hide
+	CHECK(usage.find("-4, --a4") != std::string::npos);
+	CHECK(usage.find("-5, --a5") != std::string::npos); // Hidden but specified: Include in usage
+	CHECK(usage.find("-6, --a6") != std::string::npos);
+	CHECK(usage.find("-7, --a7") == std::string::npos); // Hidden and not specified: Hide
+
+	CHECK(usage.find("a0 desc") != std::string::npos);
+	CHECK(usage.find("a1 desc") != std::string::npos); // Hidden but specified: Include in usage
+	CHECK(usage.find("a2 desc") != std::string::npos);
+	CHECK(usage.find("a3 desc") == std::string::npos); // Hidden and not specified: Hide
+	CHECK(usage.find("a4 desc") != std::string::npos);
+	CHECK(usage.find("a5 desc") != std::string::npos); // Hidden but specified: Include in usage
+	CHECK(usage.find("a6 desc") != std::string::npos);
+	CHECK(usage.find("a7 desc") == std::string::npos); // Hidden and not specified: Hide
+}
+
 // -------------------------------------------------------------------------------------------------

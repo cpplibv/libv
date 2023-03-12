@@ -72,6 +72,7 @@ namespace arg {
 //			args.multiple<T>        (name, min_count, max_count)[flag]+(description)? = value|args
 //			args.alternate<K, V>    (name                      )[flag]+(description)? = values...|args...
 //			args.composite<T...>    (name                      )[flag]+(description)? = values...|args...
+//	    args.<generic_args_type>.hidden()                     // Makes the argument hidden and does not include it in usage
 //		args.command            (...)
 //		args.sub_command        (...)
 //	S	args.positional         (args...)
