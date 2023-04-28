@@ -660,132 +660,133 @@
 // =================================================================================================
 // === Code binary size tracking ===
 
-// libv
-#include <libv/algo/slice.hpp>
-#include <libv/range/view_split_sv.hpp>
-#include <libv/utility/parse_number.hpp>
-#include <libv/utility/read_file.hpp>
-#include <libv/utility/write_file.hpp>
-// std
-#include <filesystem>
-#include <iostream>
-#include <map>
-#include <sstream>
-#include <vector>
-
-
-struct Entry {
-	std::vector<uint64_t> values;
-};
-
-int main() {
-
-	// Configs
-
-	const auto prefix = "build/dev/CMakeFiles/space.dir/app/";
-	const auto dir = std::filesystem::path(prefix);
-	const auto stats_file = "build/dev/space.stats.csv";
-
-	// Load file
-
-	std::string stat_history;
-
-	try {
-		stat_history = libv::read_file_or_throw(stats_file);
-	} catch (const std::system_error& ex) {
-		if (ex.code() != std::make_error_code(std::errc::no_such_file_or_directory)) {
-			std::cerr << "Failed to load statics history:\n" << ex.what() << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
-
-	// Parse file
-
-	std::map<std::string, Entry, std::less<>> statistics;
-	uint64_t history_depth = 0;
-
-	try {
-		if (!stat_history.empty()) {
-			for (const auto& line : stat_history | libv::view::split_sv('\n')) {
-				if (line.empty())
-					continue;
-
-				uint64_t current_history_depth = 0;
-				bool is_first_cell = true;
-				Entry* currentEntry = nullptr;
-
-				for (const auto& cell : line | libv::view::split_sv(',')) {
-					if (is_first_cell) {
-						currentEntry = &statistics.emplace(cell, Entry{}).first->second;
-						is_first_cell = false;
-						continue;
-					}
-
-					++current_history_depth;
-					currentEntry->values.emplace_back(libv::parse_number_or_throw<uint64_t>(cell));
-				}
-
-				history_depth = std::max(history_depth, current_history_depth);
-			}
-		}
-
-	} catch (const std::exception& ex) {
-		std::cerr << "Failed to parse statics history:\n"
-				<< ex.what() << "\n"
-				<< "line: " << statistics.size()
-				<< std::endl;
-		return EXIT_FAILURE;
-	}
-
-	// Record current state
-
-	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
-		if (!entry.is_regular_file())
-			continue;
-
-		const auto full_path = entry.path().generic_string();
-		const auto path = libv::slice_prefix_view(libv::slice_suffix_view(full_path, ".obj"), prefix);
-
-		const auto size = entry.file_size();
-		std::cout << path << " " << static_cast<double>(size) / 1024.0 << " KB" << std::endl;
-
-		auto stat_it = statistics.find(path);
-		if (stat_it == statistics.end()) {
-			stat_it = statistics.emplace(path, Entry{}).first;
-			stat_it->second.values.resize(history_depth);
-		}
-
-		stat_it->second.values.emplace_back(size);
-	}
-
-	for (auto& [key, stats] : statistics)
-		if (stats.values.size() != history_depth + 1)
-			stats.values.emplace_back(0);
-
-	// touch /E/dev/cpp/libv/app/space/network/network_client.cpp
-	// time ninja -C build/dev /E/dev/cpp/libv/app/space/network/network_client.cpp^
-
-	// Serialize statistics
-
-	std::ostringstream new_stat_history;
-	for (const auto& [key, stats] : statistics) {
-		new_stat_history << key;
-		for (const auto& value : stats.values)
-			new_stat_history << ',' << value;
-		new_stat_history << '\n';
-	}
-
-	// Save statistics
-
-	try {
-		libv::write_file_or_throw(stats_file, std::move(new_stat_history).str());
-	} catch (const std::system_error& ex) {
-		std::cerr << "Failed to save statics history:\n" << ex.what() << std::endl;
-		return EXIT_FAILURE;
-	}
-}
+// // libv
+// #include <libv/algo/slice.hpp>
+// #include <libv/range/view_split_sv.hpp>
+// #include <libv/utility/parse_number.hpp>
+// #include <libv/utility/read_file.hpp>
+// #include <libv/utility/write_file.hpp>
+// // std
+// #include <filesystem>
+// #include <iostream>
+// #include <map>
+// #include <sstream>
+// #include <vector>
+//
+//
+// struct Entry {
+// 	std::vector<uint64_t> values;
+// };
+//
+// int main() {
+//
+// 	// Configs
+//
+// 	const auto prefix = "build/dev/CMakeFiles/space.dir/app/";
+// 	const auto dir = std::filesystem::path(prefix);
+// 	const auto stats_file = "build/dev/space.stats.csv";
+//
+// 	// Load file
+//
+// 	std::string stat_history;
+//
+// 	try {
+// 		stat_history = libv::read_file_or_throw(stats_file);
+// 	} catch (const std::system_error& ex) {
+// 		if (ex.code() != std::make_error_code(std::errc::no_such_file_or_directory)) {
+// 			std::cerr << "Failed to load statics history:\n" << ex.what() << std::endl;
+// 			return EXIT_FAILURE;
+// 		}
+// 	}
+//
+// 	// Parse file
+//
+// 	std::map<std::string, Entry, std::less<>> statistics;
+// 	uint64_t history_depth = 0;
+//
+// 	try {
+// 		if (!stat_history.empty()) {
+// 			for (const auto& line : stat_history | libv::view::split_sv('\n')) {
+// 				if (line.empty())
+// 					continue;
+//
+// 				uint64_t current_history_depth = 0;
+// 				bool is_first_cell = true;
+// 				Entry* currentEntry = nullptr;
+//
+// 				for (const auto& cell : line | libv::view::split_sv(',')) {
+// 					if (is_first_cell) {
+// 						currentEntry = &statistics.emplace(cell, Entry{}).first->second;
+// 						is_first_cell = false;
+// 						continue;
+// 					}
+//
+// 					++current_history_depth;
+// 					currentEntry->values.emplace_back(libv::parse_number_or_throw<uint64_t>(cell));
+// 				}
+//
+// 				history_depth = std::max(history_depth, current_history_depth);
+// 			}
+// 		}
+//
+// 	} catch (const std::exception& ex) {
+// 		std::cerr << "Failed to parse statics history:\n"
+// 				<< ex.what() << "\n"
+// 				<< "line: " << statistics.size()
+// 				<< std::endl;
+// 		return EXIT_FAILURE;
+// 	}
+//
+// 	// Record current state
+//
+// 	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+// 		if (!entry.is_regular_file())
+// 			continue;
+//
+// 		const auto full_path = entry.path().generic_string();
+// 		const auto path = libv::slice_prefix_view(libv::slice_suffix_view(full_path, ".obj"), prefix);
+//
+// 		const auto size = entry.file_size();
+// 		std::cout << path << " " << static_cast<double>(size) / 1024.0 << " KB" << std::endl;
+//
+// 		auto stat_it = statistics.find(path);
+// 		if (stat_it == statistics.end()) {
+// 			stat_it = statistics.emplace(path, Entry{}).first;
+// 			stat_it->second.values.resize(history_depth);
+// 		}
+//
+// 		stat_it->second.values.emplace_back(size);
+// 	}
+//
+// 	for (auto& [key, stats] : statistics)
+// 		if (stats.values.size() != history_depth + 1)
+// 			stats.values.emplace_back(0);
+//
+// 	// touch /E/dev/cpp/libv/app/space/network/network_client.cpp
+// 	// time ninja -C build/dev /E/dev/cpp/libv/app/space/network/network_client.cpp^
+//
+// 	// Serialize statistics
+//
+// 	std::ostringstream new_stat_history;
+// 	for (const auto& [key, stats] : statistics) {
+// 		new_stat_history << key;
+// 		for (const auto& value : stats.values)
+// 			new_stat_history << ',' << value;
+// 		new_stat_history << '\n';
+// 	}
+//
+// 	// Save statistics
+//
+// 	try {
+// 		libv::write_file_or_throw(stats_file, std::move(new_stat_history).str());
+// 	} catch (const std::system_error& ex) {
+// 		std::cerr << "Failed to save statics history:\n" << ex.what() << std::endl;
+// 		return EXIT_FAILURE;
+// 	}
+// }
 
 //// =================================================================================================
+// expected
 //
 //#include <iostream>
 //#include <expected>
@@ -816,3 +817,104 @@ int main() {
 //	else
 //		std::cout << "Error: " << var.error() << std::endl;
 //}
+
+
+// =================================================================================================
+// zstd
+
+#include <iostream>
+#include <string_view>
+#include <vector>
+// #include <expected>
+#include <zstd.h>
+#include <cassert>
+#include <span>
+
+
+std::vector<std::byte> compress(std::string_view data, int level) {
+	assert(level >= 1 && level <= 22);
+
+	std::vector<std::byte> result;
+	result.resize(ZSTD_compressBound(data.size()));
+
+	std::cout << "bound:       " << result.size() << std::endl;
+
+	const auto cSize = ZSTD_compress(result.data(), result.size(), data.data(), data.size(), level);
+	// CHECK_ZSTD(cSize);
+	// auto code = ZSTD_isError(cSize);
+	// if (code) {
+	// 	return code;
+	// 	ZSTD_getErrorName
+	// }
+	result.erase(result.begin() + cSize, result.end());
+
+	return result;
+}
+
+std::string decompress(std::span<const std::byte> data) {
+	std::string result;
+
+	const auto rSize = ZSTD_getFrameContentSize(data.data(), data.size());
+	// CHECK(rSize != ZSTD_CONTENTSIZE_ERROR, "%s: not compressed by zstd!", fname);
+ 	// CHECK(rSize != ZSTD_CONTENTSIZE_UNKNOWN, "%s: original size unknown!", fname);
+	// auto code = ZSTD_isError(rSize); ?
+	// if (code) {
+	// 	return code;
+	// 	ZSTD_getErrorName
+	// }
+	result.resize(rSize);
+
+	const auto dSize = ZSTD_decompress(result.data(), result.size(), data.data(), data.size());
+	(void) dSize;
+	// CHECK_ZSTD(dSize);
+	// CHECK(dSize == rSize, "Impossible because zstd will check this condition!");
+	// auto code = ZSTD_isError(dSize);
+	// if (code) {
+	// 	return code;
+	// 	ZSTD_getErrorName
+	// }
+
+	return result;
+}
+
+int main() {
+	const std::string_view data = "No plan of operations extends with certainty beyond the first encounter with the enemy's main strength";
+
+	std::cout << "ZSTD" << std::endl;
+	std::cout << "size:        " << data.size() << std::endl;
+
+	{
+		const auto compressedData = compress(data, 1);
+		std::cout << "com size  1: " << compressedData.size() << std::endl;
+
+		std::cout << "com data  1: ";
+		for (const auto& byte : compressedData)
+			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+		std::cout << std::endl;
+
+		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+	} {
+		const auto compressedData = compress(data, 9);
+		std::cout << "com size  9: " << compressedData.size() << std::endl;
+
+		std::cout << "com data  9: ";
+		for (const auto& byte : compressedData)
+			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+		std::cout << std::endl;
+
+		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+	} {
+		const auto compressedData = compress(data, 22);
+		std::cout << "com size 22: " << compressedData.size() << std::endl;
+
+		std::cout << "com data 22: ";
+		for (const auto& byte : compressedData)
+			std::cout << (std::isprint(static_cast<int>(byte)) ? static_cast<char>(byte) : '.');
+		std::cout << std::endl;
+
+		std::cout << "decomp:      " << decompress(compressedData) << std::endl;
+	}
+
+
+	return EXIT_SUCCESS;
+}

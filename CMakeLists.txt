@@ -547,6 +547,18 @@ wish_create_external(
 		-DJUST_INSTALL_VIDE=ON
 )
 
+wish_create_external(
+	NAME zstd
+	GIT_REPOSITORY https://github.com/facebook/zstd.git
+	GIT_TAG v1.5.5
+	SOURCE_SUBDIR build/cmake
+	CMAKE_ARGS
+		-DZSTD_LEGACY_SUPPORT=OFF
+		-DZSTD_BUILD_PROGRAMS=OFF
+		-DZSTD_BUILD_CONTRIB=OFF
+	LINK zstd
+)
+
 # === Targets =====================================================================================
 
 wish_group(group_generator generator) # --- Generator ---------------------------------------------
@@ -1098,6 +1110,7 @@ wish_create_executable(
 #	LINK   libv::ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
 	LINK   libv::diff
 	LINK   libv::mt libv::process
+	LINK   ext_zstd
 )
 
 wish_create_executable(
