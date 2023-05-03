@@ -1,8 +1,8 @@
 
 if (NOT DEFINED WISH_REQUEST_VERSION)
-	message(FATAL_ERROR "Wish: WISH_REQUEST_VERSION is not defined (Example: v5.0.5)\n"
+	message(FATAL_ERROR "Wish: WISH_REQUEST_VERSION is not defined (Example: v5.1.0)\n"
 			"  Usage:\n"
-			"    set(WISH_REQUEST_VERSION v5.0.5)\n"
+			"    set(WISH_REQUEST_VERSION v5.1.0)\n"
 			"    include(cmake/wish.cmake)\n")
 endif ()
 
@@ -25,7 +25,9 @@ if (NOT WISH_REQUEST_VERSION STREQUAL WISH_CURRENT_VERSION)
 	set(wish_path_lite ${CMAKE_CURRENT_BINARY_DIR}/wish_lite.zip)
 
 	file(GLOB_RECURSE wish_installed_files ${wish_path_install}/wish/**.cmake)
-	file(REMOVE ${wish_installed_files})
+	if (wish_installed_files)
+		file(REMOVE ${wish_installed_files})
+	endif ()
 	file(DOWNLOAD https://github.com/VaderY/wish/releases/download/${WISH_REQUEST_VERSION}/wish_lite.zip ${wish_path_lite})
 	file(ARCHIVE_EXTRACT INPUT ${wish_path_lite} DESTINATION ${wish_path_install})
 	file(WRITE ${wish_path_install}/wish/.gitignore "*")
