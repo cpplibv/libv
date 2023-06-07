@@ -12,8 +12,10 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/meta/reflection_access.hpp>
+#include <libv/rev/renderer/renderer_editor_grid.hpp>
 #include <libv/rev/resource/shader.hpp>
-#include <libv/rev/resource/shader_loader.hpp>
+#include <libv/rev/resource_manager.hpp>
+#include <libv/rev/settings.hpp>
 #include <libv/sun/camera.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/layout/layout_text.hpp>
@@ -39,14 +41,18 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 struct RendererResourceContext {
-	libv::rev::ShaderLoader shader_loader;
+	libv::rev::ResourceManager loader;
 //	libv::rev::ModelLoader model_loader{"model/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 	RendererResourceContext(libv::Nexus& nexus) :
-		shader_loader(nexus, "shader/") {
+		loader([] {
+			libv::rev::Settings settings;
+			settings.shader.base_path = "shader/";
+			return settings;
+		}(), nexus) {
 		// Include the res/shader/ folder from libv
-		shader_loader.add_include_directory("", "../../res/shader/");
+		loader.shader.add_include_directory("", "../../res/shader/");
 //		// Include the res/model/ folder from libv
 //		model_loader.add_include_directory("", "../../res/model/");
 	}
@@ -230,17 +236,6 @@ public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct RendererEditorGrid {
-	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader;
-
-public:
-	explicit RendererEditorGrid(RendererResourceContext& rctx);
-
-//	void build_mesh();
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
-
 struct RendererFleet {
 //	Model model;
 	std::optional<Model> model;
@@ -308,7 +303,7 @@ struct Renderer {
 	RendererResourceContext resource_context;
 
 	RendererEditorBackground editorBackground{resource_context};
-	RendererEditorGrid editorGrid{resource_context};
+	libv::rev::RendererEditorGrid editorGrid{resource_context.loader};
 	RendererGizmo gizmo{resource_context};
 	RendererDebug debug{resource_context};
 	RendererCommandArrow arrow{resource_context};

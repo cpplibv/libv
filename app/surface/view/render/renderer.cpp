@@ -430,34 +430,6 @@ void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 
 // -------------------------------------------------------------------------------------------------
 
-RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "surface/editor_grid_plane.vs", "surface/editor_grid_plane.fs") {
-	auto position = mesh_grid.attribute(attribute_position);
-	auto index = mesh_grid.index();
-
-	position(-1, -1, 0);
-	position(+1, -1, 0);
-	position(+1, +1, 0);
-	position(-1, +1, 0);
-
-	index.quad(0, 1, 2, 3); // Front face quad
-	index.quad(0, 3, 2, 1); // Back face quad
-}
-
-void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
-
-	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.render(mesh_grid);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 //RendererFleet::RendererFleet(RendererResourceContext& rctx) :
 //// <<< P2: Model loader
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),

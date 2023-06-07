@@ -28,6 +28,7 @@
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/meta/reflection_access.hpp>
+#include <libv/rev/renderer/renderer_editor_grid.hpp>
 #include <libv/rev/resource_manager.hpp>
 #include <libv/rev/settings.hpp>
 #include <libv/rev/shader/block/matrices.hpp>
@@ -112,47 +113,10 @@ struct RendererResourceContext {
 	}
 };
 
-struct RendererEditorGrid {
-	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader;
-
-public:
-	explicit RendererEditorGrid(RendererResourceContext& rctx);
-
-//	void build_mesh();
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
-
-RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.loader.shader, "surface/editor_grid_plane.vs", "surface/editor_grid_plane.fs") {
-	auto position = mesh_grid.attribute(attribute_position);
-	auto index = mesh_grid.index();
-
-	position(-1, -1, 0);
-	position(+1, -1, 0);
-	position(+1, +1, 0);
-	position(-1, +1, 0);
-
-	index.quad(0, 1, 2, 3); // Front face quad
-	index.quad(0, 3, 2, 1); // Back face quad
-}
-
-void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
-	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
-	uniforms[libv::rev::layout_matrices.matM] = glr.model;
-	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
-	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
-
-	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.render(mesh_grid);
-}
-
 struct Renderer {
 	RendererResourceContext resource_context;
 
-	RendererEditorGrid editorGrid{resource_context};
+	libv::rev::RendererEditorGrid editorGrid{resource_context.loader};
 //	RendererDebug debug{resource_context};
 //	RendererGizmo gizmo{resource_context};
 //	RendererText text{resource_context};

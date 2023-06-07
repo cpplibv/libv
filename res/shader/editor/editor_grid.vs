@@ -1,6 +1,7 @@
 #version 330 core
 
-#include <block/matrices.glsl>
+#include <block/matrices200.glsl>
+#include <block/camera200.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
 
@@ -9,7 +10,6 @@ out float lod_ramp;
 out float lod_level_index;
 out float lod_transition;
 out float lod_level;
-
 
 
 float log10(float v) {

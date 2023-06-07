@@ -1,7 +1,6 @@
-
 local shader = {}
 
-local uniform_typenames = {
+shader.uniform_typenames = {
 	texture = { glsl = "texture", cpp = "libv::glr::Uniform_texture"},
 
 	bool = { glsl = "bool", cpp = "libv::glr::Uniform_bool"},
@@ -83,7 +82,7 @@ shader.generate = function(rules)
 		out("\n")
 		out("struct Uniforms" .. rules.name .. " {\n")
 		for _, member in ipairs(rules.uniforms) do
-			out("\t" .. uniform_typenames[member[1]].cpp .. " " .. member[2] .. ";\n")
+			out("\t" .. shader.uniform_typenames[member[1]].cpp .. " " .. member[2] .. ";\n")
 		end
 
 		if (#rules.uniforms ~= 0) then
@@ -127,23 +126,4 @@ shader.generate = function(rules)
 	generate_cpp(fn_cpp)
 end
 
--- -------------------------------------------------------------------------------------------------
-
---local shader = plugin("shader")
-
-namespace("libv::rev")
-
-include_hpp("libv/rev/shader/attribute.hpp")
-include_hpp("libv/rev/shader/block/camera200.hpp")
-include_hpp("libv/rev/shader/block/matrices200.hpp")
-
-shader.generate{
-	name = "Particle",
-	uniforms = {
-		{"texture", "texture0", "textureChannel_diffuse"},
-	},
-	blocks = {
-		"Matrices200",
-		"Camera200",
-	},
-}
+return shader

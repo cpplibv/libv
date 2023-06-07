@@ -111,14 +111,6 @@ Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
 
 
 
-shader block generation
-
-
-
-
-
-
-
 
 rev render pass:
 	objects should be able to access their renderer

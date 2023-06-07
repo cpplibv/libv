@@ -3,66 +3,56 @@
 // hpp
 #include "libv_gl_runner.hpp"
 // libv
-//#include <libv/gl/gl.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/utility/chrono.hpp>
 #include <libv/utility/nexus.hpp>
 #include <libv/utility/read_file.hpp>
+//#include <libv/gl/gl.hpp>
 // std
 #include <chrono>
 #include <iostream>
 // pro
-#include <libv/glr/attribute.hpp>
-#include <libv/glr/layout_std140.hpp>
-#include <libv/glr/mesh.hpp>
-
-//#include <libv/glr/program.hpp>
+#include <libv/gl/framebuffer.hpp>
 #include <libv/gl/gl.hpp>
-
+#include <libv/glr/attribute.hpp>
 #include <libv/glr/framebuffer.hpp>
+#include <libv/glr/layout_std140.hpp>
+#include <libv/glr/layout_to_string.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/procedural/ignore.hpp>
+#include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/glr/uniform_buffer.hpp>
-
-#include <libv/glr/procedural/sphere.hpp>
-#include <libv/glr/procedural/ignore.hpp>
-
+#include <libv/img/save.hpp>
+#include <libv/rev/materials/block_matrices.hpp>
+#include <libv/rev/materials/material_sprite_baker.hpp>
+#include <libv/rev/model.hpp>
 #include <libv/rev/post_processing.hpp>
 #include <libv/rev/render_target.hpp>
+#include <libv/rev/renderer/renderer_editor_grid.hpp>
+#include <libv/rev/resource/material_scanner.hpp>
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/resource/shader_loader.hpp>
-
-#include <libv/rev/model.hpp>
 #include <libv/rev/resource_manager.hpp>
 #include <libv/rev/settings.hpp>
-#include <libv/rev/texture.hpp>
-//#include <libv/rev/resource/texture_loader.hpp>
-
 #include <libv/rev/shader/attribute.hpp>
-#include <libv/rev/resource/material_scanner.hpp>
-#include <libv/rev/materials/material_sprite_baker.hpp>
-#include <libv/vm4/load.hpp>
-
-#include <libv/img/save.hpp>
-#include <libv/utility/write_file.hpp>
-
+#include <libv/rev/texture.hpp>
 #include <libv/utility/min_max.hpp>
-
+#include <libv/utility/write_file.hpp>
+#include <libv/vm4/load.hpp>
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
-#include <libv/gl/framebuffer.hpp>
 //#include <libv/glr/attribute.hpp>
 //#include <libv/glr/font.hpp>
 //#include <libv/glr/procedural/cube.hpp>
 //#include <libv/glr/procedural/progress_segmented_ring.hpp>
+//#include <libv/glr/program.hpp>
 //#include <libv/glr/text.hpp>
 //#include <libv/glr/texture.hpp>
 //#include <libv/glr/uniform.hpp>
 //#include <libv/glr/uniform_block_binding.hpp>
-
-#include <libv/rev/materials/block_matrices.hpp>
-
-#include <libv/glr/layout_to_string.hpp>
+//#include <libv/rev/resource/texture_loader.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -258,60 +248,6 @@ public:
 	}
 };
 
-// =================================================================================================
-
-struct UniformsTestMode {
-	libv::glr::Uniform_int32 test_mode;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(test_mode, "test_mode", 0);
-	}
-
-	template <typename Access> void access_blocks(Access& access) {
-		access(libv::rev::uniformBlock_matrices);
-	}
-};
-
-using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
-
-struct RendererEditorGrid {
-	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader;
-
-public:
-	explicit RendererEditorGrid(libv::rev::ResourceManager& loader);
-
-//	void build_mesh();
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
-
-RendererEditorGrid::RendererEditorGrid(libv::rev::ResourceManager& loader) :
-		shader(loader.shader, "surface/editor_grid_plane.vs", "surface/editor_grid_plane.fs") {
-	auto position = mesh_grid.attribute(libv::rev::attribute_position);
-	auto index = mesh_grid.index();
-
-	position(-1, -1, 0);
-	position(+1, -1, 0);
-	position(+1, +1, 0);
-	position(-1, +1, 0);
-
-	index.quad(0, 1, 2, 3); // Front face quad
-	index.quad(0, 3, 2, 1); // Back face quad
-}
-
-void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
-	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
-	uniforms[libv::rev::layout_matrices.matM] = glr.model;
-	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
-	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
-
-	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.render(mesh_grid);
-}
-
-// =================================================================================================
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsSpriteBakerDownsample {
@@ -633,7 +569,7 @@ struct Sandbox {
 	// -------------------------------------------------------------------------------------------------
 
 	RendererSprite sprites{loader};
-	RendererEditorGrid grid{loader};
+	libv::rev::RendererEditorGrid grid{loader};
 
 	// -------------------------------------------------------------------------------------------------
 

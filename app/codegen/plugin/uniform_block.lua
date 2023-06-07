@@ -96,8 +96,7 @@ uniform_block.generate = function(blockIndex, blockName, glslFilepath, members)
 	end
 
 	local fn_cpp = function(out)
-		out("\n")
-		out("// Foo " .. blockName .. " fn_cpp\n")
+		--out("\n")
 	end
 
 	local fn_glsl = function(out)

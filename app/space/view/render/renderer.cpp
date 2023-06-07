@@ -26,7 +26,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "editor_background.vs", "editor_background.fs") {
+		shader(rctx.loader.shader, "editor/editor_background.vs", "editor/editor_background.fs") {
 
 	// TODO P1: Switch to blue noise once implemented
 	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
@@ -65,7 +65,7 @@ void RendererEditorBackground::render(libv::glr::Queue& glr, libv::vec2f canvas_
 // -------------------------------------------------------------------------------------------------
 
 RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
-		shader{rctx.shader_loader, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
+		shader{rctx.loader.shader, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
 }
 
 void RendererCommandArrow::restart_chain(float animation_offset) {
@@ -285,7 +285,7 @@ void RendererCommandArrow::render(libv::glr::Queue& glr, libv::vec2f canvas_size
 // -------------------------------------------------------------------------------------------------
 
 RendererDebug::RendererDebug(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
 }
 
 void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
@@ -642,7 +642,7 @@ void RendererDebug::clear_debug_shapes() {
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.loader.shader, "flat_color.vs", "flat_color.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -684,41 +684,13 @@ void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 
 // -------------------------------------------------------------------------------------------------
 
-RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "editor_grid_plane.vs", "editor_grid_plane.fs") {
-	auto position = mesh_grid.attribute(attribute_position);
-	auto index = mesh_grid.index();
-
-	position(-1, -1, 0);
-	position(+1, -1, 0);
-	position(+1, +1, 0);
-	position(-1, +1, 0);
-
-	index.quad(0, 1, 2, 3); // Front face quad
-	index.quad(0, 3, 2, 1); // Back face quad
-}
-
-void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
-	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
-	uniforms[libv::rev::layout_matrices.matM] = glr.model;
-	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
-	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
-
-	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.render(mesh_grid);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
 // <<< P2: Model loader
 		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 //		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
-		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
+		shader(rctx.loader.shader, "fleet.vs", "fleet.fs") {
 
 //	log_space.fatal("RendererFleet...");
 //
@@ -743,7 +715,7 @@ void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 // -------------------------------------------------------------------------------------------------
 
 RendererPlanet::RendererPlanet(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "planet.vs", "planet.fs") {
+		shader(rctx.loader.shader, "planet.vs", "planet.fs") {
 	build_mesh(mesh);
 }
 
@@ -779,7 +751,7 @@ void RendererPlanet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unif
 // -------------------------------------------------------------------------------------------------
 
 RendererText::RendererText(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "font_2D.vs", "font_2D.fs") {
+		shader(rctx.loader.shader, "font_2D.vs", "font_2D.fs") {
 }
 
 void RendererText::add_text(
@@ -923,7 +895,7 @@ void Renderer::prepare_for_render(libv::glr::Queue& glr) {
 	// shader_loader.update MUST run before any other render queue operation
 	// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
 	// | So this is a better place than before, still not the best, When UI gets rev updates in the future maybe there will be better solutions
-	resource_context.shader_loader.update(glr.out_of_order_gl());
+	resource_context.loader.shader.update(glr.out_of_order_gl());
 }
 
 // -------------------------------------------------------------------------------------------------

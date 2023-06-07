@@ -10,6 +10,7 @@
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
+#include <libv/rev/renderer/renderer_editor_grid.hpp>
 #include <libv/rev/resource/resource_manager.hpp>
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/settings.hpp>
@@ -204,17 +205,6 @@ public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct RendererEditorGrid {
-	Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader;
-
-public:
-	explicit RendererEditorGrid(RendererResourceContext& rctx);
-
-//	void build_mesh();
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
-};
-
 struct RendererText {
 private:
 	ShaderText shader;
@@ -257,7 +247,7 @@ public:
 struct Renderer {
 	RendererResourceContext resource_context;
 
-	RendererEditorGrid editorGrid{resource_context};
+	libv::rev::RendererEditorGrid editorGrid{resource_context.loader};
 	RendererDebug debug{resource_context};
 	RendererGizmo gizmo{resource_context};
 	RendererText text{resource_context};

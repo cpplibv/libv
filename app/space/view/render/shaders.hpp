@@ -31,22 +31,6 @@ constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
 
-struct UniformLayoutMatrices {
-	// Could be split into two: Camera and Model
-	// 			Camera: matV, matP, near, far, ...
-	// 			Model: matM, matMVP
-
-	libv::glr::Uniform_mat4f matMVP;
-	libv::glr::Uniform_mat4f matP;
-	libv::glr::Uniform_mat4f matM;
-	libv::glr::Uniform_vec3f eye;
-
-	LIBV_REFLECTION_ACCESS(matMVP);
-	LIBV_REFLECTION_ACCESS(matP);
-	LIBV_REFLECTION_ACCESS(matM);
-	LIBV_REFLECTION_ACCESS(eye);
-};
-
 //struct UniformLayoutPass {
 //	libv::glr::Uniform_float time_sim;
 //	libv::glr::Uniform_float time_real;

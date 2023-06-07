@@ -125,7 +125,7 @@ SpaceCanvas::SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, Gam
 		controls(controls),
 		screen_picker(camera.picker({100, 100})),
 		renderTarget({100, 100}, 4),
-		postProcessing(renderer.resource_context.shader_loader, {100, 100}),
+		postProcessing(renderer.resource_context.loader.shader, {100, 100}),
 		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
 		//			Component shall not receive any event before onLayout gets called
 		// <<< renderTarget ctor: ^same
