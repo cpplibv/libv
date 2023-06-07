@@ -24,13 +24,14 @@
 // #include <span>
 // #include <random>
 // pro
-#include <libv/rev/resource/attribute.hpp>
+#include <libv/rev/shader/attribute.hpp>
 #include <libv/rev/resource/resource_manager.hpp>
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/resource/texture.hpp>
 
-#include <libv/rev/uniform_block/camera200.hpp>
-#include <libv/rev/uniform_block/matrices200.hpp>
+// #include <libv/rev/shader/block/camera200.hpp>
+// #include <libv/rev/shader/block/matrices200.hpp>
+#include <libv/rev/shader/particle.hpp>
 
 #include <libv/rev/effect/particle.hpp>
 // #include <libv/rev/effect/particle_engine.hpp>
@@ -46,21 +47,21 @@ constexpr auto attribute_particle_packSizeRotation = libv::glr::Attribute<11, li
 
 // constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 
-struct UniformsParticle {
-//	libv::glr::Uniform_mat4f matMVP;
-//	libv::glr::Uniform_mat4f matM;
-//	libv::glr::Uniform_vec3f color;
-	libv::glr::Uniform_texture texture0;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", textureChannel_diffuse);
-	}
-
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices200);
-		access(uniformBlock_camera200);
-	}
-};
+// struct UniformsParticle {
+// //	libv::glr::Uniform_mat4f matMVP;
+// //	libv::glr::Uniform_mat4f matM;
+// //	libv::glr::Uniform_vec3f color;
+// 	libv::glr::Uniform_texture texture0;
+//
+// 	template <typename Access> void access_uniforms(Access& access) {
+// 		access(texture0, "texture0", textureChannel_diffuse);
+// 	}
+//
+// 	template <typename Access> void access_blocks(Access& access) {
+// 		access(uniformBlock_Matrices200);
+// 		access(uniformBlock_Camera200);
+// 	}
+// };
 
 // -------------------------------------------------------------------------------------------------
 
@@ -130,18 +131,18 @@ public:
 
 		glr.program(shader_particle.program());
 
-		auto uniforms = uniform_stream.block_unique(layout_matrices200);
-		uniforms[layout_matrices200.matMVP] = glr.mvp();
-		uniforms[layout_matrices200.matM] = glr.model;
+		auto uniforms = uniform_stream.block_unique(layout_Matrices200);
+		uniforms[layout_Matrices200.matMVP] = glr.mvp();
+		uniforms[layout_Matrices200.matM] = glr.model;
 		glr.uniform(std::move(uniforms));
 
-		auto uniformsCam = uniform_stream.block_shared(layout_camera200);
-		uniformsCam[layout_camera200.matP] = glr.projection;
-		uniformsCam[layout_camera200.matV] = glr.view;
-		uniformsCam[layout_camera200.eye] = glr.eye();
-		uniformsCam[layout_camera200.cameraForwardW] = libv::vec3f(glr.view.top()[0][2], glr.view.top()[1][2], glr.view.top()[2][2]);
-		uniformsCam[layout_camera200.cameraRightW] = libv::vec3f(glr.view.top()[0][0], glr.view.top()[1][0], glr.view.top()[2][0]);
-		uniformsCam[layout_camera200.cameraUpW] = libv::vec3f(glr.view.top()[0][1], glr.view.top()[1][1], glr.view.top()[2][1]);
+		auto uniformsCam = uniform_stream.block_shared(layout_Camera200);
+		uniformsCam[layout_Camera200.matP] = glr.projection;
+		uniformsCam[layout_Camera200.matV] = glr.view;
+		uniformsCam[layout_Camera200.eye] = glr.eye();
+		uniformsCam[layout_Camera200.cameraForwardW] = libv::vec3f(glr.view.top()[0][2], glr.view.top()[1][2], glr.view.top()[2][2]);
+		uniformsCam[layout_Camera200.cameraRightW] = libv::vec3f(glr.view.top()[0][0], glr.view.top()[1][0], glr.view.top()[2][0]);
+		uniformsCam[layout_Camera200.cameraUpW] = libv::vec3f(glr.view.top()[0][1], glr.view.top()[1][1], glr.view.top()[2][1]);
 		glr.uniform(std::move(uniformsCam));
 
 		// glr.texture(texture_star_01.texture(), textureChannel_diffuse);

@@ -2,6 +2,7 @@
 
 // libv
 #include <libv/algo/linear_find.hpp>
+#include <libv/algo/slice.hpp>
 #include <libv/lua/lua.hpp>
 #include <libv/utility/projection.hpp>
 #include <libv/utility/read_file.hpp>
@@ -26,11 +27,11 @@
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr inline std::string_view codegen_version = "v4.0.0";
+constexpr inline std::string_view codegen_version = "v5.0.0";
 
 // -------------------------------------------------------------------------------------------------
 
-class SourceGenerator {
+class SourceGenerator_v1 {
 public:
 	struct StaticMemberEntry {
 		std::string type;
@@ -61,7 +62,8 @@ public:
 			struct_(struct_) {}
 	};
 
-	using hook_type = std::function<void(std::function<void(std::string_view)>, const SourceGenerator::ClazzEntry&)>;
+	using clazz_hook_type = std::function<void(std::function<void(std::string_view)>, const SourceGenerator_v1::ClazzEntry&)>;
+	using file_hook_type = std::function<void(std::function<void(std::string_view)>)>;
 
 private:
 	std::vector<std::string> namespaces;
@@ -69,8 +71,13 @@ private:
 	std::set<std::string> includes_cpp;
 
 	std::vector<std::shared_ptr<ClazzEntry>> global_classes;
-	std::vector<hook_type> class_hooks_hpp;
-	std::vector<hook_type> class_hooks_cpp;
+	std::vector<clazz_hook_type> class_hooks_hpp;
+	std::vector<clazz_hook_type> class_hooks_cpp;
+	std::vector<file_hook_type> file_hooks_hpp;
+	std::vector<file_hook_type> file_hooks_cpp;
+	std::map<std::string, std::vector<file_hook_type>> file_hooks_external;
+
+	bool first_cpp_class = true;
 
 public:
 	void add_namespace(std::string namespace_str) {
@@ -97,12 +104,22 @@ public:
 		global_classes.erase(it);
 		return clazz;
 	}
-	void add_class_hook_hpp(hook_type hook) {
+	void add_class_hook_hpp(clazz_hook_type hook) {
 		class_hooks_hpp.emplace_back(std::move(hook));
 	}
 
-	void add_class_hook_cpp(hook_type hook) {
+	void add_class_hook_cpp(clazz_hook_type hook) {
 		class_hooks_cpp.emplace_back(std::move(hook));
+	}
+
+	void add_file_hook_hpp(file_hook_type hook) {
+		file_hooks_hpp.emplace_back(std::move(hook));
+	}
+	void add_file_hook_cpp(file_hook_type hook) {
+		file_hooks_cpp.emplace_back(std::move(hook));
+	}
+	void add_file_hook_external(std::string_view filepath, file_hook_type hook) {
+		file_hooks_external[std::string(filepath)].emplace_back(std::move(hook));
 	}
 
 	template <typename Out>
@@ -153,8 +170,12 @@ public:
 //		if (!clazz.member_classes.empty())
 //			out("\n");
 
-		out("\n");
-		out("// -------------------------------------------------------------------------------------------------\n");
+		if (!first_cpp_class) {
+			out("\n");
+			out("// -------------------------------------------------------------------------------------------------\n");
+		}
+		first_cpp_class = false;
+
 //		for (const auto& member : clazz.members)
 //			if (member.init_value.empty())
 //				out("{}\t{} {};\n", ident, member.type, member.identifier);
@@ -215,6 +236,11 @@ public:
 
 		out("// -------------------------------------------------------------------------------------------------\n");
 
+		for (const auto& hook : file_hooks_hpp)
+			hook([&](const std::string_view str) {
+				out("{}", str);
+			});
+
 		for (const auto& clazz : global_classes) {
 			out("\n");
 			generate_hpp_class(*clazz, out);
@@ -258,7 +284,14 @@ public:
 		out("\n");
 
 		for (const auto& ns : namespaces)
-			out("namespace {} {{\n", ns);
+			out("namespace {} {{\n\n", ns);
+
+		out("// -------------------------------------------------------------------------------------------------\n");
+
+		for (const auto& hook : file_hooks_cpp)
+			hook([&](const std::string_view str) {
+				out("{}", str);
+			});
 
 		for (const auto& clazz : global_classes) {
 			generate_cpp_class(*clazz, out);
@@ -274,32 +307,73 @@ public:
 
 		return std::move(os).str();
 	}
+
+	[[nodiscard]] std::map<std::string, std::string> generate_external(std::string_view input_file) {
+		std::map<std::string, std::string> result;
+
+		for (const auto& [filepath, hooks] : file_hooks_external) {
+			std::ostringstream os;
+
+			const auto out = [&os](std::string_view fmt, auto&&... args) {
+				os << fmt::format(fmt::runtime(fmt), std::forward<decltype(args)>(args)...);
+			};
+
+			out("//\n"); // Empty first line to allow first line watermark
+			out("// Generated source code\n");
+			out("// Generator version: {}\n", codegen_version);
+			if (!input_file.empty())
+				out("// Input file: {}\n", input_file);
+
+			out("\n");
+
+			for (const auto& hook : hooks)
+				hook([&](const std::string_view str) {
+					out("{}", str);
+				});
+
+			result.emplace(filepath, std::move(os).str());
+		}
+
+		return result;
+	}
 };
 
 struct SourceGeneratorLua {
 	sol::state lua;
 //	libv::lua::State lua;
-	SourceGenerator gen;
+	SourceGenerator_v1 gen;
 
-	SourceGeneratorLua() {
+	SourceGeneratorLua(std::string filepath_in, std::string filepath_hpp, std::string filepath_cpp) {
 		lua.open_libraries(sol::lib::base);
 		lua.open_libraries(sol::lib::table);
 		lua.open_libraries(sol::lib::string);
 
 		{
-			auto type = lua.new_usertype<SourceGenerator::MemberEntry>("MemberEntry");
-			type.set("identifier", &SourceGenerator::MemberEntry::identifier);
-			type.set("type", &SourceGenerator::MemberEntry::type);
-			type.set("init_value", &SourceGenerator::MemberEntry::init_value);
-			type.set("use_move", &SourceGenerator::MemberEntry::use_move);
+			auto type = lua.new_usertype<SourceGenerator_v1::MemberEntry>("MemberEntry");
+			type.set("identifier", &SourceGenerator_v1::MemberEntry::identifier);
+			type.set("type", &SourceGenerator_v1::MemberEntry::type);
+			type.set("init_value", &SourceGenerator_v1::MemberEntry::init_value);
+			type.set("use_move", &SourceGenerator_v1::MemberEntry::use_move);
 		}
 		{
-			auto type = lua.new_usertype<SourceGenerator::ClazzEntry>("ClazzEntry");
-			type.set("identifier", &SourceGenerator::ClazzEntry::identifier);
-			type.set("struct", &SourceGenerator::ClazzEntry::struct_);
-			type.set("scope_class", &SourceGenerator::ClazzEntry::scope_class);
-			type.set("members", &SourceGenerator::ClazzEntry::members);
+			auto type = lua.new_usertype<SourceGenerator_v1::ClazzEntry>("ClazzEntry");
+			type.set("identifier", &SourceGenerator_v1::ClazzEntry::identifier);
+			type.set("struct", &SourceGenerator_v1::ClazzEntry::struct_);
+			type.set("scope_class", &SourceGenerator_v1::ClazzEntry::scope_class);
+			type.set("members", &SourceGenerator_v1::ClazzEntry::members);
 		}
+
+		lua["__codegen_single_line"] = "// -------------------------------------------------------------------------------------------------\n";
+		lua["__codegen_double_line"] = "// =================================================================================================\n";
+		lua["__codegen_filepath_in"] = libv::slice_prefix_view(filepath_in, "src/");
+		lua["__codegen_filepath_hpp"] = libv::slice_prefix_view(filepath_hpp, "src/");
+		if (!filepath_cpp.empty())
+			lua["__codegen_filepath_cpp"] = libv::slice_prefix_view(filepath_cpp, "src/");
+
+		lua.set_function("plugin", [this](std::string name) {
+			auto plugin_env = sol::environment(lua, sol::create, lua.globals());
+			return lua.safe_script_file("app/codegen/plugin/" + name + ".lua", plugin_env);
+		});
 
 		lua.set_function("namespace", [this](std::string name) {
 			gen.add_namespace(std::move(name));
@@ -346,12 +420,24 @@ struct SourceGeneratorLua {
 			return result;
 		});
 
-		lua.set_function("enable_hpp", [this](SourceGenerator::hook_type hook) {
+		lua.set_function("enable_hpp", [this](SourceGenerator_v1::clazz_hook_type hook) {
 			gen.add_class_hook_hpp(std::move(hook));
 		});
 
-		lua.set_function("enable_cpp", [this](SourceGenerator::hook_type hook) {
+		lua.set_function("enable_cpp", [this](SourceGenerator_v1::clazz_hook_type hook) {
 			gen.add_class_hook_cpp(std::move(hook));
+		});
+
+		lua.set_function("generate_hpp", [this](SourceGenerator_v1::file_hook_type hook) {
+			gen.add_file_hook_hpp(std::move(hook));
+		});
+
+		lua.set_function("generate_cpp", [this](SourceGenerator_v1::file_hook_type hook) {
+			gen.add_file_hook_cpp(std::move(hook));
+		});
+
+		lua.set_function("generate_external_file", [this](std::string_view filepath, SourceGenerator_v1::file_hook_type hook) {
+			gen.add_file_hook_external(filepath, std::move(hook));
 		});
 
 		lua.set_function("struct", [this](std::string identifier, sol::table members) {
@@ -405,15 +491,16 @@ struct SourceGeneratorLua {
 		});
 	}
 
-	[[nodiscard]] std::pair<std::string, std::string> generate(std::string_view input_file, std::string_view source_script) {
+	[[nodiscard]] auto generate(std::string_view input_file, std::string_view source_script) {
 		auto env = sol::environment(lua, sol::create, lua.globals());
 
 		lua.script(source_script, env);
 
 		auto result_hpp = gen.generate_hpp(input_file);
 		auto result_cpp = gen.generate_cpp(input_file);
+		auto result_externals = gen.generate_external(input_file);
 
-		return std::make_pair(result_hpp, result_cpp);
+		return std::make_tuple(result_hpp, result_cpp, result_externals);
 	}
 };
 
@@ -421,9 +508,22 @@ struct SourceGeneratorLua {
 //  			enable function should accept a table where multiple hooks
 //				could be defined like: cpp/hpp - pre/post - class/members
 
-int main(int argc, const char** argv) {
-	SourceGeneratorLua eb;
+void save(const std::string& filepath, const std::string& content, bool external) {
+	// Try to read back the current content of the output file, to check if its changed
+	std::cout << (external ? "output_file (external): " : "output_file: ") << filepath << std::flush;
+	const auto current_source_hpp = libv::read_file_ec(filepath);
 
+	if (!current_source_hpp.ec && current_source_hpp.data == content)
+		// Output file is already up-to-date, skip write to not invalidate timestamps on files
+		std::cout << " (up-to-date)";
+	else
+		// The output file is out-of-date, write out the fresh source
+		libv::write_file_or_throw(filepath, content);
+
+	std::cout << std::endl;
+}
+
+int main(int argc, const char** argv) {
 	if (argc < 3) {
 		std::cerr << "Usage: codegen <input_file> <output_file_hpp> [<output_file_cpp>]" << std::endl;
 		return EXIT_FAILURE;
@@ -442,6 +542,8 @@ int main(int argc, const char** argv) {
 	const std::string output_file_hpp = argv[2];
 	const std::string output_file_cpp = header_only_mode ? "" : argv[3];
 
+	SourceGeneratorLua eb(input_file, output_file_hpp, output_file_cpp);
+
 	std::cout << " input_file: " << input_file << "\n";
 
 	const auto input_source = libv::read_file_ec(input_file);
@@ -450,34 +552,25 @@ int main(int argc, const char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	const auto generated_source = eb.generate(input_file, input_source.data);
+	const auto generated_sources = eb.generate(input_file, input_source.data);
 
-	// Try to read back the current content of the output file, to check if its changed
-	std::cout << "output_file: " << output_file_hpp << std::flush;
-	const auto current_source_hpp = libv::read_file_ec(output_file_hpp);
-
-	if (!current_source_hpp.ec && current_source_hpp.data == generated_source.first)
-		// Output file is already up-to-date, skip write to not invalidate timestamps on files
-		std::cout << " (up-to-date)";
-	else
-		// The output file is out-of-date, write out the fresh source
-		libv::write_file_or_throw(output_file_hpp, generated_source.first);
-
-	std::cout << std::endl;
-
-	if (!header_only_mode) {
-		std::cout << "output_file: " << output_file_cpp << std::flush;
-		const auto current_source_cpp = libv::read_file_ec(output_file_cpp);
-
-		if (!current_source_cpp.ec && current_source_cpp.data == generated_source.second)
-			// Output file is already up-to-date, skip write to not invalidate timestamps on files
-			std::cout << " (up-to-date)";
-		else
-			// The output file is out-of-date, write out the fresh source
-			libv::write_file_or_throw(output_file_cpp, generated_source.second);
-
-		std::cout << std::endl;
-	}
+	save(output_file_hpp, std::get<0>(generated_sources), false);
+	if (!header_only_mode)
+		save(output_file_cpp, std::get<1>(generated_sources), false);
+	for (const auto& [filepath, source_code] : std::get<2>(generated_sources))
+		save(filepath, source_code, true);
 
 	return EXIT_SUCCESS;
 }
+
+// -- fix file generated source stamp
+// -- [hpp|cpp] head before
+// -- [hpp|cpp] head after
+// -- [hpp|cpp] include before
+// -- [hpp|cpp] include after
+// -- [hpp|cpp] namespace begin before
+// -- [hpp|cpp] namespace begin after
+// -- [hpp|cpp] namespace end before
+// -- [hpp|cpp] namespace end after
+// -- [hpp|cpp] tail before
+// -- [hpp|cpp] tail after

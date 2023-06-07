@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/resource/attribute.hpp
+// Project: libv.rev, File: src/libv/rev/shader/attribute.hpp
 
 #pragma once
 

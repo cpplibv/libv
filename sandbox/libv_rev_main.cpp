@@ -31,6 +31,8 @@
 #include <libv/rev/resource/shader.hpp>
 #include <libv/rev/resource/shader_loader.hpp>
 
+#include <libv/rev/shader/block/matrices200.hpp>
+
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
 //#include <libv/glr/attribute.hpp>
@@ -52,24 +54,7 @@ constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
-const auto uniformBlock_matrices   = libv::glr::UniformBlockBinding{0, "Matrices"};
-
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-
-// -------------------------------------------------------------------------------------------------
-
-struct UniformLayoutMatrices {
-	libv::glr::Uniform_mat4f matMVP;
-//	libv::glr::Uniform_mat4f matP;
-	libv::glr::Uniform_mat4f matM;
-//	libv::glr::Uniform_vec3f color;
-
-	LIBV_REFLECTION_ACCESS(matMVP);
-//	LIBV_REFLECTION_ACCESS(matP);
-	LIBV_REFLECTION_ACCESS(matM);
-//	LIBV_REFLECTION_ACCESS(color);
-};
-const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -87,7 +72,7 @@ struct UniformsOnlyMatrixBlock {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_Matrices200);
 	}
 };
 
@@ -267,9 +252,9 @@ struct Sandbox {
 			glr.model.scale(300.f);
 			glr.model.rotate(libv::degrees(running_time.count() * 5.f), 0, 1, 0);
 
-			auto uniforms = uniform_stream.block_unique(layout_matrices);
-			uniforms[layout_matrices.matMVP] = glr.mvp();
-			uniforms[layout_matrices.matM] = glr.model;
+			auto uniforms = uniform_stream.block_unique(libv::rev::layout_Matrices200);
+			uniforms[libv::rev::layout_Matrices200.matMVP] = glr.mvp();
+			uniforms[libv::rev::layout_Matrices200.matM] = glr.model;
 
 			glr.program(shader_sphere.program());
 			glr.uniform(std::move(uniforms));
@@ -284,9 +269,9 @@ struct Sandbox {
 			glr.model.scale(15.f);
 			glr.model.rotate(libv::radian(libv::pi * fi / mini_countf), 0, 1, 0); // Using pi and not tau as only half rotation is enough, sphere is symmetric
 
-			auto uniforms = uniform_stream.block_unique(layout_matrices);
-			uniforms[layout_matrices.matMVP] = glr.mvp();
-			uniforms[layout_matrices.matM] = glr.model;
+			auto uniforms = uniform_stream.block_unique(libv::rev::layout_Matrices200);
+			uniforms[libv::rev::layout_Matrices200.matMVP] = glr.mvp();
+			uniforms[libv::rev::layout_Matrices200.matM] = glr.model;
 
 			glr.program(shader_sphere.program());
 			glr.uniform(std::move(uniforms));
@@ -302,9 +287,9 @@ struct Sandbox {
 			glr.model.translate(0, -0.90f, 0);
 			glr.model.scale(1, 0.10f, 1);
 
-			auto uniforms = uniform_stream.block_unique(layout_matrices);
-			uniforms[layout_matrices.matMVP] = glr.mvp();
-			uniforms[layout_matrices.matM] = glr.model;
+			auto uniforms = uniform_stream.block_unique(libv::rev::layout_Matrices200);
+			uniforms[libv::rev::layout_Matrices200.matMVP] = glr.mvp();
+			uniforms[libv::rev::layout_Matrices200.matM] = glr.model;
 
 			glr.program(shader_color_bar.program());
 			glr.uniform(std::move(uniforms));

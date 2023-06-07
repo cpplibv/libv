@@ -520,7 +520,7 @@ public:
 	std::string error_message(int width = 120) const {
 		std::ostringstream os;
 		error_message(os, width);
-		return std::move(os.str());
+		return std::move(os).str();
 	}
 
 	std::ostream& report(std::ostream& os, int width = 120) const {
@@ -556,7 +556,7 @@ public:
 	std::string report(int width = 120) const {
 		std::ostringstream os;
 		report(os, width);
-		return std::move(os.str());
+		return std::move(os).str();
 	}
 
 	std::ostream& usage(std::ostream& os, int width = 120) const {
@@ -587,7 +587,7 @@ public:
 	std::string usage(int width = 120) const {
 		std::ostringstream os;
 		usage(os, width);
-		return std::move(os.str());
+		return std::move(os).str();
 	}
 };
 

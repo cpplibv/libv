@@ -563,6 +563,7 @@ wish_generator(
 wish_generator(
 	TARGET  codegen
 	COMMAND codegen
+#	RUNTIME_FILES app/codegen/plugin/*.lua (add DEPENDS on custom commands)
 	OUTPUT  REPLACE ".in.lua" ".hpp"
 	OUTPUT  REPLACE ".in.lua" ".cpp"
 # TODO P2: Enable header only and split gen
@@ -729,6 +730,8 @@ wish_create_library(
 wish_create_library(
 	TARGET libv::rev STATIC
 	SOURCE src/libv/rev/*.cpp
+	GENERATE codegen src/libv/rev/shader/block/*.in.lua
+	GENERATE codegen src/libv/rev/shader/*.in.lua
 	LINK   libv::glr libv::gl libv::utility libv::fsw
 #	LINK   ext_boost
 	LINK   libv::algo libv::range libv::log ext_range ext_ctre # Source include engine stuff

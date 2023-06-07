@@ -1,16 +1,18 @@
 //
+// Generated source code
+// Generator version: v5.0.0
+// Input file: src/libv/rev/shader/block/camera200.in.lua
 
 #pragma once
 
-// libv
+//
 #include <libv/glr/layout_std140.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
 #include <libv/meta/reflection_access.hpp>
 
 
-namespace libv {
-namespace rev {
+namespace libv::rev {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -30,10 +32,9 @@ struct UniformLayoutCamera200 {
 	LIBV_REFLECTION_ACCESS(cameraUpW);
 };
 
-const auto uniformBlock_camera200 = libv::glr::UniformBlockBinding{1, "Camera200"};
-const auto layout_camera200 = libv::glr::layout_std140<UniformLayoutCamera200>(uniformBlock_camera200);
+const auto uniformBlock_Camera200 = libv::glr::UniformBlockBinding{0, "Camera200"};
+const auto layout_Camera200 = libv::glr::layout_std140<UniformLayoutCamera200>(uniformBlock_Camera200);
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace rev
-} // namespace libv
+} // namespace libv::rev

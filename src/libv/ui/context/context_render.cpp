@@ -301,6 +301,9 @@ bool Renderer::cull_test(libv::vec2f pos, libv::vec2f size, float threshold) con
 	const auto min = xy(glr.model * libv::vec4f{pos, 0, 1});
 	const auto max = xy(glr.model * libv::vec4f{pos + size, 0, 1});
 
+	(void) threshold;
+	// TODO P5: Implement threshold
+
 //	const auto max = pos + size;
 
 //	const auto limit = context.ui_size;

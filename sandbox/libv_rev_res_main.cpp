@@ -38,7 +38,7 @@
 #include <libv/rev/texture.hpp>
 //#include <libv/rev/resource/texture_loader.hpp>
 
-#include <libv/rev/resource/attribute.hpp>
+#include <libv/rev/shader/attribute.hpp>
 #include <libv/rev/resource/material_scanner.hpp>
 #include <libv/rev/materials/material_sprite_baker.hpp>
 #include <libv/vm4/load.hpp>

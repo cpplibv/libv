@@ -21,21 +21,25 @@ using core_cref = const CoreComponent&;
 
 [[nodiscard]] constexpr inline core_ptr get_core(Component& component) noexcept {
 	// NOTE: Cast to first member (static_cast could be used, but reinterpret_cast allows incompleteness)
+	// NOTE: If you ever get a dangling-pointer warning to this code. Don't use temporary handlers.
 	return *reinterpret_cast<core_ptr*>(&component);
 }
 
 [[nodiscard]] constexpr inline core_cptr get_core(const Component& component) noexcept {
 	// NOTE: Cast to first member (static_cast could be used, but reinterpret_cast allows incompleteness)
+	// NOTE: If you ever get a dangling-pointer warning to this code. Don't use temporary handlers.
 	return *reinterpret_cast<const core_cptr*>(&component);
 }
 
 [[nodiscard]] constexpr inline core_ref ref_core(Component& component) noexcept {
 	// NOTE: Cast to first member (static_cast could be used, but reinterpret_cast allows incompleteness)
+	// NOTE: If you ever get a dangling-pointer warning to this code. Don't use temporary handlers.
 	return **reinterpret_cast<core_ptr*>(&component);
 }
 
 [[nodiscard]] constexpr inline core_cref ref_core(const Component& component) noexcept {
 	// NOTE: Cast to first member (static_cast could be used, but reinterpret_cast allows incompleteness)
+	// NOTE: If you ever get a dangling-pointer warning to this code. Don't use temporary handlers.
 	return **reinterpret_cast<const core_cptr*>(&component);
 }
 

@@ -86,7 +86,8 @@ void CoreCanvasAdaptor::doCreate(Renderer& r) {
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
-		auto events = CanvasAdaptor{this}.event();
+		auto handler = CanvasAdaptor{this};
+		auto events = handler.event();
 		events.before_create.fire(glr.out_of_order_gl());
 		canvas_object->create(glr);
 		events.after_create.fire(glr.out_of_order_gl());
@@ -98,7 +99,8 @@ void CoreCanvasAdaptor::doDestroy(Renderer& r) {
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
-		auto events = CanvasAdaptor{this}.event();
+		auto handler = CanvasAdaptor{this};
+		auto events = handler.event();
 		events.before_destroy.fire(glr.out_of_order_gl());
 		canvas_object->destroy(glr);
 		events.after_destroy.fire(glr.out_of_order_gl());
@@ -115,7 +117,8 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		// 				or use a framebuffer for this and render with UI texture shader
 		//				(Matrix stacks reset view and discards the UI's current view, fine for now, but with clipping support it will break)
 
-		auto events = CanvasAdaptor{this}.event();
+		auto handler = CanvasAdaptor{this};
+		auto events = handler.event();
 		events.before_render.fire(glr.out_of_order_gl());
 
 		const auto prev_view_pos = glr.viewport_position();

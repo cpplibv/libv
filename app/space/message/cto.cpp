@@ -1,6 +1,6 @@
 //
 // Generated source code
-// Generator version: v4.0.0
+// Generator version: v5.0.0
 // Input file: app/space/message/cto.in.lua
 
 //

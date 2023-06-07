@@ -267,11 +267,11 @@ void RendererCommandArrow::render(libv::glr::Queue& glr, libv::vec2f canvas_size
 	//				Resolution ideas: indirections?, uniform array as coordinates?, VBA update is okey?
 	//			and/or Command arrows could be merged into a single VAO and use sub-meshes to render
 
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
 	glr.uniform(std::move(uniforms));
@@ -545,29 +545,29 @@ void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 	glr.program(shader.program());
 
 	{
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
+		auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+		uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+		uniforms[libv::rev::layout_matrices.matM] = glr.model;
+		uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+		uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(uniforms));
 		glr.render(mesh_triangle);
 	}
 	{
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
+		auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+		uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+		uniforms[libv::rev::layout_matrices.matM] = glr.model;
+		uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+		uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(uniforms));
 		glr.render(mesh_line);
 	}
 	{
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = glr.mvp();
-		uniforms[layout_matrices.matM] = glr.model;
-		uniforms[layout_matrices.matP] = glr.projection;
-		uniforms[layout_matrices.eye] = glr.eye();
+		auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+		uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+		uniforms[libv::rev::layout_matrices.matM] = glr.model;
+		uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+		uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(uniforms));
 		glr.render(mesh_point);
 	}
@@ -671,11 +671,11 @@ void RendererGizmo::build_gizmo_lines(libv::glr::Mesh& mesh) {
 }
 
 void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
 	glr.uniform(std::move(uniforms));
@@ -699,11 +699,11 @@ RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
 }
 
 void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
 	glr.uniform(std::move(uniforms));
@@ -762,11 +762,11 @@ void RendererPlanet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unif
 	const auto m_guard = gl.model.push_guard();
 	gl.model.scale(planet.radius);
 
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = gl.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = gl.model;
+	uniforms[libv::rev::layout_matrices.matP] = gl.projection;
+	uniforms[libv::rev::layout_matrices.eye] = gl.eye();
 
 	gl.program(shader.program());
 	gl.uniform(shader.uniform().base_color0, planet.color0);
@@ -898,11 +898,11 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 	glr.state.disableDepthTest();
 	glr.state.disableDepthMask();
 
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
 	glr.texture(font->texture().base_ref(), textureChannel_diffuse);

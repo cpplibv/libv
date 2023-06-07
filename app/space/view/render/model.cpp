@@ -72,11 +72,11 @@ void Model::render_node(libv::glr::Queue& glr, uint32_t nodeID, ShaderFleet& sha
 
 	glr.model *= vm4.nodes[nodeID].transformation;
 
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.uniform(std::move(uniforms));
 

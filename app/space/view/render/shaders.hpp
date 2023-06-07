@@ -8,6 +8,7 @@
 #include <libv/glr/uniform.hpp>
 #include <libv/meta/reflection_access.hpp>
 #include <libv/rev/resource/shader.hpp>
+#include <libv/rev/shader/block/matrices.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 
 
@@ -70,10 +71,8 @@ struct UniformLayoutMatrices {
 //	LIBV_REFLECTION_ACCESS(frame_random_ivec4);
 //};
 
-const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
 //const auto uniformBlock_model = libv::glr::UniformBlockBinding{1, "Model"};
 //const auto uniformBlock_pass = libv::glr::UniformBlockBinding{?, "Pass"};
-const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
 //const auto layout_pass = libv::glr::layout_std140<UniformLayoutPass>(uniformBlock_pass);
 
 // -------------------------------------------------------------------------------------------------
@@ -83,7 +82,7 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 //          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
 //          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
 //          And this would be called on any program that includes block/sphere.glsl
-//          program.block_binding(uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
+//          program.block_binding(libv::rev::uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
 //          | issue: some struct might have already been defined, so block to string might have to skip them
 //                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
 //                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
@@ -97,7 +96,7 @@ struct UniformsColor {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -115,7 +114,7 @@ struct UniformsCommandArrow {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -146,7 +145,7 @@ struct UniformsFleet {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -162,7 +161,7 @@ struct UniformsPlanet {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -177,7 +176,7 @@ struct UniformsSurface {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -189,7 +188,7 @@ struct UniformsTestMode {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -202,7 +201,7 @@ struct UniformsText {
 
 //	template <typename Access> void access_blocks(Access&) {
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -292,7 +291,7 @@ struct UniformsText {
 //	}
 //
 //	template <typename Access> void access_blocks(Access& access) {
-//		access(uniformBlock_matrices);
+//		access(libv::rev::uniformBlock_matrices);
 ////		access(uniformBlock_model);
 //	}
 //};

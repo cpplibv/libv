@@ -30,6 +30,7 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/rev/resource_manager.hpp>
 #include <libv/rev/settings.hpp>
+#include <libv/rev/shader/block/matrices.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/ui.hpp>
 
@@ -58,27 +59,6 @@ constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
 
-struct UniformLayoutMatrices {
-	// Could be split into two: Camera and Model
-	// 			Camera: matV, matP, near, far, ...
-	// 			Model: matM, matMVP
-
-	libv::glr::Uniform_mat4f matMVP;
-	libv::glr::Uniform_mat4f matP;
-	libv::glr::Uniform_mat4f matM;
-	libv::glr::Uniform_vec3f eye;
-
-	LIBV_REFLECTION_ACCESS(matMVP);
-	LIBV_REFLECTION_ACCESS(matP);
-	LIBV_REFLECTION_ACCESS(matM);
-	LIBV_REFLECTION_ACCESS(eye);
-};
-
-inline const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
-//inline const auto uniformBlock_definitions = libv::glr::UniformBlockBinding{1, "SpriteDefinitions"};
-
-inline const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
-
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsTestMode {
@@ -89,7 +69,7 @@ struct UniformsTestMode {
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
+		access(libv::rev::uniformBlock_matrices);
 	}
 };
 
@@ -158,11 +138,11 @@ RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
 }
 
 void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = glr.mvp();
-	uniforms[layout_matrices.matM] = glr.model;
-	uniforms[layout_matrices.matP] = glr.projection;
-	uniforms[layout_matrices.eye] = glr.eye();
+	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
+	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();
+	uniforms[libv::rev::layout_matrices.matM] = glr.model;
+	uniforms[libv::rev::layout_matrices.matP] = glr.projection;
+	uniforms[libv::rev::layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
 	glr.uniform(std::move(uniforms));

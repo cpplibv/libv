@@ -6,7 +6,7 @@
 #include <libv/glr/queue.hpp>
 #include <libv/vm4/model.hpp>
 // pro
-#include <libv/rev/resource/attribute.hpp>
+#include <libv/rev/shader/attribute.hpp>
 #include <libv/rev/resource/material_scanner.hpp>
 #include <libv/rev/resource/model_loader_internal.hxx>
 

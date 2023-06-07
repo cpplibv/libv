@@ -8,7 +8,7 @@
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/vm4/texture_type.hpp>
 // pro
-#include <libv/rev/resource/attribute.hpp>
+#include <libv/rev/shader/attribute.hpp>
 #include <libv/rev/resource/material_scanner.hpp>
 
 

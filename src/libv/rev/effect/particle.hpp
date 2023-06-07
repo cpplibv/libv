@@ -78,11 +78,24 @@ struct Particle {
 class ParticleEffect;
 
 struct ParticleModule {
-	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) { }
-
-	virtual void onSpawn(ParticleEffect& system, std::span<Particle> particles) { }
-	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) { }
-	virtual void onDeath(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) { }
+	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) {
+		(void) system;
+		(void) delta_time;
+	}
+	virtual void onSpawn(ParticleEffect& system, std::span<Particle> particles) {
+		(void) system;
+		(void) particles;
+	}
+	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) {
+		(void) system;
+		(void) delta_time;
+		(void) particles;
+	}
+	virtual void onDeath(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) {
+		(void) system;
+		(void) delta_time;
+		(void) particles;
+	}
 	virtual ~ParticleModule() = default;
 };
 
@@ -249,6 +262,7 @@ public:
 	}
 
 	void render(libv::rev::RenderPass& rev) {
+
 		// rev.viewFrustum.aabb_in_frustum()
 		// if (!rev.viewFrustum.point_in_frustum())
 		//	return;

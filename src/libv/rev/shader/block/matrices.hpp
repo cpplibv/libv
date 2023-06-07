@@ -26,7 +26,7 @@ struct UniformLayoutMatrices {
 	LIBV_REFLECTION_ACCESS(eye);
 };
 
-const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
+const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{1, "Matrices"};
 const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
 
 // -------------------------------------------------------------------------------------------------
