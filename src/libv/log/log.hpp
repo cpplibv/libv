@@ -297,7 +297,7 @@ public:
 	}
 
 private:
-	constexpr auto color_args(const std::string_view format) {
+	auto color_args(const std::string_view format) {
 		// Note: This function could be implemented in a true constexpr way.
 		//			Implementation could also be improved.
 		std::string result;

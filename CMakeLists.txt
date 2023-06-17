@@ -7,8 +7,16 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.2.2)
+set(WISH_REQUEST_VERSION v5.3.3)
 include(cmake/wish.cmake)
+
+# -------------------------------------------------------------------------------------------------
+# Experiments to speedup build:
+
+# pacman -S mingw64/mingw-w64-x86_64-ccache
+
+#set(WISH_ENABLE_CCACHE ON)
+#include(cmake/experimental/wish_ccache.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -29,11 +37,17 @@ set(PATH_EXT_SRC ${CMAKE_SOURCE_DIR}/ext_src)
 
 # --- Options --------------------------------------------------------------------------------------
 
-option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
-wish_force_colored_output(${FORCE_COLORED_OUTPUT})
+option(LIBV_FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+wish_force_colored_output(${LIBV_FORCE_COLORED_OUTPUT})
 
-option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
-wish_skip_external_configures(${SKIP_EXTERNAL_CONFIGURES})
+option(LIBV_SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
+wish_skip_external_configures(${LIBV_SKIP_EXTERNAL_CONFIGURES})
+
+option(LIBV_ALTERNATIVE_LINKER "Use an alternative linker. Leave empty for system default; alternatives are 'gold', 'lld', 'bfd', 'mold'" FALSE)
+wish_alternative_linker(${LIBV_ALTERNATIVE_LINKER})
+
+option(LIBV_ENABLE_IPO "Enable interprocedural optimization (LTO)" FALSE)
+wish_enable_ipo(${LIBV_ENABLE_IPO})
 
 # --- Flags ----------------------------------------------------------------------------------------
 
@@ -297,20 +311,23 @@ wish_create_external(
 
 wish_create_external(
 	NAME freetype
-	GIT_REPOSITORY https://github.com/freetype/freetype
+	GIT_REPOSITORY https://github.com/freetype/freetype.git
 	GIT_TAG VER-2-13-0
 	# GIT_TAG 4d8db130ea4342317581bab65fc96365ce806b77
 	CMAKE_ARGS
 		-DFT_ENABLE_ERROR_STRINGS=ON # ON = Enable support for meaningful error descriptions.
-		-DFT_DISABLE_ZLIB=OFF # OFF = System wise zlib can be used
-		-DFT_DISABLE_BZIP2=OFF # OFF = Enable support of bzip2 compressed fonts
+		-DFT_DISABLE_ZLIB=ON # OFF = System wise zlib can be used
+		-DFT_DISABLE_BZIP2=ON # OFF = Enable support of bzip2 compressed fonts
 		-DFT_DISABLE_PNG=ON # ON = Disable support of PNG compressed OpenType embedded bitmaps
-		-DFT_DISABLE_HARFBUZZ=OFF # OFF = Used for improving auto-hinting of OpenType fonts
+		-DFT_DISABLE_HARFBUZZ=ON # OFF = Used for improving auto-hinting of OpenType fonts
 		-DFT_DISABLE_BROTLI=ON # ON = Disable support of compressed WOFF2 fonts
 
+	LINK freetype
 	# TODO P5: Create dedicated external target for bz2
 	# TODO P5: Create dedicated external target for zlibstatic
-	LINK freetype bz2 zlibstatic
+	# TODO P5: Create dedicated external target for harfbuzz
+#	LINK bz2 zlibstatic
+#	LINK harfbuzz
 	INCLUDE_DIR include/freetype2
 )
 

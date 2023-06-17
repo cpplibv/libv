@@ -17,41 +17,45 @@
 		{
 			"name": "gcc-debug",
 			"inherits": "gcc-base",
-			"binaryDir": "${sourceDir}/build/debug",
+			"binaryDir": "${sourceDir}/build/gcc-debug",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "debug",
-				"SKIP_EXTERNAL_CONFIGURES": "true",
-				"FORCE_COLORED_OUTPUT": "true"
+				"LIBV_SKIP_EXTERNAL_CONFIGURES": "true",
+				"LIBV_FORCE_COLORED_OUTPUT": "true",
+				"LIBV_ALTERNATIVE_LINKER": "lld"
 			}
 		},
 		{
 			"name": "gcc-dev",
 			"inherits": "gcc-base",
-			"binaryDir": "${sourceDir}/build/dev",
+			"binaryDir": "${sourceDir}/build/gcc-dev",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "dev",
-				"SKIP_EXTERNAL_CONFIGURES": "true",
-				"FORCE_COLORED_OUTPUT": "true"
+				"LIBV_SKIP_EXTERNAL_CONFIGURES": "true",
+				"LIBV_FORCE_COLORED_OUTPUT": "true",
+				"LIBV_ALTERNATIVE_LINKER": "lld"
 			}
 		},
 		{
 			"name": "gcc-release",
 			"inherits": "gcc-base",
-			"binaryDir": "${sourceDir}/build/release",
+			"binaryDir": "${sourceDir}/build/gcc-release",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "release",
-				"SKIP_EXTERNAL_CONFIGURES": "false",
-				"FORCE_COLORED_OUTPUT": "true"
+				"LIBV_SKIP_EXTERNAL_CONFIGURES": "false",
+				"LIBV_FORCE_COLORED_OUTPUT": "true",
+				"LIBV_ENABLE_IPO": "true"
 			}
 		},
 		{
 			"name": "gcc-package",
 			"inherits": "gcc-base",
-			"binaryDir": "${sourceDir}/build/package",
+			"binaryDir": "${sourceDir}/build/gcc-package",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "package",
-				"SKIP_EXTERNAL_CONFIGURES": "true",
-				"FORCE_COLORED_OUTPUT": "true"
+				"LIBV_SKIP_EXTERNAL_CONFIGURES": "true",
+				"LIBV_FORCE_COLORED_OUTPUT": "true",
+				"LIBV_ENABLE_IPO": "true"
 			}
 		}
 	]

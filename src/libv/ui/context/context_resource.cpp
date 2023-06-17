@@ -139,7 +139,7 @@ public:
 	const Settings& settings;
 
 public:
-	explicit constexpr inline FontCache(Settings& settings) :
+	explicit inline FontCache(Settings& settings) :
 			ResourceCache<Font2D, FontCache>([]{
 				const auto fallback_font_data = raw_font_consolas_min();
 				return std::make_shared<Font2D>(
@@ -185,7 +185,7 @@ public:
 	const Settings& settings;
 
 public:
-	explicit constexpr inline Texture2DCache(Settings& settings) :
+	explicit inline Texture2DCache(Settings& settings) :
 			ResourceCache<Texture2D, Texture2DCache>([]{
 				const auto fallback_texture2D_data = raw_texture2D_white256();
 				return std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
