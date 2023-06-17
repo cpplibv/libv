@@ -22,8 +22,6 @@ struct RendererEditorGrid {
 
 public:
 	explicit RendererEditorGrid(libv::rev::ResourceManager& loader);
-
-//	void build_mesh();
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 

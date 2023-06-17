@@ -691,7 +691,6 @@ atlas
 ui
 	libv.ui: if ui size .x or .y is 0, do not execute anything from ui loop (frame buffer protection)
 	libv.ui: fragments, sub component reusable codes
-	libv.ui: ContextResource
 	libv.ui: ContextConfig
 	libv.ui: ContextFileWatcher
 	libv.ui: ContextLoopExecutor: any_thread_callable_cb = context.loop.callback_as_event(my_event_callback)

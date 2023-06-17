@@ -14,30 +14,30 @@ uniform_block.uniform_typenames = {
 	float = { glsl = "float", cpp = "libv::glr::Uniform_float"},
 	double = { glsl = "double", cpp = "libv::glr::Uniform_double"},
 
-	vec2b = { glsl = "vec2b", cpp = "libv::glr::Uniform_vec2b"},
-	vec3b = { glsl = "vec3b", cpp = "libv::glr::Uniform_vec3b"},
-	vec4b = { glsl = "vec4b", cpp = "libv::glr::Uniform_vec4b"},
-	vec2i = { glsl = "vec2i", cpp = "libv::glr::Uniform_vec2i"},
-	vec3i = { glsl = "vec3i", cpp = "libv::glr::Uniform_vec3i"},
-	vec4i = { glsl = "vec4i", cpp = "libv::glr::Uniform_vec4i"},
-	vec2ui = { glsl = "vec2ui", cpp = "libv::glr::Uniform_vec2ui"},
-	vec3ui = { glsl = "vec3ui", cpp = "libv::glr::Uniform_vec3ui"},
-	vec4ui = { glsl = "vec4ui", cpp = "libv::glr::Uniform_vec4ui"},
-	vec2l = { glsl = "vec2l", cpp = "libv::glr::Uniform_vec2l"},
-	vec3l = { glsl = "vec3l", cpp = "libv::glr::Uniform_vec3l"},
-	vec4l = { glsl = "vec4l", cpp = "libv::glr::Uniform_vec4l"},
-	vec2ul = { glsl = "vec2ul", cpp = "libv::glr::Uniform_vec2ul"},
-	vec3ul = { glsl = "vec3ul", cpp = "libv::glr::Uniform_vec3ul"},
-	vec4ul = { glsl = "vec4ul", cpp = "libv::glr::Uniform_vec4ul"},
+	vec2b = { glsl = "bvec2", cpp = "libv::glr::Uniform_vec2b"},
+	vec3b = { glsl = "bvec3", cpp = "libv::glr::Uniform_vec3b"},
+	vec4b = { glsl = "bvec4", cpp = "libv::glr::Uniform_vec4b"},
+	vec2i = { glsl = "ivec2", cpp = "libv::glr::Uniform_vec2i"},
+	vec3i = { glsl = "ivec3", cpp = "libv::glr::Uniform_vec3i"},
+	vec4i = { glsl = "ivec4", cpp = "libv::glr::Uniform_vec4i"},
+	vec2ui = { glsl = "uivec2", cpp = "libv::glr::Uniform_vec2ui"},
+	vec3ui = { glsl = "uivec3", cpp = "libv::glr::Uniform_vec3ui"},
+	vec4ui = { glsl = "uivec4", cpp = "libv::glr::Uniform_vec4ui"},
+	vec2l = { glsl = "lvec2", cpp = "libv::glr::Uniform_vec2l"},
+	vec3l = { glsl = "lvec3", cpp = "libv::glr::Uniform_vec3l"},
+	vec4l = { glsl = "lvec4", cpp = "libv::glr::Uniform_vec4l"},
+	vec2ul = { glsl = "ulvec2", cpp = "libv::glr::Uniform_vec2ul"},
+	vec3ul = { glsl = "ulvec3", cpp = "libv::glr::Uniform_vec3ul"},
+	vec4ul = { glsl = "ulvec4", cpp = "libv::glr::Uniform_vec4ul"},
 	vec2 = { glsl = "vec2", cpp = "libv::glr::Uniform_vec2f"},
 	vec3 = { glsl = "vec3", cpp = "libv::glr::Uniform_vec3f"},
 	vec4 = { glsl = "vec4", cpp = "libv::glr::Uniform_vec4f"},
 	vec2f = { glsl = "vec2", cpp = "libv::glr::Uniform_vec2f"},
 	vec3f = { glsl = "vec3", cpp = "libv::glr::Uniform_vec3f"},
 	vec4f = { glsl = "vec4", cpp = "libv::glr::Uniform_vec4f"},
-	vec2d = { glsl = "vec2d", cpp = "libv::glr::Uniform_vec2d"},
-	vec3d = { glsl = "vec3d", cpp = "libv::glr::Uniform_vec3d"},
-	vec4d = { glsl = "vec4d", cpp = "libv::glr::Uniform_vec4d"},
+	vec2d = { glsl = "dvec2", cpp = "libv::glr::Uniform_vec2d"},
+	vec3d = { glsl = "dvec3", cpp = "libv::glr::Uniform_vec3d"},
+	vec4d = { glsl = "dvec4", cpp = "libv::glr::Uniform_vec4d"},
 
 	mat2 = { glsl = "mat2", cpp = "libv::glr::Uniform_mat2f"},
 	mat3 = { glsl = "mat3", cpp = "libv::glr::Uniform_mat3f"},
@@ -113,7 +113,8 @@ uniform_block.generate = function(blockIndex, blockName, glslFilepath, members)
 	include_hpp("libv/glr/uniform_block_binding.hpp")
 	include_hpp("libv/meta/reflection_access.hpp")
 
-	include_cpp(__codegen_filepath_hpp)
+	-- If there is a valid CPP file content:
+	--include_cpp(__codegen_filepath_hpp)
 
 	generate_hpp(fn_hpp)
 	generate_cpp(fn_cpp)

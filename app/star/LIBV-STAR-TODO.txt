@@ -58,9 +58,6 @@ Organize star surface scene
 Organize star rev
 	organize rev resource manager
 	use proper resource path
-	builtin:red.vs, builtin:red.fs should be built in and not file based
-
-	rev should use nexus instead of ui_hub
 
 Organize star overlay
 

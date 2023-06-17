@@ -134,6 +134,18 @@ public:
 
 	// -------------------------------------------------------------------------------------------------
 
+	[[nodiscard]] constexpr inline libv::vec3f forward() const noexcept {
+		return libv::vec3f(top()[0][2], top()[1][2], top()[2][2]);
+	}
+	[[nodiscard]] constexpr inline libv::vec3f right() const noexcept {
+		return libv::vec3f(top()[0][0], top()[1][0], top()[2][0]);
+	}
+	[[nodiscard]] constexpr inline libv::vec3f up() const noexcept {
+		return libv::vec3f(top()[0][1], top()[1][1], top()[2][1]);
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
 	inline decltype(auto) size() const {
 		return stack.size();
 	}

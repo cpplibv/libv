@@ -61,6 +61,80 @@ libv.glr: Add support for glDrawBuffers
 
 
 
+https://www.youtube.com/watch?v=PfHD3BsVsAM
+	linker: switch to mold linker on unix like (mingw), lld on windows
+		mingw64/mingw-w64-x86_64-mold
+	ccache
+
+
+
+
+
+The power of materials:
+	Materials own a shared uniform blocks for their state
+	During binding they also use a unique/stream block for model matrices
+			(or it is done outside, by the model/mesh .render())
+
+	Multiple uniform stream buffer
+	by default everything is stream (?), when they age to X frame
+	they move into a static/permanent buffer
+
+rev render pass:
+	objects should be able to access their renderer
+	or reference it
+	or select it
+	or auto select it
+
+
+
+
+
+
+
+
+
+
+
+
+
+Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
+
+
+
+
+
+
+
+--- libv.res ---
+
+libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+libv.glr: IDEA: Versioned resources, beside what tell which version are we want to use
+
+CMake resource folder
+
+resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
+resource: forbid usage of absolute paths
+resource: forbid usage of relative paths with starting ..
+
+
+libv.res: Resource - New library for resource and asset loading, caching and tracking
+		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
+		assets, audio, textures, mods/scripts and models
+
+		Requirements:
+			cache
+			load and inclusion/extension of tracking set (recursion should be possible)
+			filesystem resources
+			filesystem resource fragments (inclusion subjects)
+			virtual resources
+			virtual generated resources
+			tracking of virtual resources
+			tracking of filesystem resources
+			load/reload/unload/tracking events
+			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
+
+-------------
+
 
 Resource mapping another idea:
 	use dummy link files
@@ -103,31 +177,14 @@ Packaging
 
 
 
-Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
 
 
+Particles:
+	If I want to debug anything particle related:
+		! Camera Controls
 
-
-
-
-
-
-rev render pass:
-	objects should be able to access their renderer
-	or reference it
-	or select it
-	or auto select it
-
-
-
-
-
-
-If I want to debug anything particle related:
-	! Camera Controls
-
-If I wanna implement effects
-	lua effect def
+	If I wanna implement effects
+		lua effect def
 
 
 
@@ -427,6 +484,8 @@ app.mimp: check last write time, and skip anything who doesn't needs to be updat
 
 
 libv.rev: builtin:cube (XYZ cube)
+libv.rev: builtin:red.vs, builtin:red.fs should be built in and not file based
+
 
 libv.rev.res: Events
 	libv.rev.res: Texture fs tracking

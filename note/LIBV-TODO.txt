@@ -777,22 +777,6 @@ libv.sys: Keep awake
 		UNIX:
 			?
 
-libv.res: Resource - New library for resource and asset loading, caching and tracking
-		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
-		assets, audio, textures, mods/scripts and models
-
-		Requirements:
-			cache
-			load and inclusion/extension of tracking set (recursion should be possible)
-			filesystem resources
-			filesystem resource fragments (inclusion subjects)
-			virtual resources
-			virtual generated resources
-			tracking of virtual resources
-			tracking of filesystem resources
-			load/reload/unload/tracking events
-			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
-
 app.editor:
 	small app for first line and include order fix-ups
 	use the folder .editor in the project root are store
@@ -1483,7 +1467,6 @@ libv.glr: optimize every remote resource with head access
 libv.ui: switch of direct glr usage to a UI wrapper bulk renderer
 libv.ui: question: for bulk rendering would stencil buffer help for fonts | yes-kind of but alpha makes it tricky
 libv.glr: IDEA: An Entry object the group every call/state to a single render operation, both in queue and on the user API
-libv.glr: IDEA: Versioned resources, beside what tell which version are we want to use
 libv.glr: Make the reordering explicit and opt-in
 libv.glr: Refactor the variants
 
@@ -1611,9 +1594,6 @@ net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io
 observe: https://bkaradzic.github.io/bgfx/examples.html
 observe: https://github.com/bkaradzic/bgfx
 observe: https://github.com/hugoam/mud
-resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
-resource: forbid usage of absolute paths
-resource: forbid usage of relative paths with starting ..
 
 libv.serial: Maybe create a hjson archive https://hjson.github.io/
 libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
@@ -1627,7 +1607,6 @@ libv.net: compression lib (fast, but not the best compression for me) https://gi
 libv.range: view::input_pass resumable range pass: auto pass = range | view::input_pass; for (auto i : pass) fooA(i) if (i % 2) break; for (auto i : pass) fooB(i);
 libv.ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 libv.ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
-libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 libv.ui: https://www.factorio.com/blog/post/fff-246
 libv.ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
 libv.utility: Make a proper copy-pastable noisy type
@@ -1795,7 +1774,6 @@ http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
 Optimized compiling - cmake https://github.com/sakra/cotire
 
-CMake resource folder
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
 
 http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html

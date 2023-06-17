@@ -7,13 +7,19 @@
 
 
 
+compute-shader:
+	dx dy in compute shader: https://wickedengine.net/2022/05/08/derivatives-in-compute-shader/
+
+
+
+
+
+
 Topology / biome controlled random generation
 	https://www.youtube.com/watch?v=rBY2Dzej03A
 
-
 Delaunay triangulation
 	Could solve biome generation (smooth/blended voronoi)
-
 
 Vegetation
 	When glsl generation is online, use compute shader to place vegetation (and handle instancing)
@@ -79,7 +85,7 @@ Sprites:
 			dither blend between images
 				no linear blend, but switch pixels one-by-one based on white noise
 				! IF alpha not zero in any of them matches, then linear blend
-				maybe exclusive threshold in the middle
+				maybe exclusive angle threshold in the middle
 					60% direct
 					20-20% blend with neighbour
 						1 fetch
@@ -107,16 +113,15 @@ Visuals:
 		normal, height
 		textures on 3D: temperature, humidity etc
 
-point/height xyz -> z (only)
-
+point/height xyz -> z (only) (witch to textures will solve it anyways)
 
 libv.glr: mesh submesh update (for surface chunks)
-
 
 Big things left
 	Water
 	LOD
 	Veggi type
+
 
 
 === Queue ========================================================================================
@@ -129,7 +134,12 @@ config
 	remember last: profile file, json (libv::serial)
 
 Additional nodes:
-	curve/envelop, tangens, remap, height
+	curve/envelop,
+	"ease" functions,
+	tangens,
+	remap,
+	height (available only in non-height maps)
+	normal (available only in non-normal maps)
 
 
 
@@ -270,37 +280,20 @@ noise generator math/noise
 
 noise_simplex(x, y[, z, w]): float
 noise_fractal_simplex(x, y[, z, w], octaves, amplitude, frequency, lacunarity, persistence):float
+
 SurfaceGen
-	seed
-	1. height map, -> temp, humidity map, fertility
-	If temperature increases it will lead to a decrease in relative humidity
-	2. vegetation
-	a humidity, temperature, height -> vegetation
-	b biome range
-	3.
-
-	input:
-		biome ranges/table (different from planet to planet)
-
-	output:
-
-SurfaceViewer
-	frame/window
-	ui
-	canvas
-		visualize surface
-		camera
-		controls
+	input biome ranges/table (different from planet to planet)
 
 
 === OUT OF SCOPE ===================================================================================
 
-picture in picture: simultaneous visualization of 2D and 3D views, both with possible intermediate result/value vis.
+picture in picture:
+	simultaneous visualization of 2D and 3D views,
+	both with possible intermediate result/value vis.
 
-pop hatas elkerules: geomorphing (x, y, z1, z2)
+popping effect avoidance on lod changes: geomorphing (x, y, z1, z2)
 
-terep generalason hangsuly, nem a rendelesen
-out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis min fele, le csokk magassag, amugy no
+erosion: 10k-100k "rain drop", goes toward local minima, drop goes down = height--, drop lands or slows down height++
 	nem lehet fuggetlen chunkokat generalni
 	nem lehet vegtelen surafcet generalni
 	nem lehet 1 pixelt samplelelni
@@ -309,7 +302,7 @@ out of scope: erozio algoritmusok (vizcseppes!) 10k-100k csepp, megy a lokalis m
 	alternativa: lehet kozeliteni sima negyztremelessel ha jol van osszeblendelve egy surface tulajdonsaggal
 
 lakes
-	bool floodFillTest(x, y, surface) -> true, lehet to ott, else abort
+	bool floodFillTest(x, y, surface) -> true = place lake, false abort
 
  to, folyo, nagy hegy <- felskiccelt - maszk -> generalas
  vizszint megadasa (0- vizszint + 5)

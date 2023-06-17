@@ -30,21 +30,21 @@ RendererEditorGrid::RendererEditorGrid(libv::rev::ResourceManager& loader) :
 }
 
 void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
-	auto uniforms = uniform_stream.block_unique(libv::rev::layout_Matrices200);
-	uniforms[libv::rev::layout_Matrices200.matMVP] = glr.mvp();
-	uniforms[libv::rev::layout_Matrices200.matM] = glr.model;
+	auto matrices = uniform_stream.block_unique(libv::rev::layout_Matrices200);
+	matrices[libv::rev::layout_Matrices200.matMVP] = glr.mvp();
+	matrices[libv::rev::layout_Matrices200.matM] = glr.model;
 
-	auto uniformsCam = uniform_stream.block_unique(libv::rev::layout_Camera200);
-	uniformsCam[libv::rev::layout_Camera200.matP] = glr.projection;
-	uniformsCam[libv::rev::layout_Camera200.matV] = glr.view;
-	uniformsCam[libv::rev::layout_Camera200.eye] = glr.eye();
-	uniformsCam[libv::rev::layout_Camera200.cameraForwardW] = libv::vec3f(glr.view.top()[0][2], glr.view.top()[1][2], glr.view.top()[2][2]);
-	uniformsCam[libv::rev::layout_Camera200.cameraRightW] = libv::vec3f(glr.view.top()[0][0], glr.view.top()[1][0], glr.view.top()[2][0]);
-	uniformsCam[libv::rev::layout_Camera200.cameraUpW] = libv::vec3f(glr.view.top()[0][1], glr.view.top()[1][1], glr.view.top()[2][1]);
+	auto camera = uniform_stream.block_unique(libv::rev::layout_Camera200);
+	camera[libv::rev::layout_Camera200.matP] = glr.projection;
+	camera[libv::rev::layout_Camera200.matV] = glr.view;
+	camera[libv::rev::layout_Camera200.eye] = glr.eye();
+	camera[libv::rev::layout_Camera200.cameraForwardW] = libv::vec3f(glr.view.top()[0][2], glr.view.top()[1][2], glr.view.top()[2][2]);
+	camera[libv::rev::layout_Camera200.cameraRightW] = libv::vec3f(glr.view.top()[0][0], glr.view.top()[1][0], glr.view.top()[2][0]);
+	camera[libv::rev::layout_Camera200.cameraUpW] = libv::vec3f(glr.view.top()[0][1], glr.view.top()[1][1], glr.view.top()[2][1]);
 
 	glr.program(shader.program());
-	glr.uniform(std::move(uniforms));
-	glr.uniform(std::move(uniformsCam));
+	glr.uniform(std::move(matrices));
+	glr.uniform(std::move(camera));
 	glr.render(mesh_grid);
 }
 

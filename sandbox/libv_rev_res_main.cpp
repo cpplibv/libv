@@ -25,7 +25,7 @@
 #include <libv/glr/remote.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/img/save.hpp>
-#include <libv/rev/materials/block_matrices.hpp>
+#include <libv/rev/shader/block/matrices.hpp>
 #include <libv/rev/materials/material_sprite_baker.hpp>
 #include <libv/rev/model.hpp>
 #include <libv/rev/post_processing.hpp>

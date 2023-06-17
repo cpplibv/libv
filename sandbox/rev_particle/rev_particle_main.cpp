@@ -171,8 +171,19 @@ public:
 		glr.projection = camera.projection(canvas_size);
 		glr.view = camera.view();
 
-		// !!! Render layers, ordering
+		// auto blockPass = rev.uniformStream.block_shared(libv::rev::layout_Pass200);
+
+		// auto blockCamera = rev.uniformStream.block_shared(libv::rev::layout_Camera200);
+		// blockCamera[libv::rev::layout_Camera200.matP] = glr.projection;
+		// blockCamera[libv::rev::layout_Camera200.matV] = glr.view;
+		// blockCamera[libv::rev::layout_Camera200.eye] = glr.eye();
+		// blockCamera[libv::rev::layout_Camera200.cameraForwardW] = glr.view.forward();
+		// blockCamera[libv::rev::layout_Camera200.cameraRightW] = glr.view.right();
+		// blockCamera[libv::rev::layout_Camera200.cameraUpW] = glr.view.up();
+
+		// !!! Render layers, passes, ordering
 		state.render(rev, glr);
+		// state.render(rev, glr, cameraBlock);
 		// state.render(rev);
 		// state.render(RenderPass);
 		rev.rendererEditorGrid.render(glr, rev.uniformStream);
