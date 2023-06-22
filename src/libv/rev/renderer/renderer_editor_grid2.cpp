@@ -8,7 +8,7 @@
 // pro
 #include <libv/rev/resource_manager.hpp>
 // #include <libv/rev/shader/attribute.hpp>
-#include <libv/rev/materials/material_editor_grid.hpp>
+#include <libv/rev/material/material_editor_grid.hpp>
 
 
 namespace libv {

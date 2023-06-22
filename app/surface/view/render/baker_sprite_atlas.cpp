@@ -4,7 +4,7 @@
 #include <surface/view/render/baker_sprite_atlas.hpp>
 // libv
 #include <libv/glr/queue.hpp>
-#include <libv/rev/materials/material_sprite_baker.hpp>
+#include <libv/rev/material/material_sprite_baker.hpp>
 #include <libv/rev/model.hpp>
 #include <libv/rev/resource_manager.hpp>
 #include <libv/utility/min_max.hpp>

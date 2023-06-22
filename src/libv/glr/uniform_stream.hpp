@@ -23,6 +23,7 @@ namespace detail {
 
 struct BatchEndMarker {};
 
+// TODO P2: Instead of template just create the 30 overload, it is a finite set, and this would kill that awkward include
 template <typename... Types>
 class ImplUniformStream {
 	static constexpr uint8_t end_type = libv::meta::type_to_index_v<BatchEndMarker, Types...>;

@@ -1,7 +1,7 @@
 // Project: libv.rev, File: src/libv/rev/materials/material_red.cpp
 
 // hpp
-#include <libv/rev/materials/material_red.hpp>
+#include <libv/rev/material/material_red.hpp>
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/glr/uniform_buffer.hpp>

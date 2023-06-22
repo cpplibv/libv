@@ -61,14 +61,33 @@ libv.glr: Add support for glDrawBuffers
 
 
 
-https://www.youtube.com/watch?v=PfHD3BsVsAM
-	linker: switch to mold linker on unix like (mingw), lld on windows
-		mingw64/mingw-w64-x86_64-mold
-	ccache
 
 
 
 
+
+REV Main render API
+	batching
+		renderers
+	multi pass (like shadow)
+	customization points
+	system uniform blocks
+		frame/(?pass)
+		camera(?=pass)/(view)
+		model*
+		custom via render
+	layers
+	post-processing
+
+
+
+
+
+
+
+
+
+Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
 
 The power of materials:
 	Materials own a shared uniform blocks for their state
@@ -97,7 +116,9 @@ rev render pass:
 
 
 
-Cherno scene renderer / Bloom https://www.twitch.tv/videos/1838277966?t=0h8m5s
+
+https://www.youtube.com/watch?v=PfHD3BsVsAM
+	ccache
 
 
 

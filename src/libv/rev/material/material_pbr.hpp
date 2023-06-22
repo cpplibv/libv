@@ -6,7 +6,7 @@
 //#include <libv/glr/fwd.hpp>
 //// pro
 //#include <libv/rev/fwd.hpp>
-//#include <libv/rev/materials/block_matrices.hpp>
+//#include <libv/rev/material/block_matrices.hpp>
 //#include <libv/rev/resource/material.hpp>
 //#include <libv/rev/resource/shader.hpp>
 //#include <libv/rev/resource/texture.hpp>

@@ -34,6 +34,7 @@
 #include <libv/rev/engine/engine.hpp>
 #include <libv/rev/engine/render_pass.hpp>
 #include <libv/rev/engine/scene.hpp>
+#include <libv/rev/material/material_editor_grid.hpp>
 #include <libv/rev/settings.hpp>
 
 #include <libv/sun/ui/overlay_shader_error.hpp>
@@ -117,6 +118,34 @@ struct SandboxState {
 
 // -------------------------------------------------------------------------------------------------
 
+// class EditorGrid {
+// 	libv::rev::MaterialEditorGrid material;
+//
+// 	explicit EditorGrid(libv::rev::Engine& rev) :
+// 		material(libv::rev::MaterialEditorGrid::create(rev.resourceManager)) {
+// 	}
+//
+// 	void render(libv::rev::RenderPass& rev) {
+// 		// shape.render(material, rev);
+// 		//
+// 		// material.render(rev, shape);
+// 		//
+// 		// // Seams like a good idea:
+// 		// RendererEditorGrid2* renderer;
+// 		// renderer->render(material, rev);
+// 		//
+// 		// rev.renderer<RendererEditorGrid2>(renderer).add();
+// 		//
+// 		// rev.renderer<RendererEditorGrid2>().add();
+// 		// // rev.render(material, shape);
+// 		//
+// 		// rev.renderer.editorGrid.render(*this);
+// 		//
+// 		// MyRenderPass& rev; // Just go full static?
+// 		// rev.rendererEditorGrid(*this);
+// 	}
+// };
+
 class SandboxCanvas : public libv::ui::CanvasBase {
 	libv::Nexus nexus;
 
@@ -125,8 +154,10 @@ class SandboxCanvas : public libv::ui::CanvasBase {
 
 	libv::sun::CameraPlayer camera;
 
-	SandboxState& state;
 	libv::rev::Engine& rev;
+
+	// EditorGrid editorGrid{rev};
+	SandboxState& state;
 
 	// libv::rev::ParticleEffect particleFountain{scene, particleLibrary.fountain};
 

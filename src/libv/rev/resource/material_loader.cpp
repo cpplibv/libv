@@ -13,8 +13,8 @@
 #include <libv/rev/resource/shader_loader.hpp>
 #include <libv/rev/resource/texture_loader.hpp>
 
-#include <libv/rev/materials/material_red.hpp>
-#include <libv/rev/materials/material_sprite_baker.hpp>
+#include <libv/rev/material/material_red.hpp>
+#include <libv/rev/material/material_sprite_baker.hpp>
 
 
 namespace libv {
