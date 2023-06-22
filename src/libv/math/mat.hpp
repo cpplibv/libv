@@ -19,8 +19,6 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-// libv
-#include <libv/meta/always.hpp>
 // pro
 #include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>

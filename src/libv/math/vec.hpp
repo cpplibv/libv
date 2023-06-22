@@ -230,28 +230,25 @@ struct vec_t : vec_base_t<N, T> {
 		return vec_t{};
 	}
 
-	template <bool always_false = false>
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE vec_t inf() noexcept {
 		if constexpr (std::numeric_limits<T>::has_infinity)
 			return one(std::numeric_limits<T>::infinity());
 		else
-			static_assert(always_false, "Underlying type has no infinity");
+			static_assert(false, "Underlying type has no infinity");
 	}
 
-	template <bool always_false = false>
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE vec_t neg_inf() noexcept {
 		if constexpr (std::numeric_limits<T>::has_infinity)
 			return one(-std::numeric_limits<T>::infinity());
 		else
-			static_assert(always_false, "Underlying type has no infinity");
+			static_assert(false, "Underlying type has no infinity");
 	}
 
-	template <bool always_false = false>
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE vec_t nan() noexcept {
 		if constexpr (std::numeric_limits<T>::has_quiet_NaN)
 			return one(std::numeric_limits<T>::quiet_NaN());
 		else
-			static_assert(always_false, "Underlying type has no NaN");
+			static_assert(false, "Underlying type has no NaN");
 	}
 
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE vec_t max() noexcept {

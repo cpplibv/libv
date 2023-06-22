@@ -2,8 +2,6 @@
 
 #pragma once
 
-// libv
-//#include <libv/meta/always.hpp>
 // std
 #include <functional> // For std::clamp only
 #include <random>

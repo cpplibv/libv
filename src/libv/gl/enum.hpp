@@ -5,7 +5,6 @@
 // fwd
 #include <libv/gl/enum_fwd.hpp>
 // libv
-#include <libv/meta/always.hpp>
 #include <libv/utility/to_underlying.hpp>
 // std
 #include <cassert>
@@ -762,7 +761,7 @@ template <typename T>
 		return AttributeType::DOUBLE;
 
 	else
-		static_assert(libv::meta::always_false_v<T>, "Not supported attribute type");
+		static_assert(false, "Not supported attribute type");
 }
 
 [[nodiscard]] constexpr inline std::size_t attributeTypeSize(AttributeType type) noexcept {

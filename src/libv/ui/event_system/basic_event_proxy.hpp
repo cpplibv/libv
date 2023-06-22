@@ -5,7 +5,6 @@
 // fwd
 #include <libv/ui/fwd.hpp>
 // libv
-#include <libv/meta/always.hpp>
 #include <libv/meta/force_inline.hpp>
 #include <libv/utility/nexus.hpp>
 // std
@@ -58,7 +57,7 @@ template <typename SignalComponentT, typename EventT, bool IsSystem, typename Fu
 		};
 
 	else
-		static_assert(libv::meta::always_false_v<Func>,
+		static_assert(false,
 				"Callback function has invalid signature, Expected either:"
 				"\n\tvoid(Component&, const Event&)"
 				"\n\tvoid(const Event&)"
@@ -104,7 +103,7 @@ template <typename SlotComponentT, typename EventT, bool IsSystem, typename Func
 		};
 
 	else
-		static_assert(libv::meta::always_false_v<Func>,
+		static_assert(false,
 				"Callback function has invalid signature, Expected either:"
 				"\n\tvoid(Component&, const Event&)"
 				"\n\tvoid(const Event&)"

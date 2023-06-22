@@ -8,7 +8,6 @@
 #include <libv/algo/fill.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/meta/always.hpp>
 #include <libv/utility/guard.hpp>
 // std
 #include <array>
@@ -581,7 +580,7 @@ private:
 			glGetIntegeri_v(param, 2, &value.z);
 
 		} else
-			static_assert(libv::meta::always_false_v<T>, "Type T is not supported");
+			static_assert(false, "Type T is not supported");
 
 		return value;
 	}

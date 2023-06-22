@@ -9,7 +9,6 @@
 // libv
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/meta/always.hpp>
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/type_traits.hpp>
@@ -227,7 +226,7 @@ template <typename T, std::size_t N, std::size_t S> struct AlignSTD140<std::arra
 	static constexpr uint32_t size = S * libv::align(AlignSTD140<libv::vec_t<N, T>>::size, AlignSTD140<libv::vec4f>::size);
 };
 template <typename T, std::size_t S> struct AlignSTD140<std::array<T, S>> {
-	static_assert(libv::meta::always_false_v<T>, "T has to be a scalar or vec type in array<T>");
+	static_assert(false, "T has to be a scalar or vec type in array<T>");
 };
 
 // 5) 7) matrix

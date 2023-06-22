@@ -5,7 +5,6 @@
 // fwd
 #include <libv/utility/nexus_fwd.hpp>
 // libv
-#include <libv/meta/always.hpp>
 #include <libv/meta/force_inline.hpp>
 #include <libv/utility/type_key.hpp>
 #include <libv/utility/unique_function.hpp>
@@ -119,7 +118,7 @@ private:
 				};
 
 			else
-				static_assert(libv::meta::always_false_v<Func>,
+				static_assert(false,
 						"Callback function has invalid signature, Expected either:"
 						"\n\tvoid(Channel*, const Event&)"
 						"\n\tvoid(const Event&)"

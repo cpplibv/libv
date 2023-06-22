@@ -6,7 +6,6 @@
 #include <cstddef> // consider changing std::size_t usage to int or T in this file
 #include <utility>
 // pro
-#include <libv/meta/always.hpp>
 #include <libv/meta/force_inline.hpp>
 
 
@@ -40,8 +39,7 @@ constexpr LIBV_FORCE_INLINE void aux_for_constexpr(F&& func, std::index_sequence
 /// @usage for_constexpr\<0, 10>( [] (auto i) { do_work(i); } );
 template <std::size_t Start, std::size_t End, typename F>
 constexpr LIBV_FORCE_INLINE void for_constexpr(F&& func) {
-	if constexpr (Start > End)
-		static_assert(libv::meta::always_false_v<F>, "End has to be greater or equal to Start");
+	static_assert(Start <= End, "End has to be greater or equal to Start");
 	aux_for_constexpr<F, Start>(std::forward<F>(func), std::make_index_sequence<End - Start>{});
 }
 

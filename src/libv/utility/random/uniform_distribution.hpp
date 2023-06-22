@@ -2,8 +2,6 @@
 
 #pragma once
 
-// libv
-#include <libv/meta/always.hpp>
 // std
 #include <chrono>
 #include <random>
@@ -62,7 +60,7 @@ T to_inclusive_max(const T value) {
 	else if constexpr (is_std_chrono_duration_v<T>)
 		return T{to_inclusive_max(value.count())};
 	else
-		static_assert(libv::meta::always_false_v<T>, "Uniform distribution for type T is not supported");
+		static_assert(false, "Uniform distribution for type T is not supported");
 }
 
 template <typename T>
@@ -74,7 +72,7 @@ T to_exclusive_max(const T value) {
 	else if constexpr (is_std_chrono_duration_v<T>)
 		return T{to_exclusive_max(value.count())};
 	else
-		static_assert(libv::meta::always_false_v<T>, "Uniform distribution for type T is not supported");
+		static_assert(false, "Uniform distribution for type T is not supported");
 }
 
 template <typename C>
@@ -86,7 +84,7 @@ template <typename C>
 	else if constexpr (is_std_chrono_duration_v<C>)
 		return uniform_duration_distribution<C>{min, max};
 	else
-		static_assert(libv::meta::always_false_v<C>, "Uniform distribution for type C is not supported");
+		static_assert(false, "Uniform distribution for type C is not supported");
 }
 
 } // namespace detail ------------------------------------------------------------------------------
