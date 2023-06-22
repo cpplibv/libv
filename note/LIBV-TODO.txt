@@ -704,7 +704,6 @@ GCC 13.1
 	std::float16_t and std::bfloat16_t
 	#warning
 	\o123 \u0100 \xAB \N{LATIN CAPITAL LETTER A WITH MACRON}
-	static operator()
 	static operator[]
 
 	std::reference_constructs_from_temporary

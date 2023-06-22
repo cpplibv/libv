@@ -32,7 +32,7 @@ class basic_worker_thread {
 	};
 
 	struct queue_comp {
-		[[nodiscard]] constexpr inline bool operator()(const queued_task& lhs, const queued_task& rhs) const noexcept {
+		[[nodiscard]] static constexpr inline bool operator()(const queued_task& lhs, const queued_task& rhs) noexcept {
 			if (lhs.time == rhs.time)
 				return lhs.index > rhs.index;
 			return lhs.time > rhs.time;

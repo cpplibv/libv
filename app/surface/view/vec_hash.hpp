@@ -12,7 +12,7 @@ namespace surface {
 // -------------------------------------------------------------------------------------------------
 
 struct VecHash {
-	constexpr inline auto operator()(libv::vec2i vec) const noexcept {
+	static constexpr inline auto operator()(libv::vec2i vec) const noexcept {
 		return libv::hash_combine(
 				libv::hash_int(static_cast<uint32_t>(vec.x)),
 				libv::hash_int(static_cast<uint32_t>(vec.y)));

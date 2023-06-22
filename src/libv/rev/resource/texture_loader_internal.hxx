@@ -32,13 +32,13 @@ using InternalTexture_ptr = libv::intrusive2_ptr<InternalTexture>;
 struct InternalTexturePtrNameComp {
 	using is_transparent = void;
 
-	[[nodiscard]] inline bool operator()(const InternalTexture_ptr& ptr, const std::string_view name) const noexcept {
+	[[nodiscard]] static inline bool operator()(const InternalTexture_ptr& ptr, const std::string_view name) noexcept {
 		return ptr->name_ < name;
 	}
-	[[nodiscard]] inline bool operator()(const std::string_view name, const InternalTexture_ptr& ptr) const noexcept {
+	[[nodiscard]] static inline bool operator()(const std::string_view name, const InternalTexture_ptr& ptr) noexcept {
 		return name < ptr->name_;
 	}
-	[[nodiscard]] inline bool operator()(const InternalTexture_ptr& lhs, const InternalTexture_ptr& rhs) const noexcept {
+	[[nodiscard]] static inline bool operator()(const InternalTexture_ptr& lhs, const InternalTexture_ptr& rhs) noexcept {
 		return lhs->name_ < rhs->name_;
 	}
 };

@@ -64,7 +64,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct lines_string_view_base_fn {
-	constexpr auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') const {
+	static constexpr auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') {
 		return detail::view_lines_string_view(rng, newline);
 	}
 };
@@ -72,7 +72,7 @@ struct lines_string_view_base_fn {
 struct lines_string_view_fn : lines_string_view_base_fn {
 	using lines_string_view_base_fn::operator();
 
-	constexpr auto operator()(const std::string_view::value_type newline = '\n') const {
+	static constexpr auto operator()(const std::string_view::value_type newline = '\n') {
 		return ranges::make_view_closure(ranges::bind_back(lines_string_view_base_fn{}, newline));
 	}
 };

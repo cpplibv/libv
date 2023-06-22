@@ -794,15 +794,15 @@ public:
 
 public:
 	template <typename Access = AccessUniformBuffer>
-	inline Access operator()(UniformBuffer& object) noexcept {
+	static inline Access operator()(UniformBuffer& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessArrayBuffer>
-	inline Access operator()(ArrayBuffer& object) noexcept {
+	static inline Access operator()(ArrayBuffer& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessBuffer>
-	inline Access operator()(Buffer& object) noexcept {
+	static inline Access operator()(Buffer& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessFramebuffer>
@@ -810,7 +810,7 @@ public:
 		return Access{object, *this};
 	}
 	template <typename Access = AccessRenderbuffer>
-	inline Access operator()(Renderbuffer& object) noexcept {
+	static inline Access operator()(Renderbuffer& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessProgram>
@@ -818,11 +818,11 @@ public:
 		return Access{object, *this};
 	}
 	template <typename Access = AccessQuery>
-	inline Access operator()(Query& object) noexcept {
+	static inline Access operator()(Query& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessShader>
-	inline Access operator()(Shader& object) noexcept {
+	static inline Access operator()(Shader& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessVertexArray>

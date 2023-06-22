@@ -11,9 +11,9 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Irnoge {
+struct Ignore {
 	template <typename... Args>
-	constexpr inline void operator()(Args&&...) noexcept {}
+	static constexpr inline void operator()(Args&&...) noexcept {}
 
 	template <typename T>
 	constexpr inline void reserve(T) noexcept {}

@@ -108,7 +108,7 @@ public:
 
 struct deinterleave_base_fn {
 	template<typename Rng, typename Int>
-	constexpr auto operator()(Rng&& rng, Int n) const {
+	static constexpr auto operator()(Rng&& rng, Int n) {
 		static_assert(ranges::random_access_range<Rng>, "The range passed to view::deinterleave must be a random access range");
 		static_assert(ranges::integral<Int>, "The number passed to view::deinterleave must be an Integral");
 
@@ -122,7 +122,7 @@ struct deinterleave_fn : deinterleave_base_fn {
 	using deinterleave_base_fn::operator();
 
 	template<typename Int>
-	constexpr auto operator()(Int n) const {
+	static constexpr auto operator()(Int n) {
 		static_assert(ranges::integral<Int>, "The number passed to view::deinterleave must be an Integral");
 
 		return ranges::make_view_closure(ranges::bind_back(deinterleave_base_fn{}, n));

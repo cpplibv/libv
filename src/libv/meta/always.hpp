@@ -14,7 +14,7 @@ namespace meta {
 template <typename... T>
 struct always_true : std::true_type {
 	template <typename... Args>
-	constexpr inline bool operator()(Args&&...) const {
+	static constexpr inline bool operator()(Args&&...) const {
 		return true;
 	}
 };
@@ -25,7 +25,7 @@ static constexpr bool always_true_v = true;
 template <typename... T>
 struct always_false : std::false_type {
 	template <typename... Args>
-	constexpr inline bool operator()(Args&&...) const {
+	static constexpr inline bool operator()(Args&&...) const {
 		return false;
 	}
 };

@@ -95,7 +95,7 @@ static_assert(std::ranges::input_range<glob_generic_path_t>);
 } // namespace detail ------------------------------------------------------------------------------
 
 struct glob_generic_path_base_fn {
-	auto operator()(const std::filesystem::path& path, const std::string_view pattern) const {
+	static auto operator()(const std::filesystem::path& path, const std::string_view pattern) const {
 		return detail::glob_generic_path_t(path, pattern);
 	}
 };
@@ -103,7 +103,7 @@ struct glob_generic_path_base_fn {
 struct glob_generic_path_fn : glob_generic_path_base_fn {
 	using glob_generic_path_base_fn::operator();
 
-	constexpr auto operator()(const std::string_view pattern) const {
+	static constexpr auto operator()(const std::string_view pattern) const {
 		return ranges::make_view_closure(ranges::bind_back(glob_generic_path_base_fn{}, pattern));
 	}
 };

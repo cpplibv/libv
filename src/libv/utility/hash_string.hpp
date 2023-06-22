@@ -21,13 +21,13 @@ struct hash_string {
 	using hash_type = std::hash<std::string_view>;
 
 public:
-	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(const char* txt) const noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE std::size_t operator()(const char* txt) noexcept {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(std::string_view txt) const noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE std::size_t operator()(std::string_view txt) noexcept {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] LIBV_FORCE_INLINE std::size_t operator()(const std::string& txt) const noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE std::size_t operator()(const std::string& txt) noexcept {
 		return hash_type{}(txt);
 	}
 };

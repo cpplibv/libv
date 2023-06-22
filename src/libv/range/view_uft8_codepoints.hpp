@@ -57,12 +57,11 @@ struct uft8_codepoints_view : aux_uft8_codepoints_view {
 // -------------------------------------------------------------------------------------------------
 
 struct uft8_codepoints_fn {
-
 	template <typename Rng>
-	auto operator()(Rng&& rng) const {
+	static auto operator()(Rng&& rng) {
 		return detail::uft8_codepoints_view(std::forward<Rng>(rng));
 	}
-	auto operator()() const {
+	static auto operator()() {
 		return [](auto&& rng) {
 			using Rng = decltype(rng);
 			return detail::uft8_codepoints_view(std::forward<Rng>(rng));

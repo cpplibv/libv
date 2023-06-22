@@ -17,11 +17,11 @@ namespace view {
 template <typename T>
 struct construct_fn {
 	template <typename Rng>
-	constexpr inline auto operator()(Rng&& rng) const {
+	static constexpr inline auto operator()(Rng&& rng) const {
 		return ranges::view::transform(libv::construct<T, uint32_t>);;
 	}
 
-	constexpr inline auto operator()() const {
+	static constexpr inline auto operator()() const {
 		return [](auto&& rng) {
 			using Rng = decltype(rng);
 			return ranges::view::transform(std::forward<Rng>(rng), libv::construct<T, uint32_t>);

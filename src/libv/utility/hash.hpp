@@ -61,6 +61,6 @@ constexpr inline std::size_t hash_combine(const Args&... args) noexcept {
 #define LIBV_MAKE_HASHABLE(TYPE, ...)                                                              \
 namespace std {                                                                                    \
 	template <> struct hash<TYPE> {                                                                \
-		constexpr std::size_t operator()(const TYPE &t) const noexcept {                           \
+		static constexpr std::size_t operator()(const TYPE &t) noexcept {                          \
 			return ::libv::hash_combine(__VA_ARGS__);                                              \
 }};}

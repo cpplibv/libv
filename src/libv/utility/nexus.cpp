@@ -54,10 +54,10 @@ struct NexusObjectKeyHasher {
 	using is_transparent = void;
 
 public:
-	[[nodiscard]] constexpr LIBV_FORCE_INLINE std::size_t operator()(const NexusObjectKey& var) const noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE std::size_t operator()(const NexusObjectKey& var) noexcept {
 		return std::hash<NexusObjectKey>{}(var);
 	}
-	[[nodiscard]] constexpr LIBV_FORCE_INLINE std::size_t operator()(const NexusObjectKeyView& var) const noexcept {
+	[[nodiscard]] static constexpr LIBV_FORCE_INLINE std::size_t operator()(const NexusObjectKeyView& var) noexcept {
 		return std::hash<NexusObjectKeyView>{}(var);
 	}
 };
