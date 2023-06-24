@@ -120,8 +120,7 @@ libv.glr: mesh submesh update (for surface chunks)
 Big things left
 	Water
 	LOD
-	Veggi type
-
+	GLSL
 
 
 === Queue ========================================================================================
@@ -142,109 +141,15 @@ Additional nodes:
 	normal (available only in non-normal maps)
 
 
+libv.noise:
+	glsl support
+	glsl support with identical cpp implementation(noise lib glsl)
+	3d noises (dev seed animation with the 3rd D)
+	clean up
+	missing algos (more warps)
+	cellular multiple return value
 
-
-69 - 78 nap
-60 nap -
-doksi: 15 nap 12500-16000 szo, 65-75 oldal
-csuszasok: 15 nap
-implementacio + kutatas: 30nap 03.13-04.13
-EPICS:
-	NOISE-LIB: 40%
-		3d-s algok <- animation miatt is
-		soft simd support
-		clean up
-		hianyzo algo (warp kieg), kisebb warp
-		api beautyfing, unifying
-		celullar tobb visszateresi ertek szimultan
-		bonus: glsl support
-		bonus: glsl support with identical cpp implementation(noise lib glsl) ?
-	NODE ARCH.: 20%
-		mix node (linear), smooth step/hermit interpolation node
-		fake node
-		logical node, min/max node
-		different return types, modify evaluate
-		node with multiple return value
-	SURFACE CONFIG:
-		more lua config support
-			template iterate table
-			convert basic stuff
-				convert [optional] number
-			error handling
-		multiple root node
-		vegetation, biomes, planet primary properties from config
-	BIOMES:
-		color palette
-		cellular blend, smooth step, hermit interpolation on edges
-		TODO: global, local dominance
-	VEGETATION:
-		requirement traits (legyen levego, viz alatti)
-		rocks, grass, bushes, trees with fertility requirement
-		IDEA: LOD popin-re: vegetation detail level threshold randomization
-		IDEA Plant placement: Vader two path method (doc)
-	CHUNK:
-		progressive generation
-		chunk lod
-		patch or skirt
-		vegetation placement/management
-	SURFACE:
-		chunks, camera, frustrum culling,
-		progressive generation managment
-		chunk lod managment
-		collusion queries: camera, terrain picking
-	RENDERING:
-		skybox
-		shaders: env. lighting
-		(shadow),
-		billboarding || instance rendering
-		vegetation textures
-
-
-3D noise algok:
-	time-mal menni z koordinatan
-
-generation limit 16ms {seed, center_x, center_y, pregenerated_data} -> chunk
-	multithreading, better containers
-		multithreading:  ui must remain responsive (one dedicated thread)
-		vector - > dynArray, vector<vector> -> vector_2D
-			surface.hpp Change container for surface points
-		vegetation gen can go parallel but not chunks gen bc we want every worker working on the current chunk which has top prio
-	glsl code gen from lua nodes
-	simd
-model rendering tricks:
- 	billboards,
- 	lod
- 	out of scope: micro texture: csak akkor jelenik meg ha nagyon kozel van a kamera
-
-vegetation (popsickle)
-	DONE: 1. spheres
-	DONE: 2.a model betoltes
-	2.b sprite/billboard
-		modellbol billboard nezetek generalasa (8*8 2D texture of 3D model from different angles)
-
-biome heatmaps
-	WIP: config
-	data structure
-	revive texture
-		a. 1 chunk texture, zoom, movement
-			projection mtx to the center chunk
-			new camera, new controls
-		b. new scene (2D, no veggie)
-
-More than one chunk
-	DONE: 1. box (3x3)
-
-	2. spiral ( 4096*4096 vertex -> 16*16 256-os chunk, super high resolution chunk max 4db)
-		DONE: spiral(id) -> (x,y)
-		camera pos or camera ray should define first chunk?
-			pos <- mi van ha ott egy hegy az orrod elott?
-			next chunk? distance from camera pos + amerre nez
-	submesh update (chunk spiral scanning update)
-	chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
-		lod illesztes, ne lyukas: patching/vertex merging, skirt
-
-1. world, camera, rendering
-noise generator math/noise
+libv.noise:
 	cellular
 		worley, voronai
 	fractal
@@ -275,14 +180,32 @@ noise generator math/noise
 	warp: regular - simplex for first
 			domainwarp open simplex independent
 		regular, polar, vortex, inverse
-	palette
-	animation
 
-noise_simplex(x, y[, z, w]): float
-noise_fractal_simplex(x, y[, z, w], octaves, amplitude, frequency, lacunarity, persistence):float
 
-SurfaceGen
-	input biome ranges/table (different from planet to planet)
+	noise_simplex(x, y[, z, w]): float
+	noise_fractal_simplex(x, y[, z, w], octaves, amplitude, frequency, lacunarity, persistence):float
+
+
+surface:
+	collusion queries: camera, terrain picking, collusion detection
+
+	improve lua config
+		template iterate table
+		error handling
+
+	proper biome blending
+
+	render:
+		shadows
+		cascading shadows
+		instance rendering
+		vegetation textures
+		micro textures (per biome)
+
+	chunks:
+		edge patch or skirt
+
+
 
 
 === OUT OF SCOPE ===================================================================================

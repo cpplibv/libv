@@ -700,7 +700,7 @@ libv: Remove friend class X; and use friend X; and ensure that X is fwd declared
 
 GCC 13.1
 	<stacktrace> with --enable-libstdcxx-backtrace=yes
-	[[assume(expr)]] (next to [[likely]], [[unlikely]])
+	[[assume(expr)]], [[likely]], [[unlikely]]
 	std::float16_t and std::bfloat16_t
 	#warning
 	\o123 \u0100 \xAB \N{LATIN CAPITAL LETTER A WITH MACRON}
