@@ -65,6 +65,8 @@ public:
 	void finish();
 
 public:
+	// TODO P2: libv.rev: Use a span for compare
+	[[nodiscard]] int compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0) const noexcept;
 	[[nodiscard]] int compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const noexcept;
 	[[nodiscard]] int compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const noexcept;
 };

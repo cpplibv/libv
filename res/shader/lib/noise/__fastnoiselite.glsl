@@ -782,45 +782,110 @@ float _fnlSingleOpenSimplex2S2D(int seed, FNLfloat x, FNLfloat y)
     int i1 = i + PRIME_X;
     int j1 = j + PRIME_Y;
 
-    float t = (xi + yi) * G2;
-    float x0 = xi - t;
-    float y0 = yi - t;
+	float t = (xi + yi) * G2;
+	float x0 = xi - t;
+	float y0 = yi - t;
 
-    int aMask = int((xi + yi + 1.f) * -0.5f);
-    int bMask = int((xi - float(aMask) + 2.f) * 0.5f - yi);
-    int cMask = int((yi - float(aMask) + 2.f) * 0.5f - xi);
+	float a0 = (2.0f / 3.0f) - x0 * x0 - y0 * y0;
+	float value = (a0 * a0) * (a0 * a0) * _fnlGradCoord2D(seed, i, j, x0, y0);
 
-    float a0 = (2.f / 3.f) - x0 * x0 - y0 * y0;
-    float value = (a0 * a0) * (a0 * a0) * _fnlGradCoord2D(seed, i, j, x0, y0);
+	float a1 = float(2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + (float(-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a0);
+	float x1 = x0 - float(1 - 2 * G2);
+	float y1 = y0 - float(1 - 2 * G2);
+	value += (a1 * a1) * (a1 * a1) * _fnlGradCoord2D(seed, i1, j1, x1, y1);
 
-    float a1 = (2.f * (1.f - 2.f * G2) * (1.f / G2 - 2.f)) * t + ((-2.f * (1.f - 2.f * G2) * (1.f - 2.f * G2)) + a0);
-    float x1 = x0 - (1.f - 2.f * G2);
-    float y1 = y0 - (1.f - 2.f * G2);
-    value += (a1 * a1) * (a1 * a1) * _fnlGradCoord2D(seed, i1, j1, x1, y1);
+	// Nested conditionals were faster than compact bit logic/arithmetic.
+	float xmyi = xi - yi;
+	if (t > G2)
+	{
+		if (xi + xmyi > 1)
+		{
+			float x2 = x0 + float(3 * G2 - 2);
+			float y2 = y0 + float(3 * G2 - 1);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i + (PRIME_X << 1), j + PRIME_Y, x2, y2);
+			}
+		}
+		else
+		{
+			float x2 = x0 + float(G2);
+			float y2 = y0 + float(G2 - 1);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i, j + PRIME_Y, x2, y2);
+			}
+		}
 
-    int di2 = ~(aMask | cMask) | 1;
-    int ndj2 = (aMask & bMask) << 1;
-    float t2 = float(di2 - ndj2) * G2;
-    float x2 = x0 - float(di2) + t2;
-    float y2 = y0 + float(ndj2) + t2;
-    float a2 = (2.f / 3.f) - x2 * x2 - y2 * y2;
-    if (a2 > 0.f)
-    {
-        value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i1 + (di2 & (-PRIME_X << 1)), j + (ndj2 & (PRIME_Y << 1)), x2, y2);
-    }
+		if (yi - xmyi > 1)
+		{
+			float x3 = x0 + float(3 * G2 - 1);
+			float y3 = y0 + float(3 * G2 - 2);
+			float a3 = (2.0f / 3.0f) - x3 * x3 - y3 * y3;
+			if (a3 > 0)
+			{
+				value += (a3 * a3) * (a3 * a3) * _fnlGradCoord2D(seed, i + PRIME_X, j + (PRIME_Y << 1), x3, y3);
+			}
+		}
+		else
+		{
+			float x3 = x0 + float(G2 - 1);
+			float y3 = y0 + float(G2);
+			float a3 = (2.0f / 3.0f) - x3 * x3 - y3 * y3;
+			if (a3 > 0)
+			{
+				value += (a3 * a3) * (a3 * a3) * _fnlGradCoord2D(seed, i + PRIME_X, j, x3, y3);
+			}
+		}
+	}
+	else
+	{
+		if (xi + xmyi < 0)
+		{
+			float x2 = x0 + float(1 - G2);
+			float y2 = y0 - float(G2);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i - PRIME_X, j, x2, y2);
+			}
+		}
+		else
+		{
+			float x2 = x0 + float(G2 - 1);
+			float y2 = y0 + float(G2);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i + PRIME_X, j, x2, y2);
+			}
+		}
 
-    int ndi3 = (aMask & cMask) << 1;
-    int dj3 = ~(aMask | bMask) | 1;
-    float t3 = float(dj3 - ndi3) * G2;
-    float x3 = x0 + float(ndi3) + t3;
-    float y3 = y0 - float(dj3) + t3;
-    float a3 = (2.f / 3.f) - x3 * x3 - y3 * y3;
-    if (a3 > 0.f)
-    {
-        value += (a3 * a3) * (a3 * a3) * _fnlGradCoord2D(seed, i + (ndi3 & (PRIME_X << 1)), j1 + (dj3 & (-PRIME_Y << 1)), x3, y3);
-    }
+		if (yi < xmyi)
+		{
+			float x2 = x0 - float(G2);
+			float y2 = y0 - float(G2 - 1);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i, j - PRIME_Y, x2, y2);
+			}
+		}
+		else
+		{
+			float x2 = x0 + float(G2);
+			float y2 = y0 + float(G2 - 1);
+			float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
+			if (a2 > 0)
+			{
+				value += (a2 * a2) * (a2 * a2) * _fnlGradCoord2D(seed, i, j + PRIME_Y, x2, y2);
+			}
+		}
+	}
 
-    return value * 18.24196194486065;
+	return value * 18.24196194486065f;
 }
 
 float _fnlSingleOpenSimplex2S3D(int seed, FNLfloat x, FNLfloat y, FNLfloat z)
@@ -1024,7 +1089,7 @@ float _fnlSingleCellular2D(fnl_state state, int seed, FNLfloat x, FNLfloat y)
     float distance1 = 1e10f;
     int closestHash = 0;
 
-    float cellularJitter = 0.5f * state.cellular_jitter_mod;
+    float cellularJitter = 0.43701595f * state.cellular_jitter_mod;
 
     int xPrimed = (xr - 1) * PRIME_X;
     int yPrimedBase = (yr - 1) * PRIME_Y;

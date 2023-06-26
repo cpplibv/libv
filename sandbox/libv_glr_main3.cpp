@@ -189,10 +189,10 @@ float noise_fractal_simplex_3d(
 //		vec2 coord,
 		vec3 coord,
 		int octaves,
-		float amplitude = 1.0,
-		float frequency = 1.0,
-		float lacunarity = 2.0,
-		float persistence = 0.5) {
+		float amplitude,
+		float frequency,
+		float lacunarity,
+		float persistence) {
 
 	float sum = 0;
 
@@ -242,7 +242,7 @@ void main() {
 
 	pos.xy = seed(pos.xy, 0);
 
-	float value = noise_fractal_simplex_3d(pos, 6) * 0.5 + 0.5;
+	float value = noise_fractal_simplex_3d(pos, 6, 1.0, 1.0, 2.0, 0.5) * 0.5 + 0.5;
 
 	vec4 result = vec4(value, value, value, 1.0);
 

@@ -64,7 +64,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct split_sv_base_fn {
-	static constexpr auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') const {
+	static constexpr auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') {
 		return detail::view_split_sv(rng, newline);
 	}
 };
@@ -72,7 +72,7 @@ struct split_sv_base_fn {
 struct split_sv_fn : split_sv_base_fn {
 	using split_sv_base_fn::operator();
 
-	static constexpr auto operator()(const std::string_view::value_type newline = '\n') const {
+	static constexpr auto operator()(const std::string_view::value_type newline = '\n') {
 		return ranges::make_view_closure(ranges::bind_back(split_sv_base_fn{}, newline));
 	}
 };

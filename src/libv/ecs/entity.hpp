@@ -41,10 +41,10 @@ struct Entity {
 };
 
 struct ChildOfCmp {
-	static inline bool operator()(const Entity& lhs, const EntityID& rhs) const {
+	static inline bool operator()(const Entity& lhs, const EntityID& rhs) {
 		return (lhs.id >> 32) < rhs;
 	}
-	static inline bool operator()(const EntityID& lhs, const Entity& rhs) const {
+	static inline bool operator()(const EntityID& lhs, const Entity& rhs) {
 		return lhs < (rhs.id >> 32);
 	}
 };

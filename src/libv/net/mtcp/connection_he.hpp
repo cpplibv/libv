@@ -221,7 +221,7 @@ namespace std { // -------------------------------------------------------------
 
 template <typename T>
 struct hash<libv::net::mtcp::Connection<T>> {
-	static constexpr auto operator()(const libv::net::mtcp::Connection<T>& t) const noexcept {
+	static constexpr auto operator()(const libv::net::mtcp::Connection<T>& t) noexcept {
 		const auto& he = static_cast<const libv::net::mtcp::detail::HandlerGuard<libv::net::mtcp::BaseConnectionHandler, T>&>(t);
 		return std::hash<std::remove_cvref_t<decltype(he)>>{}(he);
 	}

@@ -51,6 +51,11 @@ private:
 	}
 
 public:
+	Shader(ShaderLoader& loader, std::string path_cs) :
+		Shader(loader,
+				libv::gl::ShaderType::Compute, std::move(path_cs)) {
+	}
+
 	Shader(ShaderLoader& loader, std::string path_vs, std::string path_fs) :
 		Shader(loader,
 				libv::gl::ShaderType::Vertex, std::move(path_vs),
@@ -62,6 +67,10 @@ public:
 				libv::gl::ShaderType::Vertex, std::move(path_vs),
 				libv::gl::ShaderType::Geometry, std::move(path_gs),
 				libv::gl::ShaderType::Fragment, std::move(path_fs)) {
+	}
+
+	Shader(ShaderLoader& loader, libv::gl::ShaderType type0, std::string path0) :
+		BaseShader(loader, libv::type_key<Uniforms>(), ucc, type0, std::move(path0)) {
 	}
 
 	Shader(ShaderLoader& loader, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) :

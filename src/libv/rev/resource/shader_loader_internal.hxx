@@ -58,6 +58,7 @@ public:
 
 public:
 	using ucc_type = std::unique_ptr<detail::BaseUniformContainer>(*)(); /// Uniform container creator function
+	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0);
 	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1);
 	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2);
 

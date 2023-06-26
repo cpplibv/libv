@@ -42,6 +42,7 @@ public:
 	inline BaseShader(BaseShader&&) noexcept = default;
 	inline BaseShader& operator=(BaseShader&&) & noexcept = default;
 
+	BaseShader(ShaderLoader& loader, libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0);
 	BaseShader(ShaderLoader& loader, libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1);
 	BaseShader(ShaderLoader& loader, libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2);
 

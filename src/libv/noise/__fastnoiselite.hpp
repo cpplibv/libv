@@ -47,8 +47,19 @@
 // VERSION: 1.0.1
 // https://github.com/Auburn/FastNoise
 
+#pragma once
+
 #ifndef FASTNOISELITE_H
 #define FASTNOISELITE_H
+
+// =================================================================================================
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+#endif
+// =================================================================================================
 
 #include <cmath>
 
@@ -84,10 +95,10 @@ public:
 
     enum CellularDistanceFunction
     {
-        CellularDistanceFunction_Euclidean,
-        CellularDistanceFunction_EuclideanSq,
-        CellularDistanceFunction_Manhattan,
-        CellularDistanceFunction_Hybrid
+        CellularDistanceFunction_Euclidean = 0,
+        CellularDistanceFunction_EuclideanSq = 1,
+        CellularDistanceFunction_Manhattan = 2,
+        CellularDistanceFunction_Hybrid = 3,
     };
 
     enum CellularReturnType
@@ -130,7 +141,7 @@ public:
 
         mCellularDistanceFunction = CellularDistanceFunction_EuclideanSq;
         mCellularReturnType = CellularReturnType_Distance;
-        mCellularJitterModifier = 1.0f;
+        // mCellularJitterModifier = 1.0f;
 
         mDomainWarpType = DomainWarpType_OpenSimplex2;
         mWarpTransformType3D = TransformType3D_DefaultOpenSimplex2;
@@ -261,7 +272,7 @@ public:
     /// Default: 1.0
     /// Note: Setting this higher than 1 will cause artifacts
     /// </remarks>
-    void SetCellularJitter(float cellularJitter) { mCellularJitterModifier = cellularJitter; }
+    // void SetCellularJitter(float cellularJitter) { mCellularJitterModifier = cellularJitter; }
 
 
     /// <summary>
@@ -393,7 +404,7 @@ public:
         }
     }
 
-private:
+public:
     template <typename T>
     struct Arguments_must_be_floating_point_values;
 
@@ -422,7 +433,7 @@ private:
 
     CellularDistanceFunction mCellularDistanceFunction;
     CellularReturnType mCellularReturnType;
-    float mCellularJitterModifier;
+    // float mCellularJitterModifier = 1.f;
 
     DomainWarpType mDomainWarpType;
     TransformType3D mWarpTransformType3D;
@@ -526,7 +537,7 @@ private:
     }
 
 
-    float GradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd) const
+    static float GradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd)
     {
         int hash = Hash(seed, xPrimed, yPrimed);
         hash ^= hash >> 15;
@@ -539,7 +550,7 @@ private:
     }
 
 
-    float GradCoord(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd) const
+    static float GradCoord(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd)
     {
         int hash = Hash(seed, xPrimed, yPrimed, zPrimed);
         hash ^= hash >> 15;
@@ -553,7 +564,7 @@ private:
     }
 
 
-    void GradCoordOut(int seed, int xPrimed, int yPrimed, float& xo, float& yo) const
+    static void GradCoordOut(int seed, int xPrimed, int yPrimed, float& xo, float& yo)
     {
         int hash = Hash(seed, xPrimed, yPrimed) & (255 << 1);
 
@@ -562,7 +573,7 @@ private:
     }
 
 
-    void GradCoordOut(int seed, int xPrimed, int yPrimed, int zPrimed, float& xo, float& yo, float& zo) const
+    static void GradCoordOut(int seed, int xPrimed, int yPrimed, int zPrimed, float& xo, float& yo, float& zo)
     {
         int hash = Hash(seed, xPrimed, yPrimed, zPrimed) & (255 << 2);
 
@@ -572,7 +583,7 @@ private:
     }
 
 
-    void GradCoordDual(int seed, int xPrimed, int yPrimed, float xd, float yd, float& xo, float& yo) const
+    static void GradCoordDual(int seed, int xPrimed, int yPrimed, float xd, float yd, float& xo, float& yo)
     {
         int hash = Hash(seed, xPrimed, yPrimed);
         int index1 = hash & (127 << 1);
@@ -590,7 +601,7 @@ private:
     }
 
 
-    void GradCoordDual(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd, float& xo, float& yo, float& zo) const
+    static void GradCoordDual(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd, float& xo, float& yo, float& zo)
     {
         int hash = Hash(seed, xPrimed, yPrimed, zPrimed);
         int index1 = hash & (63 << 2);
@@ -980,7 +991,7 @@ private:
     // Simplex/OpenSimplex2 Noise
 
     template <typename FNfloat>
-    float SingleSimplex(int seed, FNfloat x, FNfloat y) const
+    static float SingleSimplex(int seed, FNfloat x, FNfloat y)
     {
         // 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
 
@@ -1051,7 +1062,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SingleOpenSimplex2(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SingleOpenSimplex2(int seed, FNfloat x, FNfloat y, FNfloat z)
     {
         // 3D OpenSimplex2 case uses two offset rotated cube grids.
 
@@ -1153,7 +1164,7 @@ private:
     // OpenSimplex2S Noise
 
     template <typename FNfloat>
-    float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y) const
+    static float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y)
     {
         // 2D OpenSimplex2S case is a modified 2D simplex noise.
 
@@ -1284,7 +1295,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y, FNfloat z)
     {
         // 3D OpenSimplex2S case uses two offset rotated cube grids.
 
@@ -1480,7 +1491,7 @@ private:
     // Cellular Noise
 
     template <typename FNfloat>
-    float SingleCellular(int seed, FNfloat x, FNfloat y) const
+    static float SingleCellular(int seed, FNfloat x, FNfloat y,  CellularDistanceFunction mCellularDistanceFunction, CellularReturnType mCellularReturnType, float mCellularJitterModifier)
     {
         int xr = FastRound(x);
         int yr = FastRound(y);
@@ -1610,7 +1621,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SingleCellular(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SingleCellular(int seed, FNfloat x, FNfloat y, FNfloat z,  CellularDistanceFunction mCellularDistanceFunction, CellularReturnType mCellularReturnType, float mCellularJitterModifier)
     {
         int xr = FastRound(x);
         int yr = FastRound(y);
@@ -1767,7 +1778,7 @@ private:
     // Perlin Noise
 
     template <typename FNfloat>
-    float SinglePerlin(int seed, FNfloat x, FNfloat y) const
+    static float SinglePerlin(int seed, FNfloat x, FNfloat y)
     {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
@@ -1792,7 +1803,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SinglePerlin(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SinglePerlin(int seed, FNfloat x, FNfloat y, FNfloat z)
     {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
@@ -1831,7 +1842,7 @@ private:
     // Value Cubic Noise
 
     template <typename FNfloat>
-    float SingleValueCubic(int seed, FNfloat x, FNfloat y) const
+    static float SingleValueCubic(int seed, FNfloat x, FNfloat y)
     {
         int x1 = FastFloor(x);
         int y1 = FastFloor(y);
@@ -1861,7 +1872,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SingleValueCubic(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SingleValueCubic(int seed, FNfloat x, FNfloat y, FNfloat z)
     {
         int x1 = FastFloor(x);
         int y1 = FastFloor(y);
@@ -1918,7 +1929,7 @@ private:
     // Value Noise
 
     template <typename FNfloat>
-    float SingleValue(int seed, FNfloat x, FNfloat y) const
+    static float SingleValue(int seed, FNfloat x, FNfloat y)
     {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
@@ -1938,7 +1949,7 @@ private:
     }
 
     template <typename FNfloat>
-    float SingleValue(int seed, FNfloat x, FNfloat y, FNfloat z) const
+    static float SingleValue(int seed, FNfloat x, FNfloat y, FNfloat z)
     {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
@@ -2584,3 +2595,9 @@ const T FastNoiseLite::Lookup<T>::RandVecs3D[] =
 };
 
 #endif
+
+// =================================================================================================
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+// =================================================================================================

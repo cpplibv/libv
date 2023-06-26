@@ -78,6 +78,17 @@ void InternalShader::finish() {
 	}();
 }
 
+int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0) const noexcept {
+	if (auto v = this->uniformTID <=> uniformTID; v != 0) return libv::ordering_as_int(v);
+
+	if (auto v = stages.size() <=> 1; v != 0) return libv::ordering_as_int(v);
+
+	if (auto v = stages[0].type <=> t0; v != 0) return libv::ordering_as_int(v);
+	if (auto v = stages[0].source_path <=> p0; v != 0) return libv::ordering_as_int(v);
+
+	return 0;
+}
+
 int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const noexcept {
 	if (auto v = this->uniformTID <=> uniformTID; v != 0) return libv::ordering_as_int(v);
 

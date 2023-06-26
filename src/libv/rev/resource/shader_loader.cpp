@@ -84,6 +84,25 @@ void InternalShaderLoader::unsubscribe(InternalShader* internal_ptr) {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P2: libv.rev: Use a span for internal_load 1..3 stage at once
+std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0) {
+	const auto lock = std::unique_lock(mutex);
+
+	const auto comp = [&](const auto* s) { return s->compare(uniformTID, type0, path0); };
+	const auto it = std::ranges::lower_bound(shaders, 0, {}, comp);
+	if (it != shaders.end() && 0 == (*it)->compare(uniformTID, type0, path0))
+		return (*it)->shared_from_this();
+
+	auto internal_shader = std::make_shared<InternalShader>(weak_from_this(), ucc(), uniformTID);
+	internal_shader->stages.emplace_back(type0, path0);
+	internal_shader->finish();
+	log_rev.trace("Create new shader: {}", internal_shader->name_);
+
+	shaders.emplace(it, internal_shader.get());
+	queue_source_reload.push_back(internal_shader);
+	return internal_shader;
+}
+
 std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) {
 	const auto lock = std::unique_lock(mutex);
 
@@ -206,6 +225,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			result = vec4(1.0, 0.0, 0.0, 1.0);
 		})";
 
+		// TODO P4: libv.rev: Fallback to red in case of compute shader is not a good idea, make a fallback cs
 		if (internal->current_version == -1) {
 			// Assigning a default red sources to the shader
 			internal->program.vertex(fallback_red_vs);

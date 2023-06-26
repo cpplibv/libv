@@ -164,7 +164,7 @@ namespace std { // -------------------------------------------------------------
 
 template <typename BaseHandler, typename T>
 struct hash<libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>> {
-	[[nodiscard]] static constexpr std::size_t operator()(const libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>& t) const noexcept {
+	[[nodiscard]] static constexpr std::size_t operator()(const libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>& t) noexcept {
 		return std::hash<BaseHandler*>{}(t.handler_);
 	}
 };

@@ -1157,6 +1157,7 @@ wish_create_executable(
 )
 
 add_subdirectory(sandbox/rev_particle)
+add_subdirectory(sandbox/noise)
 
 wish_create_executable(
 	TARGET sandbox_libv_rev_res
