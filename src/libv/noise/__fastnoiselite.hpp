@@ -103,13 +103,13 @@ public:
 
     enum CellularReturnType
     {
-        CellularReturnType_CellValue,
-        CellularReturnType_Distance,
-        CellularReturnType_Distance2,
-        CellularReturnType_Distance2Add,
-        CellularReturnType_Distance2Sub,
-        CellularReturnType_Distance2Mul,
-        CellularReturnType_Distance2Div
+        CellularReturnType_CellValue = 0,
+        CellularReturnType_Distance = 1,
+        CellularReturnType_Distance2 = 2,
+        CellularReturnType_Distance2Add = 3,
+        CellularReturnType_Distance2Sub = 4,
+        CellularReturnType_Distance2Mul = 5,
+        CellularReturnType_Distance2Div = 6,
     };
 
     enum DomainWarpType
@@ -1491,7 +1491,7 @@ public:
     // Cellular Noise
 
     template <typename FNfloat>
-    static float SingleCellular(int seed, FNfloat x, FNfloat y,  CellularDistanceFunction mCellularDistanceFunction, CellularReturnType mCellularReturnType, float mCellularJitterModifier)
+    static float  SingleCellular(int seed, FNfloat x, FNfloat y,  CellularDistanceFunction mCellularDistanceFunction, CellularReturnType mCellularReturnType, float mCellularJitterModifier)
     {
         int xr = FastRound(x);
         int yr = FastRound(y);

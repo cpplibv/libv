@@ -2,7 +2,10 @@
 
 // hpp
 #include <libv/noise/noise_2.hpp>
+// ext
 #include <libv/noise/__fastnoiselite.hpp>
+// libv
+#include <libv/utility/to_underlying.hpp>
 
 
 namespace libv {
@@ -56,13 +59,24 @@ float SimplexFn::operator()(libv::Seed seed, float x, float y, float z) noexcept
 
 // --- Cellular ------------------------------------------------------------------------------------
 
+static_assert(to_underlying(CellularDistanceFunction::euclidean) == FastNoiseLite::CellularDistanceFunction_Euclidean);
+static_assert(to_underlying(CellularDistanceFunction::euclideanSq) == FastNoiseLite::CellularDistanceFunction_EuclideanSq);
+static_assert(to_underlying(CellularDistanceFunction::manhattan) == FastNoiseLite::CellularDistanceFunction_Manhattan);
+static_assert(to_underlying(CellularDistanceFunction::hybrid) == FastNoiseLite::CellularDistanceFunction_Hybrid);
+
+static_assert(to_underlying(CellularReturnType::cellValue) == FastNoiseLite::CellularReturnType_CellValue);
+static_assert(to_underlying(CellularReturnType::distance) == FastNoiseLite::CellularReturnType_Distance);
+static_assert(to_underlying(CellularReturnType::distance2) == FastNoiseLite::CellularReturnType_Distance2);
+static_assert(to_underlying(CellularReturnType::distance2Add) == FastNoiseLite::CellularReturnType_Distance2Add);
+static_assert(to_underlying(CellularReturnType::distance2Sub) == FastNoiseLite::CellularReturnType_Distance2Sub);
+static_assert(to_underlying(CellularReturnType::distance2Mul) == FastNoiseLite::CellularReturnType_Distance2Mul);
+static_assert(to_underlying(CellularReturnType::distance2Div) == FastNoiseLite::CellularReturnType_Distance2Div);
+
 float CellularFn::operator()(Seed seed, float x, float y,
 		CellularDistanceFunction distanceFn,
 		CellularReturnType returnType,
 		float jitter) noexcept {
 
-	// return FastNoiseLite::SingleCellular(static_cast<int>(seed), x, y, jitter, distanceFn, returnType);
-	// return FastNoiseLite::SingleCellular(static_cast<int>(seed), x, y, static_cast<int32_t>(distanceFn), static_cast<int32_t>(returnType), jitter);
 	return FastNoiseLite::SingleCellular(static_cast<int>(seed), x, y,
 			static_cast<FastNoiseLite::CellularDistanceFunction>(distanceFn),
 			static_cast<FastNoiseLite::CellularReturnType>(returnType),

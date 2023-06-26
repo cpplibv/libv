@@ -58,20 +58,20 @@ constexpr inline struct SimplexFn {
 // --- Cellular ------------------------------------------------------------------------------------
 
 enum class CellularDistanceFunction {
-	euclidean,
-	euclideanSq,
-	manhattan,
-	hybrid
+	euclidean = 0,
+	euclideanSq = 1,
+	manhattan = 2,
+	hybrid = 3,
 };
 
 enum class CellularReturnType {
-	cellValue,
-	distance,
-	distance2,
-	distance2Add,
-	distance2Sub,
-	distance2Mul,
-	distance2Div
+	cellValue = 0,
+	distance = 1,
+	distance2 = 2,
+	distance2Add = 3,
+	distance2Sub = 4,
+	distance2Mul = 5,
+	distance2Div = 6,
 };
 
 constexpr inline struct CellularFn {
