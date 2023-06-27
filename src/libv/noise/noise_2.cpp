@@ -11,6 +11,28 @@
 namespace libv {
 namespace noise {
 
+// --- Utility ----------------------------------------------------------------------------------------
+
+libv::vec2f skew(float x, float y) {
+	const float SQRT3 = 1.7320508075688772935274463415059f;
+	const float F2 = 0.5f * (SQRT3 - 1);
+	float const t = (x + y) * F2;
+	x += t;
+	y += t;
+
+	return libv::vec2f{x, y};
+}
+
+libv::vec3f rotate(float x, float y, float z) {
+	const float R3 = 2.f / 3.f;
+	const float r = (x + y + z) * R3; // Rotation, not skew
+	x = r - x;
+	y = r - y;
+	z = r - z;
+
+	return libv::vec3f{x, y, z};
+}
+
 // --- Value ---------------------------------------------------------------------------------------
 
 float ValueFn::operator()(libv::Seed seed, float x, float y) noexcept {
@@ -35,26 +57,19 @@ float PerlinFn::operator()(libv::Seed seed, float x, float y, float z) noexcept 
 
 float SimplexFn::operator()(libv::Seed seed, float x, float y) noexcept {
 	// Skewing is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S2D
-	const float SQRT3 = 1.7320508075688772935274463415059f;
-	const float F2 = 0.5f * (SQRT3 - 1);
-	const float t = (x + y) * F2;
-	x += t;
-	y += t;
+	const auto [xr, yr] = skew(x, y);
 	// SingleOpenSimplex2S yield a different result in their GLSL and C++ implementation
 	// return FastNoiseLite::SingleOpenSimplex2S(static_cast<int>(seed), x, y);
-	return FastNoiseLite::SingleSimplex(static_cast<int>(seed), x, y);
+	return FastNoiseLite::SingleSimplex(static_cast<int>(seed), xr, yr);
 }
 
 float SimplexFn::operator()(libv::Seed seed, float x, float y, float z) noexcept {
 	// Rotating is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S3D
-	const float R3 = 2.f / 3.f;
-	const float r = (x + y + z) * R3; // Rotation, not skew
-	x = r - x;
-	y = r - y;
-	z = r - z;
+	const auto [xr, yr, zr] = rotate(x, y, z);
+
 	// Not using SingleOpenSimplex2S to keep 2D and 3D aligned
 	// return FastNoiseLite::SingleOpenSimplex2S(static_cast<int>(seed), x, y, z);
-	return FastNoiseLite::SingleOpenSimplex2(static_cast<int>(seed), x, y, z);
+	return FastNoiseLite::SingleOpenSimplex2(static_cast<int>(seed), xr, yr, zr);
 }
 
 // --- Cellular ------------------------------------------------------------------------------------
@@ -94,7 +109,62 @@ float CellularFn::operator()(Seed seed, float x, float y, float z,
 
 }
 
-// -------------------------------------------------------------------------------------------------
+// --- Warp ------------------------------------------------------------------------------------
+
+
+libv::vec2f WarpFn::operator()(Seed seed, float x, float y) noexcept {
+	const auto [xr, yr] = skew(x, y);
+	float x_out, y_out;
+	FastNoiseLite::SingleDomainWarpSimplexGradient2(static_cast<int>(seed), xr, yr, x_out, y_out, false);
+	return {x_out, y_out};
+}
+
+libv::vec3f WarpFn::operator()(Seed seed, float x, float y, float z) noexcept {
+	const auto [xr, yr, zr] = rotate(x, y, z);
+	float x_out, y_out, z_out;
+	FastNoiseLite::SingleDomainWarpSimplexGradient2(static_cast<int>(seed), xr, yr, zr, x_out, y_out, z_out, false);
+	return {x_out, y_out, z_out};
+}
+
+libv::vec2f warp_fractal(
+		Seed seed,
+		float x, float y,
+		int octaves,
+		float amplitude,
+		float frequency,
+		float lacunarity,
+		float persistence) noexcept {
+	libv::vec2f result(x, y);
+
+	for (int i = 0; i < octaves; i++) {
+		result += warp(seed++, result.x * frequency, result.y * frequency) * amplitude;
+
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
+
+	return result;
+}
+
+libv::vec3f warp_fractal(
+		Seed seed,
+		float x, float y, float z,
+		int octaves,
+		float amplitude,
+		float frequency,
+		float lacunarity,
+		float persistence) noexcept {
+	libv::vec3f result(x, y, z);
+
+	for (int i = 0; i < octaves; i++) {
+		result += warp(seed++, result.x * frequency, result.y * frequency, result.z * frequency) * amplitude;
+
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
+
+	return result;
+}
 
 } // namespace noise
 } // namespace libv

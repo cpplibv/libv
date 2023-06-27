@@ -21,6 +21,7 @@ constexpr inline struct ValueFn {
 	[[nodiscard]] static LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec2f coord) noexcept {
 		return operator()(seed, coord.x, coord.y);
 	}
+
 	[[nodiscard]] static LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec3f coord) noexcept {
 		return operator()(seed, coord.x, coord.y, coord.z);
 	}
@@ -35,6 +36,7 @@ constexpr inline struct PerlinFn {
 	[[nodiscard]] LIBV_FORCE_INLINE static float operator()(Seed seed, libv::vec2f coord) noexcept {
 		return operator()(seed, coord.x, coord.y);
 	}
+
 	[[nodiscard]] LIBV_FORCE_INLINE static float operator()(Seed seed, libv::vec3f coord) noexcept {
 		return operator()(seed, coord.x, coord.y, coord.z);
 	}
@@ -87,9 +89,9 @@ private:
 			CellularDistanceFunction distanceFn,
 			CellularReturnType returnType,
 			float jitter) :
-		_distanceFn(distanceFn),
-		_returnType(returnType),
-		_jitter(jitter) {}
+			_distanceFn(distanceFn),
+			_returnType(returnType),
+			_jitter(jitter) {}
 
 public:
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE CellularFn operator()(
@@ -126,16 +128,16 @@ public:
 			float jitter) noexcept;
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec2f coord,
-				CellularDistanceFunction distanceFn,
-				CellularReturnType returnType,
-				float jitter) const noexcept {
+			CellularDistanceFunction distanceFn,
+			CellularReturnType returnType,
+			float jitter) const noexcept {
 		return operator()(seed, coord.x, coord.y, distanceFn, returnType, jitter);
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec3f coord,
-				CellularDistanceFunction distanceFn,
-				CellularReturnType returnType,
-				float jitter) const noexcept {
+			CellularDistanceFunction distanceFn,
+			CellularReturnType returnType,
+			float jitter) const noexcept {
 		return operator()(seed, coord.x, coord.y, coord.z, distanceFn, returnType, jitter);
 	}
 } cellular;
@@ -207,6 +209,37 @@ template <typename NoiseFunc>
 
 // --- Warp ----------------------------------------------------------------------------------------
 
+constexpr inline struct WarpFn {
+	[[nodiscard]] static libv::vec2f operator()(Seed seed, float x, float y) noexcept;
+	[[nodiscard]] static libv::vec3f operator()(Seed seed, float x, float y, float z) noexcept;
+
+	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec2f operator()(Seed seed, libv::vec2f coord) noexcept {
+		return operator()(seed, coord.x, coord.y);
+	}
+
+	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f operator()(Seed seed, libv::vec3f coord) noexcept {
+		return operator()(seed, coord.x, coord.y, coord.z);
+	}
+} warp;
+
+[[nodiscard]] LIBV_FORCE_INLINE static libv::vec2f warp_fractal(
+		Seed seed,
+		float x, float y,
+		int octaves,
+		float amplitude = 1.0f,
+		float frequency = 1.0f,
+		float lacunarity = 2.0f,
+		float persistence = 0.5f) noexcept;
+
+[[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f warp_fractal(
+		Seed seed,
+		float x, float y, float z,
+		int octaves,
+		float amplitude = 1.0f,
+		float frequency = 1.0f,
+		float lacunarity = 2.0f,
+		float persistence = 0.5f) noexcept;
+
 // enum class WarpType {
 // 	simplex2,
 // 	simplex2_reduced,
@@ -236,18 +269,26 @@ template <typename NoiseFunc>
 // 		WarpType type = WarpType::simplex2);
 //
 //
-// /// 2D warps the input position
-// libv::vec2f warp(
-// 		Seed seed,
-// 		float x, float y,
-// 		WarpFractalType type,
-// 		int octaves = 5,
-// 		float amplitude = 1.0f,
-// 		float frequency = 0.01f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f);
+/// 2D warps the input position
+libv::vec2f warp_independent(
+		Seed seed,
+		float x, float y,
+		WarpFractalType type,
+		int octaves = 5,
+		float amplitude = 1.0f,
+		float frequency = 0.01f,
+		float lacunarity = 2.0f,
+		float persistence = 0.5f);
 
-// -------------------------------------------------------------------------------------------------
+libv::vec2f warp_progressive(
+		Seed seed,
+		float x, float y,
+		WarpFractalType type,
+		int octaves = 5,
+		float amplitude = 1.0f,
+		float frequency = 0.01f,
+		float lacunarity = 2.0f,
+		float persistence = 0.5f);
 
 } // namespace noise
 } // namespace libv
