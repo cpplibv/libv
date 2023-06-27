@@ -112,7 +112,7 @@ class SandboxCanvas : public libv::ui::CanvasBase {
 
 	libv::glr::Mesh plane_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Texture2D::R32F gen_texture;
-	libv::glr::Texture2D::R32F cpu_texture;
+	libv::glr::Texture2D::RGB32F cpu_texture;
 	ShaderNoiseGen shader;
 	ShaderPlane shaderPlane;
 
@@ -145,30 +145,35 @@ public:
 
 		cpu_texture.storage(1, {1024, 1024});
 		cpu_texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
-		cpu_texture.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::Red, libv::gl::Swizzle::One);
+		cpu_texture.set(libv::gl::Swizzle::Red, libv::gl::Swizzle::Green, libv::gl::Swizzle::Blue, libv::gl::Swizzle::One);
 		// cpu_texture.set(libv::gl::MinFilter::Nearest);
 		// cpu_texture.set(libv::gl::MagFilter::Nearest);
-		std::vector<float> cpu_data;
+		std::vector<libv::vec3f> cpu_data;
 		for (int y = 0; y < 1024; ++y) {
 			float yf = static_cast<float>(y);
 			for (int x = 0; x < 1024; ++x) {
 				float xf = static_cast<float>(x);
 
-				const auto uv = libv::vec3f{xf / 1024.f, yf / 1024.f, 32};
+				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f};
 				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::cellular(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = yf / 1024.f;
 				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f) * 0.5f + 0.5f;
-				const auto cpu = libv::noise::cellular(0x511D, uv * 20.f,
-						libv::noise::CellularDistanceFunction::euclideanSq,
-						libv::noise::CellularReturnType::cellValue,
-						1.f) * 0.5f + 0.5f;
+				// const auto cpu = libv::noise::cellular(0x511D, uv * 20.f,
+				// 		libv::noise::CellularDistanceFunction::euclideanSq,
+				// 		libv::noise::CellularReturnType::cellValue,
+				// 		1.f) * 0.5f + 0.5f;
+
+				// const auto warp = libv::noise::fractal(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::warp, 5) * 20.f;
+				const auto warp = libv::noise::fractal_progressive(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::simplexGradient, 5, 50.f);
+				// const auto warp = libv::noise::fractal(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::warp, 5, 200.f);
+				const auto cpu = static_cast<int>(libv::round(uv * 20.f + warp).x + libv::round(uv * 20.f + warp).y) % 2 == 0;
 				// const auto gpu = output(x, y);
 				// const auto diff = gpu - cpu;
 				// fmt::print("CPU: {:7.5f} GPU: {:7.5f} Diff: {: 10.8f}\n", cpu, gpu, diff);
 
-				cpu_data.emplace_back(cpu);
+				cpu_data.push_back({cpu, warp.x, warp.y});
 			}
 		}
 		cpu_texture.image(0, {0, 0}, {1024, 1024}, cpu_data.data());

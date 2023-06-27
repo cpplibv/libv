@@ -74,82 +74,50 @@ float simplex(uint seed, float x, float y, float z) {
 float simplex(uint seed, vec3 coord) {
 	return simplex(seed, coord.x, coord.y, coord.z);
 }
+
+// --- Simplex Gradient ----------------------------------------------------------------------------
+
+vec2 simplex_gradient(uint seed, float x, float y) {
+	// Skewing is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S2D
+	const float SQRT3 = float(1.7320508075688772935274463415059);
+	const float F2 = 0.5 * (SQRT3 - 1);
+	float s = (x + y) * F2;
+	x += s;
+	y += s;
+
+	float xr = 0;
+	float yr = 0;
+	_fnlSingleDomainWarpSimplexGradientB(int(seed), x, y, xr, yr, false);
+	return vec2(xr, yr);
+}
+
+vec2 simplex_gradient(uint seed, vec2 coord) {
+	return simplex_gradient(seed, coord.x, coord.y);
+}
+
+vec3 simplex_gradient(uint seed, float x, float y, float z) {
+	// Rotating is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S3D
+	const float R3 = 2.f / 3.f;
+	float r = (x + y + z) * R3;// Rotation, not skew
+	x = r - x;
+	y = r - y;
+	z = r - z;
+
+	float xr = 0;
+	float yr = 0;
+	float zr = 0;
+	_fnlSingleDomainWarpOpenSimplex2GradientB(int(seed), x, y, z, xr, yr, zr, false);
+	return vec3(xr, yr, zr);
+}
+
+vec3 simplex_gradient(uint seed, vec3 coord) {
+	return simplex_gradient(seed, coord.x, coord.y, coord.z);
+}
+
 // --- Cellular ------------------------------------------------------------------------------------
-
-// Structure containing entire noise system state.
-// @note Must only be created using fnlCreateState(optional: seed). To ensure defaults are set.
-
-//struct fnl_state
-//{
-//    // Seed used for all noise types.
-//    // @remark Default: 1337
-//    int seed;
-//
-//    // The frequency for all noise types.
-//    // @remark Default: 0.01
-//    float frequency;
-//
-//    // The noise algorithm to be used by GetNoise(...).
-//    // @remark Default: FNL_NOISE_OPENSIMPLEX2
-//    fnl_noise_type noise_type;
-//
-//    // Sets noise rotation type for 3D.
-//    // @remark Default: FNL_ROTATION_NONE
-//    fnl_rotation_type_3d rotation_type_3d;
-//
-//    // The method used for combining octaves for all fractal noise types.
-//    // @remark Default: None
-//    // @remark FNL_FRACTAL_DOMAIN_WARP_... only effects fnlDomainWarp...
-//    fnl_fractal_type fractal_type;
-//
-//    // The octave count for all fractal noise types.
-//    // @remark Default: 3
-//    int octaves;
-//
-//    // The octave lacunarity for all fractal noise types.
-//    // @remark Default: 2.0
-//    float lacunarity;
-//
-//    // The octave gain for all fractal noise types.
-//    // @remark Default: 0.5
-//    float gain;
-//
-//    // The octave weighting for all none Domaain Warp fractal types.
-//    // @remark Default: 0.0
-//    // @remark
-//    float weighted_strength;
-//
-//    // The strength of the fractal ping pong effect.
-//    // @remark Default: 2.0
-//    float ping_pong_strength;
-//
-//    // The distance function used in cellular noise calculations.
-//    // @remark Default: FNL_CELLULAR_FUNC_DISTANCE
-//    fnl_cellular_distance_func cellular_distance_func;
-//
-//    // The cellular return type from cellular noise calculations.
-//    // @remark Default: FNL_CELLULAR_RETURN_TYPE_EUCLIEANSQ
-//    fnl_cellular_return_type cellular_return_type;
-//
-//    // The maximum distance a cellular point can move from it's grid position.
-//    // @remark Default: 1.0
-//    // @note Setting this higher than 1 will cause artifacts.
-//    float cellular_jitter_mod;
-//
-//    // The warp algorithm when using fnlDomainWarp...
-//    // @remark Default: OpenSimplex2
-//    fnl_domain_warp_type domain_warp_type;
-//
-//    // The maximum warp distance from original position when using fnlDomainWarp...
-//    // @remark Default: 1.0
-//    float domain_warp_amp;
-//};
-
-// -------------------------------------------------------------------------------------------------
 
 #define libv_cellular_distance_func int
 #define libv_cellular_return_type int
-//#define fnl_state struct
 
 float cellular(uint seed, float x, float y,
 		libv_cellular_distance_func distanceFn,
@@ -181,6 +149,69 @@ float cellular(uint seed, vec3 coord, libv_cellular_distance_func distanceFn, li
 	return cellular(seed, coord.x, coord.y, coord.z, distanceFn, returnType, jitter);
 }
 
-// -------------------------------------------------------------------------------------------------
+// --- Fractal -------------------------------------------------------------------------------------
 
-// TODO: libv.glsl: fractal, warp,
+#define _GENERATE_FRACTAL_INDEPENDENT(ReturnType2D, ReturnType3D, NoiseFnName, NoiseFn, AdditionalParam, AdditionalCall) \
+		ReturnType2D NoiseFnName (uint seed, float x, float y, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			ReturnType2D result = ReturnType2D(0); \
+            for (int i = 0; i < octaves; ++i) { \
+                result += NoiseFn (seed++, x * frequency, y * frequency AdditionalCall) * amplitude; \
+                frequency *= lacunarity; \
+                amplitude *= persistence; \
+            } \
+            return result; \
+        } \
+		ReturnType3D NoiseFnName (uint seed, float x, float y, float z, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			ReturnType3D result = ReturnType3D(0); \
+            for (int i = 0; i < octaves; ++i) { \
+                result += NoiseFn (seed++, x * frequency, y * frequency, z * frequency AdditionalCall) * amplitude; \
+                frequency *= lacunarity; \
+                amplitude *= persistence; \
+            } \
+            return result; \
+        } \
+		ReturnType2D NoiseFnName (uint seed, vec2 coord, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			return NoiseFnName (seed, coord.x, coord.y, octaves, amplitude, frequency, lacunarity, persistence AdditionalCall); \
+        } \
+		ReturnType3D NoiseFnName (uint seed, vec3 coord, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			return NoiseFnName (seed, coord.x, coord.y, coord.z, octaves, amplitude, frequency, lacunarity, persistence AdditionalCall); \
+        }
+
+#define _GENERATE_FRACTAL_PROGRESSIVE(ReturnType2D, ReturnType3D, NoiseFnName, NoiseFn, AdditionalParam, AdditionalCall) \
+		ReturnType2D NoiseFnName (uint seed, float x, float y, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			ReturnType2D result = ReturnType2D(0); \
+            for (int i = 0; i < octaves; ++i) { \
+                result += NoiseFn (seed, x * frequency + result.x, y * frequency + result.y AdditionalCall) * amplitude; \
+                frequency *= lacunarity; \
+                amplitude *= persistence; \
+            } \
+            return result; \
+        } \
+		ReturnType3D NoiseFnName (uint seed, float x, float y, float z, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			ReturnType3D result = ReturnType3D(0); \
+            for (int i = 0; i < octaves; ++i) { \
+                result += NoiseFn (seed, x * frequency + result.x, y * frequency + result.y, z * frequency + result.z AdditionalCall) * amplitude; \
+                frequency *= lacunarity; \
+                amplitude *= persistence; \
+            } \
+            return result; \
+        } \
+		ReturnType2D NoiseFnName (uint seed, vec2 coord, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			return NoiseFnName (seed, coord.x, coord.y, octaves, amplitude, frequency, lacunarity, persistence AdditionalCall); \
+		} \
+		ReturnType3D NoiseFnName (uint seed, vec3 coord, int octaves, float amplitude, float frequency, float lacunarity, float persistence AdditionalParam) { \
+			return NoiseFnName (seed, coord.x, coord.y, coord.z, octaves, amplitude, frequency, lacunarity, persistence AdditionalCall); \
+		}
+
+#define COMMA ,
+
+_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_value, value, , )
+_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_perlin, perlin, , )
+_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_simplex, simplex, , )
+_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_cellular, cellular, COMMA libv_cellular_distance_func distanceFn COMMA libv_cellular_return_type returnType COMMA float jitter, COMMA distanceFn COMMA returnType COMMA jitter)
+_GENERATE_FRACTAL_INDEPENDENT(vec2, vec3, fractal_simplex_gradient_independent, simplex_gradient, , )
+_GENERATE_FRACTAL_PROGRESSIVE(vec2, vec3, fractal_simplex_gradient_progressive, simplex_gradient, , )
+
+#undef _GENERATE_FRACTAL_PROGRESSIVE
+#undef _GENERATE_FRACTAL_INDEPENDENT
+#undef COMMA

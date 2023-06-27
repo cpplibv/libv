@@ -2335,7 +2335,7 @@ public:
     }
 
 	template <typename FNfloat>
-	static void SingleDomainWarpSimplexGradient2(int seed, FNfloat x, FNfloat y, FNfloat& xr, FNfloat& yr, bool outGradOnly) {
+	static void SingleDomainWarpSimplexGradientB(int seed, FNfloat x, FNfloat y, FNfloat& xr, FNfloat& yr, bool outGradOnly) {
 		const float SQRT3 = 1.7320508075688772935274463415059f;
 		const float G2 = (3 - SQRT3) / 6;
 		//
@@ -2546,7 +2546,7 @@ public:
     }
 
 	template <typename FNfloat>
-	static void SingleDomainWarpSimplexGradient2(int seed, FNfloat x, FNfloat y, FNfloat z, FNfloat& xr, FNfloat& yr, FNfloat& zr, bool outGradOnly) {
+	static void SingleDomainWarpSimplexGradientB(int seed, FNfloat x, FNfloat y, FNfloat z, FNfloat& xr, FNfloat& yr, FNfloat& zr, bool outGradOnly) {
 		// x *= frequency;
 		// y *= frequency;
 		// z *= frequency;

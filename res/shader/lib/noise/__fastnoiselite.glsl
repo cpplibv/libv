@@ -1847,6 +1847,118 @@ void _fnlSingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequenc
     yr += vy * warpAmp;
 }
 
+void _fnlSingleDomainWarpSimplexGradientB(int seed, FNLfloat x, FNLfloat y, inout FNLfloat xr, inout FNLfloat yr, bool outGradOnly)
+{
+    const float SQRT3 = 1.7320508075688772935274463415059;
+    const float G2 = (3.f - SQRT3) / 6.f;
+
+//    x *= frequency;
+//    y *= frequency;
+
+    // --- Skew moved to TransformNoiseCoordinate method ---
+    // const FNLfloat F2 = 0.5f * (SQRT3 - 1);
+    // FNLfloat s = (x + y) * F2;
+    // x += s; y += s;
+
+
+    int i = _fnlFastFloor(x);
+    int j = _fnlFastFloor(y);
+    float xi = x - float(i);
+    float yi = y - float(j);
+
+    float t = (xi + yi) * G2;
+    float x0 = xi - t;
+    float y0 = yi - t;
+
+    i *= PRIME_X;
+    j *= PRIME_Y;
+
+    float vx, vy;
+    vx = vy = 0.f;
+
+    float a = 0.5f - x0 * x0 - y0 * y0;
+    if (a > 0.f)
+    {
+        float aaaa = (a * a) * (a * a);
+        float xo, yo;
+        if (outGradOnly)
+		{
+            _fnlGradCoordOut2D(seed, i, j, xo, yo);
+		}
+        else
+        {
+			_fnlGradCoordDual2D(seed, i, j, x0, y0, xo, yo);
+		}
+        vx += aaaa * xo;
+        vy += aaaa * yo;
+    }
+
+    float c = (2.f * (1.f - 2.f * G2) * (1.f / G2 - 2.f)) * t + ((-2.f * (1.f - 2.f * G2) * (1.f - 2.f * G2)) + a);
+    if (c > 0.f)
+    {
+        float x2 = x0 + (2.f * G2 - 1.f);
+        float y2 = y0 + (2.f * G2 - 1.f);
+        float cccc = (c * c) * (c * c);
+        float xo, yo;
+        if (outGradOnly)
+		{
+            _fnlGradCoordOut2D(seed, i + PRIME_X, j + PRIME_Y, xo, yo);
+		}
+        else
+		{
+            _fnlGradCoordDual2D(seed, i + PRIME_X, j + PRIME_Y, x2, y2, xo, yo);
+		}
+        vx += cccc * xo;
+        vy += cccc * yo;
+    }
+
+    if (y0 > x0)
+    {
+        float x1 = x0 + G2;
+        float y1 = y0 + (G2 - 1.f);
+        float b = 0.5f - x1 * x1 - y1 * y1;
+        if (b > 0.f)
+        {
+            float bbbb = (b * b) * (b * b);
+            float xo, yo;
+            if (outGradOnly)
+			{
+                _fnlGradCoordOut2D(seed, i, j + PRIME_Y, xo, yo);
+			}
+            else
+			{
+                _fnlGradCoordDual2D(seed, i, j + PRIME_Y, x1, y1, xo, yo);
+			}
+            vx += bbbb * xo;
+            vy += bbbb * yo;
+        }
+    }
+    else
+    {
+        float x1 = x0 + (G2 - 1.f);
+        float y1 = y0 + G2;
+        float b = 0.5f - x1 * x1 - y1 * y1;
+        if (b > 0.f)
+        {
+            float bbbb = (b * b) * (b * b);
+            float xo, yo;
+            if (outGradOnly)
+			{
+                _fnlGradCoordOut2D(seed, i + PRIME_X, j, xo, yo);
+			}
+            else
+            {
+				_fnlGradCoordDual2D(seed, i + PRIME_X, j, x1, y1, xo, yo);
+			}
+            vx += bbbb * xo;
+            vy += bbbb * yo;
+        }
+    }
+
+    xr += vx;
+    yr += vy;
+}
+
 void _fnlSingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, FNLfloat x, FNLfloat y, FNLfloat z, inout FNLfloat xr, inout FNLfloat yr, inout FNLfloat zr, bool outGradOnly)
 {
     x *= frequency;
@@ -1970,6 +2082,128 @@ void _fnlSingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float fre
     xr += vx * warpAmp;
     yr += vy * warpAmp;
     zr += vz * warpAmp;
+}
+
+void _fnlSingleDomainWarpOpenSimplex2GradientB(int seed, FNLfloat x, FNLfloat y, FNLfloat z, inout FNLfloat xr, inout FNLfloat yr, inout FNLfloat zr, bool outGradOnly)
+{
+
+    // --- Rotation moved to TransformDomainWarpCoordinate method ---
+    // const FNLfloat R3 = (FNLfloat)(2.f / 3.f);
+    // FNLfloat r = (x + y + z) * R3; // Rotation, not skew
+    // x = r - x; y = r - y; z = r - z;
+
+
+    int i = _fnlFastRound(x);
+    int j = _fnlFastRound(y);
+    int k = _fnlFastRound(z);
+    float x0 = x - float(i);
+    float y0 = y - float(j);
+    float z0 = z - float(k);
+
+    int xNSign = int(-x0 - 1.f) | 1;
+    int yNSign = int(-y0 - 1.f) | 1;
+    int zNSign = int(-z0 - 1.f) | 1;
+
+    float ax0 = float(xNSign) * -x0;
+    float ay0 = float(yNSign) * -y0;
+    float az0 = float(zNSign) * -z0;
+
+    i *= PRIME_X;
+    j *= PRIME_Y;
+    k *= PRIME_Z;
+
+    float vx, vy, vz;
+    vx = vy = vz = 0.f;
+
+    float a = (0.6f - x0 * x0) - (y0 * y0 + z0 * z0);
+    for (int l = 0; l < 2; l++)
+    {
+        if (a > 0.f)
+        {
+            float aaaa = (a * a) * (a * a);
+            float xo, yo, zo;
+            if (outGradOnly)
+			{
+                _fnlGradCoordOut3D(seed, i, j, k, xo, yo, zo);
+			}
+            else
+			{
+                _fnlGradCoordDual3D(seed, i, j, k, x0, y0, z0, xo, yo, zo);
+			}
+            vx += aaaa * xo;
+            vy += aaaa * yo;
+            vz += aaaa * zo;
+        }
+
+        float b = a + 1.f;
+        int i1 = i;
+        int j1 = j;
+        int k1 = k;
+        float x1 = x0;
+        float y1 = y0;
+        float z1 = z0;
+        if (ax0 >= ay0 && ax0 >= az0)
+        {
+            x1 += float(xNSign);
+            b -= float(xNSign) * 2.f * x1;
+            i1 -= xNSign * PRIME_X;
+        }
+        else if (ay0 > ax0 && ay0 >= az0)
+        {
+            y1 += float(yNSign);
+            b -= float(yNSign) * 2.f * y1;
+            j1 -= yNSign * PRIME_Y;
+        }
+        else
+        {
+            z1 += float(zNSign);
+            b -= float(zNSign) * 2.f * z1;
+            k1 -= zNSign * PRIME_Z;
+        }
+
+        if (b > 0.f)
+        {
+            float bbbb = (b * b) * (b * b);
+            float xo, yo, zo;
+            if (outGradOnly)
+			{
+                _fnlGradCoordOut3D(seed, i1, j1, k1, xo, yo, zo);
+			}
+            else
+			{
+                _fnlGradCoordDual3D(seed, i1, j1, k1, x1, y1, z1, xo, yo, zo);
+			}
+            vx += bbbb * xo;
+            vy += bbbb * yo;
+            vz += bbbb * zo;
+        }
+
+        if (l == 1) break;
+
+        ax0 = 0.5f - ax0;
+        ay0 = 0.5f - ay0;
+        az0 = 0.5f - az0;
+
+        x0 = float(xNSign) * ax0;
+        y0 = float(yNSign) * ay0;
+        z0 = float(zNSign) * az0;
+
+        a += (0.75f - ax0) - (ay0 + az0);
+
+        i += (xNSign >> 1) & PRIME_X;
+        j += (yNSign >> 1) & PRIME_Y;
+        k += (zNSign >> 1) & PRIME_Z;
+
+        xNSign = -xNSign;
+        yNSign = -yNSign;
+        zNSign = -zNSign;
+
+        seed += 1293373;
+    }
+
+    xr += vx;
+    yr += vy;
+    zr += vz;
 }
 
 // Domain Warp Basic Grid

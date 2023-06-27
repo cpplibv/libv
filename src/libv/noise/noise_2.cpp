@@ -106,64 +106,23 @@ float CellularFn::operator()(Seed seed, float x, float y, float z,
 			static_cast<FastNoiseLite::CellularDistanceFunction>(distanceFn),
 			static_cast<FastNoiseLite::CellularReturnType>(returnType),
 			jitter);
-
 }
 
 // --- Warp ------------------------------------------------------------------------------------
 
 
-libv::vec2f WarpFn::operator()(Seed seed, float x, float y) noexcept {
+libv::vec2f SimplexGradientFn::operator()(Seed seed, float x, float y) noexcept {
 	const auto [xr, yr] = skew(x, y);
-	float x_out, y_out;
-	FastNoiseLite::SingleDomainWarpSimplexGradient2(static_cast<int>(seed), xr, yr, x_out, y_out, false);
+	float x_out = 0, y_out = 0;
+	FastNoiseLite::SingleDomainWarpSimplexGradientB(static_cast<int>(seed), xr, yr, x_out, y_out, false);
 	return {x_out, y_out};
 }
 
-libv::vec3f WarpFn::operator()(Seed seed, float x, float y, float z) noexcept {
+libv::vec3f SimplexGradientFn::operator()(Seed seed, float x, float y, float z) noexcept {
 	const auto [xr, yr, zr] = rotate(x, y, z);
-	float x_out, y_out, z_out;
-	FastNoiseLite::SingleDomainWarpSimplexGradient2(static_cast<int>(seed), xr, yr, zr, x_out, y_out, z_out, false);
+	float x_out = 0, y_out = 0, z_out = 0;
+	FastNoiseLite::SingleDomainWarpSimplexGradientB(static_cast<int>(seed), xr, yr, zr, x_out, y_out, z_out, false);
 	return {x_out, y_out, z_out};
-}
-
-libv::vec2f warp_fractal(
-		Seed seed,
-		float x, float y,
-		int octaves,
-		float amplitude,
-		float frequency,
-		float lacunarity,
-		float persistence) noexcept {
-	libv::vec2f result(x, y);
-
-	for (int i = 0; i < octaves; i++) {
-		result += warp(seed++, result.x * frequency, result.y * frequency) * amplitude;
-
-		frequency *= lacunarity;
-		amplitude *= persistence;
-	}
-
-	return result;
-}
-
-libv::vec3f warp_fractal(
-		Seed seed,
-		float x, float y, float z,
-		int octaves,
-		float amplitude,
-		float frequency,
-		float lacunarity,
-		float persistence) noexcept {
-	libv::vec3f result(x, y, z);
-
-	for (int i = 0; i < octaves; i++) {
-		result += warp(seed++, result.x * frequency, result.y * frequency, result.z * frequency) * amplitude;
-
-		frequency *= lacunarity;
-		amplitude *= persistence;
-	}
-
-	return result;
 }
 
 } // namespace noise
