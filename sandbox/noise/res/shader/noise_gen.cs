@@ -42,6 +42,8 @@ void main() {
 	vec2 cpu_warp = texture(texture_cpu, uv + .5 / textureSize(texture_cpu, 0).xy).gb;
 //	vec2 warp = fractal_simplex_gradient_progressive(0x511D, uv * 5.f, 5, 50.f, 1.0f, 2.0f, 0.5f).xy;
 //	vec2 warp = fractal_simplex_gradient_progressive(0x511D, vec3(uv * 5.f, time * 0.2), 5, 50.f, 1.0f, 2.0f, 0.5f).xy;
+//	vec2 warp = fractal_simplex_gradient_progressive(0x511D, vec3(uv * 2.f, time * 0.2), 5, sin(time * 0.6) * 8.f, 1.0f, 2.0f, 0.5f).xy;
+//	vec2 warp = fractal_simplex_gradient_independent(0x511D, vec3(uv * 5.f, time * 0.2), 5, sin(time * 0.6) * 50.f, 1.0f, 2.0f, 0.5f).xy;
 	vec2 warp = fractal_simplex_gradient_progressive(0x511D, vec3(uv * 5.f, time * 0.2), 5, sin(time * 0.6) * 50.f, 1.0f, 2.0f, 0.5f).xy;
 //	value = cpu;
 
@@ -51,12 +53,15 @@ void main() {
 ////			FNL_CELLULAR_RETURN_TYPE_CELLVALUE,
 //			1.0f) * 0.5 + 0.5;
 
-	float value = cellular(0x511D, vec3(uv * 20.f + warp, 32*20.f),
-			FNL_CELLULAR_DISTANCE_EUCLIDEANSQ,
+	float value = cellular(0x511D, vec3(uv * 10.f + warp, 32*20.f),
+			FNL_CELLULAR_DISTANCE_EUCLIDEAN,
 //			FNL_CELLULAR_RETURN_TYPE_DISTANCE,
 			FNL_CELLULAR_RETURN_TYPE_CELLVALUE,
 			0.0f) * 0.5 + 0.5;
 
+//	float value = step(0.65, length(warp + uv - 0.5) * 2.f) - 0.4;
+//	float value = smoothstep(0.55, 0.75, length(warp + uv - 0.5) * 2.f);
+//	float value = length(warp + uv - 0.5);
 
 //	value = abs(cpu_warp.x - warp.x) + abs(cpu_warp.y - warp.y);
 

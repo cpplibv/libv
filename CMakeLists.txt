@@ -1240,6 +1240,8 @@ wish_create_executable(
 
 wish_group(group_test test) # --- Test ------------------------------------------------------------
 
+add_subdirectory(app/star_test)
+
 wish_create_executable(
 	TARGET test_libv_algo
 	SOURCE test/libv/algorithm/*.cpp

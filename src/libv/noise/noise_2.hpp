@@ -142,22 +142,22 @@ public:
 	}
 } cellular;
 
-// -------------------------------------------------------------------------------------------------
+// --- Simplex Gradient ----------------------------------------------------------------------------------------
 
-// struct SimplexGradFn {
-// 	[[nodiscard]] static float operator()(Seed seed, float x, float y) noexcept;
-// 	[[nodiscard]] static float operator()(Seed seed, float x, float y, float z) noexcept;
-//
-// 	[[nodiscard]] LIBV_FORCE_INLINE static float operator()(Seed seed, libv::vec2f coord) noexcept {
-// 		return operator()(seed, coord.x, coord.y);
-// 	}
-//
-// 	[[nodiscard]] LIBV_FORCE_INLINE static float operator()(Seed seed, libv::vec3f coord) noexcept {
-// 		return operator()(seed, coord.x, coord.y, coord.z);
-// 	}
-// } simplex_grad;
+constexpr inline struct SimplexGradientFn {
+	[[nodiscard]] static libv::vec2f operator()(Seed seed, float x, float y) noexcept;
+	[[nodiscard]] static libv::vec3f operator()(Seed seed, float x, float y, float z) noexcept;
 
-// -------------------------------------------------------------------------------------------------
+	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec2f operator()(Seed seed, libv::vec2f coord) noexcept {
+		return operator()(seed, coord.x, coord.y);
+	}
+
+	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f operator()(Seed seed, libv::vec3f coord) noexcept {
+		return operator()(seed, coord.x, coord.y, coord.z);
+	}
+} simplexGradient;
+
+// --- Fractal -------------------------------------------------------------------------------------
 
 /// FBM (Fractional Brownian Motion)
 template <typename NoiseFunc>
@@ -313,105 +313,7 @@ template <typename GradientNoiseFunc>
 	return fractal_progressive(seed, coord.x, coord.y, coord.z, noiseFunc, octaves, amplitude, frequency, lacunarity, persistence);
 }
 
-// --- Simplex Gradient ----------------------------------------------------------------------------------------
-
-constexpr inline struct SimplexGradientFn {
-	[[nodiscard]] static libv::vec2f operator()(Seed seed, float x, float y) noexcept;
-	[[nodiscard]] static libv::vec3f operator()(Seed seed, float x, float y, float z) noexcept;
-
-	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec2f operator()(Seed seed, libv::vec2f coord) noexcept {
-		return operator()(seed, coord.x, coord.y);
-	}
-
-	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f operator()(Seed seed, libv::vec3f coord) noexcept {
-		return operator()(seed, coord.x, coord.y, coord.z);
-	}
-} simplexGradient;
-
-// [[nodiscard]] LIBV_FORCE_INLINE static libv::vec2f warp_fractal(
-// 		Seed seed,
-// 		float x, float y,
-// 		int octaves,
-// 		float amplitude = 1.0f,
-// 		float frequency = 1.0f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f) noexcept;
-//
-// [[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f warp_fractal(
-// 		Seed seed,
-// 		float x, float y, float z,
-// 		int octaves,
-// 		float amplitude = 1.0f,
-// 		float frequency = 1.0f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f) noexcept;
-
-// enum class WarpType {
-// 	simplex2,
-// 	simplex2_reduced,
-// 	basic_grid,
-// };
-//
-// enum class WarpFractalType {
-// //	none,
-// //	progressive,
-// 	independent,
-// };
-//
-// libv::vec2f singleWarpSimplexGradient(Seed seed, float x, float y, float xr, float yr, float warpAmp, float frequency, bool outGradOnly);
-//
-// /// Domain Warp
-// libv::vec2f doSingleWarp(Seed seed, float x, float y, float xr, float yr, WarpType type, float amp, float freq);
-//
-// /// Domain Warp Fractal Independent
-// libv::vec2f warpFractalIndependent(
-// 		Seed seed,
-// 		float x, float y,
-// 		int octaves = 5,
-// 		float amplitude = 1.0f,
-// 		float frequency = 0.01f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f,
-// 		WarpType type = WarpType::simplex2);
-//
-//
-/// 2D warps the input position
-// libv::vec2f warp_independent(
-// 		Seed seed,
-// 		float x, float y,
-// 		WarpFractalType type,
-// 		int octaves = 5,
-// 		float amplitude = 1.0f,
-// 		float frequency = 0.01f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f);
-//
-// libv::vec2f warp_progressive(
-// 		Seed seed,
-// 		float x, float y,
-// 		WarpFractalType type,
-// 		int octaves = 5,
-// 		float amplitude = 1.0f,
-// 		float frequency = 0.01f,
-// 		float lacunarity = 2.0f,
-// 		float persistence = 0.5f);
+// -------------------------------------------------------------------------------------------------
 
 } // namespace noise
 } // namespace libv
-
-
-
-// #define _GENERATE_FRACTAL(NoiseFn) \
-// 		float fractal_ ## NoiseFn (int seed, float x, float y, float z, int octaves, float amplitude, float frequency, float lacunarity, float persistence) { \
-// 			float result = 0; \
-// 			for (int i = 0; i < octaves; ++i) { \
-// 				result += NoiseFunc ## (seed++, x * frequency, y * frequency, z * frequency) * amplitude; \
-// 				frequency *= lacunarity; \
-// 				amplitude *= persistence; \
-// 			} \
-// 			return result; \
-// 		}
-//
-//
-// _GENERATE_FRACTAL(simplex)
-
