@@ -7,7 +7,7 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.3.3)
+set(WISH_REQUEST_VERSION v5.4.2)
 include(cmake/wish.cmake)
 
 # -------------------------------------------------------------------------------------------------
@@ -745,6 +745,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv::res STATIC
+	SOURCE src/libv/res/*.cpp
+	LINK   ext_fmt
+)
+
+wish_create_library(
 	TARGET libv::rev STATIC
 	SOURCE src/libv/rev/*.cpp
 	GENERATE codegen src/libv/rev/shader/block/*.in.lua
@@ -752,7 +758,7 @@ wish_create_library(
 	LINK   libv::glr libv::gl libv::utility libv::fsw
 #	LINK   ext_boost
 	LINK   libv::algo libv::range libv::log ext_range ext_ctre # Source include engine stuff
-	LINK   libv::vm4
+	LINK   libv::vm4 libv::res
 	LINK   ext_cppcoro
 )
 
@@ -798,7 +804,7 @@ wish_create_library(
 	SOURCE src/libv/ui/*.cpp
 	GENERATE enum src/libv/ui/*.in.lua
 	LINK   libv::glr libv::parse libv::lua libv::input ext_freetype ext_utf8cpp libv::sys
-	LINK   libv::fsw
+	LINK   libv::fsw libv::res
 )
 
 wish_create_library(
@@ -1239,8 +1245,6 @@ wish_create_executable(
 )
 
 wish_group(group_test test) # --- Test ------------------------------------------------------------
-
-add_subdirectory(app/star_test)
 
 wish_create_executable(
 	TARGET test_libv_algo

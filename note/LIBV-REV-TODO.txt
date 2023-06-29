@@ -63,6 +63,15 @@ libv.glr: Add support for glDrawBuffers
 
 
 
+Implement a glsl shader unit tester framework
+	(needed by libv.noise, but will be used for other things too)
+	approx checks support
+	compute shader
+	define customization
+
+
+
+
 
 
 
@@ -128,6 +137,17 @@ https://www.youtube.com/watch?v=PfHD3BsVsAM
 
 --- libv.res ---
 
+
+objectives:
+	no resource file duplication
+	live/hot reload
+	which resources are used by each target
+	support for resource blob files (abstraction above physical filesystem)
+
+
+libv.res: global variable for resource mapping
+
+
 libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 libv.glr: IDEA: Versioned resources, beside what tell which version are we want to use
 
@@ -137,6 +157,8 @@ resource: dns like resource resolver for custom arguments: Args... -> ResourceDe
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
 
+builtin (in memory resource files)
+generated (generated resource files upon request)
 
 libv.res: Resource - New library for resource and asset loading, caching and tracking
 		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
@@ -154,7 +176,7 @@ libv.res: Resource - New library for resource and asset loading, caching and tra
 			load/reload/unload/tracking events
 			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
 
--------------
+---
 
 
 Resource mapping another idea:

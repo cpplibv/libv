@@ -8,23 +8,18 @@ wish_create_executable(
 
 wish_resource_mapping(
 		TARGET sandbox_libv_noise_view
-		FILE_NAME wish/resource_path.hpp
-		FUNCTION_NAME wish::resource_path
+		MAPPING_FILE wish/resource_mapping.hpp
+		MAPPING_FUNCTION wish::resource_mapping
 
-		GLOB res/style.lua
-		GLOB res/shader/noise_gen.cs
-
-#		GLOB ../../res/font/arialn.ttf
-#		GLOB ../../res/font/calibril.ttf
-		GLOB ../../res/font/consola.ttf
-		GLOB ../../res/shader/rev_sandbox/particle.fs
-		GLOB ../../res/shader/rev_sandbox/particle.vs
-
-		GLOB ../../res/shader/lib/noise/noise.glsl
-		GLOB ../../res/shader/lib/noise/__fastnoiselite.glsl
-
-		REPLACE ../../res/font/ res/font/
-		REPLACE ../../res/shader/rev_sandbox/ res/shader/
+		RESOURCE res/style.lua
+		RESOURCE res/shader/noise_gen.cs
+#		RESOURCE @/res/font/arialn.ttf
+#		RESOURCE @/res/font/calibril.ttf
+		RESOURCE @/res/font/consola.ttf
+		RESOURCE @/res/shader/lib/noise/__fastnoiselite.glsl
+		RESOURCE @/res/shader/lib/noise/noise.glsl
+		RESOURCE @/res/texture/light_border.png
+		RESOURCE @/res/texture/stripes_border.png
 )
 
 wish_package(

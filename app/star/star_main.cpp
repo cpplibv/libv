@@ -2,15 +2,14 @@
 
 // libv
 #include <libv/arg/arg.hpp>
+#include <libv/res/resource_path.hpp>
 #include <libv/sys/os_version.hpp>
 #include <libv/utility/last_write_time.hpp>
-#include <wish/resource_path.hpp>
-//#include <libv/utility/read_file.hpp>
+#include <wish/resource_mapping.hpp>
 // std
 #include <filesystem>
 #include <iostream>
 // pro
-//#include <star/game/config/client_config.hpp>
 #include <star/game/game_client.hpp>
 #include <star/log.hpp>
 #include <star/version.hpp>
@@ -60,6 +59,8 @@ int main(int argc, const char** argv) {
 	// -------------------------------------------------------------------------------------------------
 
 	const auto devMode = !WISH_BUILD_PACKAGE;
+
+	libv::res::init_resource_mapping(wish::resource_mapping());
 
 	if (arg_verbose.value()) {
 		libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");

@@ -26,6 +26,16 @@ struct ResourceSettings {
 };
 
 struct Settings {
+public:
+	bool use_libv_res_resource_path = false; /// Migration path
+
+public:
+	ResourceSettings res_font = {"res/font/"};
+	ResourceSettings res_shader = {"res/shader/"};
+	ResourceSettings res_texture = {"res/texture/"};
+
+public:
+	// bool enable_lcd_font = true;
 	std::chrono::milliseconds caret_flash_period{700};
 	std::chrono::milliseconds caret_show_period{350};
 
@@ -34,14 +44,7 @@ struct Settings {
 	float caret_width_offset = 32;
 	float caret_width_scale = 24;
 
-	// bool enable_lcd_font = true;
-
-	std::function<std::string(std::string)> res_resolve; /// Migration path
-
-	ResourceSettings res_font = {"res/font/"};
-	ResourceSettings res_shader = {"res/shader/"};
-	ResourceSettings res_texture = {"res/texture/"};
-
+public:
 	double scroll_step_button = 3.0;
 	double scroll_step_scroll = 3.0;
 	double scroll_step_track = std::numeric_limits<double>::infinity();

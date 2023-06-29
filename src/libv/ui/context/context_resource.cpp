@@ -4,6 +4,7 @@
 #include <libv/ui/context/context_resource.hpp>
 // libv
 #include <libv/gl/load_image.hpp>
+#include <libv/res/resource_path.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/hash_string.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
@@ -87,11 +88,11 @@ public:
 		const auto filepath_str = self.res_settings().base_path + std::string(key);
 
 		std::filesystem::path filepath;
-		if (!self.settings.res_resolve) {
+		if (!self.settings.use_libv_res_resource_path) {
 			filepath = filepath_str;
 		} else {
 			try {
-				const auto resolved_str = self.settings.res_resolve(filepath_str);
+				const auto resolved_str = libv::res::resource_path(filepath_str);
 				log_ui.trace_if(filepath_str != resolved_str, "{} mapping: {} to {}", self.resource_Name, filepath_str, resolved_str);
 				filepath = std::filesystem::path(resolved_str);
 			} catch (const std::exception& ex) {
@@ -116,7 +117,7 @@ public:
 
 		const auto filepath_str = self.res_settings().base_path + std::string(key);
 		try {
-			const auto resolved_str = self.settings.res_resolve(filepath_str);
+			const auto resolved_str = libv::res::resource_path(filepath_str);
 
 			std::error_code ignore_ec;
 			return std::filesystem::exists(resolved_str, ignore_ec);

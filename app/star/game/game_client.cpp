@@ -19,7 +19,7 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
 #include <libv/utility/timer.hpp>
-#include <wish/resource_path.hpp>
+#include <libv/res/resource_path.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
@@ -65,18 +65,13 @@ struct ImplGameClient {
 			config_(make_config<ClientConfig>(nexus_, configFilepath)),
 			ui([&] {
 				libv::ui::Settings settings;
-
-				// settings.nexus = nexus_;
-
-				// TODO P1: Internalize used UI resources under star, currently: app/star/../../res/
-				settings.res_font.base_path = "../../res/font/";
-				settings.res_shader.base_path = "../../res/shader/";
-				settings.res_texture.base_path = "../../res/texture/";
-
-				settings.res_font.restrict_under_base = false; // TODO P1: Should go away with proper res folder
-				settings.res_shader.restrict_under_base = false; // TODO P1: Should go away with proper res folder
-				settings.res_texture.restrict_under_base = false; // TODO P1: Should go away with proper res folder
-
+				settings.use_libv_res_resource_path = true;
+				settings.res_font.base_path = "res/font/";
+				settings.res_font.restrict_under_base = true;
+				settings.res_shader.base_path = "res/shader/";
+				settings.res_shader.restrict_under_base = true;
+				settings.res_texture.base_path = "res/texture/";
+				settings.res_texture.restrict_under_base = true;
 				settings.track_style_scripts = true;
 				return settings;
 			}()) {
@@ -92,7 +87,7 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	register_nexus();
 
 	self->ui.attach(self->frame);
-	self->ui.load_style_script_file(wish::resource_path("res/style.lua"));
+	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style.lua")));
 
 	init_ui(devMode);
 }

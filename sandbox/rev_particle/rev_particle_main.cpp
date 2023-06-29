@@ -7,6 +7,7 @@
 #include <libv/frame/icon_set.hpp>
 #include <libv/log/log.hpp>
 #include <libv/math/exp_moving_avg.hpp>
+#include <libv/res/resource_path.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
@@ -40,7 +41,7 @@
 #include <libv/sun/ui/overlay_shader_error.hpp>
 #include <libv/sun/camera.hpp>
 
-#include <wish/resource_path.hpp>
+#include <wish/resource_mapping.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -283,6 +284,7 @@ class Sandbox : public libv::Frame {
 
 	libv::ui::UI ui{[] {
 		libv::ui::Settings settings;
+		settings.use_libv_res_resource_path = true;
 		settings.res_font.base_path = "res/font/";
 		settings.res_font.restrict_under_base = true;
 		settings.res_shader.base_path = "res/shader/";
@@ -290,10 +292,6 @@ class Sandbox : public libv::Frame {
 		settings.res_texture.base_path = "res/texture/";
 		settings.res_texture.restrict_under_base = true;
 		settings.track_style_scripts = true;
-
-		settings.res_resolve = [](const std::string& path) {
-			return wish::resource_path(path);
-		};
 		// settings.style_scripts = { "style.lua" };
 		return settings;
 	}()};
@@ -328,8 +326,7 @@ public:
 
 		// --- UI Initialization ---
 		ui.attach(*this);
-		ui.load_style_script_file(wish::resource_path("res/style.lua"));
-		// ui.load_style_script_file("style.lua");
+		ui.load_style_script_file(std::string(libv::res::resource_path("res/style.lua")));
 		ui.add(init_ui());
 		ui.add(overlay_version());
 		ui.add(overlay_fps());
@@ -389,6 +386,7 @@ int main(int argc, const char* const* argv) {
 	std::cout << libv::logger_stream;
 
 	wish::change_current_path(argc, argv);
+	libv::res::init_resource_mapping(wish::resource_mapping());
 
 	Sandbox sandbox;
 	sandbox.show();
