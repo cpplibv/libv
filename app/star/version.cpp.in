@@ -2,6 +2,8 @@
 
 // hpp
 #include <star/version.hpp>
+// libv
+#include <libv/utility/version.hpp>
 
 
 namespace star {
@@ -9,7 +11,15 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 libv::build_info build{
-		.version_number{0, 3, 0, 0}
+		libv::version_number{
+				@WISH_BUILD_VERSION_MAJOR@,
+				@WISH_BUILD_VERSION_MINOR@,
+				@WISH_BUILD_VERSION_PATCH@},
+		"@WISH_BUILD_VERSION_NAME@",
+		"@WISH_BUILD_VARIANT@",
+		@WISH_BUILD_ID@,
+		"@WISH_BUILD_DATETIME@",
+		"@WISH_BUILD_UUID@"
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -49,7 +49,6 @@ public:
 
 } // namespace libv --------------------------------------------------------------------------------
 
-
 ////template <std::size_t N, typename T>
 ////struct fmt::formatter<libv::vec_t<N, T>, char, void> : public fmt::formatter<T, char, void> {
 ////	const char* sep_begin = " ";
@@ -167,35 +166,31 @@ struct fmt::formatter<libv::version_number> : fmt::formatter<uint16_t> {
 
 namespace libv { // --------------------------------------------------------------------------------
 
-struct build_info {
-	libv::version_number version_number;
-//	std::string version_name;
-//	... build_number;
-//	... build_hash;
-//	... build_date / build_time;
-//	... git_commit_number;
-//	... git_branch;
-//	... variant;
-//  std::string compiler;
-//  std::string build_type;
-//  std::chrono::system_clock::time_point build_time;
-//	std::optional<libv::hash::SHA1> git_hash;
-//
-//	? uint8_t stage;
-//		Alpha
-//		Beta
-//		Release candidate
-//		Release
-//
-//		Stable
-//
-//	WISH_GIT_BRANCH
-//	WISH_GIT_COMMIT_HASH
-//	WISH_DATE_SHORT WISH_TIME_SHORT
-};
+using build_id = uint32_t;
 
-//extern BuildInfo build;
-//extern libv::build_info build;
+struct build_info {
+	libv::version_number version_number = {0, 0, 0, 0};
+	std::string version_name; /// Fictional name of the version: "Espionage"
+	std::string variant; /// "Branch variant" Development / Beta / Canary / Live
+	libv::build_id build_id = {0};
+
+	// TODO P3: Use correct build_time type
+	// TODO P3: Use correct build_uuid type
+	// std::chrono::utc_clock::time_point build_time;
+	std::string build_time;
+	std::string build_uuid;
+
+	// ? uint8_t stage;
+	// 	Alpha
+	// 	Beta
+	// 	Release candidate
+	// 	Release
+	// 	Stable
+
+	// std::optional<libv::hash::SHA1> git_hash;
+	// std::string compiler;
+	// std::string build_type;
+};
 
 // -------------------------------------------------------------------------------------------------
 

@@ -16,9 +16,19 @@ wish_create_library(
 		LINK libv::noise
 )
 
+set(WISH_BUILD_VERSION_MAJOR 0 CACHE STRING "BUILD_VERSION_MAJOR")
+set(WISH_BUILD_VERSION_MINOR 0 CACHE STRING "BUILD_VERSION_MINOR")
+set(WISH_BUILD_VERSION_PATCH 0 CACHE STRING "BUILD_VERSION_PATCH")
+set(WISH_BUILD_VERSION_NAME "version-name" CACHE STRING "BUILD_VERSION_NAME")
+set(WISH_BUILD_VARIANT "dev" CACHE STRING "BUILD_VARIANT")
+set(WISH_BUILD_ID 0 CACHE STRING "BUILD_ID")
+set(WISH_BUILD_DATETIME "2000-01-01T00:00:00Z" CACHE STRING "BUILD_DATETIME")
+set(WISH_BUILD_UUID 00000000-0000-0000-0000-000000000000 CACHE STRING "BUILD_UUID")
+
 wish_create_executable(
 		TARGET star
-		SOURCE star_main.cpp version.cpp
+		SOURCE star_main.cpp
+		CONFIGURE_SOURCE version.cpp.in
 		LINK star::game libv::arg
 )
 
@@ -43,6 +53,5 @@ wish_package(
 wish_create_executable(
 		TARGET test_star
 		SOURCE test/*.cpp
-		#	SOURCE ../star/game/surface/*.cpp
 		LINK ext_catch star::game
 )
