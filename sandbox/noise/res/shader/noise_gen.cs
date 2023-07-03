@@ -5,7 +5,7 @@
 
 layout(local_size_x = 8, local_size_y = 8) in;
 
-layout(rgba32f, binding = 0) uniform image2D target;
+layout(r32f, binding = 0) uniform image2D target;
 uniform float time;
 uniform sampler2D texture_cpu;
 

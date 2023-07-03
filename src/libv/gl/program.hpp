@@ -91,6 +91,16 @@ public:
 			log_gl.error("Failed to link program:\n{}", info());
 	}
 
+	inline void link(const Shader& compute) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glAttachShader(object.id, compute.id);
+		checkGL();
+		glLinkProgram(object.id);
+		checkGL();
+		if (!status())
+			log_gl.error("Failed to link program:\n{}", info());
+	}
+
 	inline void link(const Shader& vertex, const Shader& fragment) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glAttachShader(object.id, vertex.id);

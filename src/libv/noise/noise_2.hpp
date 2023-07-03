@@ -12,6 +12,13 @@
 namespace libv {
 namespace noise {
 
+// -------------------------------------------------------------------------------------------------
+
+static constexpr float default_amplitude = 1.0f;
+static constexpr float default_frequency = 1.0f;
+static constexpr float default_lacunarity = 2.0f;
+static constexpr float default_persistence = 0.5f;
+
 // --- Value ---------------------------------------------------------------------------------------
 
 constexpr inline struct ValueFn {
@@ -166,10 +173,10 @@ template <typename NoiseFunc>
 		float x, float y,
 		NoiseFunc&& noiseFunc,
 		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+		float amplitude = default_amplitude,
+		float frequency = default_frequency,
+		float lacunarity = default_lacunarity,
+		float persistence = default_persistence) noexcept {
 	using Result = std::invoke_result_t<NoiseFunc, Seed, float, float>;
 
 	Result result{0};
@@ -191,10 +198,10 @@ template <typename NoiseFunc>
 		float x, float y, float z,
 		NoiseFunc&& noiseFunc,
 		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+		float amplitude = default_amplitude,
+		float frequency = default_frequency,
+		float lacunarity = default_lacunarity,
+		float persistence = default_persistence) noexcept {
 	using Result = std::invoke_result_t<NoiseFunc, Seed, float, float, float>;
 
 	Result result{0};
@@ -210,28 +217,12 @@ template <typename NoiseFunc>
 }
 
 template <typename NoiseFunc>
-[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal(
-		Seed seed,
-		libv::vec2f coord,
-		NoiseFunc&& noiseFunc,
-		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal( Seed seed, libv::vec2f coord, NoiseFunc&& noiseFunc, int octaves, float amplitude = default_amplitude, float frequency = default_frequency, float lacunarity = default_lacunarity, float persistence = default_persistence) noexcept {
 	return fractal(seed, coord.x, coord.y, noiseFunc, octaves, amplitude, frequency, lacunarity, persistence);
 }
 
 template <typename NoiseFunc>
-[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal(
-		Seed seed,
-		libv::vec3f coord,
-		NoiseFunc&& noiseFunc,
-		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal( Seed seed, libv::vec3f coord, NoiseFunc&& noiseFunc, int octaves, float amplitude = default_amplitude, float frequency = default_frequency, float lacunarity = default_lacunarity, float persistence = default_persistence) noexcept {
 	return fractal(seed, coord.x, coord.y, coord.z, noiseFunc, octaves, amplitude, frequency, lacunarity, persistence);
 }
 
@@ -242,10 +233,10 @@ template <typename GradientNoiseFunc>
 		float x, float y,
 		GradientNoiseFunc&& noiseFunc,
 		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+		float amplitude = default_amplitude,
+		float frequency = default_frequency,
+		float lacunarity = default_lacunarity,
+		float persistence = default_persistence) noexcept {
 	using Result = std::invoke_result_t<GradientNoiseFunc, Seed, float, float>;
 
 	Result result{0};
@@ -267,16 +258,16 @@ template <typename GradientNoiseFunc>
 		float x, float y, float z,
 		GradientNoiseFunc&& noiseFunc,
 		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
-	using Result = std::invoke_result_t<GradientNoiseFunc, Seed, float, float>;
+		float amplitude = default_amplitude,
+		float frequency = default_frequency,
+		float lacunarity = default_lacunarity,
+		float persistence = default_persistence) noexcept {
+	using Result = std::invoke_result_t<GradientNoiseFunc, Seed, float, float, float>;
 
 	Result result{0};
 
 	for (int32_t i = 0; i < octaves; ++i) {
-		result += noiseFunc(seed, x * frequency + result.x, y * frequency + result.y,  z * frequency + result.z) * amplitude;
+		result += noiseFunc(seed, x * frequency + result.x, y * frequency + result.y, z * frequency + result.z) * amplitude;
 
 		frequency *= lacunarity;
 		amplitude *= persistence;
@@ -287,29 +278,13 @@ template <typename GradientNoiseFunc>
 
 /// Homebrew progressive fractal
 template <typename GradientNoiseFunc>
-[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal_progressive(
-		Seed seed,
-		libv::vec2f coord,
-		GradientNoiseFunc&& noiseFunc,
-		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal_progressive( Seed seed, libv::vec2f coord, GradientNoiseFunc&& noiseFunc, int octaves, float amplitude = default_amplitude, float frequency = default_frequency, float lacunarity = default_lacunarity, float persistence = default_persistence) noexcept {
 	return fractal_progressive(seed, coord.x, coord.y, noiseFunc, octaves, amplitude, frequency, lacunarity, persistence);
 }
 
 /// Homebrew progressive fractal
 template <typename GradientNoiseFunc>
-[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal_progressive(
-		Seed seed,
-		libv::vec3f coord,
-		GradientNoiseFunc&& noiseFunc,
-		int octaves,
-		float amplitude = 1.0f,
-		float frequency = 1.0f,
-		float lacunarity = 2.0f,
-		float persistence = 0.5f) noexcept {
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto fractal_progressive( Seed seed, libv::vec3f coord, GradientNoiseFunc&& noiseFunc, int octaves, float amplitude = default_amplitude, float frequency = default_frequency, float lacunarity = default_lacunarity, float persistence = default_persistence) noexcept {
 	return fractal_progressive(seed, coord.x, coord.y, coord.z, noiseFunc, octaves, amplitude, frequency, lacunarity, persistence);
 }
 

@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/meta/force_inline.hpp>
+#include <libv/meta/uninitialized.hpp>
 // std
 #include <cmath>
 #include <type_traits>
@@ -23,6 +24,7 @@ struct Approx {
 	T value;
 
 	constexpr LIBV_FORCE_INLINE Approx() noexcept = default;
+	constexpr LIBV_FORCE_INLINE Approx(libv::uninitialized_t) noexcept {};
 	constexpr LIBV_FORCE_INLINE Approx(const Approx& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE Approx(Approx&& orig) noexcept = default;
 

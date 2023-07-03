@@ -50,9 +50,13 @@ public:
 			size_(x, y),
 			storage(reinterpret_cast<T*>(::operator new[](sizeof(T) * x * y))) {
 
-		// Raw allocation with placement new with libv::uninitialized which should be optimized away
-		for (std::size_t i = 0; i < x * y; ++i)
-			::new (&storage[i]) T(libv::uninitialized);
+		// Raw allocation with placement new with libv::uninitialized which should be optimized away if supported
+		if constexpr (requires { T(libv::uninitialized); })
+			for (std::size_t i = 0; i < x * y; ++i)
+				::new (&storage[i]) T(libv::uninitialized);
+		else
+			for (std::size_t i = 0; i < x * y; ++i)
+				::new (&storage[i]) T();
 	}
 
 public:

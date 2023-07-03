@@ -1343,6 +1343,14 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET test_libv_noise
+	SOURCE test/libv/noise/*.cpp
+	LINK   ext_catch libv::noise
+	LINK   libv::gl libv::rev ext_glfw
+	LINK   libv::utility libv::container libv::algo
+)
+
+wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE test/libv/parse/*.cpp
 	LINK   ext_catch libv::parse
