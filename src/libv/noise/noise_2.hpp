@@ -85,9 +85,9 @@ enum class CellularReturnType {
 
 constexpr inline struct CellularFn {
 private:
-	CellularDistanceFunction _distanceFn = CellularDistanceFunction::euclidean;
-	CellularReturnType _returnType = CellularReturnType::cellValue;
-	float _jitter = 1.0f;
+	CellularDistanceFunction distanceFn_ = CellularDistanceFunction::euclidean;
+	CellularReturnType returnType_ = CellularReturnType::cellValue;
+	float jitter_ = 1.0f;
 
 public:
 	CellularFn() = default;
@@ -96,9 +96,9 @@ private:
 			CellularDistanceFunction distanceFn,
 			CellularReturnType returnType,
 			float jitter) :
-			_distanceFn(distanceFn),
-			_returnType(returnType),
-			_jitter(jitter) {}
+			distanceFn_(distanceFn),
+			returnType_(returnType),
+			jitter_(jitter) {}
 
 public:
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE CellularFn operator()(
@@ -109,19 +109,19 @@ public:
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, float x, float y) const noexcept {
-		return operator()(seed, x, y, _distanceFn, _returnType, _jitter);
+		return operator()(seed, x, y, distanceFn_, returnType_, jitter_);
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, float x, float y, float z) const noexcept {
-		return operator()(seed, x, y, z, _distanceFn, _returnType, _jitter);
+		return operator()(seed, x, y, z, distanceFn_, returnType_, jitter_);
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec2f coord) const noexcept {
-		return operator()(seed, coord.x, coord.y, _distanceFn, _returnType, _jitter);
+		return operator()(seed, coord.x, coord.y, distanceFn_, returnType_, jitter_);
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec3f coord) const noexcept {
-		return operator()(seed, coord.x, coord.y, coord.z, _distanceFn, _returnType, _jitter);
+		return operator()(seed, coord.x, coord.y, coord.z, distanceFn_, returnType_, jitter_);
 	}
 
 	[[nodiscard]] static float operator()(Seed seed, float x, float y,
