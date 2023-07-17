@@ -17,6 +17,7 @@
 !/src/
 !/test/
 
+!/.clang-format
 !/.editorconfig
 !/.gitignore
 !/BUILDING.md

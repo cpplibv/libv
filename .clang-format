@@ -1,0 +1,74 @@
+---
+#BasedOnStyle: LLVM # Use defaults from the LLVM style
+
+AlwaysBreakTemplateDeclarations: Yes
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
+AlignOperands: DontAlign
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLambdasOnASingleLine: Empty
+#AllowShortIfStatementsOnASingleLine: false
+#AlignTrailingComments:
+#  Kind: Always
+#  OverEmptyLines: 2
+#BinPackArguments: false
+#BinPackParameters: false
+BitFieldColonSpacing: None
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+BraceWrapping:
+    BeforeLambdaBody: true
+#  AfterEnum: true
+#  AfterStruct: false
+#  SplitEmptyFunction: false
+#ColumnLimit: 0
+ColumnLimit: 120
+ContinuationIndentWidth: 8
+EmptyLineBeforeAccessModifier: LogicalBlock
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '^<catch2/'
+    Priority:        1
+  - Regex:           '^<libv/'
+    Priority:        3
+  - Regex:           '^<wish/'
+    Priority:        3
+  - Regex:           '<[[:alnum:]_]+>' # Extensionless std headers
+    Priority:        4
+  - Regex:           '<[[:alnum:].-_]+>' # Any <> header not matched so far
+    Priority:        2
+    SortPriority:    2
+  - Regex:           '"[[:alnum:]._-]+"'
+    Priority:        5
+# Unfortunately freetype wierd include via macros FT_FREETYPE_H
+#  - Regex:           '^<(assimp|boost|clip|colony|cppcoro|hdiffpatch|efsw|fmt|function2|GL|GLFW|gli|glm|openssl|immer|prometheus|range|rp3d|SOIL2|sol|sqlite3|utf8cpp|jc_voronoi|vide)/'
+#    Priority:        2
+#  - Regex:           '^<(ctre\.hpp|zstd\.h|ft2build\.h)>$'
+#    Priority:        2
+#IncludeIsMainRegex:
+#IncludeIsMainSourceRegex:
+#IndentCaseLabels
+IndentCaseLabels: false
+#IndentPPDirectives
+IndentWidth: 4
+LineEnding: LF
+LambdaBodyIndentation: OuterScope
+MaxEmptyLinesToKeep: 2
+PackConstructorInitializers: NextLine
+QualifierAlignment: Left
+#QualifierAlignment: Custom
+#QualifierOrder: ['friend', 'static', 'constexpr', 'inline', 'volatile', 'restrict', 'const', 'type']
+#QualifierOrder: ['virtual', 'explicit', 'friend', 'static', 'constexpr', 'inline', 'const', 'type']
+PointerAlignment: Left
+ReferenceAlignment: Left
+#RemoveSemicolon: true
+#RequiresClausePosition
+RequiresExpressionIndentation: OuterScope
+SpaceAfterCStyleCast: true
+SpaceInEmptyBlock: true
+SeparateDefinitionBlocks: Leave
+SortIncludes: CaseInsensitive
+TabWidth: 4
+UseTab: Always
+...
