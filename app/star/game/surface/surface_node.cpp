@@ -79,7 +79,7 @@ float NodeFractal::evaluate(float x, float y) noexcept {
 // --- NodeSimplexGradientFractal --------------------------------------------------------------------------------------------
 
 float NodeSimplexGradientFractal::evaluate(float x, float y) noexcept {
-	auto [wx, wy] = libv::noise::fractal(seed, x, y, libv::noise::simplexGradient, octaves, amplitude, frequency, lacunarity, persistence);
+	auto [wx, wy] = libv::noise::fractal(seed, x, y, libv::noise::simplex_grad, octaves, amplitude, frequency, lacunarity, persistence);
 	return input->evaluate(wx, wy);
 }
 

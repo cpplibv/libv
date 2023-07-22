@@ -64,11 +64,11 @@ struct NodeSimplex : SurfaceNode {
 struct NodeCellular : SurfaceNode {
 	Seed seed = 0x5EED;
 
-	libv::noise::CellularDistanceFunction distanceFn = libv::noise::CellularDistanceFunction::euclidean;
-	libv::noise::CellularReturnType returnType = libv::noise::CellularReturnType::cellValue;
+	libv::noise::CellularDistance distanceFn = libv::noise::CellularDistance::euclidean;
+	libv::noise::CellularReturn returnType = libv::noise::CellularReturn::cellValue;
 	float jitter = 1.0f;
 
-	NodeCellular(Seed seed, libv::noise::CellularDistanceFunction distanceFn, libv::noise::CellularReturnType returnType, float jitter) :
+	NodeCellular(Seed seed, libv::noise::CellularDistance distanceFn, libv::noise::CellularReturn returnType, float jitter) :
 			seed(seed), distanceFn(distanceFn), returnType(returnType), jitter(jitter) {}
 	virtual float evaluate(float x, float y) noexcept override;
 };

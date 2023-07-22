@@ -74,22 +74,22 @@ float SimplexFn::operator()(libv::Seed seed, float x, float y, float z) noexcept
 
 // --- Cellular ------------------------------------------------------------------------------------
 
-static_assert(to_underlying(CellularDistanceFunction::euclidean) == FastNoiseLite::CellularDistanceFunction_Euclidean);
-static_assert(to_underlying(CellularDistanceFunction::euclideanSq) == FastNoiseLite::CellularDistanceFunction_EuclideanSq);
-static_assert(to_underlying(CellularDistanceFunction::manhattan) == FastNoiseLite::CellularDistanceFunction_Manhattan);
-static_assert(to_underlying(CellularDistanceFunction::hybrid) == FastNoiseLite::CellularDistanceFunction_Hybrid);
+static_assert(to_underlying(CellularDistance::euclidean) == FastNoiseLite::CellularDistanceFunction_Euclidean);
+static_assert(to_underlying(CellularDistance::euclideansq) == FastNoiseLite::CellularDistanceFunction_EuclideanSq);
+static_assert(to_underlying(CellularDistance::manhattan) == FastNoiseLite::CellularDistanceFunction_Manhattan);
+static_assert(to_underlying(CellularDistance::hybrid) == FastNoiseLite::CellularDistanceFunction_Hybrid);
 
-static_assert(to_underlying(CellularReturnType::cellValue) == FastNoiseLite::CellularReturnType_CellValue);
-static_assert(to_underlying(CellularReturnType::distance) == FastNoiseLite::CellularReturnType_Distance);
-static_assert(to_underlying(CellularReturnType::distance2) == FastNoiseLite::CellularReturnType_Distance2);
-static_assert(to_underlying(CellularReturnType::distance2Add) == FastNoiseLite::CellularReturnType_Distance2Add);
-static_assert(to_underlying(CellularReturnType::distance2Sub) == FastNoiseLite::CellularReturnType_Distance2Sub);
-static_assert(to_underlying(CellularReturnType::distance2Mul) == FastNoiseLite::CellularReturnType_Distance2Mul);
-static_assert(to_underlying(CellularReturnType::distance2Div) == FastNoiseLite::CellularReturnType_Distance2Div);
+static_assert(to_underlying(CellularReturn::cellvalue) == FastNoiseLite::CellularReturnType_CellValue);
+static_assert(to_underlying(CellularReturn::distance) == FastNoiseLite::CellularReturnType_Distance);
+static_assert(to_underlying(CellularReturn::distance2) == FastNoiseLite::CellularReturnType_Distance2);
+static_assert(to_underlying(CellularReturn::distance2add) == FastNoiseLite::CellularReturnType_Distance2Add);
+static_assert(to_underlying(CellularReturn::distance2sub) == FastNoiseLite::CellularReturnType_Distance2Sub);
+static_assert(to_underlying(CellularReturn::distance2mul) == FastNoiseLite::CellularReturnType_Distance2Mul);
+static_assert(to_underlying(CellularReturn::distance2div) == FastNoiseLite::CellularReturnType_Distance2Div);
 
 float CellularFn::operator()(Seed seed, float x, float y,
-		CellularDistanceFunction distanceFn,
-		CellularReturnType returnType,
+		CellularDistance distanceFn,
+		CellularReturn returnType,
 		float jitter) noexcept {
 
 	return FastNoiseLite::SingleCellular(static_cast<int>(seed), x, y,
@@ -99,8 +99,8 @@ float CellularFn::operator()(Seed seed, float x, float y,
 }
 
 float CellularFn::operator()(Seed seed, float x, float y, float z,
-		CellularDistanceFunction distanceFn,
-		CellularReturnType returnType,
+		CellularDistance distanceFn,
+		CellularReturn returnType,
 		float jitter) noexcept {
 	return FastNoiseLite::SingleCellular(static_cast<int>(seed), x, y, z,
 			static_cast<FastNoiseLite::CellularDistanceFunction>(distanceFn),
@@ -109,7 +109,6 @@ float CellularFn::operator()(Seed seed, float x, float y, float z,
 }
 
 // --- Warp ------------------------------------------------------------------------------------
-
 
 libv::vec2f SimplexGradientFn::operator()(Seed seed, float x, float y) noexcept {
 	const auto [xr, yr] = skew(x, y);

@@ -77,7 +77,7 @@ float simplex(uint seed, vec3 coord) {
 
 // --- Simplex Gradient ----------------------------------------------------------------------------
 
-vec2 simplex_gradient(uint seed, float x, float y) {
+vec2 simplex_grad(uint seed, float x, float y) {
 	// Skewing is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S2D
 	const float SQRT3 = float(1.7320508075688772935274463415059);
 	const float F2 = 0.5 * (SQRT3 - 1);
@@ -91,11 +91,11 @@ vec2 simplex_gradient(uint seed, float x, float y) {
 	return vec2(xr, yr);
 }
 
-vec2 simplex_gradient(uint seed, vec2 coord) {
-	return simplex_gradient(seed, coord.x, coord.y);
+vec2 simplex_grad(uint seed, vec2 coord) {
+	return simplex_grad(seed, coord.x, coord.y);
 }
 
-vec3 simplex_gradient(uint seed, float x, float y, float z) {
+vec3 simplex_grad(uint seed, float x, float y, float z) {
 	// Rotating is done here instead of TransformNoiseCoordinate bc we are direct calling _fnlSingleOpenSimplex2S3D
 	const float R3 = 2.f / 3.f;
 	float r = (x + y + z) * R3;// Rotation, not skew
@@ -110,18 +110,35 @@ vec3 simplex_gradient(uint seed, float x, float y, float z) {
 	return vec3(xr, yr, zr);
 }
 
-vec3 simplex_gradient(uint seed, vec3 coord) {
-	return simplex_gradient(seed, coord.x, coord.y, coord.z);
+vec3 simplex_grad(uint seed, vec3 coord) {
+	return simplex_grad(seed, coord.x, coord.y, coord.z);
 }
 
 // --- Cellular ------------------------------------------------------------------------------------
 
-#define libv_cellular_distance_func int
-#define libv_cellular_return_type int
+
+#define type_cellular_distance int
+#define cellular_distance_euclidean FNL_CELLULAR_DISTANCE_EUCLIDEAN
+#define cellular_distance_euclideansq FNL_CELLULAR_DISTANCE_EUCLIDEANSQ
+#define cellular_distance_manhattan FNL_CELLULAR_DISTANCE_MANHATTAN
+#define cellular_distance_hybrid FNL_CELLULAR_DISTANCE_HYBRID
+#define default_cellular_distance cellular_distance_euclidean
+
+#define type_cellular_return int
+#define cellular_return_cellvalue FNL_CELLULAR_RETURN_TYPE_CELLVALUE
+#define cellular_return_distance FNL_CELLULAR_RETURN_TYPE_DISTANCE
+#define cellular_return_distance2 FNL_CELLULAR_RETURN_TYPE_DISTANCE2
+#define cellular_return_distance2add FNL_CELLULAR_RETURN_TYPE_DISTANCE2ADD
+#define cellular_return_distance2sub FNL_CELLULAR_RETURN_TYPE_DISTANCE2SUB
+#define cellular_return_distance2mul FNL_CELLULAR_RETURN_TYPE_DISTANCE2MUL
+#define cellular_return_distance2div FNL_CELLULAR_RETURN_TYPE_DISTANCE2DIV
+#define default_cellular_return cellular_return_cellvalue
+
+#define default_cellular_jitter 1.0f
 
 float cellular(uint seed, float x, float y,
-		libv_cellular_distance_func distanceFn,
-		libv_cellular_return_type returnType,
+		type_cellular_distance distanceFn,
+		type_cellular_return returnType,
 		float jitter) {
 	fnl_state state = fnlCreateState(int(seed));
 	state.cellular_distance_func = distanceFn;
@@ -131,8 +148,8 @@ float cellular(uint seed, float x, float y,
 }
 
 float cellular(uint seed, float x, float y, float z,
-		libv_cellular_distance_func distanceFn,
-		libv_cellular_return_type returnType,
+		type_cellular_distance distanceFn,
+		type_cellular_return returnType,
 		float jitter) {
 	fnl_state state = fnlCreateState(int(seed));
 	state.cellular_distance_func = distanceFn;
@@ -141,12 +158,28 @@ float cellular(uint seed, float x, float y, float z,
 	return _fnlSingleCellular3D(state, int(seed), x, y, z);
 }
 
-float cellular(uint seed, vec2 coord, libv_cellular_distance_func distanceFn, libv_cellular_return_type returnType, float jitter) {
+float cellular(uint seed, vec2 coord, type_cellular_distance distanceFn, type_cellular_return returnType, float jitter) {
 	return cellular(seed, coord.x, coord.y, distanceFn, returnType, jitter);
 }
 
-float cellular(uint seed, vec3 coord, libv_cellular_distance_func distanceFn, libv_cellular_return_type returnType, float jitter) {
+float cellular(uint seed, vec3 coord, type_cellular_distance distanceFn, type_cellular_return returnType, float jitter) {
 	return cellular(seed, coord.x, coord.y, coord.z, distanceFn, returnType, jitter);
+}
+
+float cellular(uint seed, float x, float y) {
+	return cellular(seed, x, y, default_cellular_distance, default_cellular_return, default_cellular_jitter);
+}
+
+float cellular(uint seed, float x, float y, float z) {
+	return cellular(seed, x, y, z, default_cellular_distance, default_cellular_return, default_cellular_jitter);
+}
+
+float cellular(uint seed, vec2 coord) {
+	return cellular(seed, coord.x, coord.y, default_cellular_distance, default_cellular_return, default_cellular_jitter);
+}
+
+float cellular(uint seed, vec3 coord) {
+	return cellular(seed, coord.x, coord.y, coord.z, default_cellular_distance, default_cellular_return, default_cellular_jitter);
 }
 
 // --- Fractal -------------------------------------------------------------------------------------
@@ -208,9 +241,9 @@ float cellular(uint seed, vec3 coord, libv_cellular_distance_func distanceFn, li
 _GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_value, value, , )
 _GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_perlin, perlin, , )
 _GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_simplex, simplex, , )
-_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_cellular, cellular, COMMA libv_cellular_distance_func distanceFn COMMA libv_cellular_return_type returnType COMMA float jitter, COMMA distanceFn COMMA returnType COMMA jitter)
-_GENERATE_FRACTAL_INDEPENDENT(vec2, vec3, fractal_simplex_gradient_independent, simplex_gradient, , )
-_GENERATE_FRACTAL_PROGRESSIVE(vec2, vec3, fractal_simplex_gradient_progressive, simplex_gradient, , )
+_GENERATE_FRACTAL_INDEPENDENT(float, float, fractal_cellular, cellular, COMMA type_cellular_distance distanceFn COMMA type_cellular_return returnType COMMA float jitter, COMMA distanceFn COMMA returnType COMMA jitter)
+_GENERATE_FRACTAL_INDEPENDENT(vec2, vec3, fractal_simplex_grad_independent, simplex_grad, , )
+_GENERATE_FRACTAL_PROGRESSIVE(vec2, vec3, fractal_simplex_grad_progressive, simplex_grad, , )
 
 #undef _GENERATE_FRACTAL_PROGRESSIVE
 #undef _GENERATE_FRACTAL_INDEPENDENT

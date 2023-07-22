@@ -155,27 +155,28 @@ public:
 			float yf = static_cast<float>(y);
 			for (int x = 0; x < 1024; ++x) {
 				float xf = static_cast<float>(x);
-
-				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f};
-				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
+				auto seed_offset = x / 64;
+				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f} * 10;
+				const auto cpu = libv::noise::simplex(0x5EED + seed_offset, uv) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::cellular(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = yf / 1024.f;
 				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::cellular(0x511D, uv * 20.f,
-				// 		libv::noise::CellularDistanceFunction::euclideanSq,
-				// 		libv::noise::CellularReturnType::cellValue,
+				// 		libv::noise::CellularDistance::euclideanSq,
+				// 		libv::noise::CellularReturn::cellValue,
 				// 		1.f) * 0.5f + 0.5f;
 
 				// const auto warp = libv::noise::fractal(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::warp, 5) * 20.f;
-				const auto warp = libv::noise::fractal_progressive(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::simplexGradient, 5, 50.f);
+				// const auto warp = libv::noise::fractal_progressive(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::simplex_grad, 5, 50.f);
+				// const auto warp = libv::noise::perlin(0x5EED, uv.x * 5.f, uv.y * 5.f, libv::noise::simplex_grad, 5, 50.f);
 				// const auto warp = libv::noise::fractal(0x511D, uv.x * 5.f, uv.y * 5.f, libv::noise::warp, 5, 200.f);
-				const auto cpu = static_cast<int>(libv::round(uv * 20.f + warp).x + libv::round(uv * 20.f + warp).y) % 2 == 0;
+				// const auto cpu = static_cast<int>(libv::round(uv * 20.f + warp).x + libv::round(uv * 20.f + warp).y) % 2 == 0;
 				// const auto gpu = output(x, y);
 				// const auto diff = gpu - cpu;
 				// fmt::print("CPU: {:7.5f} GPU: {:7.5f} Diff: {: 10.8f}\n", cpu, gpu, diff);
 
-				cpu_data.push_back({cpu, warp.x, warp.y});
+				cpu_data.push_back({cpu, 0, 0});
 			}
 		}
 		cpu_texture.image(0, {0, 0}, {1024, 1024}, cpu_data.data());
@@ -256,8 +257,8 @@ public:
 		// 			// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 		// 			// const auto cpu = libv::noise::simplex(0x5EED, xf / 1024.f, yf / 1024.f) * 0.5f + 0.5f;
 		// 			// const auto cpu = libv::noise::cellular(0x511D, xf / 1024.f, yf / 1024.f,
-		// 			// 		libv::noise::CellularDistanceFunction::euclidean,
-		// 			// 		libv::noise::CellularReturnType::cellValue, 1.f) * 0.5f + 0.5f;
+		// 			// 		libv::noise::CellularDistance::euclidean,
+		// 			// 		libv::noise::CellularReturn::cellValue, 1.f) * 0.5f + 0.5f;
 		// 			// const auto gpu = output(x, y);
 		// 			// const auto diff = gpu - cpu;
 		// 			// fmt::print("CPU: {:7.5f} GPU: {:7.5f} Diff: {: 10.8f}\n", cpu, gpu, diff);

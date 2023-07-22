@@ -66,35 +66,39 @@ constexpr inline struct SimplexFn {
 
 // --- Cellular ------------------------------------------------------------------------------------
 
-enum class CellularDistanceFunction {
+enum class CellularDistance {
 	euclidean = 0,
-	euclideanSq = 1,
+	euclideansq = 1,
 	manhattan = 2,
 	hybrid = 3,
 };
 
-enum class CellularReturnType {
-	cellValue = 0,
+static constexpr CellularDistance default_cellular_distance = CellularDistance::euclidean;
+
+enum class CellularReturn {
+	cellvalue = 0,
 	distance = 1,
 	distance2 = 2,
-	distance2Add = 3,
-	distance2Sub = 4,
-	distance2Mul = 5,
-	distance2Div = 6,
+	distance2add = 3,
+	distance2sub = 4,
+	distance2mul = 5,
+	distance2div = 6,
 };
+
+static constexpr CellularReturn default_cellular_return = CellularReturn::cellvalue;
 
 constexpr inline struct CellularFn {
 private:
-	CellularDistanceFunction distanceFn_ = CellularDistanceFunction::euclidean;
-	CellularReturnType returnType_ = CellularReturnType::cellValue;
+	CellularDistance distanceFn_ = default_cellular_distance;
+	CellularReturn returnType_ = default_cellular_return;
 	float jitter_ = 1.0f;
 
 public:
 	CellularFn() = default;
 private:
 	CellularFn(
-			CellularDistanceFunction distanceFn,
-			CellularReturnType returnType,
+			CellularDistance distanceFn,
+			CellularReturn returnType,
 			float jitter) :
 			distanceFn_(distanceFn),
 			returnType_(returnType),
@@ -102,8 +106,8 @@ private:
 
 public:
 	[[nodiscard]] static constexpr LIBV_FORCE_INLINE CellularFn operator()(
-			CellularDistanceFunction distanceFn = CellularDistanceFunction::euclidean,
-			CellularReturnType returnType = CellularReturnType::cellValue,
+			CellularDistance distanceFn = default_cellular_distance,
+			CellularReturn returnType = default_cellular_return,
 			float jitter = 1.0f) noexcept {
 		return CellularFn{distanceFn, returnType, jitter};
 	}
@@ -125,25 +129,25 @@ public:
 	}
 
 	[[nodiscard]] static float operator()(Seed seed, float x, float y,
-			CellularDistanceFunction distanceFn,
-			CellularReturnType returnType,
+			CellularDistance distanceFn,
+			CellularReturn returnType,
 			float jitter) noexcept;
 
 	[[nodiscard]] static float operator()(Seed seed, float x, float y, float z,
-			CellularDistanceFunction distanceFn,
-			CellularReturnType returnType,
+			CellularDistance distanceFn,
+			CellularReturn returnType,
 			float jitter) noexcept;
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec2f coord,
-			CellularDistanceFunction distanceFn,
-			CellularReturnType returnType,
+			CellularDistance distanceFn,
+			CellularReturn returnType,
 			float jitter) const noexcept {
 		return operator()(seed, coord.x, coord.y, distanceFn, returnType, jitter);
 	}
 
 	[[nodiscard]] LIBV_FORCE_INLINE float operator()(Seed seed, libv::vec3f coord,
-			CellularDistanceFunction distanceFn,
-			CellularReturnType returnType,
+			CellularDistance distanceFn,
+			CellularReturn returnType,
 			float jitter) const noexcept {
 		return operator()(seed, coord.x, coord.y, coord.z, distanceFn, returnType, jitter);
 	}
@@ -162,7 +166,7 @@ constexpr inline struct SimplexGradientFn {
 	[[nodiscard]] LIBV_FORCE_INLINE static libv::vec3f operator()(Seed seed, libv::vec3f coord) noexcept {
 		return operator()(seed, coord.x, coord.y, coord.z);
 	}
-} simplexGradient;
+} simplex_grad;
 
 // --- Fractal -------------------------------------------------------------------------------------
 
