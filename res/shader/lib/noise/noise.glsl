@@ -87,7 +87,7 @@ vec2 simplex_grad(uint seed, float x, float y) {
 
 	float xr = 0;
 	float yr = 0;
-	_fnlSingleDomainWarpSimplexGradientB(int(seed), x, y, xr, yr, false);
+	_fnlSingleDomainWarpSimplexGradient(int(seed), x, y, xr, yr, false);
 	return vec2(xr, yr);
 }
 
@@ -106,7 +106,7 @@ vec3 simplex_grad(uint seed, float x, float y, float z) {
 	float xr = 0;
 	float yr = 0;
 	float zr = 0;
-	_fnlSingleDomainWarpOpenSimplex2GradientB(int(seed), x, y, z, xr, yr, zr, false);
+	__fnlSingleDomainWarpOpenSimplex2Gradient(int(seed), x, y, z, xr, yr, zr, false);
 	return vec3(xr, yr, zr);
 }
 
@@ -140,22 +140,14 @@ float cellular(uint seed, float x, float y,
 		type_cellular_distance distanceFn,
 		type_cellular_return returnType,
 		float jitter) {
-	fnl_state state = fnlCreateState(int(seed));
-	state.cellular_distance_func = distanceFn;
-	state.cellular_return_type = returnType;
-	state.cellular_jitter_mod = jitter;
-	return _fnlSingleCellular2D(state, int(seed), x, y);
+	return _fnlSingleCellular2D(int(seed), x, y, distanceFn, returnType, jitter);
 }
 
 float cellular(uint seed, float x, float y, float z,
 		type_cellular_distance distanceFn,
 		type_cellular_return returnType,
 		float jitter) {
-	fnl_state state = fnlCreateState(int(seed));
-	state.cellular_distance_func = distanceFn;
-	state.cellular_return_type = returnType;
-	state.cellular_jitter_mod = jitter;
-	return _fnlSingleCellular3D(state, int(seed), x, y, z);
+	return _fnlSingleCellular3D(int(seed), x, y, z, distanceFn, returnType, jitter);
 }
 
 float cellular(uint seed, vec2 coord, type_cellular_distance distanceFn, type_cellular_return returnType, float jitter) {
