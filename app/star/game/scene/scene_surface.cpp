@@ -21,6 +21,7 @@
 
 #include <libv/sun/camera.hpp>
 
+#include <libv/gl/gl.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/layout_std140.hpp>
 #include <libv/glr/mesh.hpp>
@@ -275,7 +276,13 @@ private:
 			{ // Grid
 				const auto s2_guard = glr.state.push_guard();
 				glr.state.disableDepthMask();
+				glr.callback([](libv::gl::GL& gl) {
+					gl.pushDebugGroup("Editor Grid");
+				});
 				renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
+				glr.callback([](libv::gl::GL& gl) {
+					gl.popDebugGroup();
+				});
 			}
 
 //			{ // Camera orbit point

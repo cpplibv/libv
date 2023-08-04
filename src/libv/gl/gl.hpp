@@ -12,6 +12,7 @@
 // std
 #include <array>
 #include <stack>
+#include <string_view>
 #include <vector>
 // pro
 #include <libv/gl/assert.hpp>
@@ -704,6 +705,19 @@ public:
 			glEnable(GL_DEBUG_OUTPUT);
 			glDebugMessageCallback(debugCallback, this);
 		}
+	}
+
+	void pushDebugGroup(const std::string_view message) {
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 42000, static_cast<GLsizei>(message.size()), message.data());
+	}
+
+	[[nodiscard]] inline auto pushDebugGroup_guard(const std::string_view message) {
+		pushDebugGroup(message);
+		return libv::guard([this] { popDebugGroup(); });
+	}
+
+	void popDebugGroup() {
+		glPopDebugGroup();
 	}
 
 public:
