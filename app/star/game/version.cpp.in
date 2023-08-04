@@ -1,7 +1,7 @@
 // Project: libv, File: app/star/version.cpp
 
 // hpp
-#include <star/version.hpp>
+#include <star/game/version.hpp>
 // libv
 #include <libv/utility/version.hpp>
 
@@ -12,14 +12,14 @@ namespace star {
 
 libv::build_info build{
 		libv::version_number{
-				@WISH_BUILD_VERSION_MAJOR@,
-				@WISH_BUILD_VERSION_MINOR@,
-				@WISH_BUILD_VERSION_PATCH@},
-		"@WISH_BUILD_VERSION_NAME@",
-		"@WISH_BUILD_VARIANT@",
-		@WISH_BUILD_ID@,
-		"@WISH_BUILD_DATETIME@",
-		"@WISH_BUILD_UUID@"
+				@STAR_BUILD_VERSION_MAJOR@,
+				@STAR_BUILD_VERSION_MINOR@,
+				@STAR_BUILD_VERSION_PATCH@},
+		"@STAR_BUILD_VERSION_NAME@",
+		"@STAR_BUILD_VARIANT@",
+		@STAR_BUILD_ID@,
+		"@STAR_BUILD_DATETIME@",
+		"@STAR_BUILD_UUID@"
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -11,8 +11,8 @@
 #include <iostream>
 // pro
 #include <star/game/game_client.hpp>
+#include <star/game/version.hpp>
 #include <star/log.hpp>
-#include <star/version.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

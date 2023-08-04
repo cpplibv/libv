@@ -25,8 +25,8 @@
 #include <star/game/control/requests.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
+#include <star/game/version.hpp>
 #include <star/log.hpp>
-#include <star/version.hpp>
 
 //#include <libv/mt/worker_thread.hpp>
 //#include <libv/ui/event/event_overlay.hpp>
