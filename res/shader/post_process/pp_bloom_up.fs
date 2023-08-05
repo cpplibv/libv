@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <lib/sample.glsl>
+#include <lib/resample.glsl>
 
 in vec2 fragmentTexture0;
 

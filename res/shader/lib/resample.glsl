@@ -119,6 +119,8 @@ vec4 downsampleVerticalBlur5(sampler2D tex, vec2 uv, vec2 pixelSize) {
 			texture(tex, uv + pixelSize * vec2(0.0, +3.23076923)) * 0.07027027;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 vec4 upsampleBox4(sampler2D tex, vec2 uv, vec2 pixelSize) {
 	vec4 sum =
 			texture(tex, uv + pixelSize * vec2(-1, -1)) +
