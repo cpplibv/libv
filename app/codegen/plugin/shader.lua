@@ -116,10 +116,6 @@ shader.generate = function(rules)
 		--out("\n")
 	end
 
-	include_hpp("libv/glr/layout_std140.hpp")
-	include_hpp("libv/glr/uniform.hpp")
-	include_hpp("libv/glr/uniform_block_binding.hpp")
-
 	include_cpp(__codegen_filepath_hpp)
 
 	generate_hpp(fn_hpp)

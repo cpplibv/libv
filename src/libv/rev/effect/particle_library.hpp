@@ -1,4 +1,4 @@
-// Created by Vader on 2023.01.09..
+// Project: libv.rev, File: src/libv/rev/effect/particle_library.hpp
 
 #pragma once
 

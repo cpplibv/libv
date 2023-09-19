@@ -1,4 +1,4 @@
-// Created by Vader on 2023.01.09..
+// Project: libv.rev, File: src/libv/rev/effect/particle.hpp
 
 #pragma once
 
@@ -19,7 +19,7 @@
 #include <span>
 #include <random>
 // pro
-#include <libv/rev/engine/render_pass.hpp>
+// #include <libv/rev/engine/render_pass.hpp>
 
 // #include <fmt/printf.h>
 
@@ -261,15 +261,15 @@ public:
 		// sort(eye);
 	}
 
-	void render(libv::rev::RenderPass& rev) {
-
-		// rev.viewFrustum.aabb_in_frustum()
-		// if (!rev.viewFrustum.point_in_frustum())
-		//	return;
-
-		// sort(rev.eye());
-		// rev.rendererParticle.render(*this);
-	}
+	// void render(libv::rev::RenderPass& rev) {
+	//
+	// 	// rev.viewFrustum.aabb_in_frustum()
+	// 	// if (!rev.viewFrustum.point_in_frustum())
+	// 	//	return;
+	//
+	// 	// sort(rev.eye());
+	// 	// rev.rendererParticle.render(*this);
+	// }
 
 	// void update_offscreen(libv::time_duration_f delta_time) {
 	//
@@ -297,7 +297,7 @@ public:
 			enabled(enabled), offset(offset), velocity(velocity), spawnRate(spawnRate) {}
 
 protected:
-	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) {
+	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) override {
 		if (!enabled)
 			return;
 
@@ -308,7 +308,7 @@ protected:
 		system.spawn(static_cast<int32_t>(spawnCount));
 	}
 
-	virtual void onSpawn(ParticleEffect& system, std::span<Particle> particles) {
+	virtual void onSpawn(ParticleEffect& system, std::span<Particle> particles) override {
 		std::uniform_real_distribution distLifetime{5.f, 20.f};
 		std::uniform_real_distribution distPosition{-0.1f, 0.1f};
 		std::uniform_real_distribution distVelocityX{-10.f, 10.f};
@@ -348,6 +348,7 @@ struct ParticleModuleGravity : ParticleModule {
 
 protected:
 	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
+		(void) system;
 		for (auto& particle : particles)
 			particle.velocity += force * delta_time.count();
 	}
@@ -358,8 +359,8 @@ struct ParticleModuleVortex : ParticleModule {
 	float force = 1.0f;
 
 protected:
-	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
-	}
+	// virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
+	// }
 };
 
 struct ParticleModuleTurbulence : ParticleModule {
@@ -371,11 +372,14 @@ public:
 	explicit ParticleModuleTurbulence(float force) : force(force) {}
 
 protected:
-	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) {
+	virtual void onParticleModuleUpdate(ParticleEffect& system, libv::time_duration_f delta_time) override {
+		(void) system;
 		// !!! Need access to global time?
 		moduleAge += delta_time;
 	}
 	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
+		(void) system;
+		(void) delta_time;
 		// !!! This is not a real turbulence implementation, only a test dummy
 		for (auto& particle : particles) {
 			// const auto x = libv::noise_simplex_glsl(particle.position.x, particle.position.y);
@@ -395,15 +399,15 @@ protected:
 struct ParticleModuleNoise : ParticleModule {
 
 protected:
-	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
-	}
+	// virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
+	// }
 };
 
 struct ParticleModuleDrag : ParticleModule {
 
 protected:
-	virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
-	}
+	// virtual void onUpdate(ParticleEffect& system, libv::time_duration_f delta_time, std::span<Particle> particles) override {
+	// }
 };
 
 // -------------------------------------------------------------------------------------------------

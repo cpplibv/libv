@@ -1,4 +1,4 @@
-// Project: libv, File: app/surface/surface/node.hpp
+// Project: libv, File: app/star/game/surface/surface_node.hpp
 
 #pragma once
 
@@ -65,7 +65,7 @@ struct NodeCellular : SurfaceNode {
 	Seed seed = 0x5EED;
 
 	libv::noise::CellularDistance distanceFn = libv::noise::CellularDistance::euclidean;
-	libv::noise::CellularReturn returnType = libv::noise::CellularReturn::cellValue;
+	libv::noise::CellularReturn returnType = libv::noise::CellularReturn::cellvalue;
 	float jitter = 1.0f;
 
 	NodeCellular(Seed seed, libv::noise::CellularDistance distanceFn, libv::noise::CellularReturn returnType, float jitter) :

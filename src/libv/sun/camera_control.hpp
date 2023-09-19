@@ -24,7 +24,7 @@ struct CameraControl {
 	static constexpr const char* fn_camera_snap_angle = "camera.snap_angle";
 
 	static void register_controls(libv::ctrl::FeatureRegister controls);
-	static void bind_default_controls(libv::ctrl::BindingRegister controls);
+	static void bind_default_controls(libv::ctrl::BindingRegister controls, int version = 0);
 };
 
 struct CameraControl2D {

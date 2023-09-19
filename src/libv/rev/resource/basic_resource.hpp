@@ -15,25 +15,6 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-// libv.res: Resource - New library for resource and asset loading, caching and tracking
-//		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
-//		assets, audio, textures, mods/scripts and models
-//
-//		Requirements:
-//			cache
-//			resolve / include directory / loader mapping
-//			load and inclusion/extension of tracking set (recursion should be possible)
-//			filesystem resources
-//			filesystem resource fragments (inclusion subjects)
-//			virtual resources
-//			virtual generated resources
-//			tracking of virtual resources
-//			tracking of filesystem resources
-//			load/reload/unload/tracking events
-//			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename T>
 class BasicResourceLoaderCache {
 public:

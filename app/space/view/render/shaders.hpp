@@ -27,9 +27,9 @@ constexpr auto attribute_texture0   = libv::glr::Attribute<8, libv::vec2f>{};
 constexpr auto attribute_custom1    = libv::glr::Attribute<14, libv::vec4f>{};
 constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
-constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
+constexpr auto textureUnit_normal = libv::gl::TextureUnit{1};
+constexpr auto textureUnit_pattern = libv::gl::TextureUnit{7};
 
 //struct UniformLayoutPass {
 //	libv::glr::Uniform_float time_sim;
@@ -109,7 +109,7 @@ struct UniformsEditorBackground {
 	libv::glr::Uniform_vec4f base_color;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture_noise, "texture_noise", textureChannel_pattern);
+		access(texture_noise, "texture_noise", textureUnit_pattern);
 		access(render_resolution, "render_resolution");
 		access(base_color, "base_color");
 		access(noise_scale, "noise_scale");
@@ -155,7 +155,7 @@ struct UniformsSurface {
 	//libv::glr::Uniform_vec2f render_resolution;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture_noise, "texture_noise", textureChannel_diffuse);
+		access(texture_noise, "texture_noise", textureUnit_diffuse);
 		access(base_color, "base_color");
 	}
 
@@ -180,7 +180,7 @@ struct UniformsText {
 	libv::glr::Uniform_texture font_texture;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(font_texture, "texture_font", textureChannel_diffuse);
+		access(font_texture, "texture_font", textureUnit_diffuse);
 	}
 
 //	template <typename Access> void access_blocks(Access&) {
@@ -261,7 +261,7 @@ struct UniformsText {
 //		access(color, "color", libv::vec4f(1, 1, 1, 1));
 ////		access(matM, "matM", libv::mat4f::identity());
 ////		access(matMVP, "matMVP", libv::mat4f::identity());
-//		access(texture, "textureSampler", textureChannel_diffuse);
+//		access(texture, "textureSampler", textureUnit_diffuse);
 //		access(mode, "mode");
 ////		access(mode, "mode", 2);
 ////		access(mode, "mode", RenderMode::normalW);

@@ -5,7 +5,7 @@
 // ext
 #include <fmt/chrono.h>
 #include <fmt/format.h>
-#include <fmt/os.h>
+#include <fmt/std.h>
 #include <fmt/ostream.h>
 // libv
 #include <libv/mt/thread_number.hpp>

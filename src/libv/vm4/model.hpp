@@ -76,14 +76,14 @@ struct Node {
 	std::string name;
 	NodeID parentID;
 	//bool visibility;
-	libv::mat4f transformation;
+	libv::mat4f transform;
 	std::vector<MeshID> meshIDs;
 	std::vector<NodeID> childrenIDs;
 
 	template <typename Archive> void serialize(Archive& ar) {
 		ar(LIBV_NVP(name));
 		ar(LIBV_NVP(parentID));
-		ar(LIBV_NVP(transformation));
+		ar(LIBV_NVP(transform));
 		ar(LIBV_NVP(meshIDs));
 		ar(LIBV_NVP(childrenIDs));
 	}

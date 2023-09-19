@@ -39,7 +39,7 @@ ResourceClient::ResourceClient(libv::net::IOContext& io_context, ResourceClient:
 }
 
 ResourceClient::~ResourceClient() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 void ResourceClient::download_file(std::string identifier, std::filesystem::path save_file) {

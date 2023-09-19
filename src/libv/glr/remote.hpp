@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/math/vec.hpp>
 // std
 #include <memory>
@@ -39,7 +39,7 @@ public:
 
 public:
 	void readPixels(libv::vec2i pos, libv::vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) noexcept;
-	libv::gl::GL& gl() noexcept;
+	libv::GL& gl() noexcept;
 
 public:
 	void create();
@@ -73,7 +73,7 @@ public:
 //
 //	// Pass passes;
 //	std::vector<UIProgramProxy> program;
-//	std::vector<libv::gl::TextureChannel, UITextureProxy> textures;
+//	std::vector<libv::gl::TextureUnit, UITextureProxy> textures;
 //	//	std::vector<UIUniform> uniform;
 //	std::vector<libv::gl::VertexArray> vao;
 //};
@@ -147,7 +147,7 @@ public:
 //
 //	std::vector<Task> tasks;
 //
-//	std::vector<std::pair<gl::TextureChannel, Texture>> storeTexture;
+//	std::vector<std::pair<gl::TextureUnit, Texture>> storeTexture;
 //
 //	std::vector<double> storeUniform_double;
 //	std::vector<float> storeUniform_float;

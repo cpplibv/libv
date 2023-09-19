@@ -22,7 +22,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseBackground : public libv::ref_count_base<BaseBackground> {
+class BaseBackground : public libv::ref_count_base {
 	friend libv::ref_count_access;
 
 public:

@@ -51,8 +51,10 @@ enum class BarrierBit : GLenum {
 //	Uniform = 0x00000004, /// GL_UNIFORM_BARRIER_BIT
 };
 
+[[nodiscard]] constexpr inline auto operator+(BarrierBit e) noexcept { return libv::to_underlying(e); }
+
 [[nodiscard]] constexpr inline BarrierBit operator|(BarrierBit lhs, BarrierBit rhs) noexcept {
-	return static_cast<BarrierBit>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
+	return static_cast<BarrierBit>(+lhs | +rhs);
 }
 
 enum class BufferBit : GLenum {
@@ -66,12 +68,14 @@ enum class BufferBit : GLenum {
 	ColorDepthStencil = Color | Depth | Stencil,
 };
 
+[[nodiscard]] constexpr inline auto operator+(BufferBit e) noexcept { return libv::to_underlying(e); }
+
 [[nodiscard]] constexpr inline BufferBit operator|(BufferBit lhs, BufferBit rhs) noexcept {
-	return static_cast<BufferBit>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
+	return static_cast<BufferBit>(+lhs | +rhs);
 }
 
 [[nodiscard]] constexpr inline BufferBit operator&(BufferBit lhs, BufferBit rhs) noexcept {
-	return static_cast<BufferBit>(libv::to_underlying(lhs) & libv::to_underlying(rhs));
+	return static_cast<BufferBit>(+lhs & +rhs);
 }
 
 enum class BufferAccess : GLenum {
@@ -86,8 +90,26 @@ enum class BufferAccess : GLenum {
 	Unsynchronized = 0x0020, /// GL_MAP_UNSYNCHRONIZED_BIT
 };
 
+[[nodiscard]] constexpr inline auto operator+(BufferAccess e) noexcept { return libv::to_underlying(e); }
+
 [[nodiscard]] constexpr inline BufferAccess operator|(BufferAccess lhs, BufferAccess rhs) noexcept {
-	return static_cast<BufferAccess>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
+	return static_cast<BufferAccess>(+lhs | +rhs);
+}
+
+enum class BufferStorage : GLenum {
+	Read = 0x0001, /// GL_MAP_READ_BIT
+	Write = 0x0002, /// GL_MAP_WRITE_BIT
+
+	Persistent = 0x0040, /// GL_MAP_PERSISTENT_BIT
+	Coherent = 0x0080, /// GL_MAP_COHERENT_BIT
+	DynamicStorage = 0x0100, /// GL_DYNAMIC_STORAGE_BIT
+	ClientStorage = 0x0200, /// GL_CLIENT_STORAGE_BIT
+};
+
+[[nodiscard]] constexpr inline auto operator+(BufferStorage e) noexcept { return libv::to_underlying(e); }
+
+[[nodiscard]] constexpr inline BufferStorage operator|(BufferStorage lhs, BufferStorage rhs) noexcept {
+	return static_cast<BufferStorage>(+lhs | +rhs);
 }
 
 enum class BufferAccessFull : GLenum {
@@ -95,6 +117,8 @@ enum class BufferAccessFull : GLenum {
 	Write = 0x88B9, /// GL_WRITE_ONLY
 	ReadWrite = 0x88BA, /// GL_READ_WRITE
 };
+
+[[nodiscard]] constexpr inline auto operator+(BufferAccessFull e) noexcept { return libv::to_underlying(e); }
 
 enum class BufferUsage : GLenum {
 	StreamDraw = 0x88E0, /// GL_STREAM_DRAW
@@ -107,6 +131,8 @@ enum class BufferUsage : GLenum {
 	DynamicRead = 0x88E9, /// GL_DYNAMIC_READ
 	DynamicCopy = 0x88EA, /// GL_DYNAMIC_COPY
 };
+
+[[nodiscard]] constexpr inline auto operator+(BufferUsage e) noexcept { return libv::to_underlying(e); }
 
 //enum class BufferTarget : GLenum {
 //	Array = 0x8892, /// GL_ARRAY_BUFFER
@@ -136,6 +162,8 @@ enum class Capability : GLenum {
 	TextureCubeMapSeamless = 0x884F, /// GL_TEXTURE_CUBE_MAP_SEAMLESS
 };
 
+[[nodiscard]] constexpr inline auto operator+(Capability e) noexcept { return libv::to_underlying(e); }
+
 enum class Primitive : GLenum {
 	LineLoop = 0x0002, /// GL_LINE_LOOP
 	LineStrip = 0x0003, /// GL_LINE_STRIP
@@ -151,6 +179,8 @@ enum class Primitive : GLenum {
 	TrianglesAdjacency = 0x000C, /// GL_TRIANGLES_ADJACENCY
 };
 
+[[nodiscard]] constexpr inline auto operator+(Primitive e) noexcept { return libv::to_underlying(e); }
+
 enum class StencilAction : GLenum {
 	Keep = 0x1E00, /// GL_KEEP
 	Zero = 0, /// GL_ZERO
@@ -162,6 +192,8 @@ enum class StencilAction : GLenum {
 	Invert = 0x150A, /// GL_INVERT
 };
 
+[[nodiscard]] constexpr inline auto operator+(StencilAction e) noexcept { return libv::to_underlying(e); }
+
 // -------------------------------------------------------------------------------------------------
 
 enum class CubeSide : GLenum {
@@ -172,6 +204,12 @@ enum class CubeSide : GLenum {
 	PositiveZ = 0x8519, /// GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 	NegativeZ = 0x851A, /// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
+
+[[nodiscard]] constexpr inline auto operator+(CubeSide e) noexcept { return libv::to_underlying(e); }
+
+[[nodiscard]] constexpr inline int32_t sideIndex(CubeSide side) {
+	return static_cast<int32_t>(side) - static_cast<int32_t>(libv::gl::CubeSide::PositiveX);
+}
 
 enum class TextureTarget : GLenum {
 	_1D = 0x0DE0, /// GL_TEXTURE_1D
@@ -187,17 +225,23 @@ enum class TextureTarget : GLenum {
 	_2DMultisampleArray = 0x9102, /// GL_TEXTURE_2D_MULTISAMPLE_ARRAY
 };
 
+[[nodiscard]] constexpr inline auto operator+(TextureTarget e) noexcept { return libv::to_underlying(e); }
+
 // -------------------------------------------------------------------------------------------------
 
 enum class DepthStencilMode : GLenum {
-	DepthComponent = 0x1902, /// GL_DEPTH_COMPONENT
-	StencilIndex = 0x1901, /// GL_STENCIL_INDEX
+	Depth = 0x1902, /// GL_DEPTH_COMPONENT
+	Stencil = 0x1901, /// GL_STENCIL_INDEX
 };
+
+[[nodiscard]] constexpr inline auto operator+(DepthStencilMode e) noexcept { return libv::to_underlying(e); }
 
 enum class CompareMode : GLenum {
 	None = 0, /// GL_NONE
 	CompareRefToTexture = 0x884E, /// GL_COMPARE_REF_TO_TEXTURE
 };
+
+[[nodiscard]] constexpr inline auto operator+(CompareMode e) noexcept { return libv::to_underlying(e); }
 
 enum class TestFunction : GLenum {
 	LEqual = 0x0203, /// GL_LEQUAL
@@ -210,6 +254,8 @@ enum class TestFunction : GLenum {
 	Never = 0x0200, /// GL_NEVER
 };
 
+[[nodiscard]] constexpr inline auto operator+(TestFunction e) noexcept { return libv::to_underlying(e); }
+
 enum class BlendEquation : GLenum {
 	Add = 0x8006, /// GL_FUNC_ADD
 	Subtract = 0x800A, /// GL_FUNC_SUBTRACT
@@ -217,6 +263,8 @@ enum class BlendEquation : GLenum {
 	Min = 0x8007, /// GL_MIN
 	Max = 0x8008, /// GL_MAX
 };
+
+[[nodiscard]] constexpr inline auto operator+(BlendEquation e) noexcept { return libv::to_underlying(e); }
 
 enum class BlendFunction : GLenum {
 	ConstantAlpha = 0x8003, /// GL_CONSTANT_ALPHA
@@ -240,10 +288,14 @@ enum class BlendFunction : GLenum {
 	Zero = 0, /// GL_ZERO
 };
 
+[[nodiscard]] constexpr inline auto operator+(BlendFunction e) noexcept { return libv::to_underlying(e); }
+
 enum class MagFilter : GLenum {
 	Nearest = 0x2600, /// GL_NEAREST
 	Linear = 0x2601, /// GL_LINEAR
 };
+
+[[nodiscard]] constexpr inline auto operator+(MagFilter e) noexcept { return libv::to_underlying(e); }
 
 enum class MinFilter : GLenum {
 	Nearest = 0x2600, /// GL_NEAREST
@@ -254,6 +306,8 @@ enum class MinFilter : GLenum {
 	LinearMipmapLinear = 0x2703, /// GL_LINEAR_MIPMAP_LINEAR
 };
 
+[[nodiscard]] constexpr inline auto operator+(MinFilter e) noexcept { return libv::to_underlying(e); }
+
 enum class Swizzle : GLenum {
 	Red = 0x1903, /// GL_RED
 	Green = 0x1904, /// GL_GREEN
@@ -263,6 +317,8 @@ enum class Swizzle : GLenum {
 	One = 1, /// GL_ONE
 };
 
+[[nodiscard]] constexpr inline auto operator+(Swizzle e) noexcept { return libv::to_underlying(e); }
+
 enum class Wrap : GLenum {
 	ClampToEdge = 0x812F, /// GL_CLAMP_TO_EDGE
 	Repeat = 0x2901, /// GL_REPEAT
@@ -270,6 +326,8 @@ enum class Wrap : GLenum {
 	MirroredRepeat = 0x8370, /// GL_MIRRORED_REPEAT
 	MirrorClampToEdge = 0x8743, /// GL_MIRROR_CLAMP_TO_EDGE
 };
+
+[[nodiscard]] constexpr inline auto operator+(Wrap e) noexcept { return libv::to_underlying(e); }
 
 enum class Filter : GLenum {
 	Nearest = 0x2600, /// GL_NEAREST
@@ -279,6 +337,8 @@ enum class Filter : GLenum {
 	NearestMipmapLinear = 0x2702, /// GL_NEAREST_MIPMAP_LINEAR
 	LinearMipmapLinear = 0x2703, /// GL_LINEAR_MIPMAP_LINEAR
 };
+
+[[nodiscard]] constexpr inline auto operator+(Filter e) noexcept { return libv::to_underlying(e); }
 
 enum class DataType : GLenum {
 	U8 = 0x1401, /// GL_UNSIGNED_BYTE
@@ -302,6 +362,8 @@ enum class DataType : GLenum {
 	U32_R10_G10_B10_A2 = 0x8036, /// GL_UNSIGNED_INT_10_10_10_2
 	U32_A2_B10_G10_R10 = 0x8368, /// GL_UNSIGNED_INT_2_10_10_10_REV
 };
+
+[[nodiscard]] constexpr inline auto operator+(DataType e) noexcept { return libv::to_underlying(e); }
 
 [[nodiscard]] constexpr inline auto sizeInfo(DataType type) noexcept {
 	struct Result {
@@ -351,6 +413,8 @@ enum class ReadFormat : GLenum {
 	STENCIL = 0x1901, /// GL_STENCIL_INDEX
 };
 
+[[nodiscard]] constexpr inline auto operator+(ReadFormat e) noexcept { return libv::to_underlying(e); }
+
 // -------------------------------------------------------------------------------------------------
 
 enum class FormatBase : GLenum {
@@ -362,6 +426,8 @@ enum class FormatBase : GLenum {
 	DEPTH_STENCIL = 0x84F9, /// GL_DEPTH_STENCIL
 	STENCIL = 0x1901, /// GL_STENCIL_INDEX
 };
+
+[[nodiscard]] constexpr inline auto operator+(FormatBase e) noexcept { return libv::to_underlying(e); }
 
 enum class FormatCompressed : GLenum {
 	R = 0x8225, /// GL_COMPRESSED_RED
@@ -390,6 +456,8 @@ enum class FormatCompressed : GLenum {
 	SRGBA_S3TC_DXT5_EXT = 0x8C4F, /// GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
 };
 
+[[nodiscard]] constexpr inline auto operator+(FormatCompressed e) noexcept { return libv::to_underlying(e); }
+
 enum class FormatDepth : GLenum {
 	DEPTH_COMPONENT16 = 0x81A5, /// GL_DEPTH_COMPONENT16
 	DEPTH_COMPONENT24 = 0x81A6, /// GL_DEPTH_COMPONENT24
@@ -397,10 +465,14 @@ enum class FormatDepth : GLenum {
 	DEPTH_COMPONENT32F = 0x8CAC, /// GL_DEPTH_COMPONENT32F
 };
 
+[[nodiscard]] constexpr inline auto operator+(FormatDepth e) noexcept { return libv::to_underlying(e); }
+
 enum class FormatDepthStencil : GLenum {
 	DEPTH32F_STENCIL8 = 0x8CAD, /// GL_DEPTH32F_STENCIL8
 	DEPTH24_STENCIL8 = 0x88F0, /// GL_DEPTH24_STENCIL8
 };
+
+[[nodiscard]] constexpr inline auto operator+(FormatDepthStencil e) noexcept { return libv::to_underlying(e); }
 
 enum class FormatStencil : GLenum {
 	STENCIL_INDEX1 = 0x8D46, /// GL_STENCIL_INDEX1
@@ -408,6 +480,8 @@ enum class FormatStencil : GLenum {
 	STENCIL_INDEX8 = 0x8D48, /// GL_STENCIL_INDEX8
 	STENCIL_INDEX16 = 0x8D49, /// GL_STENCIL_INDEX16
 };
+
+[[nodiscard]] constexpr inline auto operator+(FormatStencil e) noexcept { return libv::to_underlying(e); }
 
 enum class FormatSized : GLenum {
 	R8 = 0x8229, /// GL_R8
@@ -472,6 +546,8 @@ enum class FormatSized : GLenum {
 	RGBA32I = 0x8D82, /// GL_RGBA32I
 	RGBA32UI = 0x8D70, /// GL_RGBA32UI
 };
+
+[[nodiscard]] constexpr inline auto operator+(FormatSized e) noexcept { return libv::to_underlying(e); }
 
 [[nodiscard]] constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	switch (format) {
@@ -639,6 +715,8 @@ struct Format {
 	constexpr inline Format(FormatStencil format) noexcept :
 		format(to_underlying(format)),
 		base(compatibleFormatBase(format)) { }
+
+	[[nodiscard]] inline bool operator==(const Format& other) const noexcept = default;
 };
 
 // ShaderType --------------------------------------------------------------------------------------
@@ -652,6 +730,8 @@ enum class ShaderType : GLenum {
 	TessEvaluation = 0x8E87, /// GL_TESS_EVALUATION_SHADER
 };
 
+[[nodiscard]] constexpr inline auto operator+(ShaderType e) noexcept { return libv::to_underlying(e); }
+
 [[nodiscard]] inline const char* to_string(ShaderType type) noexcept {
 	switch (type) {
 	case ShaderType::Vertex: return "vertex";
@@ -662,7 +742,7 @@ enum class ShaderType : GLenum {
 	case ShaderType::TessEvaluation: return "tess-evaluation";
 	}
 	assert(false && "Invalid ShaderType enum value");
-	return "<<invalid>>";
+	return "<<invalid-ShaderType-enum-value>>";
 }
 
 [[nodiscard]] inline const char* to_string_short(ShaderType type) noexcept {
@@ -675,7 +755,7 @@ enum class ShaderType : GLenum {
 	case ShaderType::TessEvaluation: return "te";
 	}
 	assert(false && "Invalid ShaderType enum value");
-	return "x";
+	return "<x>";
 }
 
 [[nodiscard]] inline const char* to_string_ext(ShaderType type) noexcept {
@@ -688,34 +768,31 @@ enum class ShaderType : GLenum {
 	case ShaderType::TessEvaluation: return "tes";
 	}
 	assert(false && "Invalid ShaderType enum value");
-	return "x";
+	return "xs";
 }
 
-// TextureChannel ----------------------------------------------------------------------------------
+// TextureUnit ----------------------------------------------------------------------------------
 
-enum class TextureChannel : GLint {
+enum class TextureUnit : GLint {
 	diffuse = 0,
 	normal = 1,
 	specular = 2,
 	emission = 3,
 	environment = 4,
 	pass = 5,
-	ambient = 6,
-	//	_7 = 7,
-	sky = 8,
-	//	_9 = 9,
-	shadow0 = 10,
-	shadow1 = 11,
-	shadow2 = 12,
-	shadow3 = 13,
-	shadow4 = 14,
-	shadow5 = 15,
-	shadow6 = 16,
-	shadow7 = 17,
-	//	_18 = 18,
-	//	_19 = 19,
-	//	_20 = 20,
+	ambient = 6, // Sky Cube for reflection
+	// _7 = 7,
+	// _8 = 8,
+	// _9 = 9,
+	shadow = 10,
+	// _11 = 11,
+	// _12 = 12,
+	// _13 = 13,
+	// _14 = 14,
+	// _15 = 15,
 };
+
+[[nodiscard]] constexpr inline auto operator+(TextureUnit e) noexcept { return libv::to_underlying(e); }
 
 // AttributeType --------------------------------------------------------------------------------
 
@@ -741,6 +818,8 @@ enum class AttributeType : GLenum {
 	//Acceptable by glVertexAttribLPointer:
 	DOUBLE = 0x140A, /// GL_DOUBLE
 };
+
+[[nodiscard]] constexpr inline auto operator+(AttributeType e) noexcept { return libv::to_underlying(e); }
 
 template <typename T>
 [[nodiscard]] constexpr inline AttributeType toAttributeType() noexcept {
@@ -793,20 +872,27 @@ enum class CullFace : GLenum {
 	Front = 0x0404, /// GL_FRONT
 };
 
+[[nodiscard]] constexpr inline auto operator+(CullFace e) noexcept { return libv::to_underlying(e); }
+
 enum class PolygonMode : GLenum {
 	Fill = 0x1B02, /// GL_FILL
 	Line = 0x1B01, /// GL_LINE
 	Point = 0x1B00, /// GL_POINT
 };
 
+[[nodiscard]] constexpr inline auto operator+(PolygonMode e) noexcept { return libv::to_underlying(e); }
+
 enum class FrontFace : GLenum {
 	CCW = 0x0901, /// GL_CCW
 	CW = 0x0900, /// GL_CW
 };
 
+[[nodiscard]] constexpr inline auto operator+(FrontFace e) noexcept { return libv::to_underlying(e); }
+
 // -------------------------------------------------------------------------------------------------
 
 enum class Attachment : GLenum {
+	None = 0, /// GL_NONE
 	Color0 = 0x8CE0, /// GL_COLOR_ATTACHMENT0
 	Color1 = 0x8CE1, /// GL_COLOR_ATTACHMENT1
 	Color2 = 0x8CE2, /// GL_COLOR_ATTACHMENT2
@@ -828,6 +914,8 @@ enum class Attachment : GLenum {
 	Stencil = 0x8D20, /// GL_STENCIL_ATTACHMENT
 };
 
+[[nodiscard]] constexpr inline auto operator+(Attachment e) noexcept { return libv::to_underlying(e); }
+
 enum class FramebufferStatus : GLenum {
 	Complete = 0x8CD5, /// GL_FRAMEBUFFER_COMPLETE
 
@@ -841,6 +929,24 @@ enum class FramebufferStatus : GLenum {
 	Unsupported = 0x8CDD, /// GL_FRAMEBUFFER_UNSUPPORTED
 };
 
+[[nodiscard]] constexpr inline auto operator+(FramebufferStatus e) noexcept { return libv::to_underlying(e); }
+
+[[nodiscard]] inline const char* to_string(FramebufferStatus status) noexcept {
+	switch (status) {
+	case FramebufferStatus::Complete: return "Complete";
+	case FramebufferStatus::IncompleteAttachment: return "Incomplete Attachment";
+	case FramebufferStatus::IncompleteDraw_buffer: return "Incomplete Draw Buffer";
+	case FramebufferStatus::IncompleteLayerTargets: return "Incomplete Layer Targets";
+	case FramebufferStatus::IncompleteMissingAttachment: return "Incomplete Missing Attachment";
+	case FramebufferStatus::IncompleteMultisample: return "Incomplete Multisample";
+	case FramebufferStatus::IncompleteReadBuffer: return "Incomplete Read Buffer";
+	case FramebufferStatus::Undefined: return "Undefined";
+	case FramebufferStatus::Unsupported: return "Unsupported";
+	}
+	assert(false && "Invalid FramebufferStatus enum value");
+	return "<<invalid-FramebufferStatus-enum-value>>";
+}
+
 // -------------------------------------------------------------------------------------------------
 
 enum class QueryType : GLenum {
@@ -850,7 +956,26 @@ enum class QueryType : GLenum {
 	PrimitivesGenerated = 0x8C87,/// GL_PRIMITIVES_GENERATED
 	TransformFeedbackPrimitivesWritten = 0x8C88,/// GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN
 	TimeElapsed = 0x88BF,/// GL_TIME_ELAPSED
+	// Timestamp = 0x8E28,/// GL_TIMESTAMP
 };
+
+[[nodiscard]] constexpr inline auto operator+(QueryType e) noexcept { return libv::to_underlying(e); }
+
+// -------------------------------------------------------------------------------------------------
+
+enum class ClipOrigin : GLenum {
+	LowerLeft = 0x8CA1, /// GL_LOWER_LEFT
+	UpperLeft = 0x8CA2, /// GL_UPPER_LEFT
+};
+
+[[nodiscard]] constexpr inline auto operator+(ClipOrigin e) noexcept { return libv::to_underlying(e); }
+
+enum class ClipDepth : GLenum {
+	NegativeOneToOne = 0x935E, /// GL_NEGATIVE_ONE_TO_ONE
+	ZeroToOne = 0x935F, /// GL_ZERO_TO_ONE
+};
+
+[[nodiscard]] constexpr inline auto operator+(ClipDepth e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
 

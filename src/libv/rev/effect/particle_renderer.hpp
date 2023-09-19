@@ -1,4 +1,4 @@
-// Created by Vader on 2023.01.09..
+// Project: libv.rev, File: src/libv/rev/effect/particle_renderer.hpp
 
 #pragma once
 
@@ -45,7 +45,7 @@ namespace rev {
 constexpr auto attribute_particle_xyz       = libv::glr::Attribute<10, libv::vec3f>{};
 constexpr auto attribute_particle_packSizeRotation = libv::glr::Attribute<11, libv::vec2f>{};
 
-// constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+// constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
 
 // struct UniformsParticle {
 // //	libv::glr::Uniform_mat4f matMVP;
@@ -54,7 +54,7 @@ constexpr auto attribute_particle_packSizeRotation = libv::glr::Attribute<11, li
 // 	libv::glr::Uniform_texture texture0;
 //
 // 	template <typename Access> void access_uniforms(Access& access) {
-// 		access(texture0, "texture0", textureChannel_diffuse);
+// 		access(texture0, "texture0", textureUnit_diffuse);
 // 	}
 //
 // 	template <typename Access> void access_blocks(Access& access) {
@@ -78,13 +78,13 @@ struct RendererParticle {
 
 public:
 	explicit RendererParticle(libv::rev::ResourceManager& rm) :
-		shader_particle(rm.shader, "rev_sandbox/particle.vs", "rev_sandbox/particle.fs"),
+		shader_particle(rm.shader, "sandbox_rev/particle.vs", "sandbox_rev/particle.fs"),
 		texture_star_01(rm.texture.load("particle/star_01.png", libv::rev::parse_swizzle_or_throw("111r"))),
 		texture_star_06(rm.texture.load("particle/star_06.png", libv::rev::parse_swizzle_or_throw("111r"))),
 		texture_circle_05(rm.texture.load("particle/circle_05.png", libv::rev::parse_swizzle_or_throw("111r"))) {
 	}
 
-	void create(libv::gl::GL& gl) {
+	void create(libv::GL& gl) {
 		libv::vec3f quadPositions[] = {
 				{-0.5f, -0.5f, 0.f},
 				{+0.5f, -0.5f, 0.f},
@@ -118,7 +118,7 @@ public:
 		gl(vao).unbind();
 	}
 
-	void destroy(libv::gl::GL& gl) {
+	void destroy(libv::GL& gl) {
 		gl(properties).destroy();
 		gl(positions).destroy();
 		gl(shape).destroy();
@@ -145,13 +145,13 @@ public:
 		uniformsCam[layout_Camera200.cameraUpW] = libv::vec3f(glr.view.top()[0][1], glr.view.top()[1][1], glr.view.top()[2][1]);
 		glr.uniform(std::move(uniformsCam));
 
-		// glr.texture(texture_star_01.texture(), textureChannel_diffuse);
-		// glr.texture(texture_star_06.texture(), textureChannel_diffuse);
-		glr.texture(texture_circle_05.texture(), textureChannel_diffuse);
+		// glr.texture(texture_star_01.texture(), textureUnit_diffuse);
+		// glr.texture(texture_star_06.texture(), textureUnit_diffuse);
+		glr.texture(texture_circle_05.texture(), textureUnit_diffuse);
 
 		// !!! Test Hack &system
-		// glr.callbackProgram([this](libv::gl::GL& gl) {
-		glr.callbackProgram([this, &system](libv::gl::GL& gl) mutable {
+		// glr.callbackProgram([this](libv::GL& gl) {
+		glr.callbackProgram([this, &system](libv::GL& gl) mutable {
 
 			const auto sizePositions = system.numParticle() * sizeof(libv::vec3f);
 			gl(positions).named_data(nullptr, sizePositions, libv::gl::BufferUsage::StreamDraw);

@@ -54,7 +54,7 @@ PostProcessing::PostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebuff
 }
 
 PostProcessing::~PostProcessing() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 void PostProcessing::size(libv::vec2i framebufferSize) noexcept {
@@ -149,7 +149,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16
 	glr.program(self->shaderDownsamplePrefilter.program());
 	glr.uniform(self->shaderDownsamplePrefilter.uniform().bloomThreshold, self->bloomThreshold_);
 	glr.uniform(self->shaderDownsamplePrefilter.uniform().bloomKnee, self->bloomKnee_);
-	glr.texture(input, libv::gl::TextureChannel{0});
+	glr.texture(input, libv::gl::TextureUnit{0});
 	glr.render_full_screen();
 
 	// Bloom: Downsample
@@ -159,7 +159,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16
 		glr.viewport({0, 0}, self->bloomMips[i].temp.size());
 
 		glr.program(self->shaderDownsampleBlurH.program());
-		glr.texture(self->bloomMips[i - 1].main.resolve(glr), libv::gl::TextureChannel{0});
+		glr.texture(self->bloomMips[i - 1].main.resolve(glr), libv::gl::TextureUnit{0});
 		glr.render_full_screen();
 
 		// Vertical blur
@@ -167,7 +167,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16
 		glr.viewport({0, 0}, self->bloomMips[i].main.size());
 
 		glr.program(self->shaderDownsampleBlurV.program());
-		glr.texture(self->bloomMips[i].temp.resolve(glr), libv::gl::TextureChannel{0});
+		glr.texture(self->bloomMips[i].temp.resolve(glr), libv::gl::TextureUnit{0});
 		glr.render_full_screen();
 	}
 
@@ -182,7 +182,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16
 			glr.viewport({0, 0}, self->bloomMips[i - 1].main.size());
 
 			glr.program(self->shaderUpsample.program());
-			glr.texture(self->bloomMips[i].main.resolve(glr), libv::gl::TextureChannel{0});
+			glr.texture(self->bloomMips[i].main.resolve(glr), libv::gl::TextureUnit{0});
 			glr.render_full_screen();
 		}
 	}
@@ -192,8 +192,8 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R16
 	glr.viewport({0, 0}, self->framebufferSize);
 
 	glr.program(self->shaderCombine.program());
-	glr.texture(input, libv::gl::TextureChannel{0});
-	glr.texture(self->bloomMips[0].main.resolve(glr), libv::gl::TextureChannel{1});
+	glr.texture(input, libv::gl::TextureUnit{0});
+	glr.texture(self->bloomMips[0].main.resolve(glr), libv::gl::TextureUnit{1});
 	glr.uniform(self->shaderCombine.uniform().bloomIntensity, self->bloomIntensity_);
 	glr.uniform(self->shaderCombine.uniform().vignetteIntensity, self->vignetteIntensity_ * 3.0f); // NOTE: Multiply by 3 to allow the 0..1 configuration range to yield a reasonable 3 as max value
 	glr.uniform(self->shaderCombine.uniform().vignetteSmoothness, self->vignetteSmoothness_ * 5.0f); // NOTE: Multiply by 5 to allow the 0..1 configuration range to yield a reasonable 5 as max value

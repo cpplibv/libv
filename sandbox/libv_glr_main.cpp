@@ -119,7 +119,7 @@ void main() {
 	output = output + texture(texture1Sampler, fragmentTexture0);
 	output = output + vec4(vec3(fragmentTexture0 * 0.3 + 0.4, 0.5) * color, 1.0) * 3;
 	output = output / 10;
-	output = output * 2; // To over expose so I can test HDR
+	output = output * 2; // To over expose so we can test HDR
 
 	//output = output + vec4(vec3(fragmentTexture0 * 0.3 + 0.4, 0.5) * color, 1.0);
 }
@@ -217,8 +217,8 @@ const auto uniformBlock_material = libv::glr::UniformBlockBinding{2, "Material"}
 const auto uniformBlock_lights   = libv::glr::UniformBlockBinding{3, "Lights"};
 const auto uniformBlock_skeleton = libv::glr::UniformBlockBinding{4, "Skeleton"};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
+constexpr auto textureUnit_normal  = libv::gl::TextureUnit{1};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -314,8 +314,8 @@ struct Sandbox {
 		sphere_program.block_binding(uniformBlock_sphere);
 		sphere_program.assign(sphere_uniform_shift, "shift");
 		sphere_program.assign(sphere_uniform_time, "time");
-		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
-		sphere_program.assign(sphere_uniform_texture1, "texture1Sampler", textureChannel_normal);
+		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureUnit_diffuse);
+		sphere_program.assign(sphere_uniform_texture1, "texture1Sampler", textureUnit_normal);
 
 		const auto dataTexture0 = libv::read_file_or_throw("res/texture/hexagon_metal_0001_diffuse.dds");
 		auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
@@ -348,8 +348,8 @@ struct Sandbox {
 			stream_program.block_binding(uniformBlock_sphere);
 	//		stream_program.assign(sphere_uniform_shift, "shift");
 	//		stream_program.assign(sphere_uniform_time, "time");
-	//		stream_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
-	//		stream_program.assign(sphere_uniform_texture1, "texture1Sampler", textureChannel_normal);
+	//		stream_program.assign(sphere_uniform_texture0, "texture0Sampler", textureUnit_diffuse);
+	//		stream_program.assign(sphere_uniform_texture1, "texture1Sampler", textureUnit_normal);
 
 //			const auto dataTexture0 = libv::read_file_or_throw("res/texture/hexagon_metal_0001_diffuse.dds");
 //			auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
@@ -377,7 +377,7 @@ struct Sandbox {
 
 		quad_program.vertex(shader_quad_vs);
 		quad_program.fragment(shader_quad_fs);
-		quad_program.assign(quad_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
+		quad_program.assign(quad_uniform_texture0, "texture0Sampler", textureUnit_diffuse);
 
 		{
 			auto position = quad_mesh.attribute(attribute_position);
@@ -402,10 +402,11 @@ struct Sandbox {
 
 		sky_program.vertex(shader_sky_vs);
 		sky_program.fragment(shader_sky_fs);
-		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureChannel_diffuse);
+		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureUnit_diffuse);
 		sky_program.assign(sky_uniform_matMVP, "matMVP");
 
-		const auto dataSky = libv::read_file_or_throw("res/texture/cube_debug_transparent.dds");
+		// const auto dataSky = libv::read_file_or_throw("res/texture/sky/sky_debug_x_front_uv.dds");
+		const auto dataSky = libv::read_file_or_throw("res/texture/sky/sky_debug_x_front_uv_transparent.dds");
 		auto imageSky = libv::gl::load_image_or_throw(dataSky);
 		sky_texture0.load(std::move(imageSky));
 
@@ -443,7 +444,7 @@ struct Sandbox {
 	}
 
 	void update(const std::chrono::duration<float> deltaTime) {
-		angle = std::fmod(angle + 5.0f * deltaTime.count(), 360.0f);
+		angle = std::fmod(angle + 25.0f * deltaTime.count(), 360.0f);
 		time += deltaTime.count();
 	}
 
@@ -508,6 +509,8 @@ struct Sandbox {
 		gl.projection = libv::mat4f::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 1000.f);
 		gl.view = libv::mat4f::lookAt({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f});
 		gl.view.rotate(libv::degrees{angle}, 0.f, 0.f, 1.f);
+		// gl.view = libv::mat4f::lookAt({-1.f, 0.f, 0.0f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f});
+		// gl.view.rotate(libv::degrees{std::sin(angle / 50.f) * 120.f}, 0.f, -1.f, 0.f);
 		gl.model = libv::mat4f::identity();
 
 		{
@@ -524,8 +527,8 @@ struct Sandbox {
 				gl.uniform(sphere_uniform_shift, libv::vec3f(0, angle, static_cast<float>(i)));
 				gl.uniform(sphere_uniform_time, time);
 				gl.uniform(std::move(uniforms));
-				gl.texture(sphere_texture0, textureChannel_diffuse);
-				gl.texture(sphere_texture1, textureChannel_normal);
+				gl.texture(sphere_texture0, textureUnit_diffuse);
+				gl.texture(sphere_texture1, textureUnit_normal);
 				gl.render(sphere_mesh);
 			}
 		}
@@ -574,7 +577,7 @@ struct Sandbox {
 			gl.state.depthFunctionLEqual();
 			gl.program(sky_program);
 			gl.uniform(sky_uniform_matMVP, gl.projection * libv::mat4f(libv::mat3f(gl.view)));
-			gl.texture(sky_texture0, textureChannel_diffuse);
+			gl.texture(sky_texture0, textureUnit_diffuse);
 			gl.render(sky_mesh);
 		}
 	}
@@ -585,7 +588,7 @@ struct Sandbox {
 		gl.state.disableDepthTest();
 
 		gl.program(quad_program);
-		gl.texture(framebuffer2Color, textureChannel_diffuse);
+		gl.texture(framebuffer2Color, textureUnit_diffuse);
 		gl.render(quad_mesh);
 	}
 };
@@ -594,5 +597,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.GL3", WINDOW_WIDTH, WINDOW_HEIGHT);
+	return run_sandbox<Sandbox>("Sandbox libv.GLR", WINDOW_WIDTH, WINDOW_HEIGHT);
 }

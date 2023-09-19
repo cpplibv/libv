@@ -45,11 +45,11 @@ constexpr inline T byte_swap(T var) {
     if constexpr (sizeof (T) == 1)
         return var;
     else if constexpr (sizeof (T) == 2)
-        return bit_cast<T>(byte_swap(bit_cast<uint16_t>(var)));
+        return std::bit_cast<T>(byte_swap(std::bit_cast<uint16_t>(var)));
     else if constexpr (sizeof (T) == 4)
-        return bit_cast<T>(byte_swap(bit_cast<uint32_t>(var)));
+        return std::bit_cast<T>(byte_swap(std::bit_cast<uint32_t>(var)));
     else if constexpr (sizeof (T) == 8)
-        return bit_cast<T>(byte_swap(bit_cast<uint64_t>(var)));
+        return std::bit_cast<T>(byte_swap(std::bit_cast<uint64_t>(var)));
     else
         static_assert(sizeof (T) == sizeof (T), "byte_swap is only supported for 1, 2, 4, 8 byte types");
 }

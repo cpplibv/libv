@@ -26,7 +26,7 @@ struct UniformsPPTexture {
 	libv::glr::Uniform_texture texture0;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", libv::gl::TextureChannel{0});
+		access(texture0, "texture0", libv::gl::TextureUnit{0});
 	}
 
 	template <typename Access> void access_blocks(Access&) {
@@ -39,7 +39,7 @@ struct UniformsPPBloomPrefilter {
 	libv::glr::Uniform_float bloomKnee;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", libv::gl::TextureChannel{0});
+		access(texture0, "texture0", libv::gl::TextureUnit{0});
 		access(bloomThreshold, "bloomThreshold");
 		access(bloomKnee, "bloomKnee");
 	}
@@ -60,8 +60,8 @@ struct UniformsPPCombine {
 	libv::glr::Uniform_vec3f vignetteColor;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(textureMain, "textureMain", libv::gl::TextureChannel{0});
-		access(textureBloom, "textureBloom", libv::gl::TextureChannel{1});
+		access(textureMain, "textureMain", libv::gl::TextureUnit{0});
+		access(textureBloom, "textureBloom", libv::gl::TextureUnit{1});
 		access(bloomIntensity, "bloomIntensity");
 		access(vignetteIntensity, "vignetteIntensity");
 		access(vignetteSmoothness, "vignetteSmoothness");

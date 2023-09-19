@@ -177,7 +177,7 @@ inline std::string layout_to_string(const std::string& name = "block") {
 	detail::ToStringLayouter layouter{ss, {}};
 	layouter.pass<T>(name);
 
-	return ss.str();
+	return std::move(ss).str();
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -45,10 +45,14 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template<typename... Args>
-constexpr inline std::size_t hash_combine(const Args&... args) noexcept {
-	std::size_t seed = 0;
+constexpr inline std::size_t hash_combine_add(std::size_t seed, const Args&... args) noexcept {
 	((void) (seed ^= std::hash<Args>{}(args) + 0x9e3779b9 + (seed << 6) + (seed >> 2)), ...);
 	return seed;
+}
+
+template<typename... Args>
+constexpr inline std::size_t hash_combine(const Args&... args) noexcept {
+	return hash_combine_add(0, args...);
 }
 
 // -------------------------------------------------------------------------------------------------

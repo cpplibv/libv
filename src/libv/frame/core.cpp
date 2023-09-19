@@ -111,6 +111,7 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_FOCUS_ON_SHOW, self->focusOnShow);
 	glfwWindowHint(GLFW_FLOATING, self->alwaysOnTop);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
+	// glfwWindowHint(GLFW_SRGB_CAPABLE, false);
 
 	GLFWmonitor* monitor = getCurrentMonitor().handler;
 

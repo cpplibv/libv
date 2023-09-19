@@ -5,7 +5,7 @@
 // libv
 #include <libv/utility/float_equal.hpp>
 #include <libv/utility/parse_number.hpp>
-#include <libv/utility/trim.hpp>
+#include <libv/algo/trim.hpp>
 // std
 #include <sstream>
 // pro

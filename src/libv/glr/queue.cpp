@@ -23,9 +23,9 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-static inline void changeState(libv::gl::GL& gl, State target) {
+static inline void changeState(libv::GL& gl, State target) {
 	gl.capability.blend.set(target.capabilityBlend != 0);
-	gl.capability.cullFace.set(target.capabilityCullFace != 0);
+	gl.capability.cull.set(target.capabilityCullFace != 0);
 	gl.capability.depthTest.set(target.capabilityDepthTest != 0);
 	gl.capability.multisample.set(target.capabilityMultisample != 0);
 	gl.capability.rasterizerDiscard.set(target.capabilityRasterizerDiscard != 0);
@@ -90,7 +90,7 @@ struct QueueTaskMesh {
 	std::shared_ptr<RemoteProgram> program;
 	std::shared_ptr<RemoteMesh> mesh;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -106,7 +106,7 @@ struct QueueTaskMeshVII : QueueTaskMesh {
 	VertexIndex baseIndex;
 	VertexIndex numIndices;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -120,7 +120,7 @@ struct QueueTaskMeshVII : QueueTaskMesh {
 struct QueueTaskMeshInstanced : QueueTaskMesh {
 	int32_t instanceCount;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -135,7 +135,7 @@ struct QueueTaskMeshFullScreen {
 	State state;
 	std::shared_ptr<RemoteProgram> program;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -155,7 +155,7 @@ struct QueueTaskDispatchCompute {
 	uint32_t group_size_y;
 	uint32_t group_size_z;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -169,7 +169,7 @@ struct QueueTaskDispatchCompute {
 struct QueueTaskMemoryBarrier {
 	libv::gl::BarrierBit bits;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		(void) remote;
 		gl.memoryBarrier(bits);
 	}
@@ -178,7 +178,7 @@ struct QueueTaskMemoryBarrier {
 struct QueueTaskClear {
 	libv::gl::BufferBit buffers;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		// TODO P5: Color mask in not auto enabled, Stencil mask need verification
 		(void) remote;
 
@@ -207,9 +207,9 @@ struct QueueTaskClear {
 
 struct QueueTaskCallback {
 	State state;
-	std::function<void(libv::gl::GL&)> callback;
+	std::function<void(libv::GL&)> callback;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -222,10 +222,10 @@ struct QueueTaskCallback {
 
 struct QueueTaskCallbackProgram {
 	State state;
-	std::function<void(libv::gl::GL&)> callback;
+	std::function<void(libv::GL&)> callback;
 	std::shared_ptr<RemoteProgram> program;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -239,7 +239,7 @@ struct QueueTaskCallbackProgram {
 struct QueueTaskClearColor {
 	libv::vec4f color;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		(void) remote;
 		gl.clearColor(color);
 	}
@@ -248,7 +248,7 @@ struct QueueTaskClearColor {
 struct QueueTaskUniformBlockUnique {
 	UniformBlockUniqueView_std140 view;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		view.remote->bind(gl, remote, view.binding, view.block);
 	}
 };
@@ -256,7 +256,7 @@ struct QueueTaskUniformBlockUnique {
 struct QueueTaskUniformBlockShared {
 	UniformBlockSharedView_std140 view;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		view.remote()->bind(gl, remote, view.binding(), view.block());
 	}
 };
@@ -264,19 +264,19 @@ struct QueueTaskUniformBlockShared {
 struct QueueTaskUniformBlockStream {
 	UniformBlockStreamView_std140 view;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		view.remote->bind(gl, remote, view.binding, view.block);
 	}
 };
 
 struct QueueTaskTexture {
 	Texture texture;
-	libv::gl::TextureChannel channel;
+	libv::gl::TextureUnit unit;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		// TODO P4: Could be optimized with gl addition: Only change activeTexture if binding is different
 		//		gl.bind(channel, object); BUT sync_might_bind might interfere
-		gl.activeTexture(channel);
+		gl.activeTexture(unit);
 		auto object = AttorneyRemoteTexture::sync_might_bind(texture, gl, remote);
 		gl.bind(object);
 	}
@@ -289,7 +289,7 @@ struct QueueTaskBindImageTexture {
 	int32_t layer;
 	libv::gl::BufferAccessFull access;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		auto object = AttorneyRemoteTexture::sync_might_bind(texture, gl, remote);
 		if (layer < 0)
 			gl.bindImageTexture(unit, object, level, access, texture.format());
@@ -302,7 +302,7 @@ struct QueueTaskViewport {
 	libv::vec2i position;
 	libv::vec2i size;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		(void) remote;
 		gl.viewport(position, size);
 	}
@@ -326,7 +326,7 @@ struct QueueTaskFramebuffer {
 	QueueTaskFramebuffer(Mode mode) :
 		mode(mode) { }
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		switch (mode) {
 		case QueueTaskFramebuffer::Mode::both:
 			return AttorneyRemoteFramebuffer::bind(*framebuffer, gl, remote);
@@ -361,7 +361,7 @@ struct QueueTaskBlit {
 	libv::gl::BufferBit mask;
 	libv::gl::MagFilter filter;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::GL& gl, Remote& remote) const noexcept {
 		auto previous_read = gl.framebuffer_read();
 		auto previous_draw = gl.framebuffer_draw();
 
@@ -430,7 +430,7 @@ public:
 
 	State currentState{};
 
-	libv::gl::GL& gl;
+	libv::GL& gl;
 
 public:
 	ImplQueue(gl::GL& gl) :
@@ -468,16 +468,16 @@ Queue::~Queue() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Queue::callback(std::function<void(libv::gl::GL&)> func) {
+void Queue::callback(std::function<void(libv::GL&)> func) {
 	self->add<QueueTaskCallback>(state.state(), std::move(func));
 }
 
-void Queue::callbackProgram(std::function<void(libv::gl::GL&)> func) {
+void Queue::callbackProgram(std::function<void(libv::GL&)> func) {
 	self->programStack.top()->uniformStream.endBatch();
 	self->add<QueueTaskCallbackProgram>(state.state(), std::move(func), self->programStack.top());
 }
 
-libv::gl::GL& Queue::out_of_order_gl() noexcept {
+libv::GL& Queue::out_of_order_gl() noexcept {
 	return self->gl;
 }
 
@@ -587,7 +587,7 @@ void Queue::blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i 
 
 // -------------------------------------------------------------------------------------------------
 
-void Queue::uniform(const Uniform_t<libv::gl::TextureChannel> uniform, libv::gl::TextureChannel value) {
+void Queue::uniform(const Uniform_t<libv::gl::TextureUnit> uniform, libv::gl::TextureUnit value) {
 	self->programStack.top()->uniformStream.set(uniform.location, value);
 }
 void Queue::uniform(const Uniform_t<bool> uniform, bool value) {
@@ -743,7 +743,7 @@ void Queue::uniform(UniformBlockStreamView_std140 view) {
 	self->add<QueueTaskUniformBlockStream>(std::move(view));
 }
 
-void Queue::texture(Texture texture, const libv::gl::TextureChannel channel) {
+void Queue::texture(Texture texture, const libv::gl::TextureUnit channel) {
 	self->add<QueueTaskTexture>(std::move(texture), channel);
 }
 
@@ -790,7 +790,7 @@ void Queue::memoryBarrier(libv::gl::BarrierBit bits) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Queue::execute(libv::gl::GL& gl, Remote& remote) {
+void Queue::execute(libv::GL& gl, Remote& remote) {
 	for (const auto& task_variant : self->tasks) {
 		auto execution = [&]<typename T>(const T& task) {
 			if constexpr ( requires { task.execute(gl, remote, self->currentState); } )

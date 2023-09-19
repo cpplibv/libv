@@ -435,13 +435,13 @@ void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tree_01.vm4"))),
 ////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/Tree_med.fixed.game.vm4"))),
 ////		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
-////		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
+////		model(rctx.model_loader, "fighter_01_eltanin.vm4"),
 //		shader(rctx.loader.shader, "fleet.vs", "fleet.fs") {
 //
 ////	log_surface.fatal("RendererFleet...");
 ////
 ////	log_surface.fatal("read_file_or_throw...");
-////	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4");
+////	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.vm4");
 ////	log_surface.fatal("load_or_throw...");
 ////	auto model_t = libv::vm4::load_or_throw(file);
 ////	// TODO P1: app.surface: exception from here gets silently ignored
@@ -587,7 +587,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 	uniforms[layout_matrices.eye] = glr.eye();
 
 	glr.program(shader.program());
-	glr.texture(font->texture().base_ref(), textureChannel_diffuse);
+	glr.texture(font->texture().base_ref(), textureUnit_diffuse);
 //	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
 //	glr.uniform(shader.uniform().selected, selected);
 	glr.uniform(std::move(uniforms));

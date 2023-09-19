@@ -16,14 +16,14 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-void RemoteUniformBuffer::create(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteUniformBuffer::create(libv::GL& gl, Remote& remote_) noexcept {
 	gl(buffer).create();
 
 	remote = make_observer_ptr(&remote_.destroyQueues());
 	created = true;
 }
 
-void RemoteUniformBuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteUniformBuffer::update(libv::GL& gl, Remote& remote_) noexcept {
 	if (!created)
 		create(gl, remote_);
 
@@ -32,11 +32,11 @@ void RemoteUniformBuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	dirty = false;
 }
 
-void RemoteUniformBuffer::bind(libv::gl::GL& gl, Remote& remote_, UniformBlockBindingLocation binding, const UniformDataBlock& block) noexcept {
+void RemoteUniformBuffer::bind(libv::GL& gl, Remote& remote_, UniformBlockBindingLocation binding, const UniformDataBlock& block) noexcept {
 	if (dirty)
 		update(gl, remote_);
 
-	gl(buffer).bindRange(binding, block.offset, block.size);
+	gl(buffer).bindRange(binding, static_cast<uint32_t>(block.offset), static_cast<uint32_t>(block.size));
 }
 
 RemoteUniformBuffer::~RemoteUniformBuffer() noexcept {

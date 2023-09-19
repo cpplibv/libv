@@ -20,7 +20,7 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-class InternalTexture : public libv::ref_count_base<InternalTexture> {
+class InternalTexture : public libv::ref_count_base {
 	friend libv::ref_count_access;
 
 public:

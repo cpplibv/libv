@@ -51,7 +51,7 @@ void RendererSkybox::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	uniforms[layout_matrices.matP] = glr.projection;
 	uniforms[layout_matrices.eye] = glr.eye();
 	glr.uniform(std::move(uniforms));
-	glr.texture(texture.texture(), textureChannel_diffuse);
+	glr.texture(texture.texture(), textureUnit_diffuse);
 	glr.render(mesh);
 }
 

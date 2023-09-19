@@ -23,7 +23,7 @@ struct UniformsSurfaceTexture {
 //	libv::glr::Uniform_texture texture_noise;
 
 	template <typename Access> void access_uniforms(Access&) {
-//		access(texture_noise, "texture_noise", textureChannel_diffuse);
+//		access(texture_noise, "texture_noise", textureUnit_diffuse);
 //		access(base_color, "base_color");
 	}
 

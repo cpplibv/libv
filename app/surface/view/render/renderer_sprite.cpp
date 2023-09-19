@@ -147,8 +147,8 @@ void RendererSprite::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uni
 	block_matrices[layout_matrices.eye] = glr.eye();
 	glr.uniform(std::move(block_matrices));
 	glr.uniform(spriteDefinitionsBlock);
-	glr.texture(spriteAtlas->textureColor, textureChannel_diffuse);
-	glr.texture(spriteAtlas->textureNormal, textureChannel_normal);
+	glr.texture(spriteAtlas->textureColor, textureUnit_diffuse);
+	glr.texture(spriteAtlas->textureNormal, textureUnit_normal);
 
 	std::erase_if(spriteChunks, [&](const auto& pair) {
 		const auto& [index, spriteChunk] = pair;

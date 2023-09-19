@@ -1,4 +1,4 @@
-// Project: libv.sys, File: src/libv/sys/clipboard.cpp
+// Project: libv.sys, File: src/libv/sys/executable_path.cpp
 
 // hpp
 #include <libv/sys/executable_path.hpp>

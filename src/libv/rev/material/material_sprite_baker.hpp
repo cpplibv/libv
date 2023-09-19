@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/materials/material_sprite_baker.hpp
+// Project: libv.rev, File: src/libv/rev/material/material_sprite_baker.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.noise, File: src/libv/noise/noise.hpp
+// Project: libv.noise, File: src/libv/noise/noise_2.hpp
 
 #pragma once
 

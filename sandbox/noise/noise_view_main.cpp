@@ -1,4 +1,4 @@
-// Project: libv.rev, File: sandbox/libv_rev_main.cpp
+// Project: libv.noise, File: sandbox/noise/noise_view_main.cpp
 
 // libv
 // #include <libv/arg/arg.hpp>
@@ -27,19 +27,16 @@
 // std
 #include <iostream>
 // pro
-// #include <libv/rev/effect/particle.hpp>
-// #include <libv/rev/effect/particle_system.hpp>
-// #include <libv/rev/post_processing.hpp>
-// #include <libv/rev/render_target.hpp>
-// #include <libv/rev/resource/resource_manager.hpp>
-// #include <libv/rev/resource/shader.hpp>
-#include <libv/rev/effect/particle.hpp>
-#include <libv/rev/engine/canvas.hpp>
-#include <libv/rev/engine/engine.hpp>
-#include <libv/rev/engine/render_pass.hpp>
-#include <libv/rev/engine/scene.hpp>
-#include <libv/rev/material/material_editor_grid.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/glr/texture.hpp>
+#include <libv/glr/uniform.hpp>
+#include <libv/glr/uniform_buffer.hpp>
+#include <libv/rev/renderer/renderer_editor_grid.hpp>
+#include <libv/rev/resource_manager.hpp>
 #include <libv/rev/settings.hpp>
+#include <libv/rev/shader.hpp>
+#include <libv/rev/shader/attribute.hpp>
 
 #include <libv/sun/ui/overlay_shader_error.hpp>
 #include <libv/sun/camera.hpp>
@@ -57,7 +54,6 @@ static constexpr libv::vec2i window_size = {1680, 1050};
 
 bool enablePostProcessing = true;
 bool enableSimulationUpdate = true;
-// !!! enableCameraRotate should be different
 bool enableCameraRotate = true;
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
@@ -71,8 +67,8 @@ struct UniformsNoiseGen {
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(time, "time", 0.f);
-		access(texture, "texture", libv::rev::textureChannel_diffuse);
-		access(texture_cpu, "texture_cpu", libv::rev::textureChannel_normal);
+		access(texture, "texture", libv::rev::textureUnit_diffuse);
+		access(texture_cpu, "texture_cpu", libv::rev::textureUnit_normal);
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -89,7 +85,7 @@ struct UniformsPlane {
 	libv::glr::Uniform_mat4f matMVP;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture, "texture0Sampler", libv::rev::textureChannel_diffuse);
+		access(texture, "texture0Sampler", libv::rev::textureUnit_diffuse);
 		access(matMVP, "matMVP");
 	}
 
@@ -105,12 +101,11 @@ using ShaderPlane = libv::rev::Shader<UniformsPlane>;
 class SandboxCanvas : public libv::ui::CanvasBase {
 	libv::Nexus nexus;
 
-	libv::rev::Canvas canvas;
-	// libv::rev::Scene scene;
-
 	libv::sun::CameraPlayer camera;
 
-	libv::rev::Engine& rev;
+	libv::rev::ResourceManager& rm;
+	libv::rev::RendererEditorGrid& rendererEditorGrid;
+	libv::glr::UniformBuffer& uniformStream;
 
 	libv::glr::Mesh plane_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Texture2D::R32F gen_texture;
@@ -119,11 +114,13 @@ class SandboxCanvas : public libv::ui::CanvasBase {
 	ShaderPlane shaderPlane;
 
 public:
-	explicit SandboxCanvas(libv::Nexus& nexus, libv::rev::Engine& rev) :
+	explicit SandboxCanvas(libv::Nexus& nexus, libv::rev::ResourceManager& rm, libv::rev::RendererEditorGrid& rendererEditorGrid, libv::glr::UniformBuffer& uniformStream) :
 			nexus(nexus),
-			rev(rev),
-			shader(rev.resourceManager.shader, "noise_gen.cs"),
-			shaderPlane(rev.resourceManager.shader, "simple_texture.vs", "simple_texture.fs") {
+			rm(rm),
+			rendererEditorGrid(rendererEditorGrid),
+			uniformStream(uniformStream),
+			shader(rm.shader, "noise_gen.cs"),
+			shaderPlane(rm.shader, "simple_texture.vs", "simple_texture.fs") {
 		camera.look_at({100, 100, 60}, {0, 0, 0});
 
 		{
@@ -156,7 +153,7 @@ public:
 			for (int x = 0; x < 1024; ++x) {
 				float xf = static_cast<float>(x);
 				auto seed_offset = x / 64;
-				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f} * 10;
+				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f} * 10.f;
 				const auto cpu = libv::noise::simplex(0x5EED + seed_offset, uv) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::cellular(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;
 				// const auto cpu = yf / 1024.f;
@@ -185,14 +182,10 @@ public:
 	virtual void update(libv::ui::time_duration deltaTime) override {
 		if (enableCameraRotate)
 			camera.orbit_yaw(static_cast<float>(deltaTime.count()) * libv::deg_to_rad(22.5f));
-
-		// !!! Should be set differently, also eye must be mutex guarded, 1 frame diff is fine, its only used for sort
-		//		but best would be a delayed evaluation, or rather the camera update be part of the async update process?
-		// state.eye = camera.eye();
 	}
 
 	virtual void render(libv::glr::Queue& glr) override {
-		canvas.resize(canvas_size.cast<int32_t>());
+		rm.update(glr.out_of_order_gl());
 
 		const auto& guard_p = glr.projection.push_guard();
 		const auto& guard_v = glr.view.push_guard();
@@ -219,13 +212,13 @@ public:
 			glr.program(shader.program());
 			glr.bindImageTexture(0, gen_texture, 0, libv::gl::BufferAccessFull::Write);
 			glr.uniform(shader.uniform().time, static_cast<float>(this->ui().state.time().count()));
-			glr.texture(cpu_texture, libv::rev::textureChannel_normal);
+			glr.texture(cpu_texture, libv::rev::textureUnit_normal);
 			glr.dispatchCompute(1024 / 8, 1024 / 8);
 			glr.memoryBarrier(libv::gl::BarrierBit::ShaderImageAccess);
 		}
 
 
-		rev.rendererEditorGrid.render(glr, rev.uniformStream);
+		rendererEditorGrid.render(glr, uniformStream);
 
 
 		glr.projection = libv::mat4f::ortho({0, 0}, canvas_size);
@@ -238,11 +231,11 @@ public:
 
 			glr.program(shaderPlane.program());
 			glr.uniform(shaderPlane.uniform().matMVP, glr.mvp());
-			glr.texture(gen_texture, libv::rev::textureChannel_diffuse);
+			glr.texture(gen_texture, libv::rev::textureUnit_diffuse);
 			glr.render(plane_mesh);
 		}
 
-		// glr.callback([this](libv::gl::GL& gl) {
+		// glr.callback([this](libv::GL& gl) {
 		// 	libv::vector_2D<float> output{1024, 1024};
 		// 	gl.readTextureImage(gen_texture.out_of_order_gl(), 0, libv::gl::ReadFormat::R, libv::gl::DataType::F32, output.data());
 		//
@@ -272,38 +265,25 @@ public:
 
 class SandboxScene {
 private:
-	libv::rev::Engine engine;
+	libv::rev::ResourceManager rm;
+	libv::rev::RendererEditorGrid rendererEditorGrid{rm};
+	libv::glr::UniformBuffer uniformStream{libv::gl::BufferUsage::StreamDraw};
 
 public:
 	explicit SandboxScene(libv::Nexus& nexus) :
-			engine([] {
+		rm([] {
 				libv::rev::Settings settings;
 				settings.model.base_path = "../../res/model/";
 				settings.shader.base_path = "../../res/shader/";
 				settings.texture.base_path = "../../res/texture/";
 				return settings;
 			}(), nexus) {
-		engine.resourceManager.shader.add_include_directory("", "res/shader/");
+		rm.shader.add_include_directory("", "res/shader/");
 	}
 
 public:
 	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) {
-		auto canvas = libv::ui::createCanvas<SandboxCanvas>("canvas", nexus, engine);
-
-		canvas.event().global_before_update([this](const libv::ui::EventBeforeUpdate& event) mutable {
-			engine.async_update(event.frame_time, event.delta_time);
-		});
-		canvas.event().before_create.connect_system([this](const auto& event) mutable {
-			engine.create(event.gl);
-		});
-		canvas.event().before_render.connect_system([this](const auto& event) mutable {
-			engine.prepare_render(event.gl);
-		});
-		canvas.event().after_destroy.connect_system([this](const auto& event) mutable {
-			engine.destroy(event.gl);
-		});
-
-		return canvas;
+		return libv::ui::createCanvas<SandboxCanvas>("canvas", nexus, rm, rendererEditorGrid, uniformStream);
 	}
 };
 

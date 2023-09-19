@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/version.hpp
+// Project: libv, File: app/star/game/version.hpp
 
 #pragma once
 

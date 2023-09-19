@@ -67,7 +67,7 @@ public:
 
 public:
 	void update_fs();
-	void update_gl(libv::gl::GL& gl);
+	void update_gl(libv::GL& gl);
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -43,8 +43,8 @@ namespace ui {
 //const auto uniformBlock_lights   = libv::glr::UniformBlockBinding{3, "Lights"};
 //const auto uniformBlock_skeleton = libv::glr::UniformBlockBinding{4, "Skeleton"};
 
-//constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-//constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
+//constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
+//constexpr auto textureUnit_normal  = libv::gl::TextureUnit{1};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -214,7 +214,7 @@ public:
 
 		// Cleanup
 		tasks.clear();
-		glr.callback([this](libv::gl::GL&) {
+		glr.callback([this](libv::GL&) {
 			uniform_stream.clear();
 		});
 
@@ -236,7 +236,7 @@ ContextRender::ContextRender() :
 	self(std::make_unique<ImplContextRender>()) { }
 
 ContextRender::~ContextRender() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 Renderer ContextRender::root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time, libv::vec2f mouse_position, libv::vec2f ui_size) {

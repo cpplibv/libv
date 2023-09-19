@@ -23,10 +23,10 @@ ResourceManager::ResourceManager(Settings settings, libv::Nexus& nexus) :
 }
 
 ResourceManager::~ResourceManager() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
-void ResourceManager::update(libv::gl::GL& gl) {
+void ResourceManager::update(libv::GL& gl) {
 	self->update(gl);
 	shader.update(gl);
 }

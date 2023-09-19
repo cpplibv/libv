@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/materials/material_red.cpp
+// Project: libv.rev, File: src/libv/rev/material/material_red.cpp
 
 // hpp
 #include <libv/rev/material/material_red.hpp>

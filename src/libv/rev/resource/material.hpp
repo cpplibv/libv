@@ -13,7 +13,7 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseMaterial : public libv::ref_count_base<BaseMaterial> {
+class BaseMaterial : public libv::ref_count_base {
 	friend libv::ref_count_access;
 
 public:

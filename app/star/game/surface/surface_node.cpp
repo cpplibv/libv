@@ -1,4 +1,4 @@
-// Project: libv, File: app/surface/surface/node.cpp
+// Project: libv, File: app/star/game/surface/surface_node.cpp
 
 // hpp
 #include <star/game/surface/surface_node.hpp>
@@ -24,6 +24,7 @@ float NodeConstant::evaluate(float x, float y) noexcept {
 }
 
 std::string star::SurfaceNode::glsl(star::SurfaceNodeContext ctx) const noexcept {
+	(void) ctx;
 	return {};
 }
 

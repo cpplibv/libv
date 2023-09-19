@@ -2,12 +2,12 @@
 
 in vec2 fragmentTexture0;
 
-out vec4 result;
+out vec4 outputColor;
 
 uniform sampler2D texture0;
 
 // -------------------------------------------------------------------------------------------------
 
 void main() {
-	result = texture(texture0, fragmentTexture0).rgba;
+	outputColor = texture(texture0, fragmentTexture0).rgba;
 }

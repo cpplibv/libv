@@ -23,7 +23,7 @@ Texture::Texture(Texture&&) noexcept = default;
 Texture& Texture::operator=(Texture&&) & noexcept = default;
 
 Texture::~Texture() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 libv::glr::Texture& Texture::texture() noexcept {

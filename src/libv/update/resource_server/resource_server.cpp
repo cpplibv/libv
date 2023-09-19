@@ -123,7 +123,7 @@ ResourceServer::ResourceServer(Settings settings_) :
 	self(std::make_unique<ImplResourceServer>(std::move(settings_))) {
 }
 
-ResourceServer::~ResourceServer() = default; // For the sake of forward declared ptr
+ResourceServer::~ResourceServer() = default; // For the sake of forward declared types
 
 const ResourceServer::Settings& ResourceServer::settings() const noexcept {
 	return self->settings;

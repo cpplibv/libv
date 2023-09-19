@@ -106,7 +106,7 @@ auto process_filename_index(std::string_view line, int index) {
 
 } // namespace -------------------------------------------------------------------------------------
 
-std::string GLSLSourceCode::translateErrorMessageFilenames(std::string_view errorMessage) const {
+std::string GLSLSourceCode::fixupErrorMessage(std::string_view errorMessage) const {
 	std::ostringstream os;
 
 	for (std::string_view line : errorMessage | libv::view::lines_string_view()) {

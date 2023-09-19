@@ -31,7 +31,7 @@ int main(int argc, const char** argv) {
 	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;
 
-	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
+	libv::logger_stream.setFormat("{severity} {thread_id:2} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;
 
 	app::log_app.info("{}", args.report(100));

@@ -18,15 +18,15 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-void RemoteProgram::create(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteProgram::create(libv::GL& gl, Remote& remote_) noexcept {
 	gl(program).create();
 
 	remote = make_observer_ptr(&remote_.destroyQueues());
 	created = true;
 }
 
-void RemoteProgram::update(libv::gl::GL& gl, Remote& remote_) noexcept {
-	bool first_update = !created;
+void RemoteProgram::update(libv::GL& gl, Remote& remote_) noexcept {
+	const bool first_update = !created;
 
 	if (!created)
 		create(gl, remote_);
@@ -81,7 +81,7 @@ void RemoteProgram::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	}
 }
 
-void RemoteProgram::use(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteProgram::use(libv::GL& gl, Remote& remote_) noexcept {
 	if (dirty)
 		update(gl, remote_);
 

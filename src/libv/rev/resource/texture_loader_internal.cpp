@@ -26,7 +26,7 @@ InternalTextureLoader::InternalTextureLoader(const std::shared_ptr<InternalResou
 }
 
 InternalTextureLoader::~InternalTextureLoader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -46,6 +46,10 @@ void InternalTextureLoader::initDefaultGLR() {
 //	initBuiltin("builtin:green",       libv::vec4uc{  0, 255,   0, 255});
 //	initBuiltin("builtin:blue",        libv::vec4uc{  0,   0, 255, 255});
 	initBuiltin("builtin:magenta",     libv::vec4uc{255,   0, 255, 255});
+
+	// initBuiltin("builtin:uvtest", ...);
+	// initBuiltin("builtin:uv", ...);
+	// initBuiltin("builtin:mango", ...);
 
 	initBuiltin("builtin:transparent", libv::vec4uc{  0,   0,   0,   0});
 	initBuiltin("builtin:none",        libv::vec4uc{  0,   0,   0,   0});
@@ -146,7 +150,7 @@ void InternalTextureLoader::process_fs(InternalTexture_ptr&& res) {
 //		irm->fsw.subscribe_file(resource_path, [] {
 //		});
 
-		const auto resource_data = libv::read_file_ec(resource_path);
+		auto resource_data = libv::read_file_ec(resource_path);
 		if (resource_data.ec) {
 //			errors.emplace_back(resource_path, resource_data.ec);
 			log_rev.warn("Failed to read file {} for {}: {}", resource_path, res->name_, resource_data.ec.message());

@@ -1,7 +1,7 @@
 #version 330 core
 
 #include <command_arrow.glsl>
-#include <lib/linearize_depth.glsl>
+//#include <lib/linearize_depth.glsl>
 
 layout (lines) in;
 layout (triangle_strip, max_vertices = 9) out;

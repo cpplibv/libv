@@ -5,7 +5,7 @@
 // fwd
 #include <libv/ui/fwd.hpp>
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
@@ -79,7 +79,7 @@ public:
 	[[nodiscard]] EventHub event_hub();
 
 public:
-	[[nodiscard]] libv::gl::GL& gl();
+	[[nodiscard]] libv::GL& gl();
 	[[nodiscard]] libv::Nexus& nexus();
 
 	[[nodiscard]] ContextState& state();

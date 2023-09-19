@@ -1,4 +1,4 @@
-// Created by Vader on 2023-02-24.
+// Project: libv.utility, File: src/libv/utility/locale/loc_number.hpp
 
 #pragma once
 

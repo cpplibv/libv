@@ -75,22 +75,22 @@ int main() {
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 //
 //		std::cout << "> Create A" << std::endl;
-//		std::ofstream file_a(path_a.string());
+//		std::ofstream file_a(path_a.generic_string());
 //		file_a.close();
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 //
 //		std::cout << "> Create B" << std::endl;
-//		std::ofstream file_b(path_b.string());
+//		std::ofstream file_b(path_b.generic_string());
 //		file_b.close();
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 //
 //		std::cout << "> Create C" << std::endl;
-//		std::ofstream file_c(path_c.string());
+//		std::ofstream file_c(path_c.generic_string());
 //		file_c.close();
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 //
 //		std::cout << "> Modify C" << std::endl;
-//		file_c.open(path_c.string());
+//		file_c.open(path_c.generic_string());
 //		file_c << "Hi";
 //		file_c.close();
 //		std::this_thread::sleep_for(std::chrono::milliseconds(200));

@@ -1,0 +1,83 @@
+
+RES - Resource
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+objectives:
+	no resource file duplication
+	live/hot reload
+	which resources are used by each target
+	support for resource blob files (abstraction above physical filesystem)
+
+
+libv.res: global variable for resource mapping
+
+
+libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+libv.glr: IDEA: Versioned resources, beside what tell which version are we want to use
+
+CMake resource folder
+
+resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
+resource: forbid usage of absolute paths
+resource: forbid usage of relative paths with starting ..
+
+builtin (in memory resource files)
+generated (generated resource files upon request)
+
+libv.res: Resource - New library for resource and asset loading, caching and tracking
+		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
+		assets, audio, textures, mods/scripts and models
+
+		Requirements:
+			cache
+			load and inclusion/extension of tracking set (recursion should be possible)
+			filesystem resources
+			filesystem resource fragments (inclusion subjects)
+			virtual resources
+			virtual generated resources
+			tracking of virtual resources
+			tracking of filesystem resources
+			load/reload/unload/tracking events
+			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
+
+---
+
+
+Resource mapping another idea:
+	use dummy link files
+	enable link follow on dev builds
+
+
+Packaging
+	Resource mapping
+		resource_path_fallthrough()
+		proper exception type with proper details
+		libv.res: It needs to be a thing
+			include directories
+			virtual mapping
+
+	RC
+		icon for executables on windows
+
+	Strip symbols
+		wish: package strip debug information:
+			objcopy --only-keep-debug "${tostripfile}" "${debugdir}/${debugfile}"
+			strip --strip-debug --strip-unneeded "${tostripfile}"
+			objcopy --add-gnu-debuglink="${debugdir}/${debugfile}" "${tostripfile}"
+
+		GDB:
+			gdb -s sandbox_libv_rev_par.debug -e sandbox_libv_rev_par.exe
+		or
+			symbol-file debug/sandbox_libv_rev_par.debug
+
+	Installer
+		...
+
+	Signing
+		...

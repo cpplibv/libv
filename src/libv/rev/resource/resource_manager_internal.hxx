@@ -3,9 +3,9 @@
 #pragma once
 
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/mt/queue_busy.hpp>
-#include <libv/mt/token_machine.hpp>
+#include <libv/mt/ticket_machine.hpp>
 //#include <libv/mt/worker_thread.hpp>
 #include <libv/mt/worker_thread_pool.hpp>
 #include <libv/utility/timer.hpp>
@@ -26,7 +26,7 @@ struct InternalResourceManager {
 	Settings settings;
 
 private:
-	libv::mt::token_machine pending_blocking_work;
+	libv::mt::ticket_machine pending_blocking_work;
 //	libv::mt::worker_thread thread_fs{"res/fs"};
 //	libv::mt::worker_thread_pool thread_cpu{2, "res/cpu"};
 	libv::mt::worker_thread_pool thread_fs{2, "res/fs"};
@@ -38,7 +38,7 @@ public:
 		settings(std::move(settings)) {
 	}
 
-	void update(libv::gl::GL& gl) {
+	void update(libv::GL& gl) {
 		(void) gl;
 		libv::Timer timer;
 
@@ -65,7 +65,7 @@ public:
 	void queue_fs(F&& task_) {
 		thread_fs.execute_async([
 					task = std::forward<F>(task_),
-					token = pending_blocking_work.create_token()]() mutable {
+					token = pending_blocking_work.create_ticket()]() mutable {
 			task();
 		});
 	}
@@ -74,7 +74,7 @@ public:
 	void queue_cpu(F&& task_) {
 		thread_cpu.execute_async([
 					task = std::forward<F>(task_),
-					token = pending_blocking_work.create_token()]() mutable {
+					token = pending_blocking_work.create_ticket()]() mutable {
 			task();
 		});
 	}

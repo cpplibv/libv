@@ -12,7 +12,7 @@ namespace mimp {
 
 // -------------------------------------------------------------------------------------------------
 
-bool execute_script(libv::vm4::Model& model, const std::string& script);
+void execute_script(libv::vm4::Model& model, const std::string& script);
 
 // -------------------------------------------------------------------------------------------------
 

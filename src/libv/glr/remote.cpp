@@ -68,7 +68,7 @@ void Remote::readPixels(libv::vec2i pos, libv::vec2i size, libv::gl::ReadFormat 
 	self->gl->readPixels(pos, size, format, type, data);
 }
 
-libv::gl::GL& Remote::gl() noexcept {
+libv::GL& Remote::gl() noexcept {
 	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
 	LIBV_GL_DEBUG_ASSERT(self->initalized);
 	return *self->gl;

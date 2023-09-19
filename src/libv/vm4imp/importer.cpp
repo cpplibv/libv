@@ -196,7 +196,7 @@ public:
 				m.d1, m.d2, m.d3, m.d4);
 
 		const auto globalMat = parentMat * nodeMat;
-		// If the determinant of the upper-left 3x3 part of the transformation matrix is negative: The winding order is flipped.
+		// If the determinant of the upper-left 3x3 part of the transform matrix is negative: The winding order is flipped.
 		const bool isCW = libv::mat3f(globalMat).determinant() < 0;
 
 		if (isCW)
@@ -204,7 +204,7 @@ public:
 
 		model.nodes[nodeID].parentID = parentID;
 		model.nodes[nodeID].name = aiNode->mName.C_Str();
-		model.nodes[nodeID].transformation = nodeMat;
+		model.nodes[nodeID].transform = nodeMat;
 
 		for (uint32_t i = 0; i < aiNode->mNumMeshes; i++) {
 			model.nodes[nodeID].meshIDs.push_back(aiNode->mMeshes[i]);
@@ -316,7 +316,7 @@ public:
 
 template <typename F>
 void foreachVertex(Model& model, NodeID nodeID, libv::mat4f parentMat, const F& func) {
-	const auto globalMat = parentMat * model.nodes[nodeID].transformation;
+	const auto globalMat = parentMat * model.nodes[nodeID].transform;
 
 	for (const auto& meshID : model.nodes[nodeID].meshIDs) {
 		for (std::size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
@@ -350,10 +350,11 @@ void calculateAABB(Model& model) {
 }
 
 void calculateBoundingSphere(Model& model) {
+	// TODO P4: This implementation is a very rough approximation based on AABB, improve it to a proper algo
 	// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
-	// NOTE: This implementation is a very rough approximation based on AABB, improve it on-demand
 
 	model.BS_origin = (model.AABB_min + model.AABB_max) * 0.5f;
+	model.BS_radius = 0.f;
 
 	foreachVertex(model, 0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
 		const auto dist = (model.BS_origin - positionW).length();
@@ -461,7 +462,7 @@ std::optional<Model> import(const std::string& filePath) {
 	// --- Post-process ---
 	// TODO P4: libv.vm4: Prompt / importer setting for unit scale factor
 	// TODO P4: libv.vm4: Handle multiple LOD case for unit scale factor
-	model->nodes[0].transformation.scale(libv::vec3f(100.f, 100.f, 100.f));
+	model->nodes[0].transform.scale(libv::vec3f(100.f, 100.f, 100.f));
 	// TODO P4: libv.vm4: Prompt / importer setting for winding order fix
 	ctx.fixupFlippedWindingOrder();
 	// TODO P4: libv.vm4: Prompt / importer setting for aiProcess_OptimizeGraph
@@ -486,3 +487,39 @@ void recalculateBounding(Model& model) {
 
 } // namespace vm4
 } // namespace libv
+
+// =================================================================================================
+
+// TODO P2: libv.vm4: include BSO and BSR for each node(?) / LOD(?) / mesh(?) / model
+// TODO P2: libv.vm4: include AABB for each node(?) / LOD(?) / mesh(?) / model
+// void find_bounding_sphere() {
+// 	// Find (BSO) Bounding sphere origin and (BSR) Bounding sphere radius
+// 	const auto& node = scene.model.nodes[0];
+//
+// 	auto referencePointW = libv::vec3f{};
+// 	auto referenceDistanceWSQ = 0.f;
+//
+// 	for (const auto& meshID : node.meshIDs) {
+// 		const auto& mesh = scene.model.meshes[meshID];
+// 		const auto indexBegin = mesh.baseIndex;
+// 		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
+//
+// 		for (std::size_t index = indexBegin; index < indexEnd; ++index) {
+// 			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
+// 			const auto vertexPositionM = scene.model.vertices[vertexID].position;
+// 			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
+//
+// 			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).length_sq();
+// 			if (vertexDistanceWSQ > referenceDistanceWSQ) {
+// 				referencePointW
+//
+// 			}
+// 		}
+// 	}
+//
+// 	for (const auto& childID : node.childrenIDs)
+// 		referencePoint = findFarestVertex(scene.model.nodes[childID], referencePoint);
+//
+// //	for (const auto& node : scene.model.nodes)
+// //	for (const auto& node : scene.model.nodes)
+// }

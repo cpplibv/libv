@@ -110,7 +110,8 @@ TEST_CASE("Vec concepts should reject out of order types", "[libv.math.vec]") {
 	CHECK(not libv::Vec4Type<TestVec4, float>);
 }
 
-TEST_CASE("Vec2 concepts accepts vec2_t but rejects non 2 dimensional or non matching element types", "[libv.math.vec]") {
+TEST_CASE("Vec2 concepts accepts vec2 with matching element types", "[libv.math.vec]") {
+	// libv
 	CHECK(libv::Vec2<libv::vec2f>);
 	CHECK(libv::Vec2Type<libv::vec2f, float>);
 	CHECK(not libv::Vec2Type<libv::vec2f, double>);
@@ -122,37 +123,8 @@ TEST_CASE("Vec2 concepts accepts vec2_t but rejects non 2 dimensional or non mat
 	CHECK(not libv::Vec2<libv::vec4f>);
 	CHECK(not libv::Vec2Type<libv::vec4f, float>);
 	CHECK(not libv::Vec2Type<libv::vec4f, double>);
-}
 
-TEST_CASE("Vec3 concepts accepts vec3_t but rejects non 3 dimensional or non matching element types", "[libv.math.vec]") {
-	CHECK(not libv::Vec3<libv::vec2f>);
-	CHECK(not libv::Vec3Type<libv::vec2f, float>);
-	CHECK(not libv::Vec3Type<libv::vec2f, double>);
-
-	CHECK(libv::Vec3<libv::vec3f>);
-	CHECK(libv::Vec3Type<libv::vec3f, float>);
-	CHECK(not libv::Vec3Type<libv::vec3f, double>);
-
-	CHECK(not libv::Vec3<libv::vec4f>);
-	CHECK(not libv::Vec3Type<libv::vec4f, float>);
-	CHECK(not libv::Vec3Type<libv::vec4f, double>);
-}
-
-TEST_CASE("Vec4 concepts accepts vec4_t but rejects non 4 dimensional or non matching element types", "[libv.math.vec]") {
-	CHECK(not libv::Vec4<libv::vec2f>);
-	CHECK(not libv::Vec4Type<libv::vec2f, float>);
-	CHECK(not libv::Vec4Type<libv::vec2f, double>);
-
-	CHECK(not libv::Vec4<libv::vec3f>);
-	CHECK(not libv::Vec4Type<libv::vec3f, float>);
-	CHECK(not libv::Vec4Type<libv::vec3f, double>);
-
-	CHECK(libv::Vec4<libv::vec4f>);
-	CHECK(libv::Vec4Type<libv::vec4f, float>);
-	CHECK(not libv::Vec4Type<libv::vec4f, double>);
-}
-
-TEST_CASE("Vec2 concepts accepts glm but rejects non 2 dimensional or non matching element types", "[libv.math.vec]") {
+	// glm
 	CHECK(libv::Vec2<glm::vec2>);
 	CHECK(libv::Vec2Type<glm::vec2, float>);
 	CHECK(not libv::Vec2Type<glm::vec2, double>);
@@ -166,7 +138,21 @@ TEST_CASE("Vec2 concepts accepts glm but rejects non 2 dimensional or non matchi
 	CHECK(not libv::Vec2Type<glm::vec4, double>);
 }
 
-TEST_CASE("Vec3 concepts accepts glm but rejects non 3 dimensional or non matching element types", "[libv.math.vec]") {
+TEST_CASE("Vec3 concepts accepts vec3 with matching element types", "[libv.math.vec]") {
+	// libv
+	CHECK(not libv::Vec3<libv::vec2f>);
+	CHECK(not libv::Vec3Type<libv::vec2f, float>);
+	CHECK(not libv::Vec3Type<libv::vec2f, double>);
+
+	CHECK(libv::Vec3<libv::vec3f>);
+	CHECK(libv::Vec3Type<libv::vec3f, float>);
+	CHECK(not libv::Vec3Type<libv::vec3f, double>);
+
+	CHECK(not libv::Vec3<libv::vec4f>);
+	CHECK(not libv::Vec3Type<libv::vec4f, float>);
+	CHECK(not libv::Vec3Type<libv::vec4f, double>);
+
+	// glm
 	CHECK(not libv::Vec3<glm::vec2>);
 	CHECK(not libv::Vec3Type<glm::vec2, float>);
 	CHECK(not libv::Vec3Type<glm::vec2, double>);
@@ -180,7 +166,21 @@ TEST_CASE("Vec3 concepts accepts glm but rejects non 3 dimensional or non matchi
 	CHECK(not libv::Vec3Type<glm::vec4, double>);
 }
 
-TEST_CASE("Vec4 concepts accepts glm but rejects non 4 dimensional or non matching element types", "[libv.math.vec]") {
+TEST_CASE("Vec4 concepts accepts vec4 with matching element types", "[libv.math.vec]") {
+	// libv
+	CHECK(not libv::Vec4<libv::vec2f>);
+	CHECK(not libv::Vec4Type<libv::vec2f, float>);
+	CHECK(not libv::Vec4Type<libv::vec2f, double>);
+
+	CHECK(not libv::Vec4<libv::vec3f>);
+	CHECK(not libv::Vec4Type<libv::vec3f, float>);
+	CHECK(not libv::Vec4Type<libv::vec3f, double>);
+
+	CHECK(libv::Vec4<libv::vec4f>);
+	CHECK(libv::Vec4Type<libv::vec4f, float>);
+	CHECK(not libv::Vec4Type<libv::vec4f, double>);
+
+	// glm
 	CHECK(not libv::Vec4<glm::vec2>);
 	CHECK(not libv::Vec4Type<glm::vec2, float>);
 	CHECK(not libv::Vec4Type<glm::vec2, double>);

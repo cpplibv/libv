@@ -256,7 +256,7 @@ private:
 //}
 //
 //int main(int, char**) {
-////	libv::logger_stream.setFormat("{severity} {thread_id:2} {module:8}: {message}\n");
+////	libv::logger_stream.setFormat("{severity} {thread_id} {module:8}: {message}\n");
 //	std::cout << libv::logger_stream;
 //
 //	std::vector<std::jthread> threads;
@@ -310,12 +310,14 @@ void main_client(std::string_view address, std::string_view name) {
 }
 
 int main(int argc, char** argv) {
-	libv::logger_stream.setFormat("                {severity} {thread_id} {module}: {message}, {file}:{line}\n");
-	std::cout << libv::logger_stream;
-
 	if (argc < 2 || (std::string_view(argv[1]) == "c" && argc < 4)) {
-		std::cout << "Usage: s | c address name" << std::endl;
+		std::cout << "Usage: s | c <address> <name> [silent]" << std::endl;
 		return EXIT_FAILURE;
+	}
+
+	if (not (argc > 2 && std::string_view(argv[argc - 1]) == "silent")) {
+		libv::logger_stream.setFormat("                {severity} {thread_id} {module}: {message}, {file}:{line}\n");
+		std::cout << libv::logger_stream;
 	}
 
 	if (std::string_view(argv[1]) == "c")

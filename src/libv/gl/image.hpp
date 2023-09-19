@@ -9,6 +9,7 @@
 #include <memory>
 // pro
 #include <libv/gl/texture_object.hpp>
+#include <libv/gl/enum.hpp>
 
 
 namespace libv {
@@ -20,6 +21,7 @@ namespace detail {
 struct ImageImplementation {
 	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
 	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept = 0;
+	[[nodiscard]] virtual TextureTarget type() const noexcept = 0;
 	[[nodiscard]] virtual Texture createTexture() const noexcept = 0;
 	virtual ~ImageImplementation() noexcept = default;
 };
@@ -44,6 +46,10 @@ public:
 
 	[[nodiscard]] libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept {
 		return impl->pixel(level, x, y);
+	}
+
+	[[nodiscard]] inline TextureTarget type() const noexcept {
+		return impl->type();
 	}
 
 	/// @context OpenGL

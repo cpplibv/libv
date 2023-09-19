@@ -77,18 +77,18 @@ public:
 	}
 
 public:
-	inline void compile(const char* sourceStr, const GLint size) noexcept {
+	inline void compile(const char* sourceStr, const GLint size, bool logError = true) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glShaderSource(object.id, 1, &sourceStr, &size);
 		checkGL();
 		glCompileShader(object.id);
 		checkGL();
-		if (!status())
+		if (logError && !status())
 			log_gl.error("Failed to compile shader:\n{}", info());
 	}
 
-	inline void compile(std::string_view source) noexcept {
-		compile(source.data(), static_cast<GLint>(source.size()));
+	inline void compile(std::string_view source, bool logError = true) noexcept {
+		compile(source.data(), static_cast<GLint>(source.size()), logError);
 	}
 };
 

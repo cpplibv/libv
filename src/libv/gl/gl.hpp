@@ -15,17 +15,21 @@
 #include <string_view>
 #include <vector>
 // pro
+#include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/assert.hpp>
+#include <libv/gl/buffer_object.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
-#include <libv/gl/matrix_stack.hpp>
-#include <libv/gl/array_buffer_object.hpp>
-#include <libv/gl/buffer_object.hpp>
 #include <libv/gl/framebuffer_object.hpp>
+#include <libv/gl/fwd.hpp>
+#include <libv/gl/indirect_command_buffer_object.hpp>
+#include <libv/gl/matrix_stack.hpp>
+#include <libv/gl/pixel_buffer_object.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/gl/query_object.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/gl/shader_object.hpp>
+#include <libv/gl/shader_storage_buffer_object.hpp>
 #include <libv/gl/texture_object.hpp>
 #include <libv/gl/uniform_buffer_object.hpp>
 #include <libv/gl/vertex_array_object.hpp>
@@ -38,12 +42,17 @@ namespace gl {
 
 class AccessArrayBuffer;
 class AccessBuffer;
+class AccessFence;
 class AccessFramebuffer;
+class AccessPixelBuffer;
 class AccessProgram;
+class AccessQuery;
 class AccessRenderbuffer;
 class AccessShader;
+class AccessShaderStorageBuffer;
 template <typename T> class AccessTexture;
 class AccessUniformBuffer;
+class AccessIndirectCommandBuffer;
 class AccessVertexArray;
 
 // -------------------------------------------------------------------------------------------------
@@ -62,7 +71,7 @@ struct BlendEquationSetter {
 		set(value);
 	}
 	[[nodiscard]] inline auto set_guard(BlendEquation value) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(value);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -137,8 +146,8 @@ struct BlendFunctionSetter {
 		set(source, destination);
 	}
 	[[nodiscard]] inline auto set_guard(BlendFunction source, BlendFunction destination) noexcept {
-		auto past_source = current_source;
-		auto past_destination = current_destination;
+		const auto past_source = current_source;
+		const auto past_destination = current_destination;
 		set(source, destination);
 		return libv::guard([this, past_source, past_destination] { set(past_source, past_destination); });
 	}
@@ -178,24 +187,24 @@ struct CapabilitySetter {
 			set(enable_);
 		}
 		[[nodiscard]] inline auto enable_guard() noexcept {
-			auto past = current;
+			const auto past = current;
 			enable();
 			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto disable_guard() noexcept {
-			auto past = current;
+			const auto past = current;
 			disable();
 			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto set_guard(bool enable_) noexcept {
-			auto past = current;
+			const auto past = current;
 			set(enable_);
 			return libv::guard([this, past] { set(past); });
 		}
 	};
 
 	Selector<to_value(Capability::Blend)> blend;
-	Selector<to_value(Capability::CullFace)> cullFace;
+	Selector<to_value(Capability::CullFace)> cull;
 	Selector<to_value(Capability::DepthTest)> depthTest;
 	Selector<to_value(Capability::Multisample)> multisample;
 	Selector<to_value(Capability::RasterizerDiscard)> rasterizerDiscard;
@@ -206,7 +215,7 @@ struct CapabilitySetter {
 	inline void operator()(Capability capability, bool enable) {
 		switch (capability) {
 			case Capability::Blend: return blend(enable);
-			case Capability::CullFace: return cullFace(enable);
+			case Capability::CullFace: return cull(enable);
 			case Capability::DepthTest: return depthTest(enable);
 			case Capability::Multisample: return multisample(enable);
 			case Capability::RasterizerDiscard: return rasterizerDiscard(enable);
@@ -238,7 +247,7 @@ struct ClipPlanesSetter {
 		set(value);
 	}
 	[[nodiscard]] inline auto set_guard(uint32_t value) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(value);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -260,7 +269,7 @@ struct CullFaceSetter {
 		set(face);
 	}
 	[[nodiscard]] inline auto set_guard(CullFace face) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(face);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -295,7 +304,7 @@ struct DepthFunctionSetter {
 		set(value);
 	}
 	[[nodiscard]] inline auto set_guard(TestFunction value) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(value);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -366,7 +375,7 @@ struct FrontFaceSetter {
 		set(face);
 	}
 	[[nodiscard]] inline auto set_guard(FrontFace face) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(face);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -401,7 +410,7 @@ struct PolygonModeSetter {
 		set(mode);
 	}
 	[[nodiscard]] inline auto set_guard(PolygonMode mode) noexcept {
-		auto past = current;
+		const auto past = current;
 		set(mode);
 		return libv::guard([this, past] { set(past); });
 	}
@@ -429,9 +438,59 @@ struct PolygonModeSetter {
 // -------------------------------------------------------------------------------------------------
 
 struct MaskSetter {
+	struct Color {
+		bool currentR = true;
+		bool currentG = true;
+		bool currentB = true;
+		bool currentA = true;
+
+		// inline void init() {
+		// 	current = get(GL_COLOR_WRITEMASK);
+		// }
+
+		inline void set(bool r, bool g, bool b, bool a) noexcept {
+			if (currentR != r || currentG != g || currentB != b || currentA != a) {
+				currentR = r;
+				currentG = g;
+				currentB = b;
+				currentA = a;
+				glColorMask(currentR, currentG, currentB, currentA);
+				checkGL();
+			}
+		}
+		/// Bitmask 0000'RGBA
+		inline void set(uint8_t bitmask) noexcept {
+			assert(bitmask <= 0b1111);
+			set(
+					(bitmask & (1u << 3u)) != 0,
+					(bitmask & (1u << 2u)) != 0,
+					(bitmask & (1u << 1u)) != 0,
+					(bitmask & (1u << 0u)) != 0
+			);
+		}
+		inline void operator()(bool r, bool g, bool b, bool a) noexcept {
+			set(r, g, b, a);
+		}
+		[[nodiscard]] inline auto set_guard(bool r, bool g, bool b, bool a) noexcept {
+			const auto pastR = currentR;
+			const auto pastG = currentG;
+			const auto pastB = currentB;
+			const auto pastA = currentA;
+			set(r, g, b, a);
+			return libv::guard([this, pastR, pastG, pastB, pastA] {
+				set(pastR, pastG, pastB, pastA);
+			});
+		}
+
+		// void glColorMaski(GLuint buf, GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
+	};
+
 	struct Depth {
-		// TODO P5: Would be nice to get rid of this assumption of initial value being 'true'
 		bool current = true;
+
+		// inline void init() {
+		// 	current = get(GL_DEPTH_WRITEMASK);
+		// }
 
 		inline void set(bool enable_) noexcept {
 			if (current != enable_) {
@@ -458,33 +517,117 @@ struct MaskSetter {
 			set(enable_);
 		}
 		[[nodiscard]] inline auto enable_guard() noexcept {
-			auto past = current;
+			const auto past = current;
 			enable();
 			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto disable_guard() noexcept {
-			auto past = current;
+			const auto past = current;
 			disable();
 			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto set_guard(bool enable_) noexcept {
-			auto past = current;
+			const auto past = current;
 			set(enable_);
 			return libv::guard([this, past] { set(past); });
 		}
 	};
-	struct Color {
-		// R G B A
-		// ?
-	};
 	struct Stencil {
-		// ?
-		//GLuint mask;
+		uint8_t bitmask = 0;
+
+		// inline void init() {
+		// 	current = get(GL_DEPTH_WRITEMASK);
+		// }
+
+		inline void set(uint8_t bitmask_) noexcept {
+			if (bitmask != bitmask_) {
+				bitmask = bitmask_;
+				glStencilMask(bitmask_);
+				checkGL();
+			}
+		}
+		inline void operator()(uint8_t bitmask_) noexcept {
+			set(bitmask_);
+		}
+		[[nodiscard]] inline auto set_guard(uint8_t bitmask_) noexcept {
+			const auto past = bitmask;
+			set(bitmask_);
+			return libv::guard([this, past] { set(past); });
+		}
 	};
 
-	Depth depth;
 	Color color;
+	Depth depth;
 	Stencil stencil;
+};
+
+struct StencilSetter {
+	struct Function {
+		TestFunction function = TestFunction::Always;
+		uint8_t reference = 0;
+		uint8_t bitmask = 255;
+
+		// inline void init() {
+		// 	current = get(...);
+		// }
+
+		inline void set(TestFunction function_, uint8_t reference_, uint8_t bitmask_) noexcept {
+			if (function != function_ || reference != reference_ || bitmask != bitmask_) {
+				function = function_;
+				reference = reference_;
+				bitmask = bitmask_;
+				glStencilFunc(libv::to_underlying(function), reference, bitmask);
+				checkGL();
+			}
+		}
+		inline void operator()(TestFunction function_, uint8_t reference_, uint8_t bitmask_) noexcept {
+			set(function_, reference_, bitmask_);
+		}
+		[[nodiscard]] inline auto set_guard(TestFunction function_, uint8_t reference_, uint8_t bitmask_) noexcept {
+			const auto pastFunction = function;
+			const auto pastReference = reference;
+			const auto pastBitmask = bitmask;
+			set(function_, reference_, bitmask_);
+			return libv::guard([this, pastFunction, pastReference, pastBitmask] {
+				set(pastFunction, pastReference, pastBitmask);
+			});
+		}
+	};
+
+	struct Operation {
+		StencilAction stencilFail = StencilAction::Keep;
+		StencilAction depthFail = StencilAction::Keep;
+		StencilAction stencilAndDepthPass = StencilAction::Keep;
+
+		// inline void init() {
+		// 	current = get(...);
+		// }
+
+		inline void set(StencilAction stencilFail_, StencilAction depthFail_, StencilAction stencilAndDepthPass_) noexcept {
+			if (stencilFail != stencilFail_ || depthFail != depthFail_ || stencilAndDepthPass != stencilAndDepthPass_) {
+				stencilFail = stencilFail_;
+				depthFail = depthFail_;
+				stencilAndDepthPass = stencilAndDepthPass_;
+				glStencilOp(libv::to_underlying(stencilFail), libv::to_underlying(depthFail), libv::to_underlying(stencilAndDepthPass));
+				checkGL();
+			}
+		}
+		inline void operator()(StencilAction stencilFail_, StencilAction depthFail_, StencilAction stencilAndDepthPass_) noexcept {
+			set(stencilFail_, depthFail_, stencilAndDepthPass_);
+		}
+		[[nodiscard]] inline auto set_guard(StencilAction stencilFail_, StencilAction depthFail_, StencilAction stencilAndDepthPass_) noexcept {
+			const auto pastStencilFail = stencilFail;
+			const auto pastDepthFail = depthFail;
+			const auto pastStencilAndDepthPass = stencilAndDepthPass;
+			set(stencilFail_, depthFail_, stencilAndDepthPass_);
+			return libv::guard([this, pastStencilFail, pastDepthFail, pastStencilAndDepthPass] {
+				set(pastStencilFail, pastDepthFail, pastStencilAndDepthPass);
+			});
+		}
+	};
+
+	Function function;
+	Operation operation;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -507,19 +650,30 @@ public:
 	BlendFunctionSetter blendFunction;
 	CapabilitySetter capability;
 	ClipPlanesSetter clipPlanes;
+	MaskSetter mask;
+	StencilSetter stencil;
 	CullFaceSetter cullFace;
 	DepthFunctionSetter depthFunction;
 	FrontFaceSetter frontFace;
 	PolygonModeSetter polygonMode;
-	MaskSetter mask;
+
+	ClipOrigin clipOrigin = ClipOrigin::LowerLeft;
+	ClipDepth clipDepth = ClipDepth::NegativeOneToOne;
 
 private:
 	VertexArray currentVertexArray{0};
 
-	TextureChannel currentActiveTexture{0};
-	std::array<std::array<uint32_t, 16>, 11> textureBindings; /// Target -> Channel -> ID
+	TextureUnit currentActiveTexture{0};
+	std::array<std::array<uint32_t, 16>, 11> textureBindings; /// Target -> Unit -> ID
 
 	Program currentProgram_{0};
+
+	struct UniformBlockBinding {
+		UniformBuffer ubo;
+		uint32_t offset = 0;
+		// uint32_t size = 0;
+	};
+	std::array<UniformBlockBinding, 64> uniformBlockBindings; /// Binding -> UBO, Offset, Size
 
 	Framebuffer framebufferRead_{0};
 	Framebuffer framebufferDraw_{0};
@@ -529,8 +683,8 @@ private:
 
 public:
 	GL() {
-		for (auto& channels : textureBindings)
-			libv::fill(channels, 0);
+		for (auto& units : textureBindings)
+			libv::fill(units, 0);
 
 		init(); // This init function calls into the OpenGL context
 	}
@@ -618,6 +772,21 @@ public:
 	}
 	[[nodiscard]] inline GLint getMaxUniformBufferBindings() const {
 		return get<GLint>(GL_MAX_UNIFORM_BUFFER_BINDINGS);
+	}
+	[[nodiscard]] inline GLint getMaxVertexUniformBlocks() const {
+		return get<GLint>(GL_MAX_VERTEX_UNIFORM_BLOCKS);
+	}
+	[[nodiscard]] inline GLint getMaxGeometryUniformBlocks() const {
+		return get<GLint>(GL_MAX_GEOMETRY_UNIFORM_BLOCKS);
+	}
+	[[nodiscard]] inline GLint getMaxFragmentUniformBlocks() const {
+		return get<GLint>(GL_MAX_FRAGMENT_UNIFORM_BLOCKS);
+	}
+	[[nodiscard]] inline GLint getMaxComputeUniformBlocks() const {
+		return get<GLint>(GL_MAX_COMPUTE_UNIFORM_BLOCKS);
+	}
+	[[nodiscard]] inline GLint getMaxCombinedUniformBlocks() const {
+		return get<GLint>(GL_MAX_COMBINED_UNIFORM_BLOCKS);
 	}
 	[[nodiscard]] inline GLint getMaxVertexAttribs() const {
 		return get<GLint>(GL_MAX_VERTEX_ATTRIBS);
@@ -721,16 +890,20 @@ public:
 	}
 
 public:
-	inline void activeTexture(TextureChannel channel);
+	inline void clipControl(ClipOrigin clipOrigin, ClipDepth clipDepth);
+
 	inline void viewport(vec2i pos, vec2i size);
 	inline void viewport(int32_t left, int32_t bottom, int32_t width, int32_t height);
 	inline void blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter);
+	inline void dsa_blit(Framebuffer read, Framebuffer draw, vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter);
 
 	// void line_width(float width); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glLineWidth.xhtml
 	// void point_size(float size); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glPointSize.xhtml
 
 	inline void clearColor(const libv::vec4f& col);
-	inline void clearColor(float r, float g, float b, float a = 1.0f);
+	inline void clearColor(float r, float g, float b, float a);
+	inline void clearDepth(float d);
+	inline void clearStencil(uint8_t value);
 	inline void clear(BufferBit buffers = BufferBit::ColorDepthStencil);
 
 	inline void readPixels(vec2i pos, vec2i size, ReadFormat format, DataType type, void* data) {
@@ -753,37 +926,41 @@ public:
 	}
 
 public:
-	//	void depthMask(bool writeEnabled);
-	//	void stencilMask(bool writeEnabled);
-	//	void stencilMask(uint mask);
-	//
-	//	void stencilFunc(TestFunctiris::test_function_t function, int reference, uint mask = ~0);
-	//	void stencilOp(StencilAction::stencil_action_t fail, StencilAction::stencil_action_t zfail, StencilAction::stencil_action_t pass);
-//	inline void use(const Program& program);
-
-private:
-	inline void bind(TextureTarget target, uint32_t id);
-
-public:
 	inline void bind(const VertexArray& object) noexcept;
 	inline void unbindVertexArray() noexcept;
 	[[nodiscard]] inline VertexArray boundVertexArray() noexcept;
+	inline void cleanupDestroyedVertexArray(uint32_t id) noexcept;
+
+private:
+	inline void bind(TextureTarget target, uint32_t id);
+	inline void bindUnit(TextureUnit unit, TextureTarget target, uint32_t id);
 
 public:
+	inline void activeTexture(TextureUnit unit);
+
 	template <TextureTarget Target>
 	inline void bind(const Texture_t<Target>& texture);
 	inline void bind(const Texture& texture);
+	template <TextureTarget Target>
+	inline void bindUnit(TextureUnit unit, const Texture_t<Target>& texture);
+	inline void bindUnit(TextureUnit unit, const Texture& texture);
 	template <TextureTarget Target>
 	inline void unbind(const Texture_t<Target>& texture);
 	inline void unbind(const Texture& texture);
 
 	[[nodiscard]] inline Texture boundTexture(TextureTarget target) noexcept;
+	[[nodiscard]] inline Texture boundTexture(TextureTarget target, TextureUnit unit) noexcept;
 
-	inline void cleanupDestroyedTextureID(TextureTarget target, uint32_t id) noexcept;
+	inline void cleanupDestroyedTexture(TextureTarget target, uint32_t id) noexcept;
 
 public:
 	inline void useProgram(const Program& program) noexcept;
 	[[nodiscard]] inline Program boundProgram() noexcept;
+
+public:
+	inline void bindUniformBufferBase(const UniformBuffer& object, uint32_t binding) noexcept;
+	inline void bindUniformBufferRange(const UniformBuffer& object, uint32_t binding, uint32_t offset, uint32_t size) noexcept;
+	inline void cleanupDestroyedBuffer(const UniformBuffer& object) noexcept;
 
 public:
 	inline void bindImageTexture(uint32_t unit, libv::gl::Texture texture, int32_t level, libv::gl::BufferAccessFull access, libv::gl::Format format) noexcept;
@@ -802,21 +979,29 @@ public:
 	inline void framebuffer_default() noexcept;
 	inline void framebuffer_default_draw() noexcept;
 	inline void framebuffer_default_read() noexcept;
-
 	[[nodiscard]] inline Framebuffer framebuffer_draw() const noexcept;
 	[[nodiscard]] inline Framebuffer framebuffer_read() const noexcept;
+	inline void cleanupDestroyedFramebuffer(uint32_t id) noexcept;
 
 public:
 	template <typename Access = AccessUniformBuffer>
-	static inline Access operator()(UniformBuffer& object) noexcept {
-		return Access{object};
+	inline Access operator()(UniformBuffer& object) noexcept {
+		return Access{object, *this};
+	}
+	template <typename Access = AccessIndirectCommandBuffer>
+	inline Access operator()(IndirectCommandBuffer& object) noexcept {
+		return Access{object, *this};
 	}
 	template <typename Access = AccessArrayBuffer>
-	static inline Access operator()(ArrayBuffer& object) noexcept {
-		return Access{object};
+	inline Access operator()(ArrayBuffer& object) noexcept {
+		return Access{object, *this};
 	}
 	template <typename Access = AccessBuffer>
 	static inline Access operator()(Buffer& object) noexcept {
+		return Access{object};
+	}
+	template <typename Access = AccessFence>
+	inline Access operator()(Fence& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessFramebuffer>
@@ -826,6 +1011,10 @@ public:
 	template <typename Access = AccessRenderbuffer>
 	static inline Access operator()(Renderbuffer& object) noexcept {
 		return Access{object};
+	}
+	template <typename Access = AccessPixelBuffer>
+	inline Access operator()(PixelBuffer& object) noexcept {
+		return Access{object, *this};
 	}
 	template <typename Access = AccessProgram>
 	inline Access operator()(Program& object) noexcept {
@@ -838,6 +1027,10 @@ public:
 	template <typename Access = AccessShader>
 	static inline Access operator()(Shader& object) noexcept {
 		return Access{object};
+	}
+	template <typename Access = AccessShaderStorageBuffer>
+	inline Access operator()(ShaderStorageBuffer& object) noexcept {
+		return Access{object, *this};
 	}
 	template <typename Access = AccessVertexArray>
 	inline Access operator()(VertexArray& object) noexcept {
@@ -855,31 +1048,15 @@ public:
 
 // =================================================================================================
 
-constexpr inline std::size_t GL::convertToTargetIndex(TextureTarget target) noexcept {
-	switch (target) {
-	case TextureTarget::_2D: return 0;
-	case TextureTarget::CubeMap: return 1;
-	case TextureTarget::_1D: return 2;
-	case TextureTarget::_3D: return 3;
-	case TextureTarget::_1DArray: return 4;
-	case TextureTarget::_2DArray: return 5;
-	case TextureTarget::Rectangle: return 6;
-	case TextureTarget::CubeMapArray: return 7;
-	case TextureTarget::Buffer: return 8;
-	case TextureTarget::_2DMultisample: return 9;
-	case TextureTarget::_2DMultisampleArray: return 10;
-	}
-	// TODO P5: libv.gl: instead of default (0): log and assert invalid input
-	return 0;
+void GL::clipControl(ClipOrigin clipOrigin, ClipDepth clipDepth) {
+	if (this->clipOrigin == clipOrigin && this->clipDepth == clipDepth)
+		return;
+	this->clipOrigin = clipOrigin;
+	this->clipDepth = clipDepth;
+	glClipControl(libv::to_underlying(clipOrigin), libv::to_underlying(clipDepth));
+	checkGL();
 }
 
-inline void GL::activeTexture(TextureChannel channel) {
-	if (currentActiveTexture != channel) {
-		currentActiveTexture = channel;
-		glActiveTexture(GL_TEXTURE0 + to_value(channel));
-		checkGL();
-	}
-}
 inline void GL::viewport(vec2i pos, vec2i size) {
 	glViewport(pos.x, pos.y, size.x, size.y);
 	checkGL();
@@ -905,12 +1082,41 @@ inline void GL::blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_siz
 	);
 	checkGL();
 }
+inline void GL::dsa_blit(Framebuffer read, Framebuffer draw, vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter) {
+	LIBV_GL_DEBUG_ASSERT(read.id != 0);
+	LIBV_GL_DEBUG_ASSERT(draw.id != 0);
+	LIBV_GL_DEBUG_ASSERT(filter != MagFilter::Linear || mask == BufferBit::Color);
+
+	glBlitNamedFramebuffer(
+			read.id,
+			draw.id,
+			src_pos.x,
+			src_pos.y,
+			src_pos.x + src_size.x,
+			src_pos.y + src_size.y,
+			dst_pos.x,
+			dst_pos.y,
+			dst_pos.x + dst_size.x,
+			dst_pos.y + dst_size.y,
+			libv::to_value(mask),
+			libv::to_value(filter)
+	);
+	checkGL();
+}
 inline void GL::clearColor(const libv::vec4f& col) {
 	glClearColor(col.x, col.y, col.z, col.w);
 	checkGL();
 }
 inline void GL::clearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
+	checkGL();
+}
+inline void GL::clearDepth(float d) {
+	glClearDepth(d);
+	checkGL();
+}
+inline void GL::clearStencil(uint8_t value) {
+	glClearStencil(value);
 	checkGL();
 }
 inline void GL::clear(BufferBit buffers) {
@@ -938,14 +1144,52 @@ inline VertexArray GL::boundVertexArray() noexcept {
 	return currentVertexArray;
 }
 
+inline void GL::cleanupDestroyedVertexArray(uint32_t id) noexcept {
+	if (currentVertexArray.id == id)
+		currentVertexArray.id = 0;
+}
+
 // -------------------------------------------------------------------------------------------------
 
-inline void GL::bind(TextureTarget target, uint32_t id) {
-	std::size_t targetID = convertToTargetIndex(target);
+constexpr inline std::size_t GL::convertToTargetIndex(TextureTarget target) noexcept {
+	switch (target) {
+	case TextureTarget::_2D: return 0;
+	case TextureTarget::CubeMap: return 1;
+	case TextureTarget::_1D: return 2;
+	case TextureTarget::_3D: return 3;
+	case TextureTarget::_1DArray: return 4;
+	case TextureTarget::_2DArray: return 5;
+	case TextureTarget::Rectangle: return 6;
+	case TextureTarget::CubeMapArray: return 7;
+	case TextureTarget::Buffer: return 8;
+	case TextureTarget::_2DMultisample: return 9;
+	case TextureTarget::_2DMultisampleArray: return 10;
+	}
+	// TODO P5: libv.gl: instead of default (0): log and assert invalid input
+	return 0;
+}
 
+inline void GL::activeTexture(TextureUnit unit) {
+	if (currentActiveTexture != unit) {
+		currentActiveTexture = unit;
+		glActiveTexture(GL_TEXTURE0 + to_value(unit));
+		checkGL();
+	}
+}
+
+inline void GL::bind(TextureTarget target, uint32_t id) {
+	const std::size_t targetID = convertToTargetIndex(target);
 	auto& binding = textureBindings[targetID][to_value(currentActiveTexture)];
 	if (binding != id) {
 		glBindTexture(to_value(target), id);
+		binding = id;
+	}
+}
+inline void GL::bindUnit(TextureUnit unit, TextureTarget target, uint32_t id) {
+	const std::size_t targetID = convertToTargetIndex(target);
+	auto& binding = textureBindings[targetID][to_value(unit)];
+	if (binding != id) {
+		glBindTextureUnit(to_value(unit), id);
 		binding = id;
 	}
 }
@@ -957,6 +1201,13 @@ inline void GL::bind(const Texture& texture) {
 	bind(texture.target, texture.id);
 }
 template <TextureTarget Target>
+inline void GL::bindUnit(TextureUnit unit, const Texture_t<Target>& texture) {
+	bindUnit(unit, texture.target, texture.id);
+}
+inline void GL::bindUnit(TextureUnit unit, const Texture& texture) {
+	bindUnit(unit, texture.target, texture.id);
+}
+template <TextureTarget Target>
 inline void GL::unbind(const Texture_t<Target>& texture) {
 	bind(texture.target, 0);
 }
@@ -965,14 +1216,16 @@ inline void GL::unbind(const Texture& texture) {
 }
 
 inline Texture GL::boundTexture(TextureTarget target) noexcept {
-	std::size_t targetID = convertToTargetIndex(target);
-
-	return Texture{textureBindings[targetID][libv::to_value(currentActiveTexture)], target};
+	const std::size_t targetID = convertToTargetIndex(target);
+	return Texture{textureBindings[targetID][+currentActiveTexture], target};
+}
+inline Texture GL::boundTexture(TextureTarget target, TextureUnit unit) noexcept {
+	const std::size_t targetID = convertToTargetIndex(target);
+	return Texture{textureBindings[targetID][+unit], target};
 }
 
-inline void GL::cleanupDestroyedTextureID(TextureTarget target, uint32_t id) noexcept {
-	std::size_t targetID = convertToTargetIndex(target);
-
+inline void GL::cleanupDestroyedTexture(TextureTarget target, uint32_t id) noexcept {
+	const std::size_t targetID = convertToTargetIndex(target);
 	for (auto& activeID : textureBindings[targetID])
 		if (activeID == id)
 			activeID = 0;
@@ -994,13 +1247,54 @@ inline Program GL::boundProgram() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+inline void GL::bindUniformBufferBase(const UniformBuffer& object, uint32_t binding) noexcept {
+	if (binding < std::size(uniformBlockBindings)) {
+		auto& current = uniformBlockBindings[binding];
+		// if (current.ubo != object && current.offset != offset && current.size != size)
+		if (current.ubo.id == object.id && current.offset == 0)
+			return;
+
+		current.ubo = object;
+		current.offset = 0;
+		// current.size = size;
+	}
+	glBindBufferBase(GL_UNIFORM_BUFFER, binding, object.id);
+	checkGL();
+}
+
+inline void GL::bindUniformBufferRange(const UniformBuffer& object, uint32_t binding, uint32_t offset, uint32_t size) noexcept {
+	if (binding < std::size(uniformBlockBindings)) {
+		auto& current = uniformBlockBindings[binding];
+		// if (current.ubo != object && current.offset != offset && current.size != size)
+		if (current.ubo.id == object.id && current.offset == offset)
+			return;
+
+		current.ubo = object;
+		current.offset = offset;
+		// current.size = size;
+	}
+	glBindBufferRange(GL_UNIFORM_BUFFER, binding, object.id, offset, size);
+	checkGL();
+}
+
+inline void GL::cleanupDestroyedBuffer(const UniformBuffer& object) noexcept {
+	for (auto& binding : uniformBlockBindings) {
+		if (binding.ubo.id == object.id) {
+			binding.ubo.id = 0;
+			binding.offset = 0;
+		}
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline void GL::bindImageTexture(
 		uint32_t unit,
 		libv::gl::Texture texture,
 		int32_t level,
 		libv::gl::BufferAccessFull access,
 		libv::gl::Format format) noexcept {
-	glBindImageTexture(unit, texture.id, level, false, 0, libv::to_underlying(access), format.format);
+	glBindImageTexture(unit, texture.id, level, true, 0, libv::to_underlying(access), format.format);
 	checkGL();
 }
 
@@ -1011,7 +1305,7 @@ inline void GL::bindImageTexture(
 		int32_t layer,
 		libv::gl::BufferAccessFull access,
 		libv::gl::Format format) noexcept {
-	glBindImageTexture(unit, texture.id, level, true, layer, libv::to_underlying(access), format.format);
+	glBindImageTexture(unit, texture.id, level, false, layer, libv::to_underlying(access), format.format);
 	checkGL();
 }
 
@@ -1081,6 +1375,13 @@ inline Framebuffer GL::framebuffer_draw() const noexcept {
 
 inline Framebuffer GL::framebuffer_read() const noexcept {
 	return framebufferRead_;
+}
+
+inline void GL::cleanupDestroyedFramebuffer(uint32_t id) noexcept {
+	if (framebufferDraw_.id == id)
+		framebufferDraw_.id = 0;
+	if (framebufferRead_.id == id)
+		framebufferRead_.id = 0;
 }
 
 // -------------------------------------------------------------------------------------------------

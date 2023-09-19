@@ -502,7 +502,7 @@ Flow task(int id, int count, thread_pool& tp) {
 //	};
 //}
 
-#include <libv/mt/token_machine.hpp>
+#include <libv/mt/ticket_machine.hpp>
 #include <libv/mt/worker_thread.hpp>
 #include <mutex>
 std::mutex cout_m;
@@ -551,14 +551,14 @@ cppcoro::generator<ThreadAffinity> alternative_idea(int id, int i, int count) {
 struct CallFoo {
 	libv::mt::worker_thread_pool& threads_cpu;
 	libv::mt::worker_thread& threads_gl;
-	libv::mt::token token;
+	libv::mt::ticket token;
 	cppcoro::generator<ThreadAffinity> t;
 	cppcoro::generator<ThreadAffinity>::iterator it;
 
 	CallFoo(
 			libv::mt::worker_thread_pool& threads_cpu,
 			libv::mt::worker_thread& threads_gl,
-			libv::mt::token&& token,
+			libv::mt::ticket&& token,
 			cppcoro::generator<ThreadAffinity>&& t) :
 		threads_cpu(threads_cpu),
 		threads_gl(threads_gl),
@@ -622,7 +622,7 @@ struct CallFoo {
 int main() {
 	COUT("Hello coroutines" << " Thread: " << std::this_thread::get_id() << std::endl)
 
-	libv::mt::token_machine tm;
+	libv::mt::ticket_machine tm;
 	libv::mt::worker_thread_pool threads_cpu(4);
 	libv::mt::worker_thread threads_gl;
 
@@ -631,7 +631,7 @@ int main() {
 		cppcoro::generator<ThreadAffinity> task = alternative_idea(0, 0, 0);
 		COUT_A("after  task create" << std::endl)
 		COUT_B("before CallFoo create" << std::endl)
-		CallFoo(threads_cpu, threads_gl, tm.create_token(), std::move(task));
+		CallFoo(threads_cpu, threads_gl, tm.create_ticket(), std::move(task));
 		COUT_A("after  CallFoo create" << std::endl)
 	}
 

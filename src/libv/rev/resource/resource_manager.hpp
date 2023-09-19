@@ -5,7 +5,7 @@
 // fwd
 #include <libv/rev/fwd.hpp>
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // pro
 #include <libv/rev/resource/material_loader.hpp>
@@ -41,7 +41,7 @@ public:
 	~ResourceManager();
 
 public:
-	void update(libv::gl::GL& gl);
+	void update(libv::GL& gl);
 };
 
 // -------------------------------------------------------------------------------------------------

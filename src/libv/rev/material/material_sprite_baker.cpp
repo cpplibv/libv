@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/materials/material_sprite_baker.cpp
+// Project: libv.rev, File: src/libv/rev/material/material_sprite_baker.cpp
 
 // hpp
 #include <libv/rev/material/material_sprite_baker.hpp>
@@ -28,7 +28,7 @@ Material MaterialSpriteBaker::create(const MaterialScanner& scan) {
 
 void MaterialSpriteBaker::bind(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	glr.program(shader.program());
-	glr.texture(diffuse.texture(), textureChannel_diffuse);
+	glr.texture(diffuse.texture(), textureUnit_diffuse);
 
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 	uniforms[layout_matrices.matMVP] = glr.mvp();

@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/utility/interval_registry.hpp>
+#include <libv/container/interval_registry.hpp>
 // std
 #include <filesystem>
 #include <fstream>

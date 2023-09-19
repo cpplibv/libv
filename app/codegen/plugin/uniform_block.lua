@@ -100,6 +100,8 @@ uniform_block.generate = function(blockIndex, blockName, glslFilepath, members)
 	end
 
 	local fn_glsl = function(out)
+		out("#pragma once\n")
+		out("\n")
 		out("\n")
 		out("layout(std140) uniform " .. blockName .. " {\n")
 		for _, member in ipairs(members) do

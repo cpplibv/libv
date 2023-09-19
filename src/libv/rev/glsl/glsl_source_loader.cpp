@@ -132,7 +132,7 @@ GLSLSourceLoader::GLSLSourceLoader() :
 }
 
 GLSLSourceLoader::~GLSLSourceLoader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 void GLSLSourceLoader::add_global_define(std::string define) {

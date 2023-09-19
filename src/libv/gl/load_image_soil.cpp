@@ -31,6 +31,7 @@ public:
 
 	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
 	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept override;
+	[[nodiscard]] virtual TextureTarget type() const noexcept override;
 	[[nodiscard]] virtual Texture createTexture() const noexcept override;
 	virtual ~ImageSOIL() noexcept override = default;
 };
@@ -71,44 +72,15 @@ libv::vec4f ImageSOIL::pixel(int32_t level, int32_t x, int32_t y) const noexcept
 	};
 }
 
+TextureTarget ImageSOIL::type() const noexcept {
+	return libv::gl::TextureTarget::_2D;
+}
+
 Texture ImageSOIL::createTexture() const noexcept {
-	// NOTE: SOIL_create_OGL_texture Fails in OpenGL 3.3 core profile
-	// SOIL_create_OGL_texture(storage.get(), size_.x, size_.y, channels, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-
-	// TODO P3: Would be nice to have on-the-fly compression requests option
-
-	{
-		// Flip Y axis
-		const auto row_size = size_.x * channels;
-		auto row_tmp = libv::dyn_array<uint8_t>{static_cast<std::size_t>(row_size)};
-
-		for (int32_t y = 0; y < size_.y / 2; ++y) {
-			auto* const tmp = row_tmp.data();
-			auto* const front = storage.get() + row_size * y;
-			auto* const back = storage.get() + row_size * (size_.y - 1 - y);
-
-			std::memcpy(tmp, front, row_size);
-			std::memcpy(front, back, row_size);
-			std::memcpy(back, tmp, row_size);
-		}
-	}
-
-	// Upload texture image
-	GLuint textureID = 0;
-	GLenum target = GL_TEXTURE_2D;
-	GLenum externalType = GL_UNSIGNED_BYTE;
-	GLenum externalFormat =
-			channels == 4 ? GL_RGBA :
-			channels == 3 ? GL_RGB :
-			channels == 2 ? GL_RG :
-			channels == 1 ? GL_R : 0;
-	GLenum Format = externalFormat;
-
-	glGenTextures(1, &textureID);
-	glBindTexture(target, textureID);
-	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexImage2D(target, 0, Format, size_.x, size_.y, 0, externalFormat, externalType, storage.get());
+	// TODO P3: Would be nice to expose SOIL_FLAG_COMPRESS_TO_DXT
+	auto sizeMutable = size_; // SOIL has feature to change the size but that is not exposed, so we ignore it
+	auto textureID = SOIL_create_OGL_texture(storage.get(), &sizeMutable.x, &sizeMutable.y, channels, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	const GLenum target = GL_TEXTURE_2D;
 
 	libv::gl::checkGL();
 	return {textureID, TextureTarget{target}};

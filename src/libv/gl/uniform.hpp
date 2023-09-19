@@ -19,7 +19,7 @@ namespace gl {
 // -------------------------------------------------------------------------------------------------
 
 // Special
-inline void uniform(const GLint location, const libv::gl::TextureChannel value) noexcept {
+inline void uniform(const GLint location, const libv::gl::TextureUnit value) noexcept {
 	glUniform1i(location, to_value(value));
 }
 
@@ -44,6 +44,12 @@ inline void uniform(const GLint location, const float value) noexcept {
 }
 inline void uniform(const GLint location, const double value) noexcept {
 	glUniform1d(location, value);
+}
+
+template <typename T>
+	requires std::is_enum_v<T>
+inline void uniform(const GLint location, const T value) noexcept {
+	uniform(location, libv::to_underlying(value));
 }
 
 // Vector 2D
@@ -194,7 +200,7 @@ struct Uniform_t : Uniform {
 	}
 };
 
-using Uniform_texture = Uniform_t<libv::gl::TextureChannel>;
+using Uniform_texture = Uniform_t<libv::gl::TextureUnit>;
 
 using Uniform_bool = Uniform_t<bool>;
 using Uniform_int32 = Uniform_t<int32_t>;

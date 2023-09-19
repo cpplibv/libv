@@ -17,7 +17,7 @@ struct GLSLSourceCode {
 	std::map<int, std::string> mappingIndexToFilename;
 
 public:
-	[[nodiscard]] std::string translateErrorMessageFilenames(std::string_view errorMessage) const;
+	[[nodiscard]] std::string fixupErrorMessage(std::string_view errorMessage) const;
 };
 
 // -------------------------------------------------------------------------------------------------

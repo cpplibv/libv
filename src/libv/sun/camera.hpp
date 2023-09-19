@@ -25,13 +25,15 @@ namespace sun {
 //	[[nodiscard]] mat4 view() const noexcept;
 //	[[nodiscard]] vec3 eye() const noexcept;
 //	[[nodiscard]] vec3 direction() const noexcept;
+//	[[nodiscard]] float near() const noexcept;
+//	[[nodiscard]] float far() const noexcept;
 //  [[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
 //  [[nodiscard]] frustum frustum() const noexcept;
 //	Maybe:
 //	[[nodiscard]] mat4 orientation() const noexcept; /// View without the orbit and the position translates
-//	[[nodiscard]] vec3 direction_up() const noexcept;
-//	[[nodiscard]] vec3 direction_forward() const noexcept;
-//	[[nodiscard]] vec3 direction_right() const noexcept;
+//	[[nodiscard]] vec3 up() const noexcept;
+//	[[nodiscard]] vec3 forward() const noexcept;
+//	[[nodiscard]] vec3 right() const noexcept;
 //};
 
 // -------------------------------------------------------------------------------------------------
@@ -91,6 +93,8 @@ private:
 
 public:
 	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
+	[[nodiscard]] mat4 projectionRevereZ(vec2 canvas_size) const noexcept;
+	[[nodiscard]] mat4 projectionRevereZInf(vec2 canvas_size) const noexcept;
 	[[nodiscard]] mat4 view() const noexcept;
 	/// View without the orbit and the position translates
 	/// Includes the OpenGL base_camera_orientation so this version is useful for OpenGL operations
@@ -106,6 +110,7 @@ public:
 
 	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
 	[[nodiscard]] libv::frustum frustum(vec2 canvas_size) const noexcept;
+	[[nodiscard]] libv::frustum_culler_inf frustum_culler(vec2 canvasSize) const noexcept;
 
 public:
 	void look_at(vec3 eye, vec3 target) noexcept;

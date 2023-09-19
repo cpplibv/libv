@@ -10,6 +10,7 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/gl.hpp>
 
 
 namespace libv {
@@ -22,10 +23,11 @@ template <typename Object, GLenum Target>
 struct BasicAccessBuffer {
 protected:
 	Object& object;
+	GL& gl;
 
 public:
-	explicit BasicAccessBuffer(Object& object) :
-		object(object) { }
+	inline BasicAccessBuffer(Object& object, GL& gl) :
+		object(object), gl(gl) { }
 
 public:
 	inline void create() noexcept {
@@ -34,9 +36,17 @@ public:
 		checkGL();
 	}
 
+	inline void dsa_create() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id == 0);
+		glCreateBuffers(1, &object.id);
+		checkGL();
+	}
+
 	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteBuffers(1, &object.id);
+		if constexpr (Target == GL_UNIFORM_BUFFER)
+			gl.cleanupDestroyedBuffer(object);
 		object.id = 0;
 		checkGL();
 	}
@@ -57,9 +67,16 @@ public:
 	[[nodiscard]] inline auto bind_guard() noexcept {
 	    bind();
 
-		return libv::guard([this] {
+		return libv::guard([*this] mutable {
 			unbind();
 		});
+	}
+
+public:
+	inline void dsa_storage(GLsizeiptr size, const void* data, BufferStorage flags) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glNamedBufferStorage(object.id, size, data, +flags);
+		checkGL();
 	}
 
 public:
@@ -69,7 +86,7 @@ public:
 		checkGL();
 	}
 
-	inline void named_data(const void* ptr, GLsizeiptr length, BufferUsage usage) noexcept {
+	inline void dsa_data(const void* ptr, GLsizeiptr length, BufferUsage usage) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glNamedBufferData(object.id, length, ptr, to_value(usage));
 		checkGL();
@@ -91,15 +108,15 @@ public:
 		this->subData(std::data(data), offset, std::size(data) * sizeof(data[0]));
 	}
 
-	inline void named_subData(GLintptr offset, const void* ptr, GLsizeiptr length) noexcept {
+	inline void dsa_subData(GLintptr offset, const void* ptr, GLsizeiptr length) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glNamedBufferSubData(object.id, offset, length, ptr);
 		checkGL();
 	}
 
 	template <typename Range>
-	inline void named_subData(GLintptr offset, const Range& data) noexcept {
-		this->named_subData(offset, std::data(data), std::size(data) * sizeof(data[0]));
+	inline void dsa_subData(GLintptr offset, const Range& data) noexcept {
+		this->dsa_subData(offset, std::data(data), std::size(data) * sizeof(data[0]));
 	}
 
 	inline void getSubData(void* ptr, GLintptr offset, GLsizeiptr length) noexcept {
@@ -109,31 +126,27 @@ public:
 	}
 
 public:
-	/// OpenGL 4.5, DSA
-	inline void* map(BufferAccessFull access) noexcept {
+	inline void* dsa_map(BufferAccessFull access) noexcept {
 		auto ptr = glMapNamedBuffer(object.id, libv::to_underlying(access));
 		checkGL();
 		return ptr;
 	}
 
-	/// OpenGL 4.5, DSA
-	inline void* mapRange(GLintptr offset, GLsizeiptr length , BufferAccess access) noexcept {
+	inline void* dsa_mapRange(GLintptr offset, GLsizeiptr length , BufferAccess access) noexcept {
 		auto ptr = glMapNamedBufferRange(object.id, offset, length, libv::to_underlying(access));
 		checkGL();
 		return ptr;
 	}
 
-	/// OpenGL 4.5, DSA
 	/// \Returns true unless the data store contents have become corrupt during the time the data store was mapped
-	[[nodiscard]] inline bool unmap() noexcept {
+	[[nodiscard]] inline bool dsa_unmap() noexcept {
 		auto valid = glUnmapNamedBuffer(object.id);
 		checkGL();
 		return valid;
 	}
 
-	/// OpenGL 4.5, DSA
 	/// - must previously have been mapped with the GL_MAP_FLUSH_EXPLICIT_BIT flag
-	inline void flushMappedRange(GLintptr offset, GLsizeiptr length) noexcept {
+	inline void dsa_flushMappedRange(GLintptr offset, GLsizeiptr length) noexcept {
 		glFlushMappedNamedBufferRange(object.id, offset, length);
 		checkGL();
 	}

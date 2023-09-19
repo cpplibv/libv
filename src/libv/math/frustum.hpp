@@ -70,15 +70,35 @@ public:
 	[[nodiscard]] const std::array<plane, 6>& planes() const noexcept;
 
 public:
-//	[[nodiscard]] float test_point(vec3f point, float threshold_radius = 0.f) const noexcept;
-
 	[[nodiscard]] position point_in_frustum(vec3f point) const noexcept;
-	[[nodiscard]] bool is_point_in_frustum(vec3f point) const noexcept;
 	[[nodiscard]] position sphere_in_frustum(vec3f point, float radius) const noexcept;
-//	int sphere_in_frustum(vec3f point, float radius) const noexcept;
 
 public:
 //	frustum contain_from_different_dir(vec3f dir);
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class frustum_culler_inf {
+private:
+	enum PlaneID {
+		left = 0,
+		right = 1,
+		up = 2,
+		down = 3,
+		near = 4,
+		// far = 5, For inf frustum_culler there is no far plane
+	};
+
+	std::array<planef, 5> planes_;
+
+public:
+	constexpr inline frustum_culler_inf() noexcept = default;
+	frustum_culler_inf(planef left, planef right, planef up, planef down, planef near) noexcept;
+
+public:
+	[[nodiscard]] bool test_point(vec3f point) const noexcept;
+	[[nodiscard]] bool test_sphere(vec3f position, float radius) const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

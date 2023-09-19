@@ -34,7 +34,7 @@ template <typename T> constexpr bool isUniform_v = isUniform<T>::value;
 
 // -------------------------------------------------------------------------------------------------
 
-using Uniform_texture = Uniform_t<libv::gl::TextureChannel>;
+using Uniform_texture = Uniform_t<libv::gl::TextureUnit>;
 
 using Uniform_bool = Uniform_t<bool>;
 using Uniform_int32 = Uniform_t<int32_t>;

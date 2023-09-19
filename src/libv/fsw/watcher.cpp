@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const Event& event) {
 //	}
 //
 //	for (const auto& item : self.watcher_entries) {
-//		std::cout << "  -- Watch entry: " << item.path.string() << " ID:" << item.watchID << " RC:" << item.ref_count << std::endl;
+//		std::cout << "  -- Watch entry: " << item.path.generic_string() << " ID:" << item.watchID << " RC:" << item.ref_count << std::endl;
 //	}
 //
 //	for (const auto& item : self.directories) {
@@ -92,7 +92,7 @@ DirectoryCluster& _unsafe_watch_dir(ImplWatcher& self, std::filesystem::path dir
 	});
 
 	efsw::WatchID id = 0;
-	auto str_dir = dir.string();
+	auto str_dir = dir.generic_string();
 	const auto key = str_dir;
 
 	const auto emplace_pair = self.directories.try_emplace(key);
@@ -115,7 +115,7 @@ DirectoryCluster& _unsafe_watch_dir(ImplWatcher& self, std::filesystem::path dir
 				break;
 
 			dir = _parent_directory(dir);
-			str_dir = dir.string();
+			str_dir = dir.generic_string();
 		}
 
 		if (id <= 0) {
@@ -203,8 +203,8 @@ void _handle_file_action(
 	// Broadcast to file callbacks
 	if (!is_dir) {
 		const auto dir = _parent_directory(path);
-		const auto key = dir.string();
-		const auto file = path.filename().string();
+		const auto key = dir.generic_string();
+		const auto file = path.filename().generic_string();
 
 		auto entry_it = self.directories.find(key);
 
@@ -222,7 +222,7 @@ void _handle_file_action(
 
 	// Broadcast to directory callbacks
 	for (auto up_dir = path; true; up_dir = _parent_directory(up_dir)) {
-		const auto up_key = up_dir.string();
+		const auto up_key = up_dir.generic_string();
 
 		const auto up_it = self.directories.find(up_key);
 		if (up_it != self.directories.end()) {
@@ -246,9 +246,9 @@ Watcher::token_type _subscribe_file(
 
 	std::error_code ignore_ec;
 
-	const auto str_file = path.filename().string();
+	const auto str_file = path.filename().generic_string();
 	const auto dir = _parent_directory(path);
-	const auto str_dir = dir.string();
+	const auto str_dir = dir.generic_string();
 
 	auto cb_up = std::make_unique<Watcher::callback_type>(std::move(callback));
 	const auto ptr = cb_up.get();
@@ -392,7 +392,6 @@ Watcher::~Watcher() {
 }
 
 Watcher::token_type Watcher::subscribe_file(std::filesystem::path path, callback_type callback) {
-
 	std::error_code ignore_ec;
 	const auto is_relative = path.is_relative();
 
@@ -404,7 +403,6 @@ Watcher::token_type Watcher::subscribe_file(std::filesystem::path path, callback
 }
 
 Watcher::token_type Watcher::subscribe_directory(std::filesystem::path path, callback_type callback) {
-
 	std::error_code ignore_ec;
 	const auto is_relative = path.is_relative();
 
@@ -417,6 +415,8 @@ Watcher::token_type Watcher::subscribe_directory(std::filesystem::path path, cal
 }
 
 void Watcher::unsubscribe(token_type token) {
+	if (token.id == nullptr)
+		return;
 	_unsubscribe(*self, token);
 }
 

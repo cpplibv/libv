@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/enum.hpp
+// Project: libv.gl, File: src/libv/gl/enum_fwd.hpp
 
 #pragma once
 
@@ -48,7 +48,7 @@ enum class FormatDepthStencil : GLenum;
 enum class FormatStencil : GLenum;
 enum class FormatSized : GLenum;
 enum class ShaderType : GLenum;
-enum class TextureChannel : GLint;
+enum class TextureUnit : GLint;
 enum class AttributeType : GLenum;
 enum class CullFace : GLenum;
 enum class PolygonMode : GLenum;

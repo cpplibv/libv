@@ -39,7 +39,7 @@ ContextUI::ContextUI(UI& ui,
 }
 
 ContextUI::~ContextUI() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------

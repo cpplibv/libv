@@ -188,7 +188,7 @@ UpdateClient::UpdateClient(Settings settings) :
 }
 
 UpdateClient::~UpdateClient() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 update_check_result UpdateClient::check_for_update() {

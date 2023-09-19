@@ -36,7 +36,7 @@ namespace mtcp {
 /// - on_connect will always be the first function to be called
 /// - on_disconnect will always be the last function to be called
 /// - both on_connect and on_disconnect called at most once
-/// - on_disconnect will be called if there was a on_connect call without an error
+/// - on_disconnect will be called if there was an on_connect call without an error
 
 // -------------------------------------------------------------------------------------------------
 
@@ -186,7 +186,7 @@ private:
 	virtual void on_send(message&& m) = 0;
 	virtual void on_send_error(error_code ec, message&& m);
 	/// Receives the first error that occurred which resulted in the disconnect if there was any
-	/// Always called if the connection was successful (if on_connect() was called)
+	/// Always called if the connection was successful (if on_connect() was ever called)
 	virtual void on_disconnect(error_code ec) = 0;
 };
 

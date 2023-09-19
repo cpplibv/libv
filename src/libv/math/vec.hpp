@@ -35,10 +35,11 @@ struct vec_base_t {
 	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : data_{} { }
 	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
 
-	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
+	// No need to specify these and they would break triviality:
+	// constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
 
 	explicit constexpr LIBV_FORCE_INLINE vec_base_t(T value) noexcept {
 		libv::meta::for_constexpr<0, N>([&](int i) {
@@ -65,10 +66,11 @@ struct vec_base_t<2, T> {
 	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{} { }
 	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
 
-	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
+	// No need to specify these and they would break triviality:
+	// constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
 
 	explicit constexpr LIBV_FORCE_INLINE vec_base_t(T value) noexcept : x(value), y(value) { }
 
@@ -94,10 +96,11 @@ struct vec_base_t<3, T> {
 	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{}, z{} {}
 	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
 
-	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
+	// No need to specify these and they would break triviality:
+	// constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
 
 	explicit constexpr LIBV_FORCE_INLINE vec_base_t(T value) noexcept : x(value), y(value), z(value) { }
 
@@ -130,10 +133,11 @@ struct vec_base_t<4, T> {
 	constexpr LIBV_FORCE_INLINE vec_base_t() noexcept : x{}, y{}, z{}, w{} {}
 	explicit(false) constexpr LIBV_FORCE_INLINE vec_base_t(libv::uninitialized_t) noexcept { }
 
-	constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
+	// No need to specify these and they would break triviality:
+	// constexpr LIBV_FORCE_INLINE vec_base_t(const vec_base_t& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t(vec_base_t&& orig) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(const vec_base_t& orig) & noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_base_t& operator=(vec_base_t&& orig) & noexcept = default;
 
 	explicit constexpr LIBV_FORCE_INLINE vec_base_t(T value) noexcept : x(value), y(value), z(value), w(value) { }
 
@@ -177,11 +181,12 @@ struct vec_t : vec_base_t<N, T> {
 	using value_type = T;
 
 	// constructors --------------------------------------------------------------------------------
-	constexpr LIBV_FORCE_INLINE vec_t() noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_t(const vec_t&) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_t(vec_t&&) noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_t& operator=(const vec_t&) & noexcept = default;
-	constexpr LIBV_FORCE_INLINE vec_t& operator=(vec_t&&) & noexcept = default;
+	// No need to specify these and they would break triviality:
+	// constexpr LIBV_FORCE_INLINE vec_t() noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_t(const vec_t&) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_t(vec_t&&) noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_t& operator=(const vec_t&) & noexcept = default;
+	// constexpr LIBV_FORCE_INLINE vec_t& operator=(vec_t&&) & noexcept = default;
 
 	using vec_base_t<N, T>::vec_base_t;
 
@@ -570,6 +575,38 @@ template <std::size_t N, typename T, typename K>
 		return result;
 	}
 }
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator<<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() << std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] << rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator>>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() >> std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] >> rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator&(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() & std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] & rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator|(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() | std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] | rhs.data()[i];
+	});
+	return result;
+}
 
 // operator*(vec, scalar) --------------------------------------------------------------------------
 
@@ -621,6 +658,38 @@ template <std::size_t N, typename T, typename K>
 		return result;
 	}
 }
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator<<(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() << std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] << rhs;
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator>>(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() >> std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] >> rhs;
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator&(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() & std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] & rhs;
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator|(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() | std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] | rhs;
+	});
+	return result;
+}
 
 // operator*(scalar, vec) --------------------------------------------------------------------------
 
@@ -671,6 +740,42 @@ template <std::size_t N, typename T, typename K>
 		});
 		return result;
 	}
+}
+template <std::size_t N, typename T, typename K>
+	requires std::is_arithmetic_v<T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator<<(const T& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() << std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs << rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+	requires std::is_arithmetic_v<T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator>>(const T& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() >> std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs >> rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+	requires std::is_arithmetic_v<T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator&(const T& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() & std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs & rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+	requires std::is_arithmetic_v<T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator|(const T& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() | std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs | rhs.data()[i];
+	});
+	return result;
 }
 
 // operator<(vec, vec) -----------------------------------------------------------------------------
@@ -1016,6 +1121,31 @@ template <std::size_t N, typename T>
 	vec_t<N, T> result;
 	libv::meta::for_constexpr<0, N>([&](int i) {
 		result.data()[i] = std::sqrt(vec.data()[i]);
+	});
+	return result;
+}
+
+template <std::size_t N, typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto pow(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = std::pow(lhs.data()[i], rhs.data()[i]);
+	});
+	return result;
+}
+template <std::size_t N, typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto pow(const vec_t<N, T>& lhs, const T& rhs) noexcept {
+	vec_t<N, T> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = std::pow(lhs.data()[i], rhs);
+	});
+	return result;
+}
+template <std::size_t N, typename T>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto pow(const T& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = std::pow(lhs, rhs.data()[i]);
 	});
 	return result;
 }

@@ -30,6 +30,18 @@ struct LuaContext {
 	libv::vm4::Model& model;
 	bool dirtyBounds = false;
 
+	void printNodes(uint32_t nodeID, int depth) {
+		const auto& node = model.nodes[nodeID];
+
+		fmt::print("{} {}: {} child, {} mesh\n", fmt::format("{:{}}", " ", depth * 4), node.name, node.childrenIDs.size(), node.meshIDs.size());
+		for (const auto& meshID : node.meshIDs) {
+			fmt::print("{}  > {}\n", fmt::format("{:{}}", " ", depth * 4), model.meshes[meshID].name);
+		}
+		for (const auto& childID : node.childrenIDs) {
+			printNodes(childID, depth + 1);
+		}
+	}
+
 	void bind() {
 		using namespace libv::vm4;
 
@@ -51,16 +63,62 @@ struct LuaContext {
 		auto api_table = lua.create_named_table("model");
 
 		api_table.set_function("scale", [this](const float value) mutable {
-			model.nodes[0].transformation.scale(libv::vec3f::one(value));
+			model.nodes[0].transform.scale(libv::vec3f::one(value));
 			dirtyBounds = true;
 		});
 
 		api_table.set_function("rotate", [this](const float x, const float y, const float z) mutable {
-			model.nodes[0].transformation.rotate(libv::deg_to_rad(x), {1, 0, 0});
-			model.nodes[0].transformation.rotate(libv::deg_to_rad(y), {0, 1, 0});
-			model.nodes[0].transformation.rotate(libv::deg_to_rad(z), {0, 0, 1});
+			model.nodes[0].transform.rotate(libv::deg_to_rad(x), {1, 0, 0});
+			model.nodes[0].transform.rotate(libv::deg_to_rad(y), {0, 1, 0});
+			model.nodes[0].transform.rotate(libv::deg_to_rad(z), {0, 0, 1});
 			dirtyBounds = true;
 		});
+
+		api_table.set_function("fix_XpZmYp", [this]() mutable {
+			// X+ Forward
+			// Z+ Right
+			// Y- Up
+			for (auto& node : model.nodes) {
+				std::swap(node.transform[1], node.transform[2]);
+			}
+			for (auto& vertex : model.vertices) {
+				vertex.position = xzy(vertex.position);
+				vertex.normal = xzy(vertex.normal);
+				vertex.tangent = xzy(vertex.tangent);
+				vertex.bitangent = xzy(vertex.bitangent);
+			}
+			for (std::size_t i = 2; i < model.indices.size(); i += 3) {
+				std::swap(model.indices[i - 1], model.indices[i]);
+			}
+			// for (auto& animation : model.animations) {
+			// 	// ...
+			// }
+
+			dirtyBounds = true;
+		});
+
+		api_table.set_function("fix_ZpXmYp", [this]() mutable {
+			// Z+ Forward
+			// X- Right
+			// Y+ Up
+			for (auto& node : model.nodes) {
+				std::swap(node.transform[0], node.transform[2]);
+				std::swap(node.transform[0], node.transform[1]);
+			}
+			for (auto& vertex : model.vertices) {
+				vertex.position = zxy(vertex.position);
+				vertex.normal = zxy(vertex.normal);
+				vertex.tangent = zxy(vertex.tangent);
+				vertex.bitangent = zxy(vertex.bitangent);
+			}
+			// for (auto& animation : model.animations) {
+			// 	// ...
+			// }
+
+			dirtyBounds = true;
+		});
+		api_table["fix_xzy"] = api_table["fix_XpZmYp"];
+		api_table["fix_zxy"] = api_table["fix_ZpXmYp"];
 
 		api_table.set_function("material", [this](const std::string_view name) mutable {
 			for (auto& material : model.materials)
@@ -122,6 +180,14 @@ struct LuaContext {
 			libv::vm4::log_vm4.fatal("AABB_max: {}", model.AABB_max);
 			libv::vm4::log_vm4.fatal("AABB_min: {}", model.AABB_min);
 		});
+
+		api_table.set_function("print_nodes", [this]() {
+			for (std::size_t i = 0; i < model.lods.size(); ++i) {
+				const auto& lod = model.lods[i];
+				fmt::print("LOD: {}, near {}, far: {}\n", i, lod.rangeNear, lod.rangeFar);
+				printNodes(lod.rootNodeID, 1);
+			}
+		});
 	}
 
 	void run(std::string_view script) {
@@ -144,20 +210,12 @@ struct LuaContext {
 
 // -------------------------------------------------------------------------------------------------
 
-bool execute_script(libv::vm4::Model& model, const std::string& script) {
-	try {
-		auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
-		LuaContext lua_context{lua, model};
-		lua_context.bind();
-		lua_context.run(script);
-		return true;
-
-	} catch (const std::exception& e) {
-		libv::vm4::log_vm4.info("Script execution failed: {}", e.what());
-		return false;
-	}
+void execute_script(libv::vm4::Model& model, const std::string& script) {
+	auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+	LuaContext lua_context{lua, model};
+	lua_context.bind();
+	lua_context.run(script);
 }
-
 
 // -------------------------------------------------------------------------------------------------
 

@@ -223,6 +223,25 @@ TEST_CASE("quat angle_between", "[libv.math.quat]") {
 	CHECK(approx_f(libv::deg_to_rad(180.0f)) == libv::angle_between(q5, q6));
 }
 
+TEST_CASE("quat angle_axis", "[libv.math.quat]") {
+	CHECK(approx(0.707106f, 0, 0, 0.707106f) == libv::quatf::angle_axis(libv::tau_f * 0.25f, libv::vec3f{0, 0, 1}));
+	CHECK(approx(0, 0, 0, 1.0f) == libv::quatf::angle_axis(libv::tau_f * 0.5f, libv::vec3f{0, 0, 1}));
+	CHECK(approx(-1.0f, 0, 0, 0) == libv::quatf::angle_axis(libv::tau_f, libv::vec3f{0, 0, 1}));
+}
+
+TEST_CASE("quat rotate", "[libv.math.quat]") {
+	const auto q1 = libv::quatf::look_at(libv::vec3f(1, 0, 0), libv::vec3f(0, 0, 1));
+
+	CHECK(approx_vec3(1, 0, 0) == q1.forward());
+	CHECK(approx_vec3(1, 0, 0) == q1.rotate_copy(libv::tau_f, libv::vec3f{0, 0, 1}).forward());
+	CHECK(approx_vec3(1, 0, 0) == q1.rotate_copy(libv::tau_f, libv::vec3f{0, 0, 1}).normalize().forward());
+
+	CHECK(approx(0.707106f, 0, 0, 0.707106f) == q1.rotate_copy(libv::tau_f * 0.25f, libv::vec3f{0, 0, 1}));
+	CHECK(approx(0, 0, 0, 1) == q1.rotate_copy(libv::tau_f * 0.5f, libv::vec3f{0, 0, 1}));
+	CHECK(approx_vec3(-1, 0, 0) == q1.rotate_copy(libv::tau_f * 0.5f, libv::vec3f{0, 0, 1}).forward());
+	CHECK(approx_vec3(0, 1, 0) == q1.rotate_copy(libv::tau_f * 0.25f, libv::vec3f{0, 0, 1}).forward());
+}
+
 TEST_CASE("quat rotate_towards", "[libv.math.quat]") {
 	const auto q1 = libv::quatf::look_at(libv::vec3f(1, 0, 0), libv::vec3f(0, 0, 1));
 	const auto q2 = libv::quatf::look_at(libv::vec3f(0, 1, 0), libv::vec3f(0, 0, 1));

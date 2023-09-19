@@ -16,6 +16,14 @@ BaseCameraOrbit::mat4 BaseCameraOrbit::projection(vec2 canvas_size) const noexce
 	return mat4::perspective(fov_y_, canvas_size.x / canvas_size.y, near_, far_);
 }
 
+BaseCameraOrbit::mat4 BaseCameraOrbit::projectionRevereZ(vec2 canvas_size) const noexcept {
+	return mat4::perspectiveRevereZ(fov_y_, canvas_size.x / canvas_size.y, near_, far_);
+}
+
+BaseCameraOrbit::mat4 BaseCameraOrbit::projectionRevereZInf(vec2 canvas_size) const noexcept {
+	return mat4::perspectiveRevereZInf(fov_y_, canvas_size.x / canvas_size.y, near_);
+}
+
 BaseCameraOrbit::mat4 BaseCameraOrbit::view() const noexcept {
 	mat4 mat = base_camera_orientation; // Forward is X+, Right is Y-, Up is Z+
 
@@ -129,18 +137,60 @@ libv::frustum BaseCameraOrbit::frustum(vec2 canvas_size) const noexcept {
 	const auto world_far_width = world_far_height_half * aspect_ratio;
 	const auto world_near_width = world_near_height_half * aspect_ratio;
 
+	const auto forward_ = forward();
+	const auto up_ = up();
+	const auto right_ = right();
 	const auto eye_ = eye();
-	const auto nbl = eye_ + near_ * forward() + world_near_height_half * -up() + world_near_width * -right();
-	const auto nbr = eye_ + near_ * forward() + world_near_height_half * -up() + world_near_width * right();
-	const auto ntr = eye_ + near_ * forward() + world_near_height_half * up() + world_near_width * right();
-	const auto ntl = eye_ + near_ * forward() + world_near_height_half * up() + world_near_width * -right();
 
-	const auto fbl = eye_ + far_ * forward() + world_far_height_half * -up() + world_far_width * -right();
-	const auto fbr = eye_ + far_ * forward() + world_far_height_half * -up() + world_far_width * right();
-	const auto ftr = eye_ + far_ * forward() + world_far_height_half * up() + world_far_width * right();
-	const auto ftl = eye_ + far_ * forward() + world_far_height_half * up() + world_far_width * -right();
+	const auto nbl = eye_ + near_ * forward_ + world_near_height_half * -up_ + world_near_width * -right_;
+	const auto nbr = eye_ + near_ * forward_ + world_near_height_half * -up_ + world_near_width * right_;
+	const auto ntr = eye_ + near_ * forward_ + world_near_height_half * up_ + world_near_width * right_;
+	const auto ntl = eye_ + near_ * forward_ + world_near_height_half * up_ + world_near_width * -right_;
+
+	const auto fbl = eye_ + far_ * forward_ + world_far_height_half * -up_ + world_far_width * -right_;
+	const auto fbr = eye_ + far_ * forward_ + world_far_height_half * -up_ + world_far_width * right_;
+	const auto ftr = eye_ + far_ * forward_ + world_far_height_half * up_ + world_far_width * right_;
+	const auto ftl = eye_ + far_ * forward_ + world_far_height_half * up_ + world_far_width * -right_;
 
 	return {nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl};
+}
+
+libv::frustum_culler_inf BaseCameraOrbit::frustum_culler(vec2 canvasSize) const noexcept {
+	const auto eyeW = eye();
+	const auto forwardW = forward();
+	const auto upW = up();
+	const auto rightW = right();
+
+	const auto width = canvasSize.x;
+	const auto height = canvasSize.y;
+	const auto aspectRatio = width / height;
+
+	const auto nearHeightHalfW = (std::tan(fov_y_ / 2.f) * near_);
+	const auto nearWidthHalfW = nearHeightHalfW * aspectRatio;
+
+	const auto nearCenterW = eyeW + forwardW * near_;
+	// const auto farCenterW = eyeW + forwardW * far_;
+
+	const auto nearLeftCenterW = nearCenterW + -rightW * nearWidthHalfW;
+	const auto normalLeft = cross(normalize(nearLeftCenterW - eyeW), upW);
+
+	const auto nearRightCenterW = nearCenterW + rightW * nearWidthHalfW;
+	const auto normalRight = cross(upW, normalize(nearRightCenterW - eyeW));
+
+	const auto nearUpCenterW = nearCenterW + upW * nearHeightHalfW;
+	const auto normalUp = cross(normalize(nearUpCenterW - eyeW), rightW);
+
+	const auto nearDownCenterW = nearCenterW + -upW * nearHeightHalfW;
+	const auto normalDown = cross(rightW, normalize(nearDownCenterW - eyeW));
+
+	return {
+		libv::planef::from_vector_point(normalLeft, nearLeftCenterW), // left
+		libv::planef::from_vector_point(normalRight, nearRightCenterW), // right
+		libv::planef::from_vector_point(normalUp, nearUpCenterW), // up
+		libv::planef::from_vector_point(normalDown, nearDownCenterW), // down
+		libv::planef::from_vector_point(forwardW, nearCenterW) // near
+		// libv::planef::from_vector_point(-forwardW, farCenterW) // far
+	};
 }
 
 // =================================================================================================

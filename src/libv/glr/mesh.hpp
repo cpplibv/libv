@@ -10,7 +10,7 @@
 #include <libv/algo/linear_find.hpp>
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/vertex_array_object.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
@@ -122,14 +122,14 @@ struct RemoteMesh {
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
-	void create(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void create(libv::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
-	void render(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept;
-	void renderArraysInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
-	void renderElementsInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
+	void render(libv::GL& gl, Remote& remote_) noexcept;
+	void render(libv::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept;
+	void renderArraysInstanced(libv::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
+	void renderElementsInstanced(libv::GL& gl, Remote& remote_, int32_t instanceCount) noexcept;
 
 	inline RemoteMesh(libv::gl::Primitive primitive, libv::gl::BufferUsage usage) noexcept :
 		primitive(primitive),

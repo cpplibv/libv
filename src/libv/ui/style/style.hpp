@@ -28,7 +28,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Style : public libv::ref_count_base<Style> {
+class Style : public libv::ref_count_base {
 	friend libv::ref_count_access;
 
 private:

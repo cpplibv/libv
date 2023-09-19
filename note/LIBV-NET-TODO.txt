@@ -53,6 +53,7 @@ libv.net.mtcp: Single write op for header and body
 
 place.it: auto update could be assisted with the application main being in a dll? with a skeleton.exe
 
+place.it: HTTP server / REST api in C++: https://www.youtube.com/watch?v=uqPTzUdNLZk | https://github.com/kevinbcarpenter/restful-with-billions
 place.it:
 	CICD:
 		git: Commit count up to a revision: git rev-list --count HEAD
@@ -85,7 +86,7 @@ libv.update: Resource Client
 			Remove 'file.temp'
 			Start again
 
-
+libv.update: A Graph Based Update System in C++: Lightning Updates - Hana Dusíková - CppNow 2023 https://www.youtube.com/watch?v=C9MWAXYdFSY
 libv.update: weed out the legacy codes related to file downloading
 	I think the best ones are in libv/update/resource/resource_server
 	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
@@ -329,9 +330,6 @@ libv.mt: worker_thread_pool and worker_thread, solve the next index loop around 
 libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connection within a connection
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 		| investigate shared_ptr with custom deleter
-libv.utility: libv::storage<T> with: initialize, destroy
-			alignas(T) std::byte storage[sizeof(T)];
-			std::aligned_storage_t<sizeof(T), alignof(T)> storage;
-		| Use std::destroy_at and std::construct_at to allow constexpr-ness
 
 
+security: password storage https://www.youtube.com/watch?v=qgpsIBLvrGY

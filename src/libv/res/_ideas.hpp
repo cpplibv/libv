@@ -1,4 +1,4 @@
-//
+// Project: libv.res, File: src/libv/res/_ideas.hpp
 
 #pragma once
 

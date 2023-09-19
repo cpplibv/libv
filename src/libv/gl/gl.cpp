@@ -53,11 +53,17 @@ void GL::init() {
 	log_gl.debug("MaxTextureSize                     [{:>8} ]", getMaxTextureSize());
 	log_gl.debug("MaxUniformBlockSize                [{:>8} ]", getMaxUniformBlockSize());
 	log_gl.debug("MaxUniformBufferBindings           [{:>8} ]", getMaxUniformBufferBindings());
+	log_gl.debug("MaxVertexUniformBlocks             [{:>8} ]", getMaxVertexUniformBlocks());
+	log_gl.debug("MaxGeometryUniformBlocks           [{:>8} ]", getMaxGeometryUniformBlocks());
+	log_gl.debug("MaxFragmentUniformBlocks           [{:>8} ]", getMaxFragmentUniformBlocks());
+	log_gl.debug("MaxComputeUniformBlocks            [{:>8} ]", getMaxComputeUniformBlocks());
+	log_gl.debug("MaxCombinedUniformBlocks           [{:>8} ]", getMaxCombinedUniformBlocks());
 	log_gl.debug("MaxVertexAttribs                   [{:>8} ]", getMaxVertexAttribs());
 	log_gl.debug("MaxVertexUniformComponents         [{:>8} ]", getMaxVertexUniformComponents());
 	log_gl.debug("UniformBufferOffsetAlignment       [{:>8} ]", getUniformBufferOffsetAlignment());
 	log_gl.debug("EXT_texture_filter_anisotropic     [{:>8} ]", GLEW_EXT_texture_filter_anisotropic ? "PASS" : "MISSING");
 	log_gl.debug("ARB_bindless_texture               [{:>8} ]", GLEW_ARB_bindless_texture ? "PASS" : "MISSING");
+	log_gl.debug("ARB_shader_draw_parameters         [{:>8} ]", GLEW_ARB_shader_draw_parameters ? "PASS" : "MISSING");
 
 	log_gl.debug("MaxComputeWorkGroupCount           [{}]", getMaxComputeWorkGroupCount());
 	log_gl.debug("MaxComputeWorkGroupSize            [{}]", getMaxComputeWorkGroupSize());
@@ -78,7 +84,7 @@ void GL::init() {
 
 	// Fetch OpenGL context current state
 	capability.blend.init();
-	capability.cullFace.init();
+	capability.cull.init();
 	capability.depthTest.init();
 	capability.multisample.init();
 	capability.rasterizerDiscard.init();
@@ -135,7 +141,7 @@ void GL::debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, G
 	if (type == GL_DEBUG_TYPE_ERROR && self.debug)
 		log_gl.error("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
 				source_str, source, type_str, type, id, severity_str, severity, message);
-	else if (self.trace)
+	else if (self.trace && type != GL_DEBUG_TYPE_PUSH_GROUP && type != GL_DEBUG_TYPE_POP_GROUP)
 		log_gl.trace("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
 				source_str, source, type_str, type, id, severity_str, severity, message);
 };

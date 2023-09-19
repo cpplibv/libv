@@ -624,6 +624,8 @@ libv.glr: UniformBlockSharedView_std140
 
 
 
+ide.clion: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
+
 
 
 wish: Exclude generated files from clean target (add_custom_target instead of add_custom_command, and/or use depends, and/or use dummy targets/files)
@@ -633,6 +635,7 @@ wish: target_link_directories()
 wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
 wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
 
+wish: Installer: Use whatever rnote uses https://github.com/flxzt/rnote/releases/tag/v0.7.1
 
 What do I need from libv to make a 'minimal' working iris program?
 	libv.ui
@@ -689,11 +692,7 @@ ext: lexy https://github.com/foonathan/lexy
 
 ext: adopt https://github.com/olegpublicprofile/stdfwd
 ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
-
-libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesystem::path::u8string and std::filesystem::path::generic_u8string
-		Search for .string(), not that many
-		Search for generic_string(), not that many
-		also, review/kill .string usages (?)
+sql: instead of using lower(column) in select use the proper coalition on the column https://www.youtube.com/watch?v=ML24GRzXF9w
 
 libv: Remove friend class X; and use friend X; and ensure that X is fwd declared in the proper scope
 
@@ -789,7 +788,7 @@ app.editor:
 			[line if next section is not empty?] line
 			wildcard.**.hpp
 			| Sorting order: folders first
-		| validate that no lpp file (local header file) is included from a hpp file
+		| validate that no hxx file (local header file) is included from a hpp file
 		| validate pragma once is used and only used in lpp or hpp files
 		| warning on [cpp,c,cxx,...] aka source extension include
 
@@ -831,12 +830,13 @@ place.it:
 
 	opengl.knowledge: docs.gl - Reference documentations
 	opengl.knowledge: learnopengl.com - Great tutorial site
-	opengl.knowledge: ogldev.org - Great tutorial site
+	opengl.knowledge: https://paroj.github.io/gltut - Amazing tutorial site
 	opengl.knowledge: open.gl - Great tutorial site
 	opengl.knowledge: opengl-tutorial.org - Great tutorial site
 	opengl.knowledge: 3dgep.com
+	opengl.knowledge: https://ogldev.org/ - Simple tutorial site
 	opengl.knowledge: http://www.songho.ca/opengl/gl_projectionmatrix.html
-	opengl.tool: renderdoc.org - Renderdoc
+	opengl.tool: renderdoc.org - RenderDoc A must have tool for debugging OpenGL API calls
 	regex.tool: regex101.com
 	regex.tool: regexr.com
 
@@ -902,97 +902,15 @@ Naming changes:
 	libv: (?) naming change: func_or       -> func_or    (unchanged)
 
 
-IDE:
-	ide: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
-
-	IDE	Colors:
-		BBBFC3
-		B5B6E3
-		5F8C8A
-
-		enum decl - C76863
-		enum usage - 9FB4C7
-		enumerator decl - 579058
-		enumerator usage - 579058
-
-	CLion:
-		Fixable: wrong working directory to run in
-			(generally the relationship between bin and res should be solved too)
-				? arg for res folder
-				? auto discover 1 folder up
-			| Solved with setting each IDE target
-			| Re-Solved it with detection and auto change of directory
-
-		Issue: TODO list is shit
-			| a separate app that I make could solve it that calls back to CLion
+CLion:
+	Issue: TODO list is shit
+		| a separate app that I make could solve it that calls back to CLion
+		| or a plugin
 
 IDE live templates:
-	Netbeans and CLion:
-		for - // Unify, for int i = 0; i < 10; i++
-		fori - // Unify, Iterator version
-		fora - // Unify, const auto& v : range
-	Netbeans:
-		pimpl
-			class $CLASS$ {
-			private:
-				std::unique_ptr<class Impl$CLASS$> self;
-
-			public:
-				$CLASS$();
-				~$CLASS$();
-			};
-
-			$CLASS$::$CLASS$() :
-				self(std::make_unique<Impl$CLASS$>()) {
-			}
-
-			$CLASS$::~$CLASS$() {
-				// For the sake of forward declared ptr
-			}
-		str - std::string
-		strv - std::string_view
-		coutv
-			std::cout << "$COPY_OF_VAR$: " << $VAR$ << std::endl;$END$
-		mv - std::move(args)
-		fw - std::forward<Args>(args)
-		fwa - std::forward<decltype(args)>(args)
-		fwp - std::forward<Args>(args)...
-		ci - var(var)                  // Remove the comma from the netbeans version
-		cim - var(std::move(var))
-		get -
-			[[nodiscard]] constexpr inline $TYPE="const auto&"$ $VAR$() const noexcept {
-				return $VAR$_;
-			}
-		getr -
-			[[nodiscard]] constexpr inline auto& $VAR$() const noexcept {
-				return $VAR$_;
-			}
-		getc -
-			[[nodiscard]] constexpr inline const auto& $VAR$() const noexcept {
-				return $VAR$_;
-			}
-		getv -
-			[[nodiscard]] constexpr inline auto $VAR$() const noexcept {
-				return $VAR$_;
-			}
-		nd - [[nodiscard]]
-		un - [[maybe_unused]]
-		ft - [[fallthrough]]
-		no - noexcept
-		cc - copy ctor and assignment
-			constexpr inline $TYPE$(const $TYPE$&) $CC_IS_NOEXCEPT$= default;
-			constexpr inline $TYPE$& operator=(const $TYPE$&) & $CC_IS_NOEXCEPT$= default;
-		mc - move ctor and assignment
-			constexpr inline $TYPE$($TYPE$&&) noexcept = default;
-			constexpr inline $TYPE$& operator=($TYPE$&&) & noexcept = default;
-		ctor
-			constexpr inline $TYPE$(const $TYPE$&) $CC_IS_NOEXCEPT$= default;
-			constexpr inline $TYPE$& operator=(const $TYPE$&) & $CC_IS_NOEXCEPT$= default;
-			constexpr inline $TYPE$($TYPE$&&) noexcept = default;
-			constexpr inline $TYPE$& operator=($TYPE$&&) & noexcept = default;
-		lock - auto lock = std::unique_lock($VAR$);
-
-
+	for - // Unify, for int i = 0; i < 10; i++
+	fori - // Unify, Iterator version
+	fora - // Unify, const auto& v : range
 
 libv.utility: non repeating random numbers: lottery problem, on collusion shuffle to back
 
@@ -1261,23 +1179,7 @@ libv.ctrl: Implementation queue:
 				'F1' is pressed but no active context handles it
 				Soft entered contexts could auto enter and handle the event
 
-app.vm4_viewer: light source indicator
-app.vm4_viewer: light source mover
-app.vm4_viewer: ortho camera, and swapping
-
-app.vm4_viewer: Rulers: Display size rulers along the 3 dimension (3/6/9 value) of the max ranges
-
-app.vm4_viewer: Run time (and config time) options for debug tool toggles, or overlays: ui toggle buttons
-app.vm4_viewer: Add config option to auto open shader on errors: /netbeans/bin/netbeans64.exe --open {file}:{line}
-app.vm4_viewer: Add config option to disable reset camera on model loading
-app.vm4_viewer: Add config option for AABB
-app.vm4_viewer: Add config option for BS
-app.vm4_viewer: Add config option for grid-XY
-app.vm4_viewer: Add config option to not reset camera on model change
-
 libv.args: support or extension for the lib to support command line "late" commands, from a different process instance with a network hook
-app.vm4_viewer: Command line argument --open "file" to auto open file
-app.vm4_viewer: Command line argument --active open file in already running instance (overrides config option)
 
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node
@@ -1302,7 +1204,7 @@ app.vm4_viewer: Command line argument --active open file in already running inst
 		vm4::model
 
 	Shader
-		texture channels
+		texture units
 		gl::uniform location miscellaneous
 		gl::uniform location transformation
 		gl::uniform location light[]
@@ -1383,12 +1285,8 @@ libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly w
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
-libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
-
-libv.glr: (?) (if passible) std140 implementation should be moved to libv.gl
+libv.glr: (?) (if possible) std140 implementation should be moved to libv.gl
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
-
-libv.ppc: new Pre-Processor Compiler library, a cpp "like" pre-processor implementation for shader loading
 
 libv.color: New libv.color library, color space conversion and manipulations, template color space, template representation
 libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
@@ -1396,9 +1294,6 @@ libv.ui: Color picker
 
 libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
 
-libv.glr: Mesh attributes should use a single VBO | false: for shadow casters it should be position 1 VBO, everything else another 1 VBO
-
-libv.glr: Procedural gizmo mesh
 
 
 --- Checkpoint ---
@@ -1479,6 +1374,9 @@ libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 libv.fsw: Improve callback and tokens to not hold the mutex during event broadcast (callback), currently it is a deadlock
 
 
+
+libv.audio: Great overview on the requirements of a basic sound engine: https://www.youtube.com/watch?v=MEizUamJTyk
+libv.audio: Idea: Choose one of N random sounds when selecting play
 libv.audio: Paper
 	For audio HARD API BARRIER IS REQUIRED (Every lib / backend is a shitshow)
 
@@ -1530,11 +1428,14 @@ libv.audio: Paper
 async: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency() | could I use separate cmake file for each ext and make a dependency on it ?
-color: color picker http://www.colorhexa.com/3affce
 color.math: colorspace of humans https://en.wikipedia.org/wiki/Lab_color_space
 color.math: http://graficaobscura.com/matrix/index.html
-color.picker: http://tristen.ca/hcl-picker/#/hlc/10/1/F68385/D1E468
 color.picker: HCL picker https://tools.lgm.cl/colorpicker.html
+color.picker: http://tristen.ca/hcl-picker/#/hlc/10/1/F68385/D1E468
+color.picker: color picker http://www.colorhexa.com/3affce
+color.picker: color picker https://huemint.com/
+color.picker: color picker https://colorhunt.co/
+color: How to pick UI colors https://www.youtube.com/watch?v=yYwEnLYT55c
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
@@ -1587,6 +1488,8 @@ gold: Architecture and code structure/organization are two separate concepts
 gold: Existence / super-position based predication
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
+gold.ui-design: Use 4-8px grid
+gold.ui-design: Use 60-30-10 color palette
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
 math: blue noise, a stable uniform noise https://gist.github.com/pixelmager/5d25fa32987273b9608a2d2c6cc74bfa
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
@@ -1598,8 +1501,6 @@ libv.serial: Maybe create a hjson archive https://hjson.github.io/
 libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv.frame: Move frames from disconnected monitor / off-screen
 libv.frame: remove default own thread, give them an io_context like executor
-libv.gl: templated buffer for binding
-libv.gl: uniformbuffer?
 libv.log: log thread naming
 libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
@@ -1674,7 +1575,7 @@ cpp: hash_maps: https://martin.ankerl.com/2019/04/01/hashmap-benchmarks-01-overv
 git: Commit count up to a revision: git rev-list --count HEAD
 ninja: CLICOLOR_FORCE=1 env var to have colored output
 UX: For windows position history: Remember not just position and size but if it was in maximized state or not (clion fucked it up, and it show a pixel line on a secondary monitor)
-UX: Upon first run avoid full-screening a desktop app by default, this makes it less scary, less intrusive and leave the clint more in control
+UX: Upon first run avoid full-screening a desktop app by default, this makes it less scary, less intrusive and leave the client more in control
 
 --- INFO -------------------------------------------------------------------------------------------
 
@@ -1704,10 +1605,7 @@ Files: Used default file names in LIBV
 	.patch - patch_progress log file
 
 Ports: Used default port ranges in LIBV
-	10022 - SSH
-	10122 - SSH (tunnel for ca-rs0-dev)
-	22001 - SSH (tunnel for ca-web-dev)
-	18080 - Jenkins
+	16000-16999 - Infrastructure reserved range
 
 	[25080-25089] - Network Sandboxes
 		25080 - app.space
@@ -1769,14 +1667,7 @@ glfw: glfwSetGammaRamp
 
 Base class for lights and cameras
 
-http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
-
-Optimized compiling - cmake https://github.com/sakra/cotire
-
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
-
-http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
-OpenGL Reference page: https://www.khronos.org/registry/OpenGL-Refpages/gl4/
 
 Shader types
 	Fresnel shader - Atmosphere
@@ -1785,279 +1676,6 @@ Shader types
 	OrenNayar - More avg lambert
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
-
-// Planned attribute locations:
-//   0  |     position  |             |
-//   1  |       normal  |     psize   |
-//   2  |               |   diffuse   |
-//   3  |               |  specular   |
-//   4  |   boneweight  |             |
-//   5  |  boneindices  |             |
-//   6  |      tangent  |             |
-//   7  |    bitangent  |             |
-//   8  |    texcoord0  |             |
-//   9  |   tessfactor  |  texcoord1  |
-//  10  |     instVec0  |  texcoord2  |
-//  11  |     instVec1  |  texcoord3  |
-//  12  |   instMatrix  |  texcoord4  |
-//  13  |     ^^^^^     |  texcoord5  |
-//  14  |     ^^^^^     |  texcoord6  |
-//  15  |     ^^^^^     |  texcoord7  |
-
-// -------------------------------------------------------------------------------------------------
-
-Additional cmake.wish ideas:
-
-wish_config(
-	TARGET                      __PARENT_TARGET_____TARGET__
-	FOLDER                      __PARENT_FOLDER__/__TARGET__
-	ALIAS                       __PARENT_ALIAS__::__TARGET__
-	SOURCE                      src/__FOLDER__/*.cpp
-	HEADER                      src/__FOLDER__/*.hpp
-
-	RESULT_PATH_BINARY_APP      bin/__FOLDER__/
-	RESULT_PATH_BINARY_EXAMPLE  bin/__FOLDER__/
-	RESULT_PATH_BINARY_SANDBOX  bin/__FOLDER__/
-	RESULT_PATH_BINARY_TEST     bin/__FOLDER__/
-	RESULT_PATH_HEADER          include/__FOLDER__/
-	RESULT_PATH_LIBRARY_DYNAMIC lib/__FOLDER__/
-	RESULT_PATH_LIBRARY_STATIC  lib/__FOLDER__/
-)
-
-string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-
-find_package(Threads REQUIRED)
-find_package(OpenGL REQUIRED)
-
-wish_create_base(
-	TARGET libv
-
-	WARNING GNU VERSION_GREATER 7.0 -Wduplicated-branches
-	WARNING GNU VERSION_GREATER 7.0 -Wrestrict
-	WARNING GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
-	WARNING GNU VERSION_GREATER 8.0 -Wcast-align=strict
-	WARNING GNU VERSION_GREATER 8.0 -Wmultistatement-macros
-
-	OPTION DEBUG -Og
-	OPTION DEBUG -ggdb3
-	OPTION RELEASE -O3
-	OPTION RELEASE -static
-	OPTION DEV -O3
-	OPTION -m64
-	OPTION -std=c++2a
-	OPTION -fconcepts
-
-	DEFINE -Dconcept="concept bool"
-	DEFINE -D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
-	IDE_DEFINE WISH_REQUIRES(...)
-
-	DEFINE -DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}"
-	DEFINE -DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
-	DEFINE -DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF}
-	DEFINE -DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/"
-)
-
-wish_create_library(
-	PARENT libv
-	TARGET vm4imp
-	LINK PUBLIC libv::log libv::vm4 ext::assimp
-)
-
-// -------------------------------------------------------------------------------------------------
-
-Additional cmake.wish ideas 2:
-
-wish_config(
-	TARGET                      __PARENT_TARGET_____TARGET__
-	FOLDER                      __PARENT_FOLDER__/__TARGET__
-	ALIAS                       __PARENT_ALIAS__::__TARGET__
-	SOURCE                      src/__FOLDER__/*.cpp
-	HEADER                      src/__FOLDER__/*.hpp
-
-	RESULT_PATH_BINARY_APP      bin/__FOLDER__/
-	RESULT_PATH_BINARY_EXAMPLE  bin/__FOLDER__/
-	RESULT_PATH_BINARY_SANDBOX  bin/__FOLDER__/
-	RESULT_PATH_BINARY_TEST     bin/__FOLDER__/
-	RESULT_PATH_HEADER          include/__FOLDER__/
-	RESULT_PATH_LIBRARY_DYNAMIC lib/__FOLDER__/
-	RESULT_PATH_LIBRARY_STATIC  lib/__FOLDER__/
-)
-
-string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-
-find_package(Threads REQUIRED)
-find_package(OpenGL REQUIRED)
-
-wish_create_base(
-	TARGET libv
-
-	WARNING GNU VERSION_GREATER 7.0 -Wduplicated-branches
-	WARNING GNU VERSION_GREATER 7.0 -Wrestrict
-	WARNING GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
-	WARNING GNU VERSION_GREATER 8.0 -Wcast-align=strict
-	WARNING GNU VERSION_GREATER 8.0 -Wmultistatement-macros
-
-	MODE DEBUG
-		OPTION -Og
-		OPTION -ggdb3
-	MODE RELEASE
-		OPTION -O3
-		OPTION -static
-	MODE DEV
-		OPTION -O3
-
-	OPTION -m64
-	OPTION -std=c++2a
-	OPTION -fconcepts
-
-	DEFINE -Dconcept="concept bool"
-	DEFINE -D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
-	IDE_DEFINE WISH_REQUIRES(...)
-
-	DEFINE -DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}"
-	DEFINE -DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
-	DEFINE -DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF}
-	DEFINE -DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/"
-)
-
-wish_create_library(
-	PARENT libv
-	TARGET vm4imp
-	LINK PUBLIC libv::log libv::vm4 ext::assimp
-)
-
-// -------------------------------------------------------------------------------------------------
-
-Additional lua.wish ideas:
-
-
-debug = mode("debug")
-release = mode("release")
-dev = mode("dev")
-
-config.target = "{PARENT_TARGET}_{TARGET}"
-config.folder = "{PARENT_FOLDER}/{TARGET}"
-config.alias  = "{PARENT_ALIAS}::{TARGET}"
-config.source = "src/{FOLDER}/**.cpp"
-config.header = "src/{FOLDER}/**.hpp"
-
-config.result_path_binary_app      = "bin/{FOLDER}/"
-config.result_path_binary_example  = "bin/{FOLDER}/"
-config.result_path_binary_sandbox  = "bin/{FOLDER}/"
-config.result_path_binary_test     = "bin/{FOLDER}/"
-config.result_path_header          = "include/{FOLDER}/"
-config.result_path_library_dynamic = "lib/{FOLDER}/"
-config.result_path_library_static  = "lib/{FOLDER}/"
-
-set.CMAKE_THREAD_PREFER_PTHREAD = "TRUE"
-set.THREADS_PREFER_PTHREAD_FLAG = "TRUE"
-
-find.package_require("Threads")
-find.package_require("OpenGL")
-
-
-ext_assimp = create_external("assimp", "https://github.com/assimp/assimp.git", "v5.0.0", {
-	BUILD_SHARED_LIBS = OFF,
-	CMAKE_EXPORT_COMPILE_COMMANDS = ON,
-	ASSIMP_BUILD_ASSIMP_TOOLS = OFF,
-	ASSIMP_BUILD_TESTS = OFF,
-	ASSIMP_BUILD_ZLIB = ON,
-	ASSIMP_NO_EXPORT = ON,
-
-	ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT = OFF,
-	ASSIMP_BUILD_FBX_IMPORTER = ON,
-})
-ext_assimp.link_public("assimp", "IrrXML", "zlibstatic")
-
-
-libv = create_base("libv")
-
-libv.warning("GNU VERSION_GREATER 7.0", "-Wduplicated-branches")
-libv.warning("GNU VERSION_GREATER 7.0", "-Wrestrict")
-libv.warning("GNU VERSION_GREATER 7.0", "-Wshadow-compatible-local")
-libv.warning("GNU VERSION_GREATER 8.0", "-Wcast-align=strict")
-libv.warning("GNU VERSION_GREATER 8.0", "-Wmultistatement-macros")
-
-libv.option(debug, "-Og")
-libv.option(debug, "--ggdb3")
-libv.option(release, "-O3")
-libv.option(release, "-static")
-libv.option(dev, "-O3")
-libv.option("-m64")
-libv.option("-std=c++2a")
-libv.option("-fconcepts")
-
-libv.define("concept=\"concept bool\"")
-libv.define("\"WISH_REQUIRES\\\\(...\\\\)=\\\"requires __VA_ARGS__\\\"\"")
-libv.ide_define("WISH_REQUIRES(...)")
-
-libv.define_wish_git_branch()
-libv.define_wish_git_commit()
-libv.define_wish_short_path_cutoff()
-libv.define_wish_short_path_prefix()
-
-libv_vm4imp = create_library(libv, "vm4imp");
-libv_vm4imp.link_public(libv_log libv_vm4 ext_assimp);
-
-
-// -------------------------------------------------------------------------------------------------
-
-Additional lua.wish ideas 2:
-
-
-debug = mode("debug")
-release = mode("release")
-dev = mode("dev")
-
-set.CMAKE_THREAD_PREFER_PTHREAD = "TRUE"
-set.THREADS_PREFER_PTHREAD_FLAG = "TRUE"
-find.package_require("Threads")
-find.package_require("OpenGL")
-
-
-ext_assimp = create_external("assimp", "https://github.com/assimp/assimp.git", "v5.0.0", {
-	BUILD_SHARED_LIBS = OFF,
-	CMAKE_EXPORT_COMPILE_COMMANDS = ON,
-	ASSIMP_BUILD_ASSIMP_TOOLS = OFF,
-	ASSIMP_BUILD_TESTS = OFF,
-	ASSIMP_BUILD_ZLIB = ON,
-	ASSIMP_NO_EXPORT = ON,
-
-	ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT = OFF,
-	ASSIMP_BUILD_FBX_IMPORTER = ON,
-})
-ext_assimp.link_public("assimp", "IrrXML", "zlibstatic")
-
-
-libv = create_base("libv")
-libv.warning_all()
-
-libv.option(debug, "-Og")
-libv.option(debug, "--ggdb3")
-libv.option(release, "-O3")
-libv.option(release, "-static")
-libv.option(dev, "-O3")
-libv.option("-m64")
-libv.option("-std=c++2a")
-libv.option("-fconcepts")
-
-libv.define("concept=\"concept bool\"")
-libv.define("\"WISH_REQUIRES\\\\(...\\\\)=\\\"requires __VA_ARGS__\\\"\"")
-libv.ide_define("WISH_REQUIRES(...)")
-
-libv.define_wish_git_branch()
-libv.define_wish_git_commit()
-libv.define_wish_short_path_cutoff()
-libv.define_wish_short_path_prefix()
-
-libv_vm4imp = create_library(libv, "vm4imp");
-libv_vm4imp.link_public(libv_log libv_vm4 ext_assimp);
-
-// -------------------------------------------------------------------------------------------------
 
 local nato_phonetic_alphabet = {
 	"Alfa",

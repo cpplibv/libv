@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/resource/texture.hpp
+// Project: libv.gl, File: src/libv/rev/gl/swizzle.cpp
 
 // hpp
 #include <libv/rev/gl/swizzle.hpp>

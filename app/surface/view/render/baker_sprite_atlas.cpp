@@ -191,8 +191,8 @@ void BakerSpriteAtlas::bake(SpriteAtlas& atlas, uint32_t index,
 	{
 		glr.program(shaderSpriteBakerDownsample.program());
 		glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
-		glr.texture(bakeSSColor, textureChannel_diffuse);
-		glr.texture(bakeSSNormal, textureChannel_normal);
+		glr.texture(bakeSSColor, textureUnit_diffuse);
+		glr.texture(bakeSSNormal, textureUnit_normal);
 		glr.render_full_screen();
 	}
 

@@ -92,29 +92,6 @@ frustum::position frustum::point_in_frustum(vec3f point) const noexcept {
 	return position::inside;
 }
 
-bool frustum::is_point_in_frustum(vec3f point) const noexcept {
-	const auto left_dist = planes_[left].distance_from_point(point);
-	if (left_dist < 0)
-		return false;
-	const auto right_dist = planes_[right].distance_from_point(point);
-	if (right_dist < 0)
-		return false;
-	const auto up_dist = planes_[up].distance_from_point(point);
-	if (up_dist < 0)
-		return false;
-	const auto down_dist = planes_[down].distance_from_point(point);
-	if (down_dist < 0)
-		return false;
-	const auto near_dist = planes_[near].distance_from_point(point);
-	if (near_dist < 0)
-		return false;
-	const auto far_dist = planes_[far].distance_from_point(point);
-	if (far_dist < 0)
-		return false;
-
-	return true;
-}
-
 frustum::position frustum::sphere_in_frustum(vec3f point, float radius) const noexcept {
 	const auto left_dist = planes_[left].distance_from_point(point);
 	if (left_dist < -radius)
@@ -148,53 +125,53 @@ frustum::position frustum::sphere_in_frustum(vec3f point, float radius) const no
 	if (far_dist < radius)
 		return position::intersect;
 
-//	float dist;
-//	dist = planes_[left].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-//
-//	dist = planes_[right].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-//
-//	dist = planes_[up].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-//
-//	dist = planes_[down].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-//
-//	dist = planes_[near].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-//
-//	dist = planes_[far].distance_from_point(point);
-//	if (dist < radius)
-//		return dist < -radius ? position::outside : position::intersect;
-
 	return position::inside;
 }
 
-//int frustum::sphere_in_frustum(libv::vec3f p, float radius) const noexcept {
-//	if (planes_[near].distance_from_point(p) < -radius)
-//		return 0;
-//	else if (planes_[far].distance_from_point(p) < -radius)
-//		return 1;
-//	else if (planes_[left].distance_from_point(p) < -radius)
-//		return 2;
-//	else if (planes_[right].distance_from_point(p) < -radius)
-//		return 3;
-//	else if (planes_[up].distance_from_point(p) < -radius)
-//		return 4;
-//	else if (planes_[down].distance_from_point(p) < -radius)
-//		return 5;
-//	else if (planes_[near].distance_from_point(p) < radius || planes_[far].distance_from_point(p) < radius || planes_[left].distance_from_point(p) < radius ||
-//			planes_[right].distance_from_point(p) < radius || planes_[up].distance_from_point(p) < radius || planes_[down].distance_from_point(p) < radius)
-//		return 6;
-//	else
-//		return 7;
-//}
+// =================================================================================================
+
+frustum_culler_inf::frustum_culler_inf(planef left_, planef right_, planef up_, planef down_, planef near_) noexcept {
+	planes_[left] = left_;
+	planes_[right] = right_;
+	planes_[up] = up_;
+	planes_[down] = down_;
+	planes_[near] = near_;
+	// planes_[far] = far_;
+}
+
+bool frustum_culler_inf::test_point(vec3f point) const noexcept {
+	if (planes_[left].distance_from_point(point) < 0)
+		return false;
+	if (planes_[right].distance_from_point(point) < 0)
+		return false;
+	if (planes_[up].distance_from_point(point) < 0)
+		return false;
+	if (planes_[down].distance_from_point(point) < 0)
+		return false;
+	if (planes_[near].distance_from_point(point) < 0)
+		return false;
+	// if (planes_[far].distance_from_point(point) < 0)
+	// 	return false;
+
+	return true;
+}
+
+bool frustum_culler_inf::test_sphere(vec3f position, float radius) const noexcept {
+	if (planes_[left].distance_from_point(position) < -radius)
+		return false;
+	if (planes_[right].distance_from_point(position) < -radius)
+		return false;
+	if (planes_[up].distance_from_point(position) < -radius)
+		return false;
+	if (planes_[down].distance_from_point(position) < -radius)
+		return false;
+	if (planes_[near].distance_from_point(position) < -radius)
+		return false;
+	// if (planes_[far].distance_from_point(position) < -radius)
+	// 	return false;
+
+	return true;
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -203,11 +180,6 @@ frustum::position frustum::sphere_in_frustum(vec3f point, float radius) const no
 // =================================================================================================
 // =================================================================================================
 // =================================================================================================
-// =================================================================================================
-
-// Articles:
-//		https://learnopengl.com/Guest-Articles/2021/CSM
-
 // =================================================================================================
 
 // "frustum from projection view matrix"

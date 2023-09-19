@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/math/vec.hpp>
 // std
@@ -64,14 +64,14 @@ public:
 	void storage_ms(libv::gl::Format format, libv::vec2i size, int32_t samples) noexcept;
 
 private:
-	void sync(libv::gl::GL& gl, Remote& remote_) const noexcept;
+	void sync(libv::GL& gl, Remote& remote_) const noexcept;
 };
 
 class AttorneyRemoteRenderbuffer {
 	friend class Queue;
 	friend class RemoteFramebuffer;
 
-	[[nodiscard]] static inline libv::gl::Renderbuffer sync(const Renderbuffer& renderbuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
+	[[nodiscard]] static inline libv::gl::Renderbuffer sync(const Renderbuffer& renderbuffer, libv::GL& gl, Remote& remote_) noexcept {
 		// NOTE: Valid aliasing, verified by the standard, head is the first member
 		auto& head = *static_cast<RemoteRenderbufferHead*>(static_cast<void*>(renderbuffer.remote.get()));
 		if (head.dirty)

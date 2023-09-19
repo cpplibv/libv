@@ -26,7 +26,7 @@ InternalShader::InternalShader(
 }
 
 InternalShader::~InternalShader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 
 	if (const auto loader_sp = loader.lock())
 		loader_sp->unsubscribe(this);
@@ -34,7 +34,6 @@ InternalShader::~InternalShader() {
 
 void InternalShader::finish() {
 	name_ = [this] { // Generate Shader Name
-
 		const auto view_basename = [](std::string_view path) {
 			const auto last_slash = path.find_last_of('/');
 			if (last_slash != std::string::npos)

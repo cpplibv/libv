@@ -1,4 +1,4 @@
-// MIT License
+// Project: libv.noise, File: src/libv/noise/__fastnoiselite.hpp
 //
 // Copyright(c) 2020 Jordan Peck (jordan.me2@gmail.com)
 // Copyright(c) 2020 Contributors

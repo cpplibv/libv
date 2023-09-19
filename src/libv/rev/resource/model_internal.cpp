@@ -26,7 +26,7 @@ void InternalModel::ref_count_one() noexcept {
 void InternalModel::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const {
 	for (const auto& node : nodes) {
 		const auto guard = glr.model.push_guard();
-		glr.model *= node.transformation;
+		glr.model *= node.transform;
 		node.material.bind(glr, uniform_stream);
 		glr.render(glrMesh, node.baseVertex, node.baseIndex, node.numIndices);
 	}
@@ -122,18 +122,18 @@ void InternalModel::load_node(const libv::vm4::Model& vm4, const std::vector<Mat
 	load_node(vm4, mats, 0, libv::mat4f::identity());
 }
 
-void InternalModel::load_node(const libv::vm4::Model& vm4, const std::vector<Material>& mats, int nodeID, const libv::mat4f& parent_transformation) {
+void InternalModel::load_node(const libv::vm4::Model& vm4, const std::vector<Material>& mats, int nodeID, const libv::mat4f& parent_transform) {
 	const auto& node = vm4.nodes[nodeID];
 
-	const auto transformation = parent_transformation * node.transformation;
+	const auto transform = parent_transform * node.transform;
 
 	for (const auto& meshID : node.meshIDs) {
 		const auto& mesh = vm4.meshes[meshID];
-		nodes.emplace_back(transformation, mats[mesh.materialID], mesh.baseVertex, mesh.baseIndex, mesh.numIndices);
+		nodes.emplace_back(transform, mats[mesh.materialID], mesh.baseVertex, mesh.baseIndex, mesh.numIndices);
 	}
 
 	for (auto childID : node.childrenIDs)
-		load_node(vm4, mats, childID, transformation);
+		load_node(vm4, mats, childID, transform);
 }
 
 

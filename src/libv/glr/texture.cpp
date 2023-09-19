@@ -54,7 +54,7 @@ struct RemoteTexture {
 
 	// Multisample
 	int32_t samples;
-	bool fixedSamples;
+	bool sampleFixed;
 
 	// Data
 	libv::vec3i dirty_dataMin = {0, 0, 0};
@@ -63,7 +63,7 @@ struct RemoteTexture {
 
 	// Properties
 	libv::gl::MagFilter magFilter = libv::gl::MagFilter::Linear;
-	libv::gl::MinFilter minFilter = libv::gl::MinFilter::NearestMipmapLinear;
+	libv::gl::MinFilter minFilter = libv::gl::MinFilter::LinearMipmapLinear;
 	libv::gl::Wrap wrapS = libv::gl::Wrap::Repeat;
 	libv::gl::Wrap wrapT = libv::gl::Wrap::Repeat;
 	libv::gl::Wrap wrapR = libv::gl::Wrap::Repeat;
@@ -75,7 +75,7 @@ struct RemoteTexture {
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 public:
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
 	~RemoteTexture() noexcept;
@@ -83,7 +83,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteTexture::update(libv::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
 		remote = make_observer_ptr(&remote_.destroyQueues());
 
@@ -138,9 +138,9 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		gl(head.texture).bind();
 
 		if (head.texture.target == libv::gl::TextureTarget::_2DMultisample)
-			gl(head.texture).storage_ms(format, libv::vec::xy(levels[0].size), samples, fixedSamples);
+			gl(head.texture).storage_ms(format, libv::vec::xy(levels[0].size), samples, sampleFixed);
 		else if (head.texture.target == libv::gl::TextureTarget::_2DMultisampleArray)
-			gl(head.texture).storage_ms(format, levels[0].size, samples, fixedSamples);
+			gl(head.texture).storage_ms(format, levels[0].size, samples, sampleFixed);
 
 		dirty_storage_ms = false;
 	}
@@ -221,10 +221,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (dirty_mipmaps) {
 		gl(head.texture).bind();
 		const auto size = gl(head.texture).getSize2D();
-		const auto level_count = std::max(
-				0,
-				std::countr_zero(std:: bit_floor(static_cast<uint32_t>(std::min(size.x, size.y)))) - 1
-		);
+		const auto level_count = std::bit_width(static_cast<uint32_t>(std::max(size.x, size.y)));
 		gl(head.texture).setMaxLevel(level_count);
 		gl(head.texture).generateMipmap();
 		dirty_mipmaps = false;
@@ -275,7 +272,7 @@ void Texture::implStorage(libv::gl::TextureTarget target, int32_t levels, libv::
 	remote->data.resize(storage_size);
 }
 
-void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format, libv::vec2i size, int32_t samples, bool fixedSamples) noexcept {
+void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format, libv::vec2i size, int32_t samples, bool sampleFixed) noexcept {
 	LIBV_GLR_DEBUG_ASSERT(target == libv::gl::TextureTarget::_2DMultisample);
 
 	remote->head.dirty = true;
@@ -285,10 +282,10 @@ void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format
 	remote->format = format;
 	remote->levels.emplace_back(RemoteTexture::Level{{size, 0}, 0});
 	remote->samples = samples;
-	remote->fixedSamples = fixedSamples;
+	remote->sampleFixed = sampleFixed;
 }
 
-void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format, libv::vec3i size, int32_t samples, bool fixedSamples) noexcept {
+void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format, libv::vec3i size, int32_t samples, bool sampleFixed) noexcept {
 	LIBV_GLR_DEBUG_ASSERT(target == libv::gl::TextureTarget::_2DMultisampleArray);
 
 	remote->head.dirty = true;
@@ -298,7 +295,7 @@ void Texture::storage_ms(libv::gl::TextureTarget target, libv::gl::Format format
 	remote->format = format;
 	remote->levels.emplace_back(RemoteTexture::Level{size, 0});
 	remote->samples = samples;
-	remote->fixedSamples = fixedSamples;
+	remote->sampleFixed = sampleFixed;
 }
 
 void Texture::load(libv::gl::Image image) noexcept {
@@ -382,14 +379,14 @@ void Texture::image(int32_t level, libv::vec3i offset, libv::vec3i size, const v
 
 void Texture::image(int32_t level, libv::gl::CubeSide side, const void* data) noexcept {
 	// Redirect to 3D image
-	const auto size_i = static_cast<int32_t>(side) - static_cast<int32_t>(libv::gl::CubeSide::PositiveX);
-	image(level, libv::vec3i{0, 0, size_i}, remote->levels[level].size, data);
+	const auto side_i = libv::gl::sideIndex(side);
+	image(level, libv::vec3i{0, 0, side_i}, remote->levels[level].size, data);
 }
 
 void Texture::image(int32_t level, libv::gl::CubeSide side, int32_t layer, const void* data) noexcept {
 	// Redirect to 3D image
-	const auto size_i = static_cast<int32_t>(side) - static_cast<int32_t>(libv::gl::CubeSide::PositiveX);
-	image(level, libv::vec3i{0, 0, layer * 6 + size_i}, remote->levels[level].size, data);
+	const auto side_i = libv::gl::sideIndex(side);
+	image(level, libv::vec3i{0, 0, layer * 6 + side_i}, remote->levels[level].size, data);
 }
 
 void Texture::set(libv::gl::MagFilter filter) noexcept {
@@ -439,13 +436,13 @@ void Texture::generate_mipmaps() noexcept {
 	remote->dirty_mipmaps = true;
 }
 
-void Texture::sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept {
+void Texture::sync_no_bind(libv::GL& gl, Remote& remote_) const noexcept {
 	auto previous = gl.boundTexture(remote->head.texture.target);
 	remote->update(gl, remote_);
 	gl.bind(previous);
 }
 
-void Texture::sync_might_bind(libv::gl::GL& gl, Remote& remote_) const noexcept {
+void Texture::sync_might_bind(libv::GL& gl, Remote& remote_) const noexcept {
 	remote->update(gl, remote_);
 }
 

@@ -70,7 +70,7 @@ void Model::render(libv::glr::Queue& glr, ShaderFleet& shader, libv::glr::Unifor
 void Model::render_node(libv::glr::Queue& glr, uint32_t nodeID, ShaderFleet& shader, libv::glr::UniformBuffer& uniform_stream) {
 	const auto guard = glr.model.push_guard();
 
-	glr.model *= vm4.nodes[nodeID].transformation;
+	glr.model *= vm4.nodes[nodeID].transform;
 
 	auto uniforms = uniform_stream.block_unique(libv::rev::layout_matrices);
 	uniforms[libv::rev::layout_matrices.matMVP] = glr.mvp();

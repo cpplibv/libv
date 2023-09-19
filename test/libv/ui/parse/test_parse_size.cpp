@@ -20,7 +20,7 @@ std::string parse_to_string(const std::string& size) {
 		ss << *result;
 	else
 		ss << "invalid";
-	return ss.str();
+	return std::move(ss).str();
 }
 
 } // namespace

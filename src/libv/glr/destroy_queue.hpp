@@ -3,9 +3,9 @@
 #pragma once
 
 // libv
-#include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/buffer_object.hpp>
 #include <libv/gl/framebuffer_object.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/gl/texture_object.hpp>
@@ -48,7 +48,7 @@ public:
 	}
 
 public:
-	void clear(libv::gl::GL& gl) noexcept;
+	void clear(libv::GL& gl) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

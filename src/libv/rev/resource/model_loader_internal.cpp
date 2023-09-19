@@ -31,7 +31,7 @@ InternalModelLoader::InternalModelLoader(const std::shared_ptr<InternalResourceM
 }
 
 InternalModelLoader::~InternalModelLoader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -62,7 +62,6 @@ void InternalModelLoader::initDefaultGLR() {
 InternalModel_ptr InternalModelLoader::load(std::string_view name) {
 	auto lock = std::unique_lock(mutex);
 	auto& ptr = cache.lookup(name, 0);
-
 
 	if (!ptr) {
 		auto mov = [this](const libv::vm4::Material& vm4Material) {
@@ -162,7 +161,7 @@ void InternalModelLoader::process_fs(InternalModel_ptr&& res, MaterialLoaderFunc
 //		irm->fsw.subscribe_file(resource_path, [] {
 //		});
 
-		const auto resource_data = libv::read_file_ec(resource_path);
+		auto resource_data = libv::read_file_ec(resource_path);
 		if (resource_data.ec) {
 //			errors.emplace_back(resource_path, resource_data.ec);
 			log_rev.warn("Failed to read file {} for {}: {}", resource_path, res->name_, resource_data.ec.message());
@@ -226,3 +225,37 @@ void InternalModelLoader::process_res(InternalModel_ptr&& res, libv::vm4::Model&
 } // namespace rev
 } // namespace libv
 
+// =================================================================================================
+
+// cppcoro::generator<ThreadAffinity> internal_load_model3(InternalModel_ptr res, MaterialLoaderFunc&& mov) {
+// 	auto loader = shared_from_this();
+//
+// 	co_yield ThreadAffinity::FS; // --------------------------------------------------------------------
+//
+// 	auto model_file = open_model_file(res);
+// 	auto header_data = model_file.read_header();
+//
+// 	co_yield ThreadAffinity::CPU; // -------------------------------------------------------------------
+//
+// 	res.header = parse_header(header_data);
+// 	std::vector<Material> materials = loader->loadMaterials(model, mov);
+//
+// 	co_yield ThreadAffinity::GL; // --------------------------------------------------------------------
+//
+// 	auto mapped_memory_pointers = map_gl_memory(res.header);
+//
+// 	co_yield ThreadAffinity::FS; // --------------------------------------------------------------------
+//
+// 	model_file.direct_memory_read_body(mapped_memory_pointers);
+// 	model_file.clear();
+//
+// 	co_yield ThreadAffinity::GL; // --------------------------------------------------------------------
+//
+// 	unmap_gl_memory(res.header, mapped_memory_pointers);
+// 	setup_vao();
+// 	finish_everything_gl();
+//
+// 	co_yield {ThreadAffinity::Continue, "Swapping model"}; // ------------------------------------------
+//
+// 	swap_default_model_with_loaded_model();
+// }

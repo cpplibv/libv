@@ -10,7 +10,7 @@ include_hpp("libv/rev/shader/block/matrices200.hpp")
 shader.generate{
 	name = "Particle",
 	uniforms = {
-		{"texture", "texture0", "textureChannel_diffuse"},
+		{"texture", "texture0", "textureUnit_diffuse"},
 	},
 	blocks = {
 		"Matrices200",

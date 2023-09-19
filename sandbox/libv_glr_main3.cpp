@@ -256,7 +256,7 @@ constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -295,11 +295,11 @@ struct Sandbox {
 		plane_program.vertex(shader_plane_vs);
 		plane_program.fragment(shader_plane_fs);
 		plane_program.assign(plane_uniform_matMVP, "matMVP");
-		plane_program.assign(plane_uniform_texture, "texture0Sampler", textureChannel_diffuse);
+		plane_program.assign(plane_uniform_texture, "texture0Sampler", textureUnit_diffuse);
 
 		gen_program.compute(shader_gen_cs);
 		gen_program.assign(gen_uniform_time, "time");
-		gen_program.assign(gen_uniform_texture, "target", textureChannel_diffuse);
+		gen_program.assign(gen_uniform_texture, "target", textureUnit_diffuse);
 
 		gen_texture.storage(1, {1024, 1024});
 		gen_texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
@@ -390,7 +390,7 @@ struct Sandbox {
 
 			gl.program(plane_program);
 			gl.uniform(plane_uniform_matMVP, gl.mvp());
-			gl.texture(gen_texture, textureChannel_diffuse);
+			gl.texture(gen_texture, textureUnit_diffuse);
 			gl.render(plane_mesh);
 		}
 	}

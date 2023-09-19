@@ -37,7 +37,7 @@ struct State {
 
 	/// 0 = Back,
 	/// 1 = Front,
-	type cullFace:1 = 1;
+	type cullFace:1 = 0;
 
 	/// 0 = Fill,
 	/// 1 = Line,
@@ -108,12 +108,16 @@ struct State {
 	///	unused zero initialized padding bits
 	type _reserved:35 = 0;
 
-	bool operator==(const State& rhs) const {
-		return std::bit_cast<type>(*this) == std::bit_cast<type>(rhs);
+	[[nodiscard]] constexpr inline type as_int() const noexcept {
+		return std::bit_cast<type>(*this);
 	}
 
-	bool operator!=(const State& rhs) const {
-		return !(*this == rhs);
+	[[nodiscard]] friend constexpr inline bool operator==(const State& lhs, const State& rhs) noexcept {
+		return lhs.as_int() == rhs.as_int();
+	}
+
+	[[nodiscard]] friend constexpr inline bool operator!=(const State& lhs, const State& rhs) noexcept {
+		return !(lhs == rhs);
 	}
 };
 static_assert(sizeof(State) == sizeof(State::type), "libv::glr::State layout error");

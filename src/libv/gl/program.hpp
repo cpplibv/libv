@@ -83,36 +83,36 @@ public:
 		checkGL();
 	}
 
-	inline void link() noexcept {
+	inline void link(bool logError = true) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glLinkProgram(object.id);
 		checkGL();
-		if (!status())
+		if (logError && !status())
 			log_gl.error("Failed to link program:\n{}", info());
 	}
 
-	inline void link(const Shader& compute) noexcept {
+	inline void link(const Shader& compute, bool logError = true) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glAttachShader(object.id, compute.id);
 		checkGL();
 		glLinkProgram(object.id);
 		checkGL();
-		if (!status())
+		if (logError && !status())
 			log_gl.error("Failed to link program:\n{}", info());
 	}
 
-	inline void link(const Shader& vertex, const Shader& fragment) noexcept {
+	inline void link(const Shader& vertex, const Shader& fragment, bool logError = true) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glAttachShader(object.id, vertex.id);
 		glAttachShader(object.id, fragment.id);
 		checkGL();
 		glLinkProgram(object.id);
 		checkGL();
-		if (!status())
+		if (logError && !status())
 			log_gl.error("Failed to link program:\n{}", info());
 	}
 
-	inline void link(const Shader& vertex, const Shader& fragment, const Shader& geometry) noexcept {
+	inline void link(const Shader& vertex, const Shader& fragment, const Shader& geometry, bool logError = true) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glAttachShader(object.id, vertex.id);
 		glAttachShader(object.id, fragment.id);
@@ -120,7 +120,7 @@ public:
 		checkGL();
 		glLinkProgram(object.id);
 		checkGL();
-		if (!status())
+		if (logError && !status())
 			log_gl.error("Failed to link program:\n{}", info());
 	}
 

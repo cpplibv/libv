@@ -152,7 +152,7 @@ struct Sandbox {
 		gl.enableDebug();
 
 		gl.capability.blend.enable();
-		gl.capability.cullFace.enable();
+		gl.capability.cull.enable();
 		gl.capability.depthTest.enable();
 		gl.depthFunction.less();
 		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
@@ -270,9 +270,9 @@ struct Sandbox {
 		gl(programTest1).assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
 		gl(shaderTest2Frag).create(libv::gl::ShaderType::Fragment);
-		gl(shaderTest2Frag).compile(libv::read_file_or_throw("res/shader/test2.fs"));
+		gl(shaderTest2Frag).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test2.fs"));
 		gl(shaderTest2Vert).create(libv::gl::ShaderType::Vertex);
-		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/test2.vs"));
+		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test2.vs"));
 		gl(programTest2).create();
 		gl(programTest2).link(shaderTest2Frag, shaderTest2Vert);
 		gl(programTest2).assign(uniformTest2matMVP, "matMVP");
@@ -314,13 +314,13 @@ struct Sandbox {
 		textureSky = libv::gl::TextureCube(imageSky.createTexture());
 
 		gl(programQuad).use();
-		uniformQuadTextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
+		uniformQuadTextureDiffuseSampler = libv::gl::TextureUnit::diffuse;
 
 		gl(programTest1).use();
-		uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
+		uniformTest1TextureDiffuseSampler = libv::gl::TextureUnit::diffuse;
 
 		gl(programTest2).use();
-		uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
+		uniformTest2TextureSkySampler = libv::gl::TextureUnit::environment;
 
 		libv::gl::checkGL();
 	}
@@ -443,7 +443,7 @@ struct Sandbox {
 			auto guard_depth = gl.capability.depthTest.disable_guard();
 			auto guard_frontFace = gl.frontFace.cw_guard(); // Cheat for the sake of sandbox
 			gl(programTest2).use();
-			gl.activeTexture(libv::gl::TextureChannel::sky);
+			gl.activeTexture(libv::gl::TextureUnit::environment);
 			gl(textureSky).bind();
 			uniformTest2matMVP = gl.mvp();
 			uniformTest2matM = gl.model;
@@ -456,7 +456,7 @@ struct Sandbox {
 		// Draw world
 		{
 			gl(programTest1).use();
-			gl.activeTexture(libv::gl::TextureChannel::diffuse);
+			gl.activeTexture(libv::gl::TextureUnit::diffuse);
 			gl(texturePlane).bind();
 			uniformTest1matMVP = gl.mvp();
 
@@ -470,7 +470,7 @@ struct Sandbox {
 		// Draw quad
 		{
 			gl(programQuad).use();
-			gl.activeTexture(libv::gl::TextureChannel::diffuse);
+			gl.activeTexture(libv::gl::TextureUnit::diffuse);
 //			gl(textureFBOMSColor).bind();
 			gl(textureFBOColor).bind();
 

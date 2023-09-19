@@ -1,4 +1,4 @@
-// Created by Vader on 2023.01.09..
+// Project: libv.rev, File: src/libv/rev/_idea/particle_static.hpp
 
 #pragma once
 

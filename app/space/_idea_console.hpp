@@ -59,7 +59,7 @@
 //}
 //
 //Console::~Console() {
-//	// For the sake of forward declared ptr
+//	// For the sake of forward declared types
 //}
 //
 //// -------------------------------------------------------------------------------------------------

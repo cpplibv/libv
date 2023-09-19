@@ -214,7 +214,7 @@ std::string err_str(T error_enum) {
 
 TEST_CASE("AAA reg logger", "[libv.net.mtcp]") {
 	std::cout << libv::logger_stream;
-//	libv::logger_stream.setFormat("{severity} {thread_id:2} {module}: {message}\n");
+//	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}\n");
 }
 
 TEST_CASE("MTCP Connection without any connect should handle incorrect calls", "[libv.net.mtcp]") {

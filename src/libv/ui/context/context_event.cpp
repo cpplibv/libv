@@ -1,4 +1,4 @@
-// Created by Vader on 2023.03.15.
+// Project: libv.ui, File: src/libv/ui/context/context_event.cpp
 
 // hpp
 #include <libv/ui/context/context_event.hpp>
@@ -25,7 +25,7 @@ ContextEvent::ContextEvent() :
 }
 
 ContextEvent::~ContextEvent() {
-	// For the sake of forward declared unique_ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------

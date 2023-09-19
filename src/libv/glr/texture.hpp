@@ -5,7 +5,7 @@
 // libv
 #include <libv/gl/assert.hpp>
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/image_fwd.hpp>
 #include <libv/gl/texture_object.hpp>
 #include <libv/math/vec.hpp>
@@ -79,12 +79,12 @@ public:
 	void image(int32_t level, libv::gl::CubeSide side, int32_t layer, const void* data) noexcept;
 
 public:
-//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
-//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
-//	void get_image(libv::gl::GL& gl, int32_t level, void* data) const noexcept;
-//	void get_image(libv::gl::GL& gl, int32_t level, libv::gl::CubeSide side, void* data)  const noexcept;
-//	void get_image(libv::gl::GL& gl, int32_t level, libv::gl::CubeSide side, int32_t layer, void* data) const noexcept;
-//	void* at(libv::gl::GL& gl, int32_t level, libv::vec3i position) const noexcept;
+//	void get_image(libv::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::GL& gl, int32_t level, void* data) const noexcept;
+//	void get_image(libv::GL& gl, int32_t level, libv::gl::CubeSide side, void* data)  const noexcept;
+//	void get_image(libv::GL& gl, int32_t level, libv::gl::CubeSide side, int32_t layer, void* data) const noexcept;
+//	void* at(libv::GL& gl, int32_t level, libv::vec3i position) const noexcept;
 
 public:
 	void set(libv::gl::MagFilter filter) noexcept;
@@ -97,8 +97,8 @@ public:
 	void generate_mipmaps() noexcept;
 
 private:
-	void sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
-	void sync_might_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
+	void sync_no_bind(libv::GL& gl, Remote& remote_) const noexcept;
+	void sync_might_bind(libv::GL& gl, Remote& remote_) const noexcept;
 
 public:
 	[[nodiscard]] libv::gl::Texture out_of_order_gl() const noexcept {
@@ -110,7 +110,7 @@ public:
 };
 
 struct AttorneyRemoteTexture {
-	[[nodiscard]] static inline libv::gl::Texture sync_no_bind(const Texture& texture, libv::gl::GL& gl, Remote& remote_) noexcept {
+	[[nodiscard]] static inline libv::gl::Texture sync_no_bind(const Texture& texture, libv::GL& gl, Remote& remote_) noexcept {
 		// NOTE: Valid aliasing, verified by the standard, head is the first member
 		auto& head = *static_cast<RemoteTextureHead*>(static_cast<void*>(texture.remote.get()));
 		if (head.dirty)
@@ -118,7 +118,7 @@ struct AttorneyRemoteTexture {
 		return head.texture;
 	}
 
-	[[nodiscard]] static inline libv::gl::Texture sync_might_bind(const Texture& texture, libv::gl::GL& gl, Remote& remote_) noexcept {
+	[[nodiscard]] static inline libv::gl::Texture sync_might_bind(const Texture& texture, libv::GL& gl, Remote& remote_) noexcept {
 		// NOTE: Valid aliasing, verified by the standard, head is the first member
 		auto& head = *static_cast<RemoteTextureHead*>(static_cast<void*>(texture.remote.get()));
 		if (head.dirty)
@@ -147,7 +147,7 @@ struct Texture2D_t : Texture {
 	inline void image(int32_t level, libv::vec2i offset, libv::vec2i size, const typename Params::storage_type* data) noexcept {
 		static_cast<Texture&>(*this).image(level, offset, size, data);
 	}
-//	inline void get_image(libv::gl::GL& gl, int32_t level, typename Params::storage_type* data) const noexcept {
+//	inline void get_image(libv::GL& gl, int32_t level, typename Params::storage_type* data) const noexcept {
 //		static_cast<const Texture&>(*this).get_image(gl, level, data);
 //	}
 };

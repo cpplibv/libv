@@ -1,4 +1,4 @@
-// Project: libv, File: app/surface/view/icon_set.cpp
+// Project: libv.frame, File: src/libv/frame/icon_set.cpp
 
 // hpp
 #include <libv/frame/icon_set.hpp>

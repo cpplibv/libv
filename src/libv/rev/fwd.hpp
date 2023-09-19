@@ -46,11 +46,11 @@ template <typename T> class Shader;
 
 using ShaderID = uint64_t;
 
-// Engine
-class Engine;
-
-// RenderPass
-class RenderPass;
+// // Engine
+// class Engine;
+//
+// // RenderPass
+// class RenderPass;
 
 // Other
 class PostProcessing;

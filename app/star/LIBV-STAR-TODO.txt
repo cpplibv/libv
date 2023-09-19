@@ -8,7 +8,8 @@ Star - System integration demo
 
 
 
-
+surface could use tessalation shaders:
+		https://www.youtube.com/watch?v=21gfE-zUym8
 
 
 
@@ -280,7 +281,6 @@ libv.ui: Warn whenever a UI component out lives the UI object itself
 
 
 app.star: Settings page back clear the focus while apply will rotate it to next
-app.star: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 
 app.star: Self-Updater
 

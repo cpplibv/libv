@@ -74,7 +74,7 @@ constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ public:
 		sphere_program.vertex(shader_texture_vs);
 		sphere_program.fragment(shader_texture_fs);
 		sphere_program.block_binding(uniformBlock_sphere);
-		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
+		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureUnit_diffuse);
 	}
 
 public:
@@ -221,7 +221,7 @@ private:
 
 			gl.program(sphere_program);
 			gl.uniform(std::move(uniforms));
-			gl.texture(sphere_texture0, textureChannel_diffuse);
+			gl.texture(sphere_texture0, textureUnit_diffuse);
 			gl.render(sphere_mesh);
 		}
 	}

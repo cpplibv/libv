@@ -29,7 +29,7 @@ Model::Model(Model&&) noexcept = default;
 Model& Model::operator=(Model&&)& noexcept = default;
 
 Model::~Model() {
-	// For the sake of forward declared vector
+	// For the sake of forward declared types
 }
 
 void Model::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) const {

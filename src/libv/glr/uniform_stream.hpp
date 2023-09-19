@@ -107,7 +107,7 @@ public:
 
 using UniformStream = detail::ImplUniformStream<
 		detail::BatchEndMarker,
-		libv::gl::TextureChannel,
+		libv::gl::TextureUnit,
 		bool, int32_t, uint32_t, int64_t, uint64_t, float, double,
 		libv::vec2b, libv::vec3b, libv::vec4b,
 		libv::vec2i, libv::vec3i, libv::vec4i, libv::vec2ui, libv::vec3ui, libv::vec4ui,

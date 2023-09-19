@@ -2,7 +2,7 @@
 
 #pragma once
 
-// std
+#include <concepts>
 #include <type_traits>
 
 
@@ -18,11 +18,10 @@ using similar = std::is_same<std::decay_t<S>, std::decay_t<T>>;
 template <typename S, typename T>
 static constexpr bool similar_v = std::is_same_v<std::decay_t<S>, std::decay_t<T>>;
 
-template <typename S, typename T>
-using Similar = std::enable_if_t<similar_v<S, T>>;
+// -------------------------------------------------------------------------------------------------
 
 template <typename S, typename T>
-using NotSimilar = std::enable_if_t<!similar_v<S, T>>;
+concept similar_as = std::same_as<std::remove_cvref_t<S>, std::remove_cvref_t<T>>;
 
 // -------------------------------------------------------------------------------------------------
 

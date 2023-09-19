@@ -39,9 +39,16 @@ public:
 		checkGL();
 	}
 
+	inline void dsa_create() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id == 0);
+		glCreateFramebuffers(1, &object.id);
+		checkGL();
+	}
+
 	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteFramebuffers(1, &object.id);
+		gl.cleanupDestroyedFramebuffer(object.id);
 		object.id = 0;
 		checkGL();
 	}
@@ -80,13 +87,13 @@ public:
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {
-		return bind(), libv::guard([this] { unbind(); });
+		return bind(), libv::guard([*this] mutable { unbind(); });
 	}
 	[[nodiscard]] inline auto bind_draw_guard() noexcept {
-		return bind_draw(), libv::guard([this] { unbind_draw(); });
+		return bind_draw(), libv::guard([*this] mutable { unbind_draw(); });
 	}
 	[[nodiscard]] inline auto bind_read_guard() noexcept {
-		return bind_read(), libv::guard([this] { unbind_read(); });
+		return bind_read(), libv::guard([*this] mutable { unbind_read(); });
 	}
 
 private:
@@ -249,6 +256,62 @@ public:
 		attach_draw3D(attachment, texture, level, layer);
 	}
 
+private:
+	inline void _dsa_texture(Attachment attachment, int32_t texture, int32_t level) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture != 0);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		glNamedFramebufferTexture(object.id, libv::to_value(attachment), texture, level);
+		checkGL();
+	}
+
+	inline void _dsa_textureLayer(Attachment attachment, int32_t texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture != 0);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		glNamedFramebufferTextureLayer(object.id, libv::to_value(attachment), texture, level, layer);
+		checkGL();
+	}
+
+public:
+	inline void dsa_attach(Attachment attachment, Renderbuffer renderbuffer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(renderbuffer.id != 0);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		glNamedFramebufferRenderbuffer(object.id, libv::to_value(attachment), GL_RENDERBUFFER, renderbuffer.id);
+		checkGL();
+	}
+
+	inline void dsa_attach(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target,
+				TextureTarget::_1D,
+				TextureTarget::_2D,
+				TextureTarget::Rectangle,
+				TextureTarget::_2DMultisample));
+		_dsa_texture(attachment, texture.id, level);
+	}
+
+	inline void dsa_attachLayer(Attachment attachment, Texture texture, int32_t level = 0, int32_t layer = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target,
+				TextureTarget::_1DArray,
+				TextureTarget::_2DArray,
+				TextureTarget::_3D,
+				TextureTarget::CubeMap,
+				TextureTarget::CubeMapArray,
+				TextureTarget::_2DMultisampleArray));
+		_dsa_textureLayer(attachment, texture.id, level, layer);
+	}
+
+	inline void dsa_attachCube(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::CubeMap);
+		_dsa_textureLayer(attachment, texture.id, level, sideIndex(side));
+	}
+
+	inline void dsa_attachCubeLayer(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0, int32_t layer = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::CubeMapArray);
+		_dsa_textureLayer(attachment, texture.id, level, layer * 6 + sideIndex(side));
+	}
+
 public:
 	inline void readBuffer(Attachment attachment) noexcept {
 		glReadBuffer(libv::to_underlying(attachment));
@@ -286,13 +349,79 @@ public:
 	}
 
 public:
+	inline void dsa_readBuffer(Attachment attachment) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glNamedFramebufferReadBuffer(object.id, libv::to_underlying(attachment));
+		checkGL();
+	}
+
+	inline void dsa_drawBuffer(Attachment attachment) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glNamedFramebufferDrawBuffer(object.id, libv::to_underlying(attachment));
+		checkGL();
+	}
+	inline void dsa_drawBuffers(Attachment a0) noexcept {
+		dsa_drawBuffer(a0);
+	}
+	inline void dsa_drawBuffers(Attachment a0, Attachment a1) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		GLenum attachments[] = {libv::to_underlying(a0), libv::to_underlying(a1)};
+		glNamedFramebufferDrawBuffers(object.id, 2, attachments);
+		checkGL();
+	}
+	inline void dsa_drawBuffers(Attachment a0, Attachment a1, Attachment a2) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		GLenum attachments[] = {libv::to_underlying(a0), libv::to_underlying(a1), libv::to_underlying(a2)};
+		glNamedFramebufferDrawBuffers(object.id, 3, attachments);
+		checkGL();
+	}
+	inline void dsa_drawBuffers(Attachment a0, Attachment a1, Attachment a2, Attachment a3) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		GLenum attachments[] = {libv::to_underlying(a0), libv::to_underlying(a1), libv::to_underlying(a2), libv::to_underlying(a3)};
+		glNamedFramebufferDrawBuffers(object.id, 4, attachments);
+		checkGL();
+	}
+	inline void dsa_drawBuffers(std::span<Attachment> attachments) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		static_assert(std::is_same_v<std::underlying_type_t<Attachment>, GLenum>);
+		glNamedFramebufferDrawBuffers(object.id,
+				static_cast<GLsizei>(attachments.size()),
+				reinterpret_cast<GLenum*>(attachments.data()));
+		checkGL();
+	}
+
+public:
+	inline void dsa_invalidate(std::span<Attachment> attachments) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		static_assert(std::is_same_v<std::underlying_type_t<Attachment>, GLenum>);
+		glInvalidateNamedFramebufferData(object.id,
+				static_cast<GLsizei>(attachments.size()),
+				reinterpret_cast<GLenum*>(attachments.data()));
+		checkGL();
+	}
+
+public:
 	[[nodiscard]] inline FramebufferStatus status_draw() const noexcept {
 		GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		checkGL();
 		return FramebufferStatus{status};
 	}
 
 	[[nodiscard]] inline FramebufferStatus status_read() const noexcept {
-		GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		GLenum status = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
+		checkGL();
+		return FramebufferStatus{status};
+	}
+
+	[[nodiscard]] inline FramebufferStatus dsa_statusDraw() const noexcept {
+		GLenum status = glCheckNamedFramebufferStatus(object.id, GL_DRAW_FRAMEBUFFER);
+		checkGL();
+		return FramebufferStatus{status};
+	}
+
+	[[nodiscard]] inline FramebufferStatus dsa_statusRead() const noexcept {
+		GLenum status = glCheckNamedFramebufferStatus(object.id, GL_READ_FRAMEBUFFER);
+		checkGL();
 		return FramebufferStatus{status};
 	}
 };

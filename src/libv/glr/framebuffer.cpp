@@ -78,17 +78,17 @@ private:
 
 private:
 	template <bool Both, bool Read, bool Draw>
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
-	void bind(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void bind_draw(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void bind_read(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void bind(libv::GL& gl, Remote& remote_) noexcept;
+	void bind_draw(libv::GL& gl, Remote& remote_) noexcept;
+	void bind_read(libv::GL& gl, Remote& remote_) noexcept;
 
-	void use_draw_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
-	void use_read_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
-	void reset_draw_buffer(libv::gl::GL& gl) noexcept;
-	void reset_read_buffer(libv::gl::GL& gl) noexcept;
+	void use_draw_buffer(libv::GL& gl, libv::gl::Attachment attachment) noexcept;
+	void use_read_buffer(libv::GL& gl, libv::gl::Attachment attachment) noexcept;
+	void reset_draw_buffer(libv::GL& gl) noexcept;
+	void reset_read_buffer(libv::GL& gl) noexcept;
 
 public:
 	~RemoteFramebuffer() noexcept;
@@ -97,7 +97,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <bool Both, bool Draw, bool Read>
-void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteFramebuffer::update(libv::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
 		gl(object).create();
 		remote = make_observer_ptr(&remote_.destroyQueues());
@@ -172,40 +172,40 @@ void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	dirty = false;
 }
 
-void RemoteFramebuffer::bind(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteFramebuffer::bind(libv::GL& gl, Remote& remote_) noexcept {
 	if (dirty)
 		update<true, false, false>(gl, remote_);
 	else
 		gl(object).bind();
 }
 
-void RemoteFramebuffer::bind_draw(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteFramebuffer::bind_draw(libv::GL& gl, Remote& remote_) noexcept {
 	if (dirty)
 		update<false, true, false>(gl, remote_);
 	else
 		gl(object).bind_draw();
 }
 
-void RemoteFramebuffer::bind_read(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteFramebuffer::bind_read(libv::GL& gl, Remote& remote_) noexcept {
 	if (dirty)
 		update<false, false, true>(gl, remote_);
 	else
 		gl(object).bind_read();
 }
 
-void RemoteFramebuffer::use_draw_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+void RemoteFramebuffer::use_draw_buffer(libv::GL& gl, libv::gl::Attachment attachment) noexcept {
 	gl(object).drawBuffer(attachment);
 }
 
-void RemoteFramebuffer::use_read_buffer(libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+void RemoteFramebuffer::use_read_buffer(libv::GL& gl, libv::gl::Attachment attachment) noexcept {
 	gl(object).readBuffer(attachment);
 }
 
-void RemoteFramebuffer::reset_draw_buffer(libv::gl::GL& gl) noexcept {
+void RemoteFramebuffer::reset_draw_buffer(libv::GL& gl) noexcept {
 	gl(object).drawBuffers(std::span<libv::gl::Attachment>(drawAttachments, drawAttachmentCount));
 }
 
-void RemoteFramebuffer::reset_read_buffer(libv::gl::GL& gl) noexcept {
+void RemoteFramebuffer::reset_read_buffer(libv::GL& gl) noexcept {
 	gl(object).readBuffer(libv::gl::Attachment::Color0);
 }
 
@@ -257,31 +257,31 @@ libv::gl::Framebuffer& Framebuffer::out_of_order_gl() {
 
 // -------------------------------------------------------------------------------------------------
 
-void AttorneyRemoteFramebuffer::bind(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
+void AttorneyRemoteFramebuffer::bind(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept {
 	framebuffer.remote->bind(gl, remote_);
 }
 
-void AttorneyRemoteFramebuffer::bind_draw(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
+void AttorneyRemoteFramebuffer::bind_draw(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept {
 	framebuffer.remote->bind_draw(gl, remote_);
 }
 
-void AttorneyRemoteFramebuffer::bind_read(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept {
+void AttorneyRemoteFramebuffer::bind_read(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept {
 	framebuffer.remote->bind_read(gl, remote_);
 }
 
-void AttorneyRemoteFramebuffer::use_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+void AttorneyRemoteFramebuffer::use_draw_buffer(const Framebuffer& framebuffer, libv::GL& gl, libv::gl::Attachment attachment) noexcept {
 	framebuffer.remote->use_draw_buffer(gl, attachment);
 }
 
-void AttorneyRemoteFramebuffer::use_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept {
+void AttorneyRemoteFramebuffer::use_read_buffer(const Framebuffer& framebuffer, libv::GL& gl, libv::gl::Attachment attachment) noexcept {
 	framebuffer.remote->use_read_buffer(gl, attachment);
 }
 
-void AttorneyRemoteFramebuffer::reset_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept {
+void AttorneyRemoteFramebuffer::reset_draw_buffer(const Framebuffer& framebuffer, libv::GL& gl) noexcept {
 	framebuffer.remote->reset_draw_buffer(gl);
 }
 
-void AttorneyRemoteFramebuffer::reset_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept {
+void AttorneyRemoteFramebuffer::reset_read_buffer(const Framebuffer& framebuffer, libv::GL& gl) noexcept {
 	framebuffer.remote->reset_read_buffer(gl);
 }
 

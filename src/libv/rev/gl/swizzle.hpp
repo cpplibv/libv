@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/resource/texture.hpp
+// Project: libv.gl, File: src/libv/rev/gl/swizzle.hpp
 
 #pragma once
 
@@ -13,7 +13,8 @@ namespace libv {
 namespace rev {
 
 // -------------------------------------------------------------------------------------------------
-// Note: I am not sure on this Swizzle replication / placement, main reason is only memory: 16byte -> 4byte storage
+// Note: I am not sure on this Swizzle replication / placement
+// main reason is only memory: 16byte -> 4byte storage
 
 struct Swizzle {
 	enum class Value : uint8_t {

@@ -1,7 +1,7 @@
 // Project: libv.utility, File: src/libv/utility/parse_number.hpp
 
 // libv
-#include <libv/utility/trim.hpp>
+#include <libv/algo/trim.hpp>
 // std
 #include <charconv>
 #include <string_view>

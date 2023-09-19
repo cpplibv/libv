@@ -367,7 +367,6 @@ app.space.net: Networking PAPER:
 		adaptive playout delay
 
 
-app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 
 
 

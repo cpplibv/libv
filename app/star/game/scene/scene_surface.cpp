@@ -57,9 +57,9 @@ constexpr auto attribute_custom1    = libv::glr::Attribute<14, libv::vec4f>{};
 constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};
 constexpr auto attribute_custom0_f2 = libv::glr::Attribute<15, libv::vec2f>{};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
-constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
+constexpr auto textureUnit_normal = libv::gl::TextureUnit{1};
+constexpr auto textureUnit_pattern = libv::gl::TextureUnit{7};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -276,11 +276,11 @@ private:
 			{ // Grid
 				const auto s2_guard = glr.state.push_guard();
 				glr.state.disableDepthMask();
-				glr.callback([](libv::gl::GL& gl) {
+				glr.callback([](libv::GL& gl) {
 					gl.pushDebugGroup("Editor Grid");
 				});
 				renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
-				glr.callback([](libv::gl::GL& gl) {
+				glr.callback([](libv::GL& gl) {
 					gl.popDebugGroup();
 				});
 			}

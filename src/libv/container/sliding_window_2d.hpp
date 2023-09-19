@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/utility/memory/unique.hpp>
 // std
 #include <cassert>
 #include <memory>
@@ -34,16 +35,25 @@ public:
 	constexpr inline sliding_window_2D(libv::vec2i offset, libv::vec2i size, const T& init_value) :
 			sliding_window_2D(offset.x, offset.y, size.x, size.y, init_value) {}
 
+	constexpr inline sliding_window_2D(libv::vec2i offset, libv::vec2i size, libv::uninitialized_t) :
+			sliding_window_2D(offset.x, offset.y, size.x, size.y, libv::uninitialized) {}
+
 	constexpr inline sliding_window_2D(int32_t offset_x_, int32_t offset_y_, int32_t size_x_, int32_t size_y_) :
 			offset_(offset_x_, offset_y_),
 			size_(size_x_, size_y_),
-			storage(std::make_unique_for_overwrite<T[]>(size_x_ * size_y_)) {}
+			storage(std::make_unique<T[]>(size_x_ * size_y_)) {}
 
 	constexpr inline sliding_window_2D(int32_t offset_x_, int32_t offset_y_, int32_t size_x_, int32_t size_y_, const T& init_value) :
 			offset_(offset_x_, offset_y_),
 			size_(size_x_, size_y_),
-			storage(std::make_unique_for_overwrite<T[]>(size_x_ * size_y_)) {
+			storage(libv::make_unique_uninitialized<T[]>(size_x_ * size_y_)) {
 		fill(init_value);
+	}
+
+	constexpr inline sliding_window_2D(int32_t offset_x_, int32_t offset_y_, int32_t size_x_, int32_t size_y_, libv::uninitialized_t) :
+			offset_(offset_x_, offset_y_),
+			size_(size_x_, size_y_),
+			storage(libv::make_unique_uninitialized<T[]>(size_x_ * size_y_)) {
 	}
 
 public:

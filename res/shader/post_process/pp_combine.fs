@@ -37,7 +37,7 @@
 
 in vec2 fragmentTexture0;
 
-out vec4 result;
+out vec4 outputColor;
 
 uniform sampler2D textureMain;
 
@@ -129,5 +129,5 @@ void main() {
 	#endif
 
 	// --- Result ---
-	result = vec4(color, 1);
+	outputColor = vec4(color, 1);
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/meta/identity.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
@@ -58,11 +58,11 @@ private:
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
-	void create(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void create(libv::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
-	void use(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void use(libv::GL& gl, Remote& remote_) noexcept;
 	~RemoteProgram() noexcept;
 };
 

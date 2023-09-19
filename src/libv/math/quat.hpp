@@ -200,10 +200,11 @@ public:
 	// Quat, Quat
 
 	constexpr inline quat_t& operator*=(quat_t rhs) noexcept {
-		w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
-		x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
-		y = w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z;
-		z = w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x;
+		auto lhs = *this;
+		w = lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z;
+		x = lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y;
+		y = lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z;
+		z = lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x;
 		return *this;
 	}
 
@@ -381,6 +382,7 @@ public:
 		return std::sqrt(length_sq());
 	}
 
+	/// The quaternion must be normalised before calling to_mat
 	[[nodiscard]] constexpr inline mat3_t<T> to_mat3() const noexcept {
 		const T qxx(x * x);
 		const T qyy(y * y);
@@ -407,6 +409,7 @@ public:
 		};
 	}
 
+	/// The quaternion must be normalised before calling to_mat
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE mat4_t<T> to_mat4() const noexcept {
 		return mat4_t<T>{to_mat3()};
 	}

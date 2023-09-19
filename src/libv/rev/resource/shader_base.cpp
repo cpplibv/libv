@@ -34,7 +34,7 @@ BaseShader::BaseShader(ShaderLoader& loader, libv::type_uid uniformTID, BaseShad
 }
 
 BaseShader::~BaseShader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 ShaderID BaseShader::id() const noexcept {

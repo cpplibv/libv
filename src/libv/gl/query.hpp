@@ -36,6 +36,13 @@ public:
 		checkGL();
 	}
 
+	inline void dsa_create(QueryType type) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id == 0);
+		glCreateQueries(libv::to_underlying(type), 1, &object.id);
+		object.type = type;
+		checkGL();
+	}
+
 	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteQueries(1, &object.id);
@@ -64,22 +71,37 @@ public:
 		return has_result == GL_TRUE;
 	}
 
-	[[nodiscard]] inline int32_t result() noexcept {
+	[[nodiscard]] inline int32_t result_i32() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		GLint result;
+		int32_t result;
 		glGetQueryObjectiv(object.id, GL_QUERY_RESULT, &result);
 		checkGL();
 		return result;
 	}
 
-	//	OpenGL 4.4+ only, use has_result + result instead
-	//	[[nodiscard]] inline int32_t result_no_wait() noexcept {
-	//		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-	//		GLint result;
-	//		glGetQueryObjectiv(object.id, GL_QUERY_RESULT_NO_WAIT, &result);
-	//		checkGL();
-	//		return result;
-	//	}
+	[[nodiscard]] inline int64_t result_i64() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		int64_t result;
+		glGetQueryObjecti64v(object.id, GL_QUERY_RESULT, &result);
+		checkGL();
+		return result;
+	}
+
+	[[nodiscard]] inline int32_t result_no_wait_i32() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		GLint result;
+		glGetQueryObjectiv(object.id, GL_QUERY_RESULT_NO_WAIT, &result);
+		checkGL();
+		return result;
+	}
+
+	[[nodiscard]] inline int64_t result_no_wait_i64() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		int64_t result;
+		glGetQueryObjecti64v(object.id, GL_QUERY_RESULT_NO_WAIT, &result);
+		checkGL();
+		return result;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

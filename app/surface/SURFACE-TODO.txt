@@ -12,9 +12,6 @@ compute-shader:
 
 
 
-
-
-
 Topology / biome controlled random generation
 	https://www.youtube.com/watch?v=rBY2Dzej03A
 
@@ -26,12 +23,15 @@ Vegetation
 	GDC - Between Tech and Art: The Vegetation of Horizon Zero Dawn - https://www.youtube.com/watch?v=wavnKZNSYqU
 
 	Grass
+		SimonDev: summary of 'Ghost of Tsushima' - https://www.youtube.com/watch?v=bp7REZBV4P4
+
 		https://www.youtube.com/watch?v=Y0Ko0kvwfgA
 		https://www.youtube.com/watch?v=jw00MbIJcrk
 		https://www.youtube.com/watch?v=PNvlqsXdQic
 
 		Procedural Grass in 'Ghost of Tsushima' - https://www.youtube.com/watch?v=Ibe1JBF5i5Y
 
+lod: (Geomipmapping) https://www.youtube.com/watch?v=08dApu_vS4c
 
 
 

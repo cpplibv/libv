@@ -6,9 +6,6 @@
 #pragma once
 
 //
-#include <libv/glr/layout_std140.hpp>
-#include <libv/glr/uniform.hpp>
-#include <libv/glr/uniform_block_binding.hpp>
 #include <libv/rev/shader/attribute.hpp>
 #include <libv/rev/shader/block/camera200.hpp>
 #include <libv/rev/shader/block/matrices200.hpp>
@@ -22,7 +19,7 @@ struct UniformsParticle {
 	libv::glr::Uniform_texture texture0;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", textureChannel_diffuse);
+		access(texture0, "texture0", textureUnit_diffuse);
 	}
 
 	template <typename Access> void access_blocks(Access& access) {

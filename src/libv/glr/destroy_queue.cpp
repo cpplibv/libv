@@ -17,7 +17,7 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-void DestroyQueues::clear(libv::gl::GL& gl) noexcept {
+void DestroyQueues::clear(libv::GL& gl) noexcept {
 	for (auto& object : gc_program)
 		gl(object).destroy();
 	gc_program.clear();

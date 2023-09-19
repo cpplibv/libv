@@ -19,6 +19,8 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+// libv
+#include <libv/meta/for_constexpr.hpp>
 // pro
 #include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>
@@ -45,7 +47,8 @@ template <typename T>
 // -------------------------------------------------------------------------------------------------
 
 template <std::size_t R, std::size_t C, typename T>
-struct mat_t : public glm::mat<static_cast<int>(R), static_cast<int>(C), T, glm::precision::highp> {
+struct mat_t : public glm::mat<static_cast<int>(C), static_cast<int>(R), T, glm::precision::highp> {
+	using base = glm::mat<static_cast<int>(C), static_cast<int>(R), T, glm::precision::highp>;
 	using value_type = T;
 	static constexpr std::size_t Column = C;
 	static constexpr std::size_t Row = R;
@@ -53,9 +56,9 @@ struct mat_t : public glm::mat<static_cast<int>(R), static_cast<int>(C), T, glm:
 	static constexpr int Ri = static_cast<int>(R);
 
 public:
-	constexpr inline mat_t() : glm::mat<Ri, Ci, T, glm::precision::highp>() {}
-	using glm::mat<Ri, Ci, T, glm::precision::highp>::mat;
-	using glm::mat<Ri, Ci, T, glm::precision::highp>::operator=;
+	constexpr inline mat_t() : base() {}
+	using base::mat;
+	using base::operator=;
 
 	constexpr inline mat_t(const mat_t&) = default;
 	constexpr inline mat_t(mat_t&&) = default;
@@ -66,10 +69,76 @@ public:
 		return *this;
 	}
 
+	static constexpr inline mat_t from_rows(libv::vec_t<C, T> row0, libv::vec_t<C, T> row1)
+			requires (Row == 2) {
+		mat_t result;
+		libv::meta::call_with_n_index<C>([&](auto... c) {
+			((result[c][0] = row0[c]), ...);
+			((result[c][1] = row1[c]), ...);
+		});
+		return result;
+	}
+
+	static constexpr inline mat_t from_rows(libv::vec_t<C, T> row0, libv::vec_t<C, T> row1, libv::vec_t<C, T> row2)
+			requires (Row == 3) {
+		mat_t result;
+		libv::meta::call_with_n_index<C>([&](auto... c) {
+			((result[c][0] = row0[c]), ...);
+			((result[c][1] = row1[c]), ...);
+			((result[c][2] = row2[c]), ...);
+		});
+		return result;
+	}
+
+	static constexpr inline mat_t from_rows(libv::vec_t<C, T> row0, libv::vec_t<C, T> row1, libv::vec_t<C, T> row2, libv::vec_t<C, T> row3)
+			requires (Row == 4) {
+		mat_t result;
+		libv::meta::call_with_n_index<C>([&](auto... c) {
+			((result[c][0] = row0[c]), ...);
+			((result[c][1] = row1[c]), ...);
+			((result[c][2] = row2[c]), ...);
+			((result[c][3] = row3[c]), ...);
+		});
+		return result;
+	}
+
+	static constexpr inline mat_t from_columns(libv::vec_t<R, T> row0, libv::vec_t<R, T> row1)
+			requires (Column == 2) {
+		mat_t result;
+		libv::meta::call_with_n_index<R>([&](auto... r) {
+			((result[0][r] = row0[r]), ...);
+			((result[1][r] = row1[r]), ...);
+		});
+		return result;
+	}
+
+	static constexpr inline mat_t from_columns(libv::vec_t<R, T> row0, libv::vec_t<R, T> row1, libv::vec_t<R, T> row2)
+			requires (Column == 3) {
+		mat_t result;
+		libv::meta::call_with_n_index<R>([&](auto... r) {
+			((result[0][r] = row0[r]), ...);
+			((result[1][r] = row1[r]), ...);
+			((result[2][r] = row2[r]), ...);
+		});
+		return result;
+	}
+
+	static constexpr inline mat_t from_columns(libv::vec_t<R, T> row0, libv::vec_t<R, T> row1, libv::vec_t<R, T> row2, libv::vec_t<R, T> row3)
+			requires (Column == 4) {
+		mat_t result;
+		libv::meta::call_with_n_index<R>([&](auto... r) {
+			((result[0][r] = row0[r]), ...);
+			((result[1][r] = row1[r]), ...);
+			((result[2][r] = row2[r]), ...);
+			((result[3][r] = row3[r]), ...);
+		});
+		return result;
+	}
+
 	// ---------------------------------------------------------------------------------------------
 
 private:
-	using mt = glm::mat<Ri, Ci, T, glm::precision::highp>;
+	using mt = base;
 	[[nodiscard]] constexpr inline mt& mx() noexcept {
 		return static_cast<mt&>(*this);
 	}
@@ -170,8 +239,20 @@ public:
 	[[nodiscard]] constexpr inline decltype(auto) operator[](int col) const noexcept {
 		return mx()[col];
 	}
-	[[nodiscard]] constexpr inline vec_t<R, T> at_v(int col) const noexcept {
-		return vec_t<R, T>{mx()[col]};
+	[[nodiscard]] constexpr inline vec_t<C, T> at_v(int col) const noexcept {
+		return vec_t<C, T>{mx()[col]};
+	}
+
+	[[nodiscard]] constexpr inline vec_t<R, T> column(int c) const noexcept {
+		assert(c < Ci);
+		return at_v(c);
+	}
+	[[nodiscard]] constexpr inline vec_t<C, T> row(int r) const noexcept {
+		assert(r < Ri);
+		vec_t<C, T> result;
+		for (int i = 0; i < Ci; ++i)
+			result[i] = mx()[i][r];
+		return result;
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -179,6 +260,20 @@ public:
 	[[nodiscard]] static constexpr inline mat_t perspective(const T fovy, const T aspect, const T near, const T far) noexcept {
 		mat_t result;
 		result = glm::perspective<T>(fovy, aspect, near, far);
+		return result;
+	}
+	[[nodiscard]] static constexpr inline mat_t perspectiveRevereZ(const T fovy, const T aspect, const T near, const T far) noexcept {
+		mat_t result;
+		result = glm::perspectiveRH_ZO<T>(fovy, aspect, far, near);
+		return result;
+	}
+	[[nodiscard]] static constexpr inline mat_t perspectiveRevereZInf(const T fovy, const T aspect, const T near) noexcept {
+		float f = 1.0f / std::tan(fovy / 2.0f);
+		mat_t result{
+				f / aspect, 0.0f,  0.0f,  0.0f,
+				0.0f,    f,  0.0f,  0.0f,
+				0.0f, 0.0f,  0.0f, -1.0f,
+				0.0f, 0.0f, near,  0.0f};
 		return result;
 	}
 

@@ -5,7 +5,7 @@
 // fwd
 #include <libv/rev/fwd.hpp>
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/utility/function_ref.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
@@ -50,7 +50,7 @@ public:
 
 	/// Loads and on-demand reloads any shader associated with this loader
 	/// Must be called from the OpenGL thread
-	void update(libv::gl::GL& gl);
+	void update(libv::GL& gl);
 
 	/// Can be called from any thread, but the callback cannot reenter the object
 	void foreach_shader(libv::function_ref<void(BaseShader)> func);

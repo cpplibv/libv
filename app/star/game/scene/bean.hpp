@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/utility.hpp
+// Project: libv, File: app/star/game/scene/bean.hpp
 
 #pragma once
 

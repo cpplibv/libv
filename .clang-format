@@ -30,16 +30,18 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '^<catch2/'
     Priority:        1
+  - Regex:           '^<libv/.*fwd(_ptr)?.hpp>'
+    Priority:        3
+    SortPriority:    2
   - Regex:           '^<libv/'
     Priority:        3
   - Regex:           '^<wish/'
     Priority:        3
   - Regex:           '<[[:alnum:]_]+>' # Extensionless std headers
     Priority:        4
-  - Regex:           '<[[:alnum:].-_]+>' # Any <> header not matched so far
+  - Regex:           '<[[:alnum:].-_]+>' # Any <> header (external headers)
     Priority:        2
-    SortPriority:    2
-  - Regex:           '"[[:alnum:]._-]+"'
+  - Regex:           '"[[:alnum:]._-]+"' # Any "" header
     Priority:        5
 # Unfortunately freetype wierd include via macros FT_FREETYPE_H
 #  - Regex:           '^<(assimp|boost|clip|colony|cppcoro|hdiffpatch|efsw|fmt|function2|GL|GLFW|gli|glm|openssl|immer|prometheus|range|rp3d|SOIL2|sol|sqlite3|utf8cpp|jc_voronoi|vide)/'

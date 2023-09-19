@@ -24,6 +24,7 @@ public:
 	ImageGLI(gli::texture&& texture) noexcept : texture(std::move(texture)) { }
 	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
 	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept override;
+	[[nodiscard]] virtual TextureTarget type() const noexcept override;
 	[[nodiscard]] virtual Texture createTexture() const noexcept override;
 	virtual ~ImageGLI() noexcept override = default;
 };
@@ -41,6 +42,7 @@ std::optional<Image> load_image_GLI(const std::string_view data) noexcept {
 
 libv::vec2i ImageGLI::size() const noexcept {
 	return {texture.extent().x, texture.extent().y};
+	// return {texture.extent().x, texture.extent().y, texture.extent().z};
 }
 
 libv::vec4f ImageGLI::pixel(int32_t level, int32_t x, int32_t y) const noexcept {
@@ -66,6 +68,23 @@ libv::vec4f ImageGLI::pixel(int32_t level, int32_t x, int32_t y) const noexcept 
 	(void) x;
 	(void) y;
 	return {0, 0, 0, 0};
+}
+
+TextureTarget ImageGLI::type() const noexcept {
+	switch (texture.target()) {
+		case gli::TARGET_1D:         return libv::gl::TextureTarget::_1D;
+		case gli::TARGET_1D_ARRAY:   return libv::gl::TextureTarget::_1DArray;
+		case gli::TARGET_2D:         return libv::gl::TextureTarget::_2D;
+		case gli::TARGET_2D_ARRAY:   return libv::gl::TextureTarget::_2DArray;
+		case gli::TARGET_3D:         return libv::gl::TextureTarget::_3D;
+		case gli::TARGET_RECT:       return libv::gl::TextureTarget::Rectangle;
+		case gli::TARGET_RECT_ARRAY: return libv::gl::TextureTarget::Rectangle;
+		// case gli::TARGET_RECT_ARRAY: return libv::gl::TextureTarget::RectangleArray;
+		case gli::TARGET_CUBE:       return libv::gl::TextureTarget::CubeMap;
+		case gli::TARGET_CUBE_ARRAY: return libv::gl::TextureTarget::CubeMapArray;
+	}
+	assert(false && "Unknown gli texture target");
+	return libv::gl::TextureTarget::_2D;
 }
 
 Texture ImageGLI::createTexture() const noexcept {

@@ -212,7 +212,7 @@ SurfaceCanvas::SurfaceCanvas(libv::ui::UI& ui, libv::ctrl::Controls& controls, s
 	spriteMappings.emplace_back(nextSpriteID++, "cactus_b", "tree_cactus_b_04.vm4", 1.0f / 7.f);
 
 	//	renderer.sprite.registerSprite("building_delnan_16P_tex.0038_med.game.vm4", 1.0f / 66.85f);
-	//	renderer.sprite.registerSprite("fighter_01_eltanin.0006_med.fixed.game.vm4", 1.0f / 66.85f);
+	//	renderer.sprite.registerSprite("fighter_01_eltanin.vm4", 1.0f / 66.85f);
 	//	renderer.sprite.registerSprite("projectile_missile_01_hellfire.0005_med.game.vm4", 1.0f / 66.85f);
 	//	renderer.sprite.registerSprite("tank_01_rocket_ring.0031_med.game.vm4", 1.0f / 66.85f);
 	//	renderer.sprite.registerSprite("test_sphere.vm4", 5.f / 100.f);

@@ -61,7 +61,7 @@ enum class TextureType : int32_t {
 	case TextureType::unknown: return "unknown";
 	}
 	assert(false && "Invalid TextureType enum value"); // unknown would be valid, but random values are not
-	return "<<invalid>>";
+	return "<<invalid-TextureType-enum-value>>";
 }
 
 // -------------------------------------------------------------------------------------------------

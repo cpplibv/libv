@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_quat.cpp
+// Project: libv.noise, File: test/libv/noise/test_glsl_cpp_noise_consistency.cpp
 
 // hpp
 #include <catch2/catch_test_macros.hpp>
@@ -38,14 +38,14 @@ struct EvalResult {
 };
 
 template <typename T>
-EvalResult eval(libv::gl::GL& gl, std::string_view glsl_function, T&& function, uint32_t numChannels = 1) {
+EvalResult eval(libv::GL& gl, std::string_view glsl_function, T&& function, uint32_t numChannels = 1) {
 	struct GL_RAII {
-		libv::gl::GL& gl;
+		libv::GL& gl;
 		libv::gl::Texture2D texture;
 		libv::gl::Shader shader;
 		libv::gl::Program program;
 
-		explicit GL_RAII(libv::gl::GL& gl) :
+		explicit GL_RAII(libv::GL& gl) :
 				gl(gl) {}
 
 		~GL_RAII() {

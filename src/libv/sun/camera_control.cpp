@@ -120,7 +120,7 @@ void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void CameraControl::bind_default_controls(libv::ctrl::BindingRegister controls) {
+void CameraControl::bind_default_controls(libv::ctrl::BindingRegister controls, int version) {
 	controls.bind(fn_camera_orbit_distance, "T", -1);
 	controls.bind(fn_camera_orbit_distance, "G");
 	controls.bind(fn_camera_orbit_distance, "Scroll", -1);
@@ -129,24 +129,46 @@ void CameraControl::bind_default_controls(libv::ctrl::BindingRegister controls) 
 	// TODO P5: libv.ctrl: ^^^ Bug, if the selected dim is 0, the change in other dims are not subject to binding specialziation selection | solution will be to dont discard 0 in selection just only after gather complete
 	// TODO P4: libv.ctrl: Implicit "noop" feature that is not visible in introspection but can be used as a dummy target
 
-	controls.bind(fn_camera_orbit_pitch, "W", -1);
-	controls.bind(fn_camera_orbit_pitch, "S");
-	controls.bind(fn_camera_orbit_pitch, "LMB + Mouse Y");
+	if (version >= 1) {
+		controls.bind(fn_camera_orbit_pitch, "Up", -1);
+		controls.bind(fn_camera_orbit_pitch, "Down");
+		controls.bind(fn_camera_orbit_pitch, "LMB + Mouse Y");
 
-	controls.bind(fn_camera_orbit_roll, "Q", -1);
-	controls.bind(fn_camera_orbit_roll, "E");
+		controls.bind(fn_camera_orbit_yaw, "Left");
+		controls.bind(fn_camera_orbit_yaw, "Right", -1);
+		controls.bind(fn_camera_orbit_yaw, "LMB + Mouse X");
 
-	controls.bind(fn_camera_orbit_yaw, "A");
-	controls.bind(fn_camera_orbit_yaw, "D", -1);
-	controls.bind(fn_camera_orbit_yaw, "LMB + Mouse X");
+		// Roll not bound
+		// controls.bind(fn_camera_orbit_roll, "Q", -1);
+		// controls.bind(fn_camera_orbit_roll, "E");
 
-	controls.bind(fn_camera_move_forward, "Up");
-	controls.bind(fn_camera_move_forward, "Down", -1);
-	controls.bind(fn_camera_move_forward, "RMB + Mouse Y", -1);
+		controls.bind(fn_camera_move_forward, "W");
+		controls.bind(fn_camera_move_forward, "S", -1);
+		controls.bind(fn_camera_move_forward, "RMB + Mouse Y", -1);
 
-	controls.bind(fn_camera_move_right, "Right");
-	controls.bind(fn_camera_move_right, "Left", -1);
-	controls.bind(fn_camera_move_right, "RMB + Mouse X", -1);
+		controls.bind(fn_camera_move_right, "D");
+		controls.bind(fn_camera_move_right, "A", -1);
+		controls.bind(fn_camera_move_right, "RMB + Mouse X", -1);
+	} else {
+		controls.bind(fn_camera_orbit_pitch, "W", -1);
+		controls.bind(fn_camera_orbit_pitch, "S");
+		controls.bind(fn_camera_orbit_pitch, "LMB + Mouse Y");
+
+		controls.bind(fn_camera_orbit_roll, "Q", -1);
+		controls.bind(fn_camera_orbit_roll, "E");
+
+		controls.bind(fn_camera_orbit_yaw, "A");
+		controls.bind(fn_camera_orbit_yaw, "D", -1);
+		controls.bind(fn_camera_orbit_yaw, "LMB + Mouse X");
+
+		controls.bind(fn_camera_move_forward, "Up");
+		controls.bind(fn_camera_move_forward, "Down", -1);
+		controls.bind(fn_camera_move_forward, "RMB + Mouse Y", -1);
+
+		controls.bind(fn_camera_move_right, "Right");
+		controls.bind(fn_camera_move_right, "Left", -1);
+		controls.bind(fn_camera_move_right, "RMB + Mouse X", -1);
+	}
 
 	controls.bind(fn_camera_move_up, "Y");
 	controls.bind(fn_camera_move_up, "H", -1);

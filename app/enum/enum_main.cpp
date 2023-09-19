@@ -411,10 +411,13 @@ struct EnumBuilderLua {
 			return property_function;
 		});
 
-		lua.set_function("value", [this](std::string entry, std::string text, sol::table properties) {
+		lua.set_function("value", [this](std::string entry, std::string text, sol::object properties) {
 			eb->value(entry, text, true);
 
-			for (const auto& [_, property] : properties) {
+			if (properties == sol::nil)
+				return;
+
+			for (const auto& [_, property] : sol::table(properties)) {
 				if (!property.is<sol::table>()) {
 					// error management
 					std::cerr << "property tables in values can only contain string or marked property table\n";

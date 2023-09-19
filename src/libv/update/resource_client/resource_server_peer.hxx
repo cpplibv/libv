@@ -3,11 +3,11 @@
 #pragma once
 
 // libv
+#include <libv/container/interval_registry.hpp>
 #include <libv/math/exp_moving_avg.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/codec.hpp>
-#include <libv/utility/interval_registry.hpp>
 #include <libv/utility/storage_size.hpp>
 #include <libv/utility/timer.hpp>
 // std

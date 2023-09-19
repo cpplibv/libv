@@ -119,7 +119,7 @@ namespace img {
 
 struct formated_image_data_dds {
 	formated_image_data_view view;
-	std::vector<std::byte> memory;
+	std::unique_ptr<unsigned char[]> memory;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -147,41 +147,31 @@ static save_result aux_save(const T* data, std::size_t size_x, std::size_t size_
 		data_ptr = reinterpret_cast<const unsigned char*>(data);
 	}
 
-	// Context
-	auto result_body = std::make_shared<formated_image_data_dds>();
-	void* context = result_body.get();
-
-	const auto output = [](void* context_, void* data, int size) {
-		auto& memory = reinterpret_cast<formated_image_data_dds*>(context_)->memory;
-
-		const std::byte* add_begin = reinterpret_cast<std::byte*>(data);
-		const std::byte* add_end = add_begin + size;
-
-		memory.insert(memory.end(), add_begin, add_end);
-	};
-
 	// Save
-	int success = SOIL_save_image_quality_to_func(
-			output,
-			context,
+	int imageEncodedSize = 0;
+	unsigned char* imageEncodedData = SOIL_write_image_to_memory_quality(
 			format,
 			static_cast<int>(size_x),
 			static_cast<int>(size_y),
 			static_cast<int>(channels),
 			data_ptr,
-			quality
+			quality,
+			&imageEncodedSize
 	);
 
-	// Evaluate
-	if (success == 0) {
+	auto result_body = std::make_shared<formated_image_data_dds>();
+	result_body->memory = std::unique_ptr<unsigned char[]>(imageEncodedData);
+
+	// Setup view
+	if (imageEncodedData == nullptr) {
 		result_body->view.data = nullptr;
 		result_body->view.size = 0;
-
 	} else {
-		result_body->view.data = reinterpret_cast<const std::byte*>(result_body->memory.data());
-		result_body->view.size = result_body->memory.size();
+		result_body->view.data = reinterpret_cast<const std::byte*>(result_body->memory.get());
+		result_body->view.size = static_cast<std::size_t>(imageEncodedSize);
 	}
 
+	// Aliasing shared_ptr constructor
 	auto result_view = std::shared_ptr<const formated_image_data_view>(std::move(result_body), &result_body->view);
 
 	return save_result{std::move(result_view)};
@@ -196,6 +186,7 @@ static inline int to_soil_format(save_format f) noexcept {
 		case save_format::jpg: return SOIL_SAVE_TYPE_JPG;
 		case save_format::png: return SOIL_SAVE_TYPE_PNG;
 		case save_format::tga: return SOIL_SAVE_TYPE_TGA;
+		case save_format::qoi: return SOIL_SAVE_TYPE_QOI;
 	}
 
 	assert(false && "Invalid save format");
@@ -306,6 +297,24 @@ save_result save_tga(const libv::vec3uc* data, std::size_t size_x, std::size_t s
 
 save_result save_tga(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_TGA);
+}
+
+// ---
+
+save_result save_qoi(const libv::vec3f* data, std::size_t size_x, std::size_t size_y) {
+	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_QOI);
+}
+
+save_result save_qoi(const libv::vec4f* data, std::size_t size_x, std::size_t size_y) {
+	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_QOI);
+}
+
+save_result save_qoi(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y) {
+	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_QOI);
+}
+
+save_result save_qoi(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
+	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_QOI);
 }
 
 // -------------------------------------------------------------------------------------------------

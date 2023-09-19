@@ -1,4 +1,4 @@
-// Project: libv.rev, File: sandbox/libv_rev_res_main.cpp
+// Project: libv.res, File: sandbox/libv_rev_res_main.cpp
 
 // hpp
 #include "libv_gl_runner.hpp"
@@ -113,8 +113,8 @@ struct UniformsSprite {
 	libv::glr::Uniform_texture textureNormal;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(textureColor, "textureColor", libv::rev::textureChannel_diffuse);
-		access(textureNormal, "textureNormal", libv::rev::textureChannel_normal);
+		access(textureColor, "textureColor", libv::rev::textureUnit_diffuse);
+		access(textureNormal, "textureNormal", libv::rev::textureUnit_normal);
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -242,8 +242,8 @@ public:
 		block_matrices[libv::rev::layout_matrices.eye] = glr.eye();
 		glr.uniform(std::move(block_matrices));
 		glr.uniform(spriteDefinitionsBlock);
-		glr.texture(sprite->texture_color, libv::rev::textureChannel_diffuse);
-		glr.texture(sprite->texture_normal, libv::rev::textureChannel_normal);
+		glr.texture(sprite->texture_color, libv::rev::textureUnit_diffuse);
+		glr.texture(sprite->texture_normal, libv::rev::textureUnit_normal);
 		glr.render(mesh);
 	}
 };
@@ -256,7 +256,7 @@ struct UniformsSpriteBakerDownsample {
 	libv::glr::Uniform_bool isColor;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(texture0, "texture0", libv::rev::textureChannel_diffuse);
+		access(texture0, "texture0", libv::rev::textureUnit_diffuse);
 		access(ssaaSamples, "ssaaSamples");
 		access(isColor, "isColor");
 	}
@@ -478,14 +478,14 @@ struct SpriteAtlasBaker {
 		{
 			glr.framebuffer_draw(resultFBOColor);
 			glr.program(shaderSpriteBakerDownsample.program());
-			glr.texture(bakeSSColor, libv::rev::textureChannel_diffuse);
+			glr.texture(bakeSSColor, libv::rev::textureUnit_diffuse);
 			glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
 			glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, true);
 			glr.render_full_screen();
 		} {
 			glr.framebuffer_draw(resultFBONormal);
 			glr.program(shaderSpriteBakerDownsample.program());
-			glr.texture(bakeSSNormal, libv::rev::textureChannel_diffuse);
+			glr.texture(bakeSSNormal, libv::rev::textureUnit_diffuse);
 			glr.uniform(shaderSpriteBakerDownsample.uniform().ssaaSamples, ssaaSamples);
 			glr.uniform(shaderSpriteBakerDownsample.uniform().isColor, false);
 			glr.render_full_screen();
@@ -498,8 +498,8 @@ struct SpriteAtlasBaker {
 
 		// --- Retrieve Textures ---
 
-//		glr.callback([size = atlasSize, result = result](libv::gl::GL& gl) {
-//		glr.callback([size = bakeSize, result = result](libv::gl::GL& gl) {
+//		glr.callback([size = atlasSize, result = result](libv::GL& gl) {
+//		glr.callback([size = bakeSize, result = result](libv::GL& gl) {
 //			const auto flipY = []<typename C>(C& data, size_t sizeX) {
 //				using value_type = typename C::value_type;
 //				const auto numRow = data.size() / sizeX;

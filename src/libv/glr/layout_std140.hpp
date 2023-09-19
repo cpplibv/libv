@@ -21,6 +21,7 @@
 
 
 // Specs:
+// https://registry.khronos.org/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
 //
 //    When using the "std140" storage layout, structures will be laid out in
 //    buffer storage with its members stored in monotonically increasing order
@@ -145,7 +146,32 @@
 //                      //  9      16   480  480    (pad end of o[1])
 //        } o[2];
 //      };
-
+//
+// Additional tutorials and descriptions:
+// https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+//     Each variable type in GLSL such as int, float and bool are defined to be four-byte quantities with each entity of 4 bytes represented as N
+//     Scalar (int, bool)       - Each scalar has a base alignment of N.
+//     Vector                   - Either 2N or 4N. This means that a vec3 has a base alignment of 4N.
+//     Array of scalars/vectors - Each element has a base alignment equal to that of a vec4.
+//     Matrices                 - Stored as a large array of column vectors, where each of those vectors has a base alignment of vec4.
+//     Struct                   - Equal to the computed size of its elements according to the previous rules, but padded to a multiple of the size of a vec4.
+//
+// layout (std140) uniform ExampleBlock
+// {
+//                      // base alignment  // aligned offset
+//     float value;     // 4               // 0
+//     vec3 vector;     // 16              // 16  (offset must be multiple of 16 so 4->16)
+//     mat4 matrix;     // 16              // 32  (column 0)
+//                      // 16              // 48  (column 1)
+//                      // 16              // 64  (column 2)
+//                      // 16              // 80  (column 3)
+//     float values[3]; // 16              // 96  (values[0])
+//                      // 16              // 112 (values[1])
+//                      // 16              // 128 (values[2])
+//     bool boolean;    // 4               // 144
+//     int integer;     // 4               // 148
+// };
+//
 
 namespace libv {
 namespace glr {
@@ -390,47 +416,47 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 //
 // Consider this alternative approach:
 //
-//struct UnfirormLayoutRule {
+//struct UniformLayoutRule {
 //	uint32_t align = 0;
 //	uint32_t size = 0;
 //};
 //
 //template <typename T> using identity = libv::meta::identity_t<T>;
 //
-//inline UnfirormLayoutRule rule_std140(...) { static_assert }
+//inline UniformLayoutRule rule_std140(...) { static_assert }
 //
-//inline UnfirormLayoutRule rule_std140(identity<bool>)          { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<int32_t>)       { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<uint32_t>)      { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<int64_t>)       { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<uint64_t>)      { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<float>)         { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<double>)        { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<bool>)          { return { 4,  4}; }
+//inline UniformLayoutRule rule_std140(identity<int32_t>)       { return { 4,  4}; }
+//inline UniformLayoutRule rule_std140(identity<uint32_t>)      { return { 4,  4}; }
+//inline UniformLayoutRule rule_std140(identity<int64_t>)       { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<uint64_t>)      { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<float>)         { return { 4,  4}; }
+//inline UniformLayoutRule rule_std140(identity<double>)        { return { 8,  8}; }
 //
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2b>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3b>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4b>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2i>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3i>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4i>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2ui>)  { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3ui>)  { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4ui>)  { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2l>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3l>)   { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4l>)   { return {32, 32}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2ul>)  { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3ul>)  { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4ul>)  { return {32, 32}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2f>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3f>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4f>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2d>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3d>)   { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4d>)   { return {32, 32}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2b>)   { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3b>)   { return {16, 12}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4b>)   { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2i>)   { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3i>)   { return {16, 12}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4i>)   { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2ui>)  { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3ui>)  { return {16, 12}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4ui>)  { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2l>)   { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3l>)   { return {32, 24}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4l>)   { return {32, 32}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2ul>)  { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3ul>)  { return {32, 24}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4ul>)  { return {32, 32}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2f>)   { return { 8,  8}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3f>)   { return {16, 12}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4f>)   { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec2d>)   { return {16, 16}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec3d>)   { return {32, 24}; }
+//inline UniformLayoutRule rule_std140(identity<libv::vec4d>)   { return {32, 32}; }
 //
 //template <typename T, std::size_t N>
-//inline UnfirormLayoutRule rule_std140(identity<std::array<T, N>) {
+//inline UniformLayoutRule rule_std140(identity<std::array<T, N>) {
 //	const auto member_rule = rule_std140(identity<T>{});
 //	const auto vec4_rule = rule_std140(identity<libv::vec4f>{});
 //
@@ -440,23 +466,23 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 //	};
 //}
 //
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2f>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3f>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4f>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2d>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3d>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4d>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3f>) { return rule_std140(identity<std::array<libv::vec3f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4f>) { return rule_std140(identity<std::array<libv::vec4f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2f>) { return rule_std140(identity<std::array<libv::vec2f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4f>) { return rule_std140(identity<std::array<libv::vec4f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2f>) { return rule_std140(identity<std::array<libv::vec2f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3f>) { return rule_std140(identity<std::array<libv::vec3f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3d>) { return rule_std140(identity<std::array<libv::vec3d, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4d>) { return rule_std140(identity<std::array<libv::vec4d, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2d>) { return rule_std140(identity<std::array<libv::vec2d, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4d>) { return rule_std140(identity<std::array<libv::vec4d, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2d>) { return rule_std140(identity<std::array<libv::vec2d, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3d>) { return rule_std140(identity<std::array<libv::vec3d, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2f>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3f>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4f>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2d>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3d>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4d>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2x3f>) { return rule_std140(identity<std::array<libv::vec3f, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2x4f>) { return rule_std140(identity<std::array<libv::vec4f, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3x2f>) { return rule_std140(identity<std::array<libv::vec2f, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3x4f>) { return rule_std140(identity<std::array<libv::vec4f, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4x2f>) { return rule_std140(identity<std::array<libv::vec2f, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4x3f>) { return rule_std140(identity<std::array<libv::vec3f, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2x3d>) { return rule_std140(identity<std::array<libv::vec3d, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat2x4d>) { return rule_std140(identity<std::array<libv::vec4d, 2>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3x2d>) { return rule_std140(identity<std::array<libv::vec2d, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat3x4d>) { return rule_std140(identity<std::array<libv::vec4d, 3>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4x2d>) { return rule_std140(identity<std::array<libv::vec2d, 4>>{}); }
+//inline UniformLayoutRule rule_std140(identity<libv::mat4x3d>) { return rule_std140(identity<std::array<libv::vec3d, 4>>{}); }
 //
 //// -------------------------------------------------------------------------------------------------

@@ -80,10 +80,10 @@ void String2D::render(Context& context) {
 		for (const auto& segment : segments) {
 			segment.program->use();
 			segment.program->uniformmatMVP = context.gl.mvp();
-			segment.program->uniformTextureSampler = gl::TextureChannel::diffuse;
+			segment.program->uniformTextureSampler = gl::TextureUnit::diffuse;
 			segment.program->uniformColor = segment.color;
 
-			context.gl.activeTexture(gl::TextureChannel::diffuse);
+			context.gl.activeTexture(gl::TextureUnit::diffuse);
 			auto txGuard = segment.font->bindGuard();
 
 			context.gl.drawArrays(vao, gl::Primitive::Triangles, segment.vertexStart, segment.vertexCount);

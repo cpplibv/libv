@@ -7,6 +7,8 @@
 // libv
 #include <optional>
 #include <string>
+#include <system_error>
+#include <vector>
 
 
 namespace libv {

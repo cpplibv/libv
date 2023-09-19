@@ -34,9 +34,9 @@ constexpr auto attribute_custom0    = libv::glr::Attribute<15, libv::vec4f>{};
 
 
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
-constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
+constexpr auto textureUnit_normal  = libv::gl::TextureUnit{1};
+constexpr auto textureUnit_pattern = libv::gl::TextureUnit{7};
 
 // -------------------------------------------------------------------------------------------------
 

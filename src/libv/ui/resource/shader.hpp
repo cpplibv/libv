@@ -15,7 +15,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr auto texture_channel0        = libv::gl::TextureChannel{0};
+constexpr auto texture_channel0        = libv::gl::TextureUnit{0};
 
 constexpr auto attribute_position      = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal        = libv::glr::Attribute<1, libv::vec3f>{};

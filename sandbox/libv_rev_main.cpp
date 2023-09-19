@@ -54,7 +54,7 @@ constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -92,8 +92,8 @@ struct Sandbox {
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 	libv::rev::ShaderLoader shader_loader{nexus, "../../res/shader/"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere.fs"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
+	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "sandbox_rev/sphere.vs", "sandbox_rev/sphere.fs"};
+	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "sandbox_rev/sphere.vs", "sandbox_rev/color_bar.fs"};
 
 	libv::rev::RenderTarget render_target{window_size, 4};
 

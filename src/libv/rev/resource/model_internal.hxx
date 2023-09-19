@@ -25,7 +25,7 @@ namespace rev {
 // -------------------------------------------------------------------------------------------------
 
 struct InternalModelNode {
-	libv::mat4f transformation;
+	libv::mat4f transform;
 	Material material;
 	int baseVertex;
 	int baseIndex;
@@ -34,7 +34,7 @@ struct InternalModelNode {
 
 // -------------------------------------------------------------------------------------------------
 
-class InternalModel : public libv::ref_count_base<InternalModel> {
+class InternalModel : public libv::ref_count_base {
 	friend libv::ref_count_access;
 
 public:

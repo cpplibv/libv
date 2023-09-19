@@ -16,7 +16,7 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-void RemoteMesh::create(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteMesh::create(libv::GL& gl, Remote& remote_) noexcept {
 	gl(vao).create();
 	gl(indices.buffer).create();
 	for (RemoteMeshAttribute& attribute : attributes)
@@ -26,7 +26,7 @@ void RemoteMesh::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	created = true;
 }
 
-void RemoteMesh::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteMesh::update(libv::GL& gl, Remote& remote_) noexcept {
 	if (!created)
 		create(gl, remote_);
 
@@ -54,7 +54,7 @@ void RemoteMesh::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	dirty = false;
 }
 
-void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteMesh::render(libv::GL& gl, Remote& remote_) noexcept {
 	assert(!attributes.empty() && "Mesh attributes were not initialized");
 
 	if (dirty)
@@ -65,7 +65,7 @@ void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(vao).drawElements(primitive, start, indexCount);
 }
 
-void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept {
+void RemoteMesh::render(libv::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept {
 	assert(!attributes.empty() && "Mesh attributes were not initialized");
 
 	if (dirty)
@@ -76,7 +76,7 @@ void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVerte
 	gl(vao).drawElementsBaseVertex(primitive, baseVertex, baseIndex, numIndices);
 }
 
-void RemoteMesh::renderArraysInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept {
+void RemoteMesh::renderArraysInstanced(libv::GL& gl, Remote& remote_, int32_t instanceCount) noexcept {
 	assert(!attributes.empty() && "Mesh attributes were not initialized");
 
 	if (dirty)
@@ -87,7 +87,7 @@ void RemoteMesh::renderArraysInstanced(libv::gl::GL& gl, Remote& remote_, int32_
 	gl(vao).drawArraysInstanced(primitive, 0, vertexCount, instanceCount);
 }
 
-void RemoteMesh::renderElementsInstanced(libv::gl::GL& gl, Remote& remote_, int32_t instanceCount) noexcept {
+void RemoteMesh::renderElementsInstanced(libv::GL& gl, Remote& remote_, int32_t instanceCount) noexcept {
 	assert(!attributes.empty() && "Mesh attributes were not initialized");
 
 	if (dirty)

@@ -140,7 +140,8 @@ public:
 	}
 
 	bool match(const std::string_view str) const {
-		table.resize((str.size() + 1) * (pattern.size() + 1), false);
+		table.resize((str.size() + 1) * (pattern.size() + 1));
+		std::ranges::fill(table, false); // Zero out everything
 
 		// accept any leading WILDCARD_ANY and at most one WILDCARD_LAYER as str start
 		{
@@ -165,7 +166,7 @@ public:
 		// solve
 		for (std::size_t i = 1; i <= str.size(); i++) {
 			for (std::size_t j = 1; j <= pattern.size(); j++) {
-				if (index(i, j)) // Optimization: Already calculated
+				if (index(i, j)) // Optimization: Already pre-calculated
 					continue;
 
 				const auto& token = pattern[j - 1];
@@ -218,7 +219,7 @@ bool WildcardGlobMatcher::match(const std::string_view str) const {
 }
 
 WildcardGlobMatcher::~WildcardGlobMatcher() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------

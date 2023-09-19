@@ -22,7 +22,7 @@ struct impl_lock_file {
 
 	explicit impl_lock_file(std::filesystem::path filepath) :
 		file(filepath, std::ios::binary | std::ios::out),
-		mutex(filepath.string().c_str()),
+		mutex(filepath.string().c_str()), // Not using generic_string()
 		filepath(std::move(filepath)) {
 	}
 };

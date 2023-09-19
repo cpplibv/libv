@@ -10,4 +10,6 @@ uniform_block.generate(0, "Camera200", "res/shader/block/camera200.glsl", {
 	{"vec3", "cameraForwardW"},
 	{"vec3", "cameraRightW"},
 	{"vec3", "cameraUpW"},
+	--{"float", "far"},
+	--{"float", "near"},
 })

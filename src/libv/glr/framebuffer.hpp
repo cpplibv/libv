@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 // std
 #include <memory>
 
@@ -49,14 +49,14 @@ public:
 };
 
 struct AttorneyRemoteFramebuffer {
-	static void bind(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept;
-	static void bind_draw(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept;
-	static void bind_read(const Framebuffer& framebuffer, libv::gl::GL& gl, Remote& remote_) noexcept;
+	static void bind(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept;
+	static void bind_draw(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept;
+	static void bind_read(const Framebuffer& framebuffer, libv::GL& gl, Remote& remote_) noexcept;
 
-	static void use_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
-	static void use_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl, libv::gl::Attachment attachment) noexcept;
-	static void reset_draw_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept;
-	static void reset_read_buffer(const Framebuffer& framebuffer, libv::gl::GL& gl) noexcept;
+	static void use_draw_buffer(const Framebuffer& framebuffer, libv::GL& gl, libv::gl::Attachment attachment) noexcept;
+	static void use_read_buffer(const Framebuffer& framebuffer, libv::GL& gl, libv::gl::Attachment attachment) noexcept;
+	static void reset_draw_buffer(const Framebuffer& framebuffer, libv::GL& gl) noexcept;
+	static void reset_read_buffer(const Framebuffer& framebuffer, libv::GL& gl) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

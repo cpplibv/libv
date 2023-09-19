@@ -347,7 +347,7 @@ TEST_CASE("Mouse: never intersect region", "[libv.ui.event.mouse]") {
 	}
 }
 
-TEST_CASE("Mouse: new subscribe should receive event from enter if created on top of mouse", "[libv.ui.event.mouse]") {
+TEST_CASE("Mouse: new subscribe receives event from enter if created on top of mouse", "[libv.ui.event.mouse]") {
 	TestContextMouse table;
 	table.event_position({0, 0});
 

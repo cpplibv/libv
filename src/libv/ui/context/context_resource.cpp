@@ -5,7 +5,6 @@
 // libv
 #include <libv/gl/load_image.hpp>
 #include <libv/res/resource_path.hpp>
-#include <libv/utility/generic_path.hpp>
 #include <libv/utility/hash_string.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>
@@ -269,14 +268,14 @@ public:
 ContextResource::ContextResource(Settings& settings) :
 	self(std::make_unique<ImplContextResource>(settings)) {
 
-	log_ui.info("Working directory:     {}", libv::generic_path(std::filesystem::current_path()));
-	log_ui.info("Resource base font:    {}", libv::generic_path(self->settings.res_font.base_path));
-	log_ui.info("Resource base shader:  {}", libv::generic_path(self->settings.res_shader.base_path));
-	log_ui.info("Resource base texture: {}", libv::generic_path(self->settings.res_texture.base_path));
+	log_ui.info("Working directory:     {}", std::filesystem::current_path().generic_string());
+	log_ui.info("Resource base font:    {}", self->settings.res_font.base_path);
+	log_ui.info("Resource base shader:  {}", self->settings.res_shader.base_path);
+	log_ui.info("Resource base texture: {}", self->settings.res_texture.base_path);
 }
 
 ContextResource::~ContextResource() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------

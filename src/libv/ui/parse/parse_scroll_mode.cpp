@@ -4,7 +4,7 @@
 #include <libv/ui/parse/parse_scroll_mode.hpp>
 // libv
 #include <libv/utility/concat.hpp>
-#include <libv/utility/trim.hpp>
+#include <libv/algo/trim.hpp>
 // std
 #include <stdexcept>
 

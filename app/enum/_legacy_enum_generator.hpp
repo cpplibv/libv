@@ -264,7 +264,7 @@ public:
 						"std::string_view {enum_name}::to_string() const noexcept {{\n"
 						"	if (value >= std::size(storage_{enum_name}_to_string)) {{\n"
 						"		assert(false && \"Invalid {enum_name} enum value\");\n"
-						"		return \"<<invalid>>\";\n"
+						"		return \"<<invalid-{enum_name}-enum-value>>\";\n"
 						"	}}\n"
 						"	return storage_{enum_name}_to_string[value];\n"
 						"}}\n",

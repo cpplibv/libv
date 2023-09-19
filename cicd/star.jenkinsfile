@@ -1,0 +1,76 @@
+node('Win11') {
+	preset = "gcc-package"
+
+	agent {
+		label 'MSYS2'
+	}
+
+	environment {
+		CI = 'true'
+	}
+
+	options {
+		timeout(timeout: 60, unit: "MINUTES")
+	}
+
+	// --- Stages ---
+
+	stage('Clone sources') {
+		git url: "https://github.com/cpplibv/libv", branch: "dev"
+	}
+
+	stage('Configure') {
+		sh "cmake --preset ${preset} -DLIBV_SKIP_EXTERNAL_CONFIGURES=FALSE"
+	}
+
+	stage('Dependencies') {
+		// TODO P2: Switch to cmake --build --target
+		sh "ninja -C build/${preset} wish_ext_lazy"
+	}
+
+	stage('Build star') {
+		sh "ninja -C build/${preset} star"
+		sh "ninja -C build/${preset} test_libv_algo"
+		def issuesGCC = scanForIssues tool: gcc()
+// 		def issuesGCC = scanForIssues tool: gcc(name: "GCC Warnings")
+		publishIssues issues: [issuesGCC], name: "GCC"
+	}
+
+	stage('Tests') {
+		sh "mkdir -p report"
+		sh "build/${preset}/test_libv_algo.exe -r junit > build/${preset}/test_libv_algo.xml"
+		def issuesUnit = scanForIssues tool: junitParser(pattern: "report/**.xml")
+// 		def issuesUnit = scanForIssues tool: junitParser(pattern: "report/**.xml", name: "Unit Tests")
+		publishIssues issues: [issuesUnit], publishAllIssues: true, name: "test_libv_algo"
+	}
+
+	stage('Archive') {
+		archiveArtifacts artifacts: "build/${preset}/star.exe"
+	}
+
+//	 stage('Package') {
+//		 archiveArtifacts artifacts: 'bin/release/star.exe'
+//	 }
+
+//	 withCredentials([file(credentialsId: 'space-priv-key', variable: 'FILE')]) {
+//		 stage('Test Secrets') {
+//			 echo 'hi'
+//			 sh "echo 'space-private-key-test'"
+//			 sh 'echo "$FILE"'
+//			 sh 'cat "$FILE"'
+//			 sh 'cp "$FILE" test.txt'
+//			 echo 'bye'
+//		 }
+//	 }
+
+//	 stage('Parallel Stage') {
+//		 parallel(
+//			 'a': stage('Branch A') {
+//				 echo "On Branch A"
+//			 },
+//			 'b': stage('Branch B') {
+//				 echo "On Branch B"
+//			 }
+//		 )
+//	 }
+}

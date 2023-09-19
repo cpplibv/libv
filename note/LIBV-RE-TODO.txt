@@ -1,0 +1,1246 @@
+
+REV - Render Engine Vader
+
+
+
+
+
+
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+14 Forward+
+	4 Light culling compute shader
+	1 SSBO
+	1 Light uniform blocks
+	2 2.5D
+	1 Spherical-sliced Cone Test
+	1 Light grid count visualisation
+	+4
+
+	// template <typename T, typename E, uint32_t numRingBuffers>
+	// class ShaderStorageBufferMappedInputVector : BaseShaderStorageBufferMappedVector {
+	// 	void gl_swap(libv::GL& gl);
+	//
+	// 	// T& head();
+	// 	// E& operator[](uint32_t index);
+	// 	// E& element(uint32_t index);
+	// };
+	//
+	// template <typename T, typename E, uint32_t numRingBuffers>
+	// class ShaderStorageBufferMappedOutputVector : BaseShaderStorageBufferMappedVector {
+	// 	void gl_swap(libv::GL& gl);
+	//
+	// 	// T& head();
+	// 	// E& operator[](uint32_t index);
+	// 	// E& element(uint32_t index);
+	// };
+
+
+
+
+
+
+
+=================================== End of draft re ===================================
+
+
+place.it:
+	PBR Channel packing convention: RGB = RMAO - Roughness, Metallic, Ambient Occlusion
+	Sorting idea:
+		for 'material sorting' instead of sorting 'objects' sort materials:
+			group the object under their material into a list inside the material (list gets cleared after each render)
+			and then sort the materials
+	light culling: spotlight culling, this is also needed on the CPU side
+			https://simoncoenen.com/blog/programming/graphics/SpotlightCulling
+			https://bartwronski.com/2017/04/13/cull-that-cone/
+	Terminology:
+		Pipeline = sum of passes and render targets (?and render context)
+	Unity HDRP pipeline graph: https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@17.0/manual/images/HDRP-frame-graph-diagram.png
+
+
+--- Next Sprint Ideas ---
+	Check out WickedEngine (clone it, look around) https://github.com/VaderY/WickedEngine
+			https://www.youtube.com/watch?v=53NvFT37HzQ
+	Read:
+		https://www.khronos.org/opengl/wiki/Memory_Model
+		https://www.khronos.org/opengl/wiki/Memory_Model#Texture_barrier
+		https://www.khronos.org/opengl/wiki/Compute_Shader#Shared_memory_coherency
+
+	Star:
+		Integrate libv.re
+		Some minimal game logic, part os space could be implemented
+
+	Ext:
+		Update everything (excluding assimp and sol2)
+
+	RE
+		Better integration into UI component/canvas
+		Late Update: Implement a late update system for mouse interactions
+				or cursor following effects (selection, highlight)
+				can have wierd and separate control flow
+		Normal mapping
+			Model tangents looks incorrect for CW meshes
+				need a proper test mesh for this (where UV layout is proper)
+				need a debug geometry shader with debug lines for each vertex / face normal spaces
+				| (might have fixed it, vectors were not normalized, but proper testing is required regardless)
+			Debug geometry shaders for vertex normal - tangent - bitangent visualization
+			Debug geometry shaders triangle normal visualization
+			2 component normal map glsl read:
+				N.xy = 2 * tex2D(image, texcoord).wy - 1;
+				N.z = sqrt(saturate(1 - N.x * N.x - N.y * N.y));
+		Alpha Scene
+			texturing test_pattern_metal_a
+				rename everywhere, its no longer test_ its a proper texture
+				organise asset projects and files
+				remove AO stuff from the gaps from the base color
+				test/use BC1 base and rmao
+			A decent lens flare configuration and textures
+			Organize objects, create some order, expand to be bigger
+		State override:
+			- Per render pass mask for RenderState and forced values in it
+			does a bitmask + bitset before rendering, so you can select
+			properties that will be forced in every state
+		Lambert / Phong / Blinn-Phong
+		PBR - Physically based rendering
+			https://www.youtube.com/watch?v=5p0e7YNONr8
+			PBR example (not 100%) https://github.com/MorcilloSanz/RendererGL
+		PBR - IBL Image Based Lighting - Diffuse
+			https://www.youtube.com/watch?v=gz24lo4mt1o&list=PLIbUZ3URbL0ESKHrvzXuHjrcLi7gxhBby&index=31
+		PBR - IBL Image Based Lighting - Specular
+			https://www.youtube.com/watch?v=N_IofZ6MF8k&list=PLIbUZ3URbL0ESKHrvzXuHjrcLi7gxhBby&index=30
+		Shadow
+			PCF - Percentage-Closer Filtering
+				https://www.youtube.com/watch?v=NCptEJ1Uevg
+			PCSS - Percentage-Closer Soft Shadows
+			CSM - Cascaded Shadow Mapping
+				https://learnopengl.com/Guest-Articles/2021/CSM
+				https://ogldev.org/www/tutorial49/tutorial49.html
+		Instance rendering mesh / object
+		Node hierarchy
+			Gathering and model block accumulation and upload
+			Culling
+			Proxies
+			 	outline: how to mimic parent transform?
+				lensflare: how to fetch position
+		LOD - Level of detail: nodes, models and animations
+		Light debug indicators
+				Editor mode toggle
+				Needs instance rendering for debug shapes
+				Not just a 2D sprite, Have a nice screen space sized 3D model
+				(Optionally) Show the influence volume
+		Resource
+			libv.re: Resource priority system (and conversion to blocking loading even if it started as async, but was later requested as blocking)
+					Loading screen, Loading bar
+					Resource priorities (blocking comes first, asyncs get delayed)
+			isLoaded query
+				[[nodiscard]] bool isLoaded() const noexcept;
+					if (!dirty)
+						return true
+					else
+						lock(cold->mutex)
+						return isLoadedLogicHere()
+			implement unspecified variant id for tex, shade, model
+					unspecified = never match
+					| NEVER PLACE IN THE CACHE! -> Super easy to implement
+						\ disadvantage: its not foreach-able
+		Texture import (* -> dds) script
+				create a script or an app that creates dds files
+				shape(Cube/<N>D/[Array]), size, BC<N>, sRGB/Linear
+		Supercompressed dds file format (ZSTD)
+		Anisotropic filtering
+		Skeleton animation
+				5part assimp: https://www.youtube.com/watch?v=GZQkwx10p-8
+				follow-up 1: https://www.youtube.com/watch?v=7JMehLi2vWk
+					^ zero weight bone can cause problems
+					^ beyond assimp optimize flag there is space for further not optimization
+				follow-up 2: https://www.youtube.com/watch?v=rE7Sf2MqVOw
+				ThinMatrix: https://www.youtube.com/watch?v=f3Cr8Yx3GGA
+			VM4 Support
+				Animations
+				Animation channels
+			RE
+				Animations
+				Animation channels
+				Animation mixers
+				Mesh
+				Object
+				Model Loader
+				Model Render
+			Animation and model examples
+				https://www.mixamo.com
+			Model loading requires multiple level of 'caching'
+					vertex+index data
+					meta data (node/material info)
+				Okey, For now
+					Vertex data caching is not now, after we have a working version
+					Material override is not now, later-later
+				Even if multiple material override is present
+					only a single model mesh should be created
+					-> model mesh is also cached
+					-> no need to retain vm4::model vertex/index data after model mesh was created
+				| Skeleton animation will alter related code, sorting this out after that happens
+			Legacy: Skeleton animation
+				Renderer
+				AnimatedModel
+					VAO
+						pos, uv, normal, ...
+						vec4i boneIDs
+						vec4f boneWeights
+					Joint root
+						int id
+						vector<Joint>
+						mat4 transform
+				Animator
+					float animationTime
+					Animation
+						vector<KeyFrame>
+							float time
+							vector<JointTransform>
+								vec3 pos
+								quat rot
+
+				Renderer - Renders an animated model in the pose determined by the joint transforms
+				AnimatedModel - Mesh and skeleton data (VAO aka skin data is immutable)
+				Joint - Backed joint transforms that are modified by the Animator
+				Animator - Runs the animation timer and burns the Animation at the current interpolated state onto the AnimatedModel
+				Animation - Animation data (immutable)
+				KeyFrame - Animation data (immutable)
+				JointTransform - Animation data (immutable)
+		Post-Process
+			Color correction https://www.youtube.com/watch?v=texTxhcfEkY
+					aka contrast + brightness + saturation + gamma
+			PP recap: https://www.youtube.com/watch?v=wbn5ULLtkHs
+			Bloom dirt texture
+					Some idea / look like Dirt texture and stronger sky bleed: https://www.youtube.com/watch?v=ThA9pueKvus
+						https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.postprocessing/PostProcessing/Shaders/Builtins/Bloom.shader
+						https://github.com/Unity-Technologies/Graphics/tree/master/com.unity.render-pipelines.universal
+			Vignette texture
+			Exposure (I think it affects both bloom prefilter and combine input)
+			AutoExposure, automatic exposure adjustment opengl, HDR
+			Establish order the post-processing steps:
+					Fog
+					Bloom
+					Exposure
+					White Balance
+					Contrast
+					Brightness
+					Color Filtering
+					Saturation
+					Tonemapping
+					Gamma
+					Debug Overlay: Color Blindness Simulation // https://www.youtube.com/watch?v=HlWDlmeecg8 and the source code https://github.com/GarrettGunnell/Post-Processing
+					? Haze
+					? Vignette
+					? Vignette Texture
+					? Bloom Texture
+					? SSAO
+					? SSR
+					? Grain
+					? Lens Flare
+					? Motion Blur
+					? Depth of Field
+					? Color Grading
+					? Channel Mixer
+					? Grain
+					?? Debug Views
+			? custom post-process operations and entry points
+					custom entry points placement
+						step4_before_bloom
+						step5_after_bloom
+						step6_before_tonemap
+						step7_after_tonemap...
+			? Single Pass Downsampler
+				understand compute shader memory model
+					https://www.khronos.org/opengl/wiki/Compute_Shader#Shared_memory_coherency
+					it might be usable for Outline JFA:
+						If a single pass Outline JFA is possible implement and speed-test it
+				https://www.khronos.org/opengl/wiki/Compute_Shader#Shared_memory_coherency
+				https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/main/docs/samples/single-pass-downsampler.md
+				https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/main/docs/techniques/single-pass-downsampler.md
+					https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/d7531ae47d8b36a5d4025663e731a47a38be882f/samples/spd/shaders/spd_cs_downsampler.hlsl#L4
+					https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/main/sdk/src/components/spd/ffx_spd.cpp#L450
+				| So the proper solution is 64x64 compute with an atomic counter and the last warp goes further and does the remaining merge (this only support 4096, NOT A PROBLEM, worst case blur does not go all the way, need to test it, but not an issue)
+
+		Full-screen Effects
+			Haze
+			SSAO - Screen space ambient occlusion
+					libv.rev: SSAO https://betterprogramming.pub/depth-only-ssao-for-forward-renderers-1a3dcfa1873a
+					example: ThreeJS based https://github.com/N8python/n8ao
+			? SSR - Screen Space Reflection
+			Fog
+			Improved Fog
+				https://www.youtube.com/watch?v=k1zGz55EqfU
+				+ warp + noise
+				+ fog height
+			? God-rays
+			? DOF - Depth of field
+			libv.re: Outline cheaper option: https://www.shadertoy.com/view/sltcRf
+						cheaper version
+						multi-color
+						multi-radius support
+						\ 8 tap is enough, but it would be nice reduce the amount of pixels
+							needed to be checked, maybe drawing a bounding box / sphere?
+							or push draw same model but push every triangle out and scale them up to support hard normals up to a certain angle breaking
+						\  even 32+ is cheaper than the JFA
+						| have both version active
+						Optimization: render a larger proxy object (enlarged in screen space) to dont make a full screen quad worth of overdraw (with mostly discarded alpha)
+
+		? Water
+			Acerola - Turning Sine Waves Into Water - https://www.youtube.com/watch?v=PH9q0HNBjT4
+			Acerola - I Tried Simulating The Entire Ocean - https://www.youtube.com/watch?v=yPfagLeUa7k
+
+		debug view
+			UI Debug controls
+			debug view center / Strech / fit mode selector hotkey
+			debug view separate mode, only enable debug hotkeys if mode is active
+			debug view +/- button to select index (layer/level)
+			debug view shortcuts slots, press F1 aka Slot 1 -> enter any debug view on any index -> persists it and changing between slots brings back that view
+
+		Model Import
+        	update assimp
+        	figure out the model.scale(0.01)
+        		vm4 import unit issue?
+        		check on assimp import flags (read all)
+        	mimp
+        		ninja -C build/gcc-dev/ mimp && ./build/gcc-dev/mimp.exe -j 8 res/model/ -w
+        		verify that fix_xzy and fix_zxy transforms correctly
+        	vm4imp
+        		check if is there a way to detect and auto fix_xzy and fix_zxy
+        	app.mimp: check last write time, and skip anything who doesn't needs to be updated
+        			! unless the mimp version changed (more like the exe lwt changed)
+        	app.mimp: (filesystem) exceptions on the worker threads are not handled
+
+		think more about:
+			handle null material (lookup and assign some default, maybe log.error + default) (and/or default ctor creates everything with a valid default resource)
+			handle null mesh (lookup and assign some default, maybe log.error + default) (and/or default ctor creates everything with a valid default resource)
+			handle null texture in material (not an error (?) just no bind) (and/or default ctor creates everything with a valid default resource)
+
+	Audio
+		Something minimal
+
+	Controls
+		Improve pattern matching algorithm, proper scoping and hierarchy
+		Improve context management (owned context-context)
+		UI interactions and integration
+		Resolve analog-binary accidental collusion with time
+
+	UI
+		Events cleanup, and interaction with controls
+		Focus traversal
+		List component (and Pagination)
+		Scroll pane = scroll area + scroll bar + connecting them
+		Font outline render
+
+	Marketing
+		Some screenshots (from the assets if not even a scene)
+		Homepage description
+			what is this
+			when to be expected
+			when demo
+			why go to discord
+		Homepage mobil resolution/aspect ratio support
+		Homepage search engine descriptions:
+			Google search "corrupt ai"
+				Corrupted AI
+				corruptedai.com
+				https://corruptedai.com
+				HomeDownloadsAbout. Login. Project Iris. Corrupted AI Software. Comming soon... Join the discord.corruptedai.com server. ©2022-2023 Császár Mátyás [Vader], ...
+			this ^ is wierd, have a proper one
+
+	libv.vm4: Verify model after loading it
+			materialID must be <= materials.size
+			materials.size must be >= 1 (unless there is no mesh/node at all)
+					might be implicitly checked by other constraints
+			lods.size >= 1
+			lod root, childID, bone indices, vertex index, every index within its data container
+			bone weights each vertex sum == 1
+		libv.vm4: On load verify every indexing (nodeID materialID etc in range [maybe even vertex index range check too]) and the integrity (no node circles) of the loaded data
+
+
+
+-------------------------------------------------------------------------------------------------
+
+https://litasa.github.io/blog/2017/09/04/OpenGL-MultiDrawIndirect-with-Individual-Textures
+rendering questions:
+	How can multi rendering work with different texture sizes
+
+glsl common header with:
+		clamp01
+		sq or sqr
+		constants
+
+canvas
+	currently it disables the UI cut planes,
+	as we will always render to back targets, this might not be a major issue
+		\! But we need to restore the glr state
+
+
+
+
+Material
+	Multiple uniform stream buffer
+	by default everything is stream (?), when they age to X frame
+	they move into a static/permanent buffer
+
+	material
+		depth only pass
+		This customization point is required even for surface height.
+		 - default = mvp transform position and done
+		 - custom = provide vertex shader, have your uniforms
+		 - vertex_pass = use the assigned shader, but only bind the vertex_state, have your uniforms
+
+
+Watch C++ Coroutine Intuition - Roi Barkan - CppNow 2023: https://www.youtube.com/watch?v=NNqVt73OsfI
+
+
+libv.re: shader_loader
+	Support for non-managed shaders (non-cached) but still include loaded
+		create from string source but support includes
+		? uses shader loader (settings) for loading
+		(example: surface compute shader)
+		hot reloading is optional for these
+
+	fallback shaders must support built in MVP uniforms and render in the correct place
+		\ requires either block load include from memory (std140 to string)
+
+
+
+libv.re: Bad file names or locations: libv/re/core/engine.hpp | Still thinking about it
+libv.re: Customizable fallback resource (including none = blocks until loaded)
+
+libv.rev: Procedural gizmo mesh
+
+Unity render passes
+	- Before
+	- Before/After PrePasses
+	- Before/After GBuffer
+	- Before/After DefferedLights
+	- Before/After Opaques
+	- Before/After Skybox
+	- Before/After Transparents
+	- Before/After PostProcessing
+	- After
+
+
+---
+
+
+Canvas canvas;
+???Engine engine;
+
+MeshSphere mesh(division);
+MaterialLambert material(color0);
+Object sphere0(pos0, mesh, material);
+
+LightPoint light(pos1, color1, intensity, distance);
+
+CameraPerspective camera(pos2, fov, aspectRatio, near, far);
+ControllerOrbit controller(camera, canvas);
+
+Scene scene;
+scene.add(camera); // Might not be necessary
+scene.add(sphere0);
+scene.add(light);
+
+engine.render(scene, camera, canvas)
+
+???RenderPass
+???RenderTarget
+
+	ThreeJS example:
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+
+		scene.add( cube );
+
+		function loop() {
+			canvas.render( scene, camera );
+		}
+
+-------------------------------------------------------------------------------------------------
+
+
+libv.re: JFA Outline with 2 type based on stencil buffer settings:
+			wall hack outline
+			visible only outline (enable depth test to the scene during mask creation)
+
+libv.re: JFA Outline optimizations:
+		Axis separation: Slower (2-16%)
+		Compute shader: On newer AMD cards significant improvements (40-50%) on older nvidia minor slowdown (1-2%)
+
+		Measurements: JFA outline, default size, vsync off:
+			RTX 2070 FBO Steps: 0.41 ms
+			RTX 2070 Compute Steps: 0.44 ms
+			RTX 2070 Compute Separated Steps: 0.45 ms
+			RTX 2070 Compute Separated Steps, Compute Init: 0.46 ms
+			RTX 2070 Compute Separated Steps, Compute Init (Early out init): 0.43 ms
+			RTX 2070 Compute Steps, Compute Init (Early out init): 0.42 ms
+			RX 7900XT FBO Steps: 0.24 ms
+            RX 7900XT Compute Steps: 0.18 ms
+            RX 7900XT Compute Separated Steps: 0.21 ms
+            RX 7900XT Compute Separated Steps, Compute Init (Early out init): 0.17 ms
+            RX 7900XT Compute Steps, Compute Init (Early out init): 0.13 ms
+
+		Idea: instead of full screen pass use a Clip Space expanded AABB/BB/SES coverage proxy (measure first)
+
+
+-------------------------------------------------------------------------------------------------
+
+
+Understand floating origins: https://www.youtube.com/watch?v=qYdcynW94vM
+
+
+
+
+engine, rev, scheduling, renderers tldr:
+	model-state does not directly own or access any GL state
+	model-state uses renderers in immediate mode with preloaded assets
+
+
+Main
+	- Frame
+	> [Self-Update]
+	> Create SandboxFrame
+
+SandboxFrame
+	- UI
+	> Setup Frame
+	> Setup UI and Overlays
+	> Create SandboxScene
+
+SandboxScene
+	- rev::Engine
+	- Game state
+	> Create SandboxCanvas
+
+
+
+camera -> canvas
+canvas -> scene
+scene -> engine
+game -> scene
+
+game state is seprate from rendering state and scenes
+(not mandatory) camera is separately live from scene/canvas
+
+
+
+
+Particles:
+	If I wanna implement effects
+		lua effect def
+
+libv.rev: Smooth particles: https://www.youtube.com/watch?v=arn_3WzCJQ8
+
+named_data(nullptr, sizeProperties,
+	// system.numParticle()
+
+		keep sizeProperties the same as long as possible
+		shrink on 1/4
+
+		call named_subData range and drawArraysInstanced with fever instance
+
+		worth only to not reallocate if the GPU not uses it
+
+Effects system
+	Effects will consist of multiple effect type: haze, particles, timing, transform manipulation, physical forces
+
+Particle system classes
+				system of systems
+				particle system manager
+				particle system
+				particle effect
+				particle effect "definition"
+				particle effect "instance"
+				particle effect shared buffer (but can have multiple instance of this)
+				if a particle effect is culled, do not upload its memory
+				if a particle effect is off-screen sleep
+
+		Particle System Manager - ("1" instance)
+			Knows about a worker thread
+			Knows about every system
+			Knows when to update
+			Updates every system
+
+		Particle Library (and/or User Particle Library for hardcoded Effect Definition lookup)
+			Handles LUA for Effect Definitions loading and reloading
+			Handles Effect Definitions
+
+		Particle System - Multiple system can be present, but usually only one system is displayed
+
+		Particle Renderer
+			GPU Buffers
+
+		Particle Effect Definition
+			Parameterization ? How
+			Stores list of Modules and their settings
+
+		Particle Effect
+			Instantiated list of Modules
+			vector<Particles>
+
+		Particle Effect Handler
+			Light weight
+
+		Game Object ("Map" is also a game object for fire and forget effects)
+			Owns a "Particle Effect" handler ? (and/or a way to self cleanup effect)
+
+
+
+
+
+libv.rev: Particle System First scope
+		emitter shape/overall effect:
+			cone - fountain
+			sphere - burst of explosion
+			cylinder/disc
+			box - static rain dusts
+			square - building placement dust effect
+
+		facing:
+			3d object
+			billboard texture (locked Z)
+			billboard texture (free follow)
+			billboard texture (locked to direction)
+			face to direction
+
+		velocity based elongation
+
+		texture selection
+
+		multi texture
+
+		sub particle (rain impact, rain steam, fireworks)
+			particles spawn particles in another particle system
+
+		Smooth particles
+			on/off per effect
+
+		Improving fillrate
+			on/off per texture
+
+		Particle GPU Memory update with mapped memory
+
+		Particle efficient storage and maximize gpu copy memory layout
+
+		Bounding box culling
+
+		LOD
+
+
+
+
+libv.rev: --- Particle System ---
+		http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
+		Particle System using Transform Feedback: https://ogldev.org/www/tutorial28/tutorial28.html
+		https://docs.unity3d.com/ScriptReference/ParticleSystem.html
+
+		Composition on modules which are driven by (L1 Cache size) batches of particles
+
+		Update and sort on a different thread
+
+		3 GPU Buffer
+			instanced mesh data - never updated
+			position (particle center) - updated every frame
+			color, age, other particle properties - updated every frame / once the particle is created
+
+
+libv.rev: --- Render System Flow ---
+		gather whats opaque and whats not
+			frustum culls
+				main camera, shadow cascade 1,2,3
+			calculate matrices and uniforms
+			place them in layers
+
+		prime depth buffer with opaque objects from camera frustum
+		shadow cascade 1,2,3 pass with shadow casters
+
+		main camera render every opaque objects (with depth ==)
+		main camera render every other (relevant) layer
+
+		post process pass(es)
+			bloom pyramid
+
+
+libv.rev: Shadow:
+	libv.rev: Multiple shadow casters: Use a texture3D (glFramebufferTextureLayer)
+
+Additional built-in blocks
+	libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+
+libv.ui: Adopt libv.re
+libv.ui: Move libv.sun overlay_shader_error.hpp to ui
+libv.ui: Accept injected Nexus
+
+!!! libv.ui: Style state (inheritance) ACL solution:
+		Go backward (?) (forward can also work?), use first match (dont inspect specificness)
+		this is how CSS does it too (just to order if first match and not last)
+libv.ui: "State" property: focus-within
+libv.ui: "State" property: nth (2nd 3rd is enough for now)
+
+
+cmake: Change from ${CMAKE_SOURCE_DIR}
+		to ${CMAKE_CURRENT_SOURCE_DIR}
+		wherever it makes sense
+
+place.it:
+	http://www.opengl.org/wiki/Buffer_Object_Streaming
+	#include <fmt/os.h> // For std::error_code
+
+	Models:
+		https://polyhaven.com/models/nature
+		https://free3d.com/3d-models/tree
+	Blender:
+		Custom pie menu: https://www.youtube.com/watch?v=S7lyISR1RDs
+		Awkward angles: https://www.youtube.com/watch?v=QwLMk_tFvfU
+		Spider legs, IK: https://www.youtube.com/watch?v=ktXD_WRMY8E
+		Addons Hard surface 1: https://www.youtube.com/watch?v=0qVqk0slIio
+			Starship Generator
+			Grid Modeler
+			Simple Scifi Pro
+			P Cutter
+		Addons Hard surface 2: https://www.youtube.com/watch?v=AT_8DU7DKUE
+		Models:
+			blenderkit.com
+	StableDiffusion:
+		Examples: https://lexica.art
+		Models: https://stable-diffusion-art.com/models/#DreamShaper
+
+place.it:
+	libv.vm4: File format signature
+	libv.update: File format signature
+			Example for PNG file signature:
+			The first eight bytes of a PNG file always contain the following values:
+			   (decimal)              137  80  78  71  13  10  26  10
+			   (hexadecimal)           89  50  4e  47  0d  0a  1a  0a
+			   (ASCII C notation)    \211   P   N   G  \r  \n \032 \n
+			This signature both identifies the file as a PNG file and provides for immediate detection of common file-transfer problems.
+			The first two bytes distinguish PNG files on systems that expect the first two bytes to identify the file type uniquely.
+			The first byte is chosen as a non-ASCII value to reduce the probability that a text file may be misrecognized as a PNG file; also, it catches bad file transfers that clear bit 7.
+			Bytes two through four name the format.
+			The CR-LF sequence catches bad file transfers that alter newline sequences.
+			The control-Z character stops file display under MS-DOS.
+			The final line feed checks for the inverse of the CR-LF translation problem.
+
+	libv.rev: solution to the blinker problem:
+		do a quad and position it around the blinker lamp in with screen space orientation in the transparent layer
+		in vertex shader sample the depth primed texture (smaller) positions of the blinker lamp to determine visibility rate
+		depth test is disabled
+		the problem is that transparent coverages above the blinker light should reduce the intensity of the quad
+		\ could use the alpha channel for that (would have to change rgb to rgba)
+
+
+
+
+-------------------------------------------------------------------------------------------------
+
+
+read:
+	https://open.gl/feedback
+	https://ogldev.org/www/tutorial28/tutorial28.html
+
+libv.vm4: reduce file size
+	libv.vm4: remove bitangent from the model format and calculate it on the fly as cross(normal, tangent) (or cross(normal, tangent))
+	libv.vm4: zstd
+
+libv.rev / libv.vm4: Parallel model memory upload to GPU. Steps:
+		FS Thread: Read model header
+		GL Thread: Memory map buffers based on header information
+			! WARNING with memory mapping: Without Resizable BAR only 256 MB can be accessed
+					| Needs a configurable limit (like 192 MB)
+					\ if limit is reached, do not schedule more mapping operations
+					\ alternatively fallback mechanism which load into sys memory and waits for upload and batch uploads it
+		FS Thread: Read model buffer contents directly into mapped GPU memory
+		GL Thread: Memory unmap, Finalize VAO
+
+libv.rev: Texture Loader: usage: mipmap, filtering, anisotropic filtering
+
+libv.rev.res: Extended loader API
+	libv.rev.res: Model add_virtual_resource
+	libv.rev.res: Texture add_virtual_resource
+	libv.rev.res: Material add_virtual_resource
+
+libv.rev: Improve the job system
+	Classify job loading request types:
+		- create: (immediate) / blocking / delayed / (lod)
+		- update: blocking / delayed / (lod)
+		- required / optional
+		- common setting override: require all / optional all
+	Currently everything is 'optional' and 'blocking'
+
+
+
+
+
+
+
+struct TrackedFile {
+	libv::fsw::Watcher* watcher;
+	libv::fsw::Token token;
+	std::string path;
+
+	void update(std::string&& data);
+	void update(std::error_code ec);
+
+	~TrackedFile() {
+		watcher->unsubscribe(token);
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.gl: Anisotropic filtering (not always available)
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+		glGenerateMipmap(GL_TEXTURE_2D);
+libv.re: Anisotropic filtering
+
+libv.re: Special uniform variant:
+	Uniform structs (as normal uniforms)
+	Uniform structs (as part of a block)
+	Uniform array (as normal uniforms)
+	Uniform array (as part of a block)
+	Uniform array of structs (as normal uniforms)
+	Uniform array of structs (as part of a block)
+	Uniform array of structs with array (as normal uniforms)
+	Uniform array of structs with array (as part of a block)
+
+libv.re: glsl_source_loader: Add query API, aka what would this include be resolve too
+		has to handling errors, query could result in error (it should probe the file, so: no such file, cannot open, etc)
+		has to handling no match, query could result in no mapping
+
+Realistic sky/atmo example https://threejs.org/examples/?q=sky#webgl_shaders_sky
+
+
+libv.re: C++23 Deducing this: scast<>() and rcast<>() for material, mesh and nodes
+
+place.it:
+	ext.plf: Adopt more of plf containers and/or algorithms // https://www.youtube.com/watch?v=XvEUYN9YgKY
+	visual.ui: Age of empires 4 menu show/hide effect is cool
+	asset.sound.voice: Voice acting: Better Radio Chatter in Video Games - https://www.youtube.com/watch?v=xgqh3p7kxy8
+	asset.texture: free high quality textures: https://quixel.com/megascans/free
+ 	ai.image: Fireship overview https://www.youtube.com/watch?v=ky5ZB-mqZKM
+
+--- Notes ------------------------------------------------------------------------------------------
+
+
+
+
+
+--- Backlog ----------------------------------------------------------------------------------------
+
+libv.rev: Hi-Z culling with compute shader (not a burning issue for now)
+
+--- Paper collection -------------------------------------------------------------------------------
+
+
+--- REV PAPER - Layers and passes ---
+	Layer usages:
+	- [depth prime] render layerOpaque with depth-only to depth MS framebuffer
+	- [blit depth prime] depth MS framebuffer to a depth SS texture (for lights, decals and depth based effects)
+	- [light/decal culling] With compute shader calculate light and decal information
+	- [shadow cast] render layerShadowCaster with depth-only to shadow SS framebuffers
+	- [opaque] render layerOpaque to HDR MS framebuffer (with depth test EQUAL)
+	- [background] render layerBackground to HDR MS framebuffer (skybox, stars)
+	- [transparent] render layerTransparent to HDR MS framebuffer
+	- [post-process] HDR MS framebuffer -> SDR SS framebuffer
+	- [lens-flare]
+	- [outline]
+	- [HUD] render layerHUD to SDR SS framebuffer (lens-flare, orientation cube)
+
+	Interesting cases:
+		Skybox = layerBackground
+		Blinker = layerHUD or layerTransparent
+		Clocked object = layerShadowCaster (but not layerOpaque) (maybe layerHaze)
+		Heat camera = scene changes passMasks to desired look
+		Unit names = layerHUD
+		Lens flare = layerHUD
+		Shields = layerTransparent
+		Water = ?
+		Parallax decal = ?
+
+
+--- Overrides ---
+	State override:
+		- Per render pass mask for RenderState and forced values in it
+
+	Different type of material overrides:
+		- Depth only, a bit special cased one
+		- During loading where we parse different materials from vm4
+		- Per render pass for the given render pass
+				Uses the depth only vertex shader stage with a custom fragment shader
+			\ This might not be a real (non-debug) use-case
+			and should be solved by proxy objects
+			| proxy objects with support for proxy materials with different fragment shaders
+				\ If this exits, could this also be used to do the pass override?
+						\ It might be expensive
+
+		Model:
+			Material overrides should still share VertexData
+				\ how, instance data is tied to the sub objects
+				\ sub objects are tied to material
+
+				Material override are extreamly important, even outline IS using it
+
+	Fragment 'override' shader type idea
+		use the depth shader as base with the only exception that
+				it gets a custom (override) fragment shader
+		copy the uniform name registry stuff from it
+				(or not even copy, only refer to it)
+				but fill the uniform indexes based on that
+				AKA: Shader that mimics the indirect indices of another shader
+				! need to keep them in sync if hot reloading is enabled
+						(or if there is a define change)
+		when binding, bind the 'override' shader BUT set the uniforms values from the original material
+
+		con: only fragment shader override
+		con: need to track reloads
+		con: when to create these? how to cache them?
+
+
+
+--- Post process Paper ---
+	TODO: document and organize this about post process and bloom:
+
+	overlay pass are:
+		after post process rgb8 is sufficient as output
+		no need for MS, SS will do
+
+	The first overlay pass IS the post process pass
+
+	mix 0.04 vs threshold
+		bloom 0.04 back mixing (additional bloom param)
+				no threshold (trivial, threshold = 0)
+				mix(scene, bloom, 0.04)
+				(https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom)
+				0.04 is a new mixing settings, could be 0
+				support the current additive operation too
+
+	new bloom setting: 'decay', per level multiplier during downsample or upsample
+
+	non-power-of-2 downsample
+		1 pixel ignore results in top right bias
+			solution: use unused texture storage and mae sure its divisible
+			make pyramid max size 256 align
+			first layer can ignore that 1 px issue, it wouldnt really effect anything
+
+		oversized pyramid
+
+	optimization options for bloom
+		drop the mirroring:
+			this reduces the pyramid size by dropping the extra mirrored padding
+			either
+				use a custom wrap function to clamp to virtual edge/border
+					-> reduces compute by 40-60%
+				or fill in the smaller (but still larger than normal) texture with the virtual edge/border
+					-> reduces compute by 30-50%, but much simpler and maybe faster
+		single dispatch downsample
+
+	bloom math that doesnt add up:
+		vec2 bloomUV = (bloomBoundingPosition + fragmentUV * bloomBoundingSize + 0.5) * bloomPixelSize;
+		I have no clue why the + 0.5 bloom pixel is needed
+		Best guess it is counter acting some downsampling shift
+			scene           = 1680 x 1050
+			pyramid storage = 1024 x  768
+			bounding size   =  840 x  525
+			bounding pos    =   64 x   64
+
+			fragmentUV = 1.5 / 1680
+
+			1.5 / 1680   // fragmentUV
+			1.5          // * scene
+			0.75         // / 2
+			64.75         // + pos
+			64.75 / 1024  // / storage
+
+			goal = 64.75 / 1024
+
+	bloom setting for pyramid clamping
+			not implemented but could be useful
+			MirroredRepeat, ClampToBorder, ClampToEdge
+			(with the current system, its not enough to only change the bloom pyramid texture, also non-MirroredRepeat could be much cheaper as smaller texture would be fine for them)
+
+	warp functions:
+		edge  : clamp(x, 1/(2n), 1-1/(2n))
+		border: (x < 1/(2n) || x > 1-1/(2n)) ? 0 : x
+		repeat: fract(x)
+		mirror: abs(floor(x * 0.5 + 0.5) * 2.0 - x)
+		mirror: iseven(x) ? fract(x) : 1-fract(x)
+
+
+--- Bloom Paper ---
+	Input: HDR Color
+	Output: A texture with blurred bloom data with half the resolution of the input (last upsampling happens during combine)
+
+	Configuration:
+		threshold
+		knee
+		intensity
+
+	Quality options:
+		number of MIPs
+		downsample with 4 or 13
+		upsample with box or tent
+
+	Passes:
+		- Prefilter (Downsample 13 tap 'balanced')
+		- Downsample 13 tap (N-1 times)
+		- Upsample 9 tap (N-1 times)
+		- Combine (Upsample 9 tap)
+
+	Sources:
+		Best article with code: https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
+		http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare
+		'Cherno' bloom overview: https://www.youtube.com/watch?v=ThA9pueKvus
+		'Cherno' bloom guide: https://www.youtube.com/watch?v=tI70-HIc5ro
+		sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
+		https://learnopengl.com/Advanced-Lighting/Bloom
+		Unity source PostProcessPass.cs: https://github.com/Unity-Technologies/Graphics/blob/31106afc882d7d1d7e3c0a51835df39c6f5e3073/com.unity.render-pipelines.universal/Runtime/Passes/PostProcessPass.cs
+		Unity source UberPost.shader:    https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/PostProcessing/UberPost.shader
+		Unity source Bloom.shader:       https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/PostProcessing/Bloom.shader
+
+
+--- Forward+ Paper ---
+	article: really-good article, could lead the development flow (but a bit old, newer and better techniques might have surfaced) https://www.3dgep.com/forward-plus/
+
+	precompute 4 plane of each tile frustum
+	depth only pass
+	light culling
+		compute tile min max depth plane from the depth only pass
+		for opaque: frustum cull with 6 plane each light
+			collect local
+			copy to global opaque light list
+		for transparent: frustum cull with 5 plane (near cannot be used, as transparent objects are not part of the depth primes) each light
+			collect local
+			copy to global transparent light list
+	light list:
+			light list = Array of every light
+			light index list = indexes -> into light list
+			light grid = offset + count -> into light index list
+
+			lookup:
+				tile = tiles[fragment_position]
+				for i = 0; i < tile.size; ++i
+					light = lights[light_index_list[tile.offset + i]]
+					shade_with(light)
+
+	better light culling
+		https://lxjk.github.io/2018/03/25/Improve-Tile-based-Light-Culling-with-Spherical-sliced-Cone.html
+			Spherical-sliced Cone Test = +15.68%
+
+	do 2.5D culling
+		https://www.slideshare.net/takahiroharada/a-25d-culling-for-forward-siggraph-asia-2012
+
+	light culling simplification idea:
+		compared to the light culling in https://www.3dgep.com/forward-plus/
+		instead of 1 thread group per tile use 1 thread per tile
+		-> this gets rid of a bunch of synchronization while
+			updating the local list. simple multi-tap depth for min max
+			3840x2160 with 16x8  = 16200 tile
+			3840x2160 with 16x16 =  8100 tile
+			1920x1080 with  8x8  =  8100 tile
+			1920x1080 with 16x8  =  4050 tile
+			1920x1080 with 16x16 =  2025 tile
+			16200 tile / 64 cull thread = 254 group dispatch
+			 8100 tile / 64 cull thread = 127 group dispatch
+			 4050 tile / 64 cull thread = 64 group dispatch
+			 2025 tile / 64 cull thread = 32 group dispatch
+		!BUT this will trash the thread group cache (instead of 1 the thread
+		group now needs 64..256 local list)
+			To help this thread groups could be under saturated (8 or 16 cull thread / group)
+		? alternatively each tile could have 2 offset and 2 size (so 2 index list in the global index list) that way lights could be into two thread ~~
+		> threads per tiles could be configurable
+
+		this idea needs to be measured
+
+		if tile count would not saturate the gpu enough use smaller tiles
+		instead of 16x16 go to 16x8 or 8x8
+
+
+--- Light attenuation ---
+
+https://imdoingitwrong.wordpress.com/2011/01/31/light-attenuation/
+https://paroj.github.io/gltut/Illumination/Tut10%20Distant%20Points%20of%20Light.html
+https://github.com/Unity-Technologies/Graphics/blob/3ecdbdf9a138eddb0e08e154af6ab2a3c60909c4/Packages/com.unity.render-pipelines.universal/ShaderLibrary/RealtimeLights.hlsl
+https://lisyarus.github.io/blog/graphics/2022/07/30/point-light-attenuation.html
+https://www.desmos.com/calculator/0eq2rzvcqw
+
+Hazel lights:
+	MinRadius - Unused
+	LightSize - For Soft Shadow
+	Radius - att = saturate(1 - dist^2 / radius^2)
+	Falloff - att = mix(att, 1, Falloff)
+
+	h=1-\frac{x^{2}}{r^{2}}
+	h\cdot f+1\left(1-f\right)
+
+	CalculatePointLights
+		float attenuation = clamp(1.0 - (lightDistance * lightDistance) / (light.Radius * light.Radius), 0.0, 1.0);
+		attenuation *= mix(attenuation, 1.0, light.Falloff);
+
+	CalculateSpotLights
+		float attenuation = clamp(1.0 - (lightDistance * lightDistance) / (light.Range * light.Range), 0.0, 1.0);
+		attenuation *= mix(attenuation, 1.0, light.Falloff);
+		attenuation *= 1.0 - pow(max(rim, 0.001), light.AngleAttenuation);
+Unity:
+	All over the place, makes no sense
+	\frac{1}{x^{2}}\cdot\left(\left(\min\left(\max\left(1-\left(x^{2}\cdot u\right)^{2},0\right),1\right)\right)^{2}\right)
+
+Physics says 1/(k * d^2) which has 0 control over anything
+	with adjusted max range its better, but not the best still
+
+Basically the best for me is lisyarus's formula
+
+Outcome: Lights support multiple formulas, the default will be the lisyarus.
+
+
+--- Lens Flare ---
+
+	Additional improvements could be:
+		delayed brightness animation, or the avg of a couple of frame
+		separate fade in and fade out time
+		separate fade times to each individual flares
+		spot-light: spot cone attenuation
+
+	https://www.youtube.com/watch?v=lZzhappD74s
+
+	ThreeJS
+		https://threejs.org/docs/#examples/en/objects/Lensflare
+		https://github.com/mrdoob/three.js/blob/master/examples/webgl_lensflares.html
+		https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Lensflare.js
+	Unity
+		https://docs.unity3d.com/560/Documentation/Manual/class-LensFlare.html
+		https://docs.unity3d.com/Manual/class-Flare.html
+
+
+--- REV - Resource paths and identifiers ---
+
+	identifier -> virtual -> physical
+
+	resourceIdentifier or identifier - Unique identifier for a resource.
+		This name should be used for loading or referencing a resource
+		(and for displaying messages and logs about resource).
+		It can be used as a key to load or look up the resource.
+
+		Example:
+			game/sky/sky-sunrise.dds
+			my-mod/sky-sunrise.dds
+
+	virtualFilepath - Virtual file path to a resource file.
+		This might be a path that doesn't directly correspond to a physical location.
+		This path should be used for displaying messages and logs about file operations.
+
+		resourceIdentifier can be resolved to a virtualFilepath
+		with the help of the settings.resourceMappings.
+		This mapping operates by replacing the resourcePrefix with the virtualPrefix.
+		This mapping can have multiple rules and the first matching will be selected.
+
+		Example mapping:
+			game/ -> res/texture/
+			my-mod/ -> mods/my-mod/texture/
+		Example:
+			res/texture/sky/sky-sunrise.dds
+			mods/my-mod/texture/sky-sunrise.dds
+
+	physicalFilepath - Concrete file path on the physical filesystem.
+		This is the file path that can be used for reading or watching files.
+
+		virtualFilepath can be resolved to a physicalFilepath
+		with the help of the libv::resource_path() function.
+		This mapping operates on direct mapping of virtualFilepath to physicalFilepath.
+
+		Example mapping:
+			res/texture/sky/sky-sunrise.dds -> res/texture/sky/sky-sunrise.dds
+			mods/my-mod/texture/sky-sunrise.dds -> ../../mods/my-mod/texture/sky-sunrise.dds
+		Example:
+			res/texture/sky/sky-sunrise.dds
+			../../mods/my-mod/texture/sky-sunrise.dds
+
+----------------------------------------------------------------------------------------------------
+
+Quick benches:
+	Mutex vs Spin-lock: https://quick-bench.com/q/yHhZDzVRJ1O5oinjyUsVO2DVAwg
+	Multi-thread dirty flag: https://quick-bench.com/q/Ewug97LLQNksLR0CQcmFPbhWHkc
+	Containers with uninitialized memory: https://quick-bench.com/q/Zelw4iqXi3hhYr4F0qedMzIIsUE
+
+----------------------------------------------------------------------------------------------------
+
+Matrix transforms and spaces:
+	local * world_matrix = world space
+	world * view_matrix = view space
+	view * projection_matrix = clip space
+	clip / clip.w = ndc space // Normalized Device Coordinates
+	ndc * (resolution, depth range) = screen space
+
+
+--- Article collection -----------------------------------------------------------------------------
+
+OpenGL Wiki
+	https://www.khronos.org/opengl/wiki/Memory_Model
+	https://www.khronos.org/opengl/wiki/Shader_Storage_Buffer_Object
+	https://www.khronos.org/opengl/wiki/Layout_Qualifier_(GLSL)
+
+Full screen triangle: https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
+sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
+
+Color blindness (8% affected): https://www.youtube.com/watch?v=HlWDlmeecg8 and the source code https://github.com/GarrettGunnell/Post-Processing
+
+std::format / fmt custom types: https://www.cppstories.com/2022/custom-stdformat-cpp20/
+
+shaders: https://www.youtube.com/watch?v=f4s1h2YETNY Resources presented in the video:
+	- Shadertoy: https://www.shadertoy.com/
+	- Inigo Quilez website: https://iquilezles.org/articles/
+	- 2D signed distance functions: https://iquilezles.org/articles/distf...
+	- Color palette article: https://iquilezles.org/articles/palet...
+	- Color palette webapp: http://dev.thi.ng/gradients/
+	- Graphtoy: https://graphtoy.com/
+
+OpenGL Reference page: https://www.khronos.org/registry/OpenGL-Refpages/gl4/
+
+Texture anti repetition technique: https://iquilezles.org/articles/texturerepetition/
+
+Depth prime pass (SimonDev): https://www.youtube.com/watch?v=arn_3WzCJQ8
+3D World Generation, Depth fixes (SimonDev): https://www.youtube.com/watch?v=8bRS9RRWfSs
+Reverse Z, ReverseZ, Flip depth range for more precision on further objects
+		https://developer.nvidia.com/content/depth-precision-visualized
+		https://www.youtube.com/watch?v=arn_3WzCJQ8
+		https://www.youtube.com/watch?v=8bRS9RRWfSs
+		https://docs.gl/gl4/glClipControl#
+		https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
+		https://www.danielecarbone.com/reverse-depth-buffer-in-opengl/
+
+OpenGL Performance: Driver overhead GDC 2014: https://gdcvault.com/play/1020791
+OpenGL Performance: https://www.youtube.com/watch?v=-bCeNzgiJ8I
+		https://www.slideshare.net/CassEveritt/beyond-porting
+OpenGL Performance costs: Render target > Program > ROP > Texture binding > Vertex format > UBO > Vertex bindings > Uniform updates | https://www.slideshare.net/CassEveritt/beyond-porting
+
+Outline JFA
+		https://bgolus.medium.com/the-quest-for-very-wide-outlines-ba82ed442cd9
+		https://gist.github.com/bgolus/a18c1a3fc9af2d73cc19169a809eb195

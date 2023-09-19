@@ -128,7 +128,7 @@ public:
 void CoreOverlayZoom::init() {
 	program.vertex(quad_vs);
 	program.fragment(quad_fs);
-	program.assign(uniformSampler0, "sampler0", libv::gl::TextureChannel{0});
+	program.assign(uniformSampler0, "sampler0", libv::gl::TextureUnit{0});
 
 	lineProgram.vertex(line_vs);
 	lineProgram.fragment(line_fs);
@@ -306,7 +306,7 @@ void CoreOverlayZoom::postRender(libv::glr::Queue& gl) {
 
 	{
 		gl.program(program);
-		gl.texture(framebufferColor0, libv::gl::TextureChannel{0});
+		gl.texture(framebufferColor0, libv::gl::TextureUnit{0});
 		gl.render(quad);
 	}
 	{

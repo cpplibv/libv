@@ -1,4 +1,4 @@
-// Created by Vader on 2023.04.17.
+// Project: libv.math, File: src/libv/math/log2.hpp
 
 // std
 #include <cstdint>

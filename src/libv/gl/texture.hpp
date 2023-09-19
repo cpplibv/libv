@@ -34,10 +34,16 @@ public:
 		checkGL();
 	}
 
+	inline void dsa_create() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id == 0);
+		glCreateTextures(to_value(object.target), 1, &object.id);
+		checkGL();
+	}
+
 	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteTextures(1, &object.id);
-		gl.cleanupDestroyedTextureID(object.target, object.id);
+		gl.cleanupDestroyedTexture(object.target, object.id);
 		object.id = 0;
 		checkGL();
 	}
@@ -46,6 +52,11 @@ public:
 	inline void bind() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		gl.bind(object);
+		checkGL();
+	}
+	inline void bindUnit(TextureUnit unit) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.bindUnit(unit, object);
 		checkGL();
 	}
 	inline void unbind() noexcept {
@@ -142,16 +153,53 @@ public:
 		emulateStorage3D(levels, format.format, format.base, width, height, depth);
 	}
 
-	inline void storage_ms(Format format, libv::vec2i size, int32_t samples, bool fixedSamples) noexcept {
+	inline void storage_ms(Format format, libv::vec2i size, int32_t samples, bool sampleFixed) noexcept {
 		object.template assert_target<TextureTarget::_2DMultisample>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glTexImage2DMultisample(to_value(object.target), samples, format.format, size.x, size.y, fixedSamples);
+		glTexImage2DMultisample(to_value(object.target), samples, format.format, size.x, size.y, sampleFixed);
 		checkGL();
 	}
-	inline void storage_ms(Format format, libv::vec3i size, int32_t samples, bool fixedSamples) noexcept {
+	inline void storage_ms(Format format, libv::vec3i size, int32_t samples, bool sampleFixed) noexcept {
 		object.template assert_target<TextureTarget::_2DMultisampleArray>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glTexImage3DMultisample(to_value(object.target), samples, format.format, size.x, size.y, size.z, fixedSamples);
+		glTexImage3DMultisample(to_value(object.target), samples, format.format, size.x, size.y, size.z, sampleFixed);
+		checkGL();
+	}
+
+	inline void dsa_storage(int32_t levels, Format format, int32_t width) noexcept {
+		object.template assert_target<TextureTarget::_1D>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureStorage1D(object.id, levels, format.format, width);
+		dsa_setBaseLevel(0);
+		dsa_setMaxLevel(levels - 1);
+		checkGL();
+	}
+	inline void dsa_storage(int32_t levels, Format format, int32_t width, int32_t height) noexcept {
+		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::CubeMap, TextureTarget::Rectangle>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureStorage2D(object.id, levels, format.format, width, height);
+		dsa_setBaseLevel(0);
+		dsa_setMaxLevel(levels - 1);
+		checkGL();
+	}
+	inline void dsa_storage(int32_t levels, Format format, int32_t width, int32_t height, int32_t depth) noexcept {
+		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureStorage3D(object.id, levels, format.format, width, height, depth);
+		dsa_setBaseLevel(0);
+		dsa_setMaxLevel(levels - 1);
+		checkGL();
+	}
+	inline void dsa_storage_ms(Format format, libv::vec2i size, int32_t samples, bool sampleFixed) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisample>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureStorage2DMultisample(object.id, samples, format.format, size.x, size.y, sampleFixed);
+		checkGL();
+	}
+	inline void dsa_storage_ms(Format format, libv::vec3i size, int32_t samples, bool sampleFixed) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisampleArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureStorage3DMultisample(object.id, samples, format.format, size.x, size.y, size.z, sampleFixed);
 		checkGL();
 	}
 
@@ -162,6 +210,14 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
 		glGenerateMipmap(to_value(object.target));
+		checkGL();
+	}
+	inline void dsa_generateMipmap() noexcept {
+		object.template assert_target<TextureTarget::_1D, TextureTarget::_2D, TextureTarget::_3D,
+				TextureTarget::_1DArray, TextureTarget::_2DArray, TextureTarget::CubeMap, TextureTarget::CubeMapArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		glGenerateTextureMipmap(object.id);
 		checkGL();
 	}
 
@@ -245,8 +301,61 @@ public:
 	}
 	inline void subImage(CubeSide cubeSide, int32_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, int32_t width, int32_t height, int32_t depth, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
 		object.template assert_target<TextureTarget::CubeMapArray>();
-		depth = depth * 6 + to_value(cubeSide) - to_value(CubeSide::PositiveX);
-		subImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, level, xOffset, yOffset, zOffset, width, height, depth, dataFormat, dataType, data);
+		const auto sideIndex = to_value(cubeSide) - to_value(CubeSide::PositiveX);
+		const auto sizeInfo = libv::gl::sizeInfo(dataType);
+		const auto pixelSize = sizeInfo.size * libv::gl::dimInfo(dataFormat) / sizeInfo.pack;
+		const auto imageSize = width * height * pixelSize;
+		for (int i = 0; i < depth; ++i) {
+			const auto layerIndex = (zOffset + i) * 6 + sideIndex;
+			subImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, level, xOffset, yOffset, layerIndex, width, height, 1, dataFormat, dataType, data + imageSize * i);
+		}
+	}
+
+private:
+	inline void dsa_subImage1D(int32_t level, int32_t xOffset, int32_t width, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureSubImage1D(object.id, level, xOffset, width, to_value(dataFormat), to_value(dataType), data);
+		checkGL();
+	}
+	inline void dsa_subImage2D(int32_t level, int32_t xOffset, int32_t yOffset, int32_t width, int32_t height, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureSubImage2D(object.id, level, xOffset, yOffset, width, height, to_value(dataFormat), to_value(dataType), data);
+		checkGL();
+	}
+	inline void dsa_subImage3D(int32_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, int32_t width, int32_t height, int32_t depth, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureSubImage3D(object.id, level, xOffset, yOffset, zOffset, width, height, depth, to_value(dataFormat), to_value(dataType), data);
+		checkGL();
+	}
+
+public:
+	inline void dsa_subImage(int32_t level, int32_t xOffset, int32_t width, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		object.template assert_target<TextureTarget::_1D>();
+		dsa_subImage1D(level, xOffset, width, dataFormat, dataType, data);
+	}
+	inline void dsa_subImage(int32_t level, int32_t xOffset, int32_t yOffset, int32_t width, int32_t height, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle>();
+		dsa_subImage2D(level, xOffset, yOffset, width, height, dataFormat, dataType, data);
+	}
+	inline void dsa_subImage(CubeSide cubeSide, int32_t level, int32_t xOffset, int32_t yOffset, int32_t width, int32_t height, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		object.template assert_target<TextureTarget::CubeMap>();
+		const auto sideIndex = to_value(cubeSide) - to_value(CubeSide::PositiveX);
+		dsa_subImage3D(level, xOffset, yOffset, sideIndex, width, height, 1, dataFormat, dataType, data);
+	}
+	inline void dsa_subImage(int32_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, int32_t width, int32_t height, int32_t depth, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D>();
+		dsa_subImage3D(level, xOffset, yOffset, zOffset, width, height, depth, dataFormat, dataType, data);
+	}
+	inline void dsa_subImage(CubeSide cubeSide, int32_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, int32_t width, int32_t height, int32_t depth, FormatBase dataFormat, DataType dataType, const void* data) noexcept {
+		object.template assert_target<TextureTarget::CubeMapArray>();
+		const auto sideIndex = to_value(cubeSide) - to_value(CubeSide::PositiveX);
+		const auto sizeInfo = libv::gl::sizeInfo(dataType);
+		const auto pixelSize = sizeInfo.size * libv::gl::dimInfo(dataFormat) / sizeInfo.pack;
+		const auto imageSize = width * height * pixelSize;
+		for (int i = 0; i < depth; ++i) {
+			const auto layerIndex = (zOffset + i) * 6 + sideIndex;
+			dsa_subImage3D(level, xOffset, yOffset, layerIndex, width, height, 1, dataFormat, dataType, data + imageSize * i);
+		}
 	}
 
 public:
@@ -292,8 +401,55 @@ public:
 		return result;
 	}
 
+	[[nodiscard]] inline int32_t dsa_getSize1D(int32_t level = 0) const noexcept {
+		object.template assert_target<TextureTarget::_1D>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		int32_t result;
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_WIDTH, &result);
+		checkGL();
+		return result;
+	}
+	[[nodiscard]] inline libv::vec2i dsa_getSize2D(int32_t level = 0) const noexcept {
+		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::CubeMap>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		libv::vec2i result;
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_WIDTH, &result.x);
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_HEIGHT, &result.y);
+		checkGL();
+		return result;
+	}
+	[[nodiscard]] inline libv::vec3i dsa_getSize3D(int32_t level = 0) const noexcept {
+		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+
+		libv::vec3i result;
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_WIDTH, &result.x);
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_HEIGHT, &result.y);
+		glGetTextureLevelParameteriv(object.id, level, GL_TEXTURE_DEPTH, &result.z);
+		checkGL();
+		return result;
+	}
+
+public:
+	inline void dsa_getTextureImage(GLint level, FormatBase format, DataType type, GLsizei bufSize, void* pixels) const noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glGetTextureImage(object.id, level, +format, +type, bufSize, pixels);
+		checkGL();
+	}
+	inline void dsa_getTextureSubImage(int32_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, int32_t xSize, int32_t ySize, int32_t zSize, FormatBase format, DataType type, GLsizei bufSize, void* pixels) const noexcept {
+		// Could assert here for texture type dimensions matching requested x,y,z dimensions
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glGetTextureSubImage(object.id, level,
+				xOffset, yOffset, zOffset,
+				xSize, ySize, zSize,
+				+format, +type, bufSize, pixels);
+		checkGL();
+	}
+
 private:
-	inline void set(GLenum parameter, GLfloat value) noexcept {
+	inline void set(GLenum parameter, float value) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glTexParameterf(to_value(object.target), parameter, value);
 		checkGL();
@@ -311,6 +467,27 @@ private:
 	inline void set(GLenum parameter, libv::vec4i value) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glTexParameteriv(to_value(object.target), parameter, value.ptr());
+		checkGL();
+	}
+
+	inline void dsa_set(GLenum parameter, float value) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureParameterf(object.id, parameter, value);
+		checkGL();
+	}
+	inline void dsa_set(GLenum parameter, int32_t value) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureParameteri(object.id, parameter, value);
+		checkGL();
+	}
+	inline void dsa_set(GLenum parameter, libv::vec4f value) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureParameterfv(object.id, parameter, value.ptr());
+		checkGL();
+	}
+	inline void dsa_set(GLenum parameter, libv::vec4i value) noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTextureParameteriv(object.id, parameter, value.ptr());
 		checkGL();
 	}
 
@@ -408,6 +585,107 @@ public:
 		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray>();
 
 		set(GL_TEXTURE_WRAP_R, static_cast<int32_t>(to_value(wrap)));
+	}
+
+	inline void dsa_setDepthStencilMode(DepthStencilMode mode) noexcept {
+		dsa_set(GL_DEPTH_STENCIL_TEXTURE_MODE, static_cast<int32_t>(to_value(mode)));
+	}
+	inline void dsa_setBaseLevel(int32_t level) noexcept {
+		dsa_set(GL_TEXTURE_BASE_LEVEL, level);
+	}
+	inline void dsa_setMaxLevel(int32_t level) noexcept {
+		dsa_set(GL_TEXTURE_MAX_LEVEL, level);
+	}
+	inline void dsa_setBorderColor(float r, float g, float b, float a) noexcept {
+		dsa_set(GL_TEXTURE_BORDER_COLOR, {r, g, b, a});
+	}
+	inline void dsa_setBorderColor(int32_t r, int32_t g, int32_t b, int32_t a) noexcept {
+		dsa_set(GL_TEXTURE_BORDER_COLOR, {r, g, b, a});
+	}
+	inline void dsa_setCompareMode(CompareMode mode) noexcept {
+		dsa_set(GL_TEXTURE_COMPARE_MODE, static_cast<int32_t>(to_value(mode)));
+	}
+	inline void dsa_setCompareFunc(TestFunction func) noexcept {
+		dsa_set(GL_TEXTURE_COMPARE_FUNC, static_cast<int32_t>(to_value(func)));
+	}
+	inline void dsa_setLODBias(float bias) noexcept {
+		dsa_set(GL_TEXTURE_LOD_BIAS, bias);
+	}
+	inline void dsa_setMagFilter(MagFilter filter) noexcept {
+		object.template assert_not_target<TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
+		dsa_set(GL_TEXTURE_MAG_FILTER, static_cast<int32_t>(to_value(filter)));
+	}
+	inline void dsa_setMaxLOD(float value) noexcept {
+		dsa_set(GL_TEXTURE_MAX_LOD, value);
+	}
+	inline void dsa_setMinFilter(MinFilter filter) noexcept {
+		object.template assert_not_target<TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
+		dsa_set(GL_TEXTURE_MIN_FILTER, static_cast<int32_t>(to_value(filter)));
+	}
+	inline void dsa_setMinLOD(float value) noexcept {
+		dsa_set(GL_TEXTURE_MIN_LOD, value);
+	}
+	inline void dsa_setSwizzle(Swizzle r, Swizzle g, Swizzle b, Swizzle a) noexcept {
+		dsa_set(GL_TEXTURE_SWIZZLE_RGBA, libv::vec4i{
+			static_cast<GLint>(to_value(r)),
+			static_cast<GLint>(to_value(g)),
+			static_cast<GLint>(to_value(b)),
+			static_cast<GLint>(to_value(a))
+		});
+	}
+	inline void dsa_setSwizzleR(Swizzle swizzle) noexcept {
+		dsa_set(GL_TEXTURE_SWIZZLE_R, swizzle);
+	}
+	inline void dsa_setSwizzleG(Swizzle swizzle) noexcept {
+		dsa_set(GL_TEXTURE_SWIZZLE_G, swizzle);
+	}
+	inline void dsa_setSwizzleB(Swizzle swizzle) noexcept {
+		dsa_set(GL_TEXTURE_SWIZZLE_B, swizzle);
+	}
+	inline void dsa_setSwizzleA(Swizzle swizzle) noexcept {
+		dsa_set(GL_TEXTURE_SWIZZLE_A, swizzle);
+	}
+
+	inline void dsa_setWrap(Wrap s) noexcept {
+		object.template assert_target<TextureTarget::_1D, TextureTarget::_1DArray>();
+
+		dsa_set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(s)));
+	}
+	inline void dsa_setWrap(Wrap s, Wrap t) noexcept {
+		object.template assert_target<
+				TextureTarget::_2D, TextureTarget::_2DArray, TextureTarget::Rectangle,
+				TextureTarget::CubeMap, TextureTarget::CubeMapArray,
+				TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
+
+		dsa_set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(s)));
+		dsa_set(GL_TEXTURE_WRAP_T, static_cast<int32_t>(to_value(t)));
+	}
+	inline void dsa_setWrap(Wrap s, Wrap t, Wrap r) noexcept {
+		object.template assert_target<TextureTarget::_3D>();
+
+		dsa_set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(s)));
+		dsa_set(GL_TEXTURE_WRAP_T, static_cast<int32_t>(to_value(t)));
+		dsa_set(GL_TEXTURE_WRAP_R, static_cast<int32_t>(to_value(r)));
+	}
+	inline void dsa_setWrapS(Wrap wrap) noexcept {
+		object.template assert_target<TextureTarget::_1D, TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle,
+				TextureTarget::CubeMap, TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray,
+				TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
+
+		dsa_set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(wrap)));
+	}
+	inline void dsa_setWrapT(Wrap wrap) noexcept {
+		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle,
+				TextureTarget::CubeMap, TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray,
+				TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
+
+		dsa_set(GL_TEXTURE_WRAP_T, static_cast<int32_t>(to_value(wrap)));
+	}
+	inline void dsa_setWrapR(Wrap wrap) noexcept {
+		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray,
+				TextureTarget::_2DMultisampleArray>();
+
+		dsa_set(GL_TEXTURE_WRAP_R, static_cast<int32_t>(to_value(wrap)));
 	}
 };
 

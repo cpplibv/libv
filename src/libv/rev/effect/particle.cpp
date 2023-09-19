@@ -1,7 +1,7 @@
-// Created by Vader on 2023.01.09..
+// Project: libv.rev, File: src/libv/rev/effect/particle.cpp
 
 // hpp
-#include <libv/rev/effect/particle.hpp>
+// #include <libv/rev/effect/particle.hpp>
 
 
 namespace libv {

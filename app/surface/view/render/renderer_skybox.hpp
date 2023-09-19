@@ -35,7 +35,7 @@ struct UniformsSkybox {
 		access(fogColor, "fogColor", libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f});
 //		access(sunColor, "sunColor", libv::vec3f{1.0f, 0.9f, 0.8f});
 //		access(sunDirection, "sunDirection", libv::vec3f{0.784464f, 0.196116f, 0.588348f});
-		access(textureSkybox, "textureSkybox", textureChannel_diffuse);
+		access(textureSkybox, "textureSkybox", textureUnit_diffuse);
 	}
 
 	template <typename Access> void access_blocks(Access& access) {

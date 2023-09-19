@@ -156,6 +156,14 @@ struct UniformsComplex {
 	LIBV_REFLECTION_ACCESS(_08_tail__);
 };
 
+struct UniformsVec3AndFloat {
+	libv::glr::Uniform_t<libv::vec3f> _00_vec3f_;
+	libv::glr::Uniform_t<float> _01_float_;
+
+	LIBV_REFLECTION_ACCESS(_00_vec3f_);
+	LIBV_REFLECTION_ACCESS(_01_float_);
+};
+
 template <typename T>
 libv::vec3ui test_info() {
 	return {libv::glr::layout_std140_align<T>(), libv::glr::layout_std140_size<T>(), libv::glr::layout_std140_stride<T>()};
@@ -497,4 +505,15 @@ TEST_CASE("Layout UniformsComplex", "[libv.glr.std140]") {
 	CHECK(layout._07_2nestB[1]._03_vec2f_.location == 368);
 	CHECK(layout._07_2nestB[1]._04_2mat2f.location == 384);
 	CHECK(layout._08_tail__.location == 480);
+}
+
+TEST_CASE("Layout UniformsVec3AndFloat", "[libv.glr.std140]") {
+	const auto layout = libv::glr::layout_std140<UniformsVec3AndFloat>(uniformblock_test);
+
+	libv::glr::Uniform_t<libv::vec3f> _00_vec3f_;
+	libv::glr::Uniform_t<float> _01_float_;
+
+	CHECK(layout.size == 16);
+	CHECK(layout._00_vec3f_.location == 0);
+	CHECK(layout._01_float_.location == 12);
 }

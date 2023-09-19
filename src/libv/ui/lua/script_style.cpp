@@ -12,7 +12,7 @@
 #include <libv/utility/concat.hpp>
 #include <libv/utility/hash_string.hpp>
 #include <libv/utility/timer.hpp>
-#include <libv/utility/trim.hpp>
+#include <libv/algo/trim.hpp>
 // std
 #include <memory>
 #include <optional>

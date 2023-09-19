@@ -16,7 +16,7 @@ std::string_view to_string(const Action value) {
 	case Action::repeat: return "repeat";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-Action-enum-value>>";
 }
 
 std::string_view to_string(const GamepadButton value) {
@@ -38,7 +38,7 @@ std::string_view to_string(const GamepadButton value) {
 	case GamepadButton::DPadLeft: return "DPadLeft";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-GamepadButton-enum-value>>";
 }
 
 std::string_view to_string(const Keycode value) {
@@ -166,7 +166,7 @@ std::string_view to_string(const Keycode value) {
 	case Keycode::Menu: return "Menu";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-Keycode-enum-value>>";
 }
 
 std::string_view to_string(const KeyState value) {
@@ -175,7 +175,7 @@ std::string_view to_string(const KeyState value) {
 	case KeyState::released: return "released";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-KeyState-enum-value>>";
 }
 
 std::string_view to_string(const MonitorEvent value) {
@@ -184,7 +184,7 @@ std::string_view to_string(const MonitorEvent value) {
 	case MonitorEvent::disconnected: return "disconnected";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-MonitorEvent-enum-value>>";
 }
 
 std::string_view to_string(const MouseButton value) {
@@ -255,7 +255,7 @@ std::string_view to_string(const MouseButton value) {
 	case MouseButton::Button63: return "mouse63";
 	}
 
-	return "<<invalid>>";
+	return "<<invalid-MouseButton-enum-value>>";
 }
 
 // -------------------------------------------------------------------------------------------------

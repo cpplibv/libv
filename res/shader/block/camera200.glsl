@@ -3,6 +3,8 @@
 // Generator version: v5.0.0
 // Input file: src/libv/rev/shader/block/camera200.in.lua
 
+#pragma once
+
 
 layout(std140) uniform Camera200 {
 	mat4 matP;

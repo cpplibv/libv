@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/materials/material_phong.hpp
+// Project: libv.rev, File: src/libv/rev/material/material_phong.hpp
 //
 //#pragma once
 //

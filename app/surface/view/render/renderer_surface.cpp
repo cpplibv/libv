@@ -118,7 +118,7 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 	glr.uniform(shader.uniform().fogColor, fogColor);
 	glr.uniform(shader.uniform().sunColor, sunColor);
 	glr.uniform(shader.uniform().sunDirection, sunDirection);
-	glr.texture(texture.texture(), textureChannel_diffuse);
+	glr.texture(texture.texture(), textureUnit_diffuse);
 
 	std::erase_if(chunkMeshMap, [&](const auto& pair) {
 		const auto& [index, chunkMesh] = pair;

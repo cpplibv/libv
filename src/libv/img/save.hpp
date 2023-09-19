@@ -19,6 +19,7 @@ enum class save_format {
 	jpg, /// JPG - Backend note: R, RGB, RGBX (where X is unused)
 	png, /// PNG
 	tga, /// TGA - Backend note: Greyscale, RGB, RGBA [uncompressed]
+	qoi, /// QOI
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -54,6 +55,11 @@ save_result save_tga(const libv::vec3f* data, std::size_t size_x, std::size_t si
 save_result save_tga(const libv::vec4f* data, std::size_t size_x, std::size_t size_y);
 save_result save_tga(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y);
 save_result save_tga(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y);
+
+save_result save_qoi(const libv::vec3f* data, std::size_t size_x, std::size_t size_y);
+save_result save_qoi(const libv::vec4f* data, std::size_t size_x, std::size_t size_y);
+save_result save_qoi(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y);
+save_result save_qoi(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y);
 
 // -------------------------------------------------------------------------------------------------
 

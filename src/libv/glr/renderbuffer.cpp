@@ -26,7 +26,7 @@ struct RemoteRenderbuffer {
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 public:
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
 	~RemoteRenderbuffer() noexcept;
@@ -34,7 +34,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-void RemoteRenderbuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+void RemoteRenderbuffer::update(libv::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
 		remote = make_observer_ptr(&remote_.destroyQueues());
 
@@ -75,7 +75,7 @@ void Renderbuffer::storage_ms(libv::gl::Format format, libv::vec2i size, int32_t
 	remote->samples = samples;
 }
 
-void Renderbuffer::sync(libv::gl::GL& gl, Remote& remote_) const noexcept {
+void Renderbuffer::sync(libv::GL& gl, Remote& remote_) const noexcept {
 	remote->update(gl, remote_);
 }
 

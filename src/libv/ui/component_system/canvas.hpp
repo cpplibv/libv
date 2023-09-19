@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component_system/attach_state.hpp
+// Project: libv.ui, File: src/libv/ui/component_system/canvas.hpp
 
 #pragma once
 

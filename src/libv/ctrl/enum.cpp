@@ -25,7 +25,7 @@ std::string_view to_string(const DigitalInputAction& var) {
 	}
 
 	assert(false && "Invalid DigitalInputAction enum value");
-	return "<<invalid>>";
+	return "<<invalid-DigitalInputAction-enum-value>>";
 }
 
 std::string_view to_string(const OperationBinary& var) {
@@ -39,7 +39,7 @@ std::string_view to_string(const OperationBinary& var) {
 	}
 
 	assert(false && "Invalid OperationBinary enum value");
-	return "<<invalid>>";
+	return "<<invalid-OperationBinary-enum-value>>";
 }
 
 // -------------------------------------------------------------------------------------------------

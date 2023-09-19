@@ -76,8 +76,8 @@ struct UniformsSprite {
 	libv::glr::Uniform_vec3f sunDirection;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(textureColor, "textureColor", textureChannel_diffuse);
-		access(textureNormal, "textureNormal", textureChannel_normal);
+		access(textureColor, "textureColor", textureUnit_diffuse);
+		access(textureNormal, "textureNormal", textureUnit_normal);
 
 		access(fogEnabled, "fogEnabled", true);
 		access(fogIntensity, "fogIntensity", 0.05f);

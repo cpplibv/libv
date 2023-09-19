@@ -22,7 +22,7 @@ public:
 worker_thread_pool::worker_thread_pool(std::size_t n, std::string new_name) :
 	self(std::make_shared<impl_worker_thread_pool>(std::move(new_name), n)) {}
 
-worker_thread_pool::~worker_thread_pool() noexcept = default; // For the sake of forward declared ptr
+worker_thread_pool::~worker_thread_pool() noexcept = default; // For the sake of forward declared types
 
 // -------------------------------------------------------------------------------------------------
 

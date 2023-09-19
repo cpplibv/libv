@@ -149,7 +149,7 @@ void main() {
 	float atmosphereHeight = atmosphereRadius - planetRadius;
 	float rayLength = length(exit - camera);
 	float rayDistance = length(cross(center - camera, center - exit)) / length(exit - camera);
-	float rayDirection = normalize(exit - camera);
+	vec3 rayDirection = normalize(exit - camera);
 	float dive = sqrt(planetRadius * planetRadius + rayDistance * rayDistance) * 2.0;
 	float lowestAltitude = rayDistance - planetRadius;
 

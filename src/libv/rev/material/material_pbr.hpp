@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/materials/material_pbr.hpp
+// Project: libv.rev, File: src/libv/rev/material/material_pbr.hpp
 //
 //#pragma once
 //

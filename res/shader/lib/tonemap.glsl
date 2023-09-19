@@ -22,6 +22,7 @@ vec3 tonemapAces(vec3 x) {
 
 // -------------------------------------------------------------------------------------------------
 
+// http://www.oscars.org/science-technology/sci-tech-projects/aces
 vec3 tonemapAcesFilmic(vec3 color) {
 	const mat3 m1 = mat3(
 		0.59719, 0.07600, 0.02840,

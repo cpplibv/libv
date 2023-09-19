@@ -2,8 +2,12 @@
 
 #pragma once
 
-// std
-#include <exception>
+#include <libv/meta/uninitialized.hpp>
+#include <libv/utility/memory/unique.hpp>
+
+#include <cassert>
+#include <cstring>
+#include <memory>
 
 
 namespace libv {
@@ -24,132 +28,122 @@ public:
 	typedef ptrdiff_t difference_type;
 
 private:
-	T* store;
-	size_type count;
-
-private:
-	void check(size_type n) {
-		if (n >= count)
-			throw std::out_of_range("dyn_array");
-	}
-
-	T* alloc(size_type n) {
-		return reinterpret_cast<T*>(new char[n * sizeof(T)]);
-	}
+	std::unique_ptr<T[]> store;
+	size_type count = 0;
 
 public:
-	dyn_array() = delete;
-	const dyn_array operator=(const dyn_array&) = delete;
+	dyn_array() = default;
 
-	explicit dyn_array(size_type c) :
-		store(alloc(c)),
-		count(c) {
-		size_type i;
-		try {
-			for (i = 0; i < count; ++i)
-				new(store + i) T;
-		} catch (...) {
-			for (; i > 0; --i)
-				(store + (i - 1))->~T();
-			throw;
-		}
+	explicit dyn_array(size_type count) :
+		store(std::make_unique<T[]>(count)),
+		count(count) {
 	}
 
-	dyn_array(const dyn_array& d) :
-		store(alloc(d.count)),
-		count(d.count) {
-		try {
-			std::uninitialized_copy(d.begin(), d.end(), begin());
-		} catch (...) {
-			delete store;
-			throw;
-		}
+	dyn_array(size_type count, libv::uninitialized_t) :
+		store(libv::make_unique_uninitialized<T[]>(count)),
+		count(count) {
 	}
+
+	dyn_array(const T* data, size_type count) :
+		dyn_array(count, libv::uninitialized) {
+		std::copy(data, data + count, store.get());
+	}
+
+	inline dyn_array(const dyn_array& orig) {
+		*this = orig;
+	}
+	inline dyn_array& operator=(const dyn_array& orig) & {
+		count = orig.count;
+		store = libv::make_unique_uninitialized<T[]>(count);
+		if constexpr (std::is_trivially_copyable_v<T>)
+			std::memcpy(store.get(), orig.store.get(), count * sizeof(T));
+		else
+			std::copy(orig.begin(), orig.end(), store.get());
+	}
+	inline dyn_array(dyn_array&&) noexcept = default;
+	inline dyn_array& operator=(dyn_array&&) & noexcept = default;
 
 	~dyn_array() {
-		for (size_type i = 0; i < count; ++i)
-			(store + i)->~T();
-		delete[] store;
 	}
 
 public:
 	// iterators:
-	iterator begin() {
-		return store;
+	[[nodiscard]] inline iterator begin() noexcept {
+		return store.get();
 	}
-	const_iterator begin() const {
-		return store;
+	[[nodiscard]] inline const_iterator begin() const noexcept {
+		return store.get();
 	}
-	const_iterator cbegin() const {
-		return store;
+	[[nodiscard]] inline const_iterator cbegin() const noexcept {
+		return store.get();
 	}
-	iterator end() {
-		return store + count;
+	[[nodiscard]] inline iterator end() noexcept {
+		return store.get() + count;
 	}
-	const_iterator end() const {
-		return store + count;
+	[[nodiscard]] inline const_iterator end() const noexcept {
+		return store.get() + count;
 	}
-	const_iterator cend() const {
-		return store + count;
+	[[nodiscard]] inline const_iterator cend() const noexcept {
+		return store.get() + count;
 	}
-	reverse_iterator rbegin() {
+	[[nodiscard]] inline reverse_iterator rbegin() noexcept {
 		return reverse_iterator(end());
 	}
-	const_reverse_iterator rbegin() const {
+	[[nodiscard]] inline const_reverse_iterator rbegin() const noexcept {
 		return reverse_iterator(end());
 	}
-	reverse_iterator rend() {
+	[[nodiscard]] inline reverse_iterator rend() noexcept {
 		return reverse_iterator(begin());
 	}
-	const_reverse_iterator rend() const {
+	[[nodiscard]] inline const_reverse_iterator rend() const noexcept {
 		return reverse_iterator(begin());
 	}
 
 	// capacity:
-	size_type size() const {
+	[[nodiscard]] inline size_type size() const noexcept {
 		return count;
 	}
-	size_type max_size() const {
+	[[nodiscard]] inline size_type max_size() const noexcept {
 		return count;
 	}
-	bool empty() const {
-		return false;
+	[[nodiscard]] inline bool empty() const noexcept {
+		return count == 0;
 	}
 
 	// element access:
-	reference operator[](size_type n) {
+	[[nodiscard]] inline reference operator[](size_type n) noexcept {
 		return store[n];
 	}
-	const_reference operator[](size_type n) const {
+	[[nodiscard]] inline const_reference operator[](size_type n) const noexcept {
 		return store[n];
 	}
-	reference front() {
+	[[nodiscard]] inline reference front() noexcept {
 		return store[0];
 	}
-	const_reference front() const {
+	[[nodiscard]] inline const_reference front() const noexcept {
 		return store[0];
 	}
-	reference back() {
+	[[nodiscard]] inline reference back() noexcept {
 		return store[count - 1];
 	}
-	const_reference back() const {
+	[[nodiscard]] inline const_reference back() const noexcept {
 		return store[count - 1];
 	}
-	const_reference at(size_type n) const {
-		check(n);
+	[[nodiscard]] inline const_reference at(size_type n) const noexcept {
+		assert(n < count && "Out of range");
 		return store[n];
 	}
-	reference at(size_type n) {
-		check(n);
+	[[nodiscard]] inline reference at(size_type n) noexcept {
+		assert(n < count && "Out of range");
 		return store[n];
 	}
 
 	// data access:
-	T* data() {
-		return store;
+	[[nodiscard]] inline T* data() noexcept {
+		return store.get();
 	}
-	const T* data() const {
-		return store;
+	[[nodiscard]] inline const T* data() const noexcept {
+		return store.get();
 	}
 };
 

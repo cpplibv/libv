@@ -4,7 +4,7 @@
 
 in vec2 fragmentTexture0;
 
-out vec4 result;
+out vec4 outputColor;
 
 uniform sampler2D texture0;
 uniform float bloomThreshold;
@@ -37,5 +37,5 @@ void main() {
 
 	sample0 = prefilter(sample0, bloomThreshold, bloomKnee);
 
-	result = vec4(sample0, 1);
+	outputColor = vec4(sample0, 1);
 }

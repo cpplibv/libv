@@ -89,7 +89,7 @@ constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
+constexpr auto textureUnit_diffuse = libv::gl::TextureUnit{0};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -120,7 +120,7 @@ struct Sandbox {
 		plane_program.vertex(shader_plane_vs);
 		plane_program.fragment(shader_plane_fs);
 		plane_program.assign(plane_uniform_matMVP, "matMVP");
-		plane_program.assign(plane_uniform_texture, "textureSampler", textureChannel_diffuse);
+		plane_program.assign(plane_uniform_texture, "textureSampler", textureUnit_diffuse);
 
 		{
 			plane_mesh.clear();
@@ -131,7 +131,9 @@ struct Sandbox {
 
 			libv::glr::ProgressSegmentedRingStyle style;
 
-			style.segment_num = 8;
+			// style.segment_num = 8;
+			// style.resolution = 4;
+			style.segment_num = 64;
 			style.resolution = 4;
 			style.radius_inner = 100;
 			style.radius_outer = 300;

@@ -21,16 +21,14 @@ public:
 	using BasicAccessBuffer<UniformBuffer, GL_UNIFORM_BUFFER>::BasicAccessBuffer;
 
 public:
-	inline void bindBase(GLuint index) noexcept {
+	inline void bindBase(uint32_t binding) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glBindBufferBase(GL_UNIFORM_BUFFER, index, object.id);
-		checkGL();
+		gl.bindUniformBufferBase(object, binding);
 	}
 
-	inline void bindRange(GLuint index, GLintptr offset, GLsizeiptr size) noexcept {
+	inline void bindRange(uint32_t binding, uint32_t offset, uint32_t size) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glBindBufferRange(GL_UNIFORM_BUFFER, index, object.id, offset, size);
-		checkGL();
+		gl.bindUniformBufferRange(object, binding, offset, size);
 	}
 };
 

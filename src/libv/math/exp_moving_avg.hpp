@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/exponential_moving_average.hpp
+// Project: libv.math, File: src/libv/math/exp_moving_avg.hpp
 
 #pragma once
 

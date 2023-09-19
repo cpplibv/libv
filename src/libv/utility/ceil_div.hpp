@@ -7,9 +7,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-// Integer division with ceil instead of floor if there is any remainder
-template <typename T>
-[[nodiscard]] constexpr inline T ceil_div(const T x, const T y) noexcept {
+/// Integer division with ceil instead of floor if there is any remainder
+template <typename T, typename K>
+[[nodiscard]] constexpr inline T ceil_div(const T x, const K y) noexcept {
 	return (x + y - 1) / y;
 }
 

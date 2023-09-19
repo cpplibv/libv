@@ -16,7 +16,7 @@ struct [[nodiscard]] ReadFileResult {
 	std::error_code ec;
 };
 
-// By default reading in 1 MB chunks between checks for cancellation
+// By default, reading in 1 MB chunks between checks for cancellation
 static constexpr std::size_t default_read_file_stop_chunk_size = 1 * 1024 * 1024;
 
 // -------------------------------------------------------------------------------------------------

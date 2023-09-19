@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/enum.hpp>
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/gl/matrix_stack.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
@@ -60,9 +60,9 @@ public:
 	void sequencePoint() noexcept; /// Registers a sequence point as a sorting fence
 
 public:
-	void callback(std::function<void(libv::gl::GL&)>);
-	void callbackProgram(std::function<void(libv::gl::GL&)>);
-	libv::gl::GL& out_of_order_gl() noexcept;
+	void callback(std::function<void(libv::GL&)>);
+	void callbackProgram(std::function<void(libv::GL&)>);
+	libv::GL& out_of_order_gl() noexcept;
 
 public:
 	inline void setClearColor(const float r, const float g, const float b, const float a) {
@@ -116,7 +116,7 @@ public:
 	void blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
 
 public:
-	void uniform(const Uniform_t<libv::gl::TextureChannel> uniform, libv::gl::TextureChannel value);
+	void uniform(const Uniform_t<libv::gl::TextureUnit> uniform, libv::gl::TextureUnit value);
 	void uniform(const Uniform_t<bool> uniform, bool value);
 	void uniform(const Uniform_t<int32_t> uniform, int32_t value);
 	void uniform(const Uniform_t<uint32_t> uniform, uint32_t value);
@@ -167,7 +167,7 @@ public:
 	void uniform(UniformBlockUniqueView_std140&& view);
 	void uniform(UniformBlockSharedView_std140 view);
 	void uniform(UniformBlockStreamView_std140 view);
-	void texture(Texture texture, const libv::gl::TextureChannel channel);
+	void texture(Texture texture, const libv::gl::TextureUnit channel);
 //	void pop_program(Program program) {}
 //	void push_program() {}
 //	void push_program(Program program) {}
@@ -185,7 +185,7 @@ public:
 	void memoryBarrier(libv::gl::BarrierBit bits);
 
 public:
-	void execute(libv::gl::GL& gl, Remote& remote);
+	void execute(libv::GL& gl, Remote& remote);
 };
 
 // -------------------------------------------------------------------------------------------------

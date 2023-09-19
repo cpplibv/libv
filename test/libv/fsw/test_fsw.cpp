@@ -137,7 +137,7 @@ private:
 				continue;
 
 			std::filesystem::create_directories(dir);
-			dirs.emplace(dir.string());
+			dirs.emplace(dir.generic_string());
 		}
 
 		std::this_thread::sleep_for(time_dir);
@@ -211,7 +211,7 @@ public:
 	}
 
 	void create_file(std::string path) {
-		path = std::filesystem::path(path).lexically_normal().string();
+		path = std::filesystem::path(path).lexically_normal().generic_string();
 
 		if (std::filesystem::exists(path))
 			throw std::runtime_error("Test failure: File already exists: " + path);
@@ -223,7 +223,7 @@ public:
 	}
 
 	void modify_file(std::string path) {
-		path = std::filesystem::path(path).lexically_normal().string();
+		path = std::filesystem::path(path).lexically_normal().generic_string();
 
 		if (!files.contains(path))
 			throw std::runtime_error("Test failure: File is not part of the test: " + path);
@@ -233,7 +233,7 @@ public:
 	}
 
 	void create_directory(std::string path) {
-		path = std::filesystem::path(path).lexically_normal().string();
+		path = std::filesystem::path(path).lexically_normal().generic_string();
 
 		if (std::filesystem::exists(path))
 			throw std::runtime_error("Test failure: Directory already exists: " + path);
@@ -242,7 +242,7 @@ public:
 	}
 
 	void remove_file(std::string path) {
-		path = std::filesystem::path(path).lexically_normal().string();
+		path = std::filesystem::path(path).lexically_normal().generic_string();
 
 		if (!files.contains(path))
 			throw std::runtime_error("Test failure: File is not part of the test: " + path);

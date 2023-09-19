@@ -56,32 +56,32 @@ private:
 	void aux_update(duration delta_time);
 
 public:
-	template <typename T>
-	inline void context_enter(T* context);
+	template <typename Context>
+	inline void context_enter(Context* context);
 
-	template <typename T>
+	template <typename Context>
 	inline void context_leave();
 
-	template <typename T>
-	inline void context_leave_if_matches(T* context);
+	template <typename Context>
+	inline void context_leave_if_matches(Context* context);
 
 public:
-	template <typename T, typename F>
+	template <typename Context, typename F>
 	inline void feature_action(std::string name, F&& function);
 
-	template <typename T, typename F>
+	template <typename Context, typename F>
 	inline void feature_analog(std::string name, F&& function, scale_group multipliers);
 
-	template <typename T, typename F>
+	template <typename Context, typename F>
 	inline void feature_analog(std::string name, scale_group multipliers, F&& function);
 
-	template <typename T, typename F>
+	template <typename Context, typename F>
 	inline void feature_analog(std::string name, F&& function, scale_type multi_impulse = 1, scale_type multi_time = 1, scale_type multi_analog = 1);
 
-	template <typename T, typename F>
+	template <typename Context, typename F>
 	inline void feature_binary(std::string name, F&& function);
 
-	template <typename T>
+	template <typename Context>
 	inline void remove_feature(std::string_view name);
 
 public:
@@ -256,57 +256,57 @@ void Controls::attach(Frame& frame) {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-inline void Controls::context_enter(T* context) {
-	_context_enter(libv::type_key<T>(), static_cast<void*>(context));
+template <typename Context>
+inline void Controls::context_enter(Context* context) {
+	_context_enter(libv::type_key<Context>(), static_cast<void*>(context));
 }
 
-template <typename T>
+template <typename Context>
 inline void Controls::context_leave() {
-	_context_leave(libv::type_key<T>());
+	_context_leave(libv::type_key<Context>());
 }
 
-template <typename T>
-inline void Controls::context_leave_if_matches(T* context) {
-	_context_leave_if_matches(libv::type_key<T>(), static_cast<void*>(context));
+template <typename Context>
+inline void Controls::context_leave_if_matches(Context* context) {
+	_context_leave_if_matches(libv::type_key<Context>(), static_cast<void*>(context));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T, typename F>
+template <typename Context, typename F>
 inline void Controls::feature_action(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = libv::type_key<T>();
+	const auto context = libv::type_key<Context>();
 
 	_feature_action(context, std::move(name), [function = std::forward<F>(function)](arg_action params, void* context) mutable {
-		if constexpr (std::is_void_v<T>)
+		if constexpr (std::is_void_v<Context>)
 			function(params), (void) context;
 		else
-			function(params, *static_cast<T*>(context));
+			function(params, *static_cast<Context*>(context));
 	});
 }
 
-template <typename T, typename F>
+template <typename Context, typename F>
 inline void Controls::feature_analog(std::string name, F&& function, scale_group multipliers) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = libv::type_key<T>();
+	const auto context = libv::type_key<Context>();
 
 	_feature_analog(context, std::move(name), [function = std::forward<F>(function)](arg_analog params, void* context) mutable {
-		if constexpr (std::is_void_v<T>)
+		if constexpr (std::is_void_v<Context>)
 			function(params), (void) context;
 		else
-			function(params, *static_cast<T*>(context));
+			function(params, *static_cast<Context*>(context));
 	}, multipliers);
 }
 
-template <typename T, typename F>
+template <typename Context, typename F>
 inline void Controls::feature_analog(std::string name, scale_group multipliers, F&& function) {
-	feature_analog<T>(std::move(name), std::forward<F>(function), multipliers);
+	feature_analog<Context>(std::move(name), std::forward<F>(function), multipliers);
 }
 
-template <typename T, typename F>
+template <typename Context, typename F>
 inline void Controls::feature_analog(std::string name, F&& function, scale_type multi_impulse, scale_type multi_time, scale_type multi_analog) {
 	const auto multipliers = scale_group{
 			.impulse = multi_impulse,
@@ -317,26 +317,26 @@ inline void Controls::feature_analog(std::string name, F&& function, scale_type 
 			.js_analog = multi_analog
 	};
 
-	feature_analog<T>(std::move(name), std::forward<F>(function), multipliers);
+	feature_analog<Context>(std::move(name), std::forward<F>(function), multipliers);
 }
 
-template <typename T, typename F>
+template <typename Context, typename F>
 inline void Controls::feature_binary(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = libv::type_key<T>();
+	const auto context = libv::type_key<Context>();
 
 	_feature_binary(context, std::move(name), [function = std::forward<F>(function)](arg_binary params, void* context) mutable {
-		if constexpr (std::is_void_v<T>)
+		if constexpr (std::is_void_v<Context>)
 			function(params), (void) context;
 		else
-			function(params, *static_cast<T*>(context));
+			function(params, *static_cast<Context*>(context));
 	});
 }
 
-template <typename T>
+template <typename Context>
 inline void Controls::remove_feature(std::string_view name) {
-	const auto context = libv::type_key<T>();
+	const auto context = libv::type_key<Context>();
 
 	_remove_feature(context, name);
 }

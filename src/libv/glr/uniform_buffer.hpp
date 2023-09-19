@@ -5,7 +5,7 @@
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
 // std
 #include <memory>
@@ -59,11 +59,11 @@ public:
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
-	void create(libv::gl::GL& gl, Remote& remote_) noexcept;
-	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void create(libv::GL& gl, Remote& remote_) noexcept;
+	void update(libv::GL& gl, Remote& remote_) noexcept;
 
 public:
-	void bind(libv::gl::GL& gl, Remote& remote_, UniformBlockBindingLocation binding, const UniformDataBlock& block) noexcept;
+	void bind(libv::GL& gl, Remote& remote_, UniformBlockBindingLocation binding, const UniformDataBlock& block) noexcept;
 
 	RemoteUniformBuffer(libv::gl::BufferUsage usage) noexcept : usage(usage) { }
 	~RemoteUniformBuffer() noexcept;

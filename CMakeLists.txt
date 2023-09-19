@@ -7,7 +7,7 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.4.2)
+set(WISH_REQUEST_VERSION v5.4.4)
 include(cmake/wish.cmake)
 
 # -------------------------------------------------------------------------------------------------
@@ -49,6 +49,9 @@ wish_alternative_linker(${LIBV_ALTERNATIVE_LINKER})
 option(LIBV_ENABLE_IPO "Enable interprocedural optimization (LTO)" FALSE)
 wish_enable_ipo(${LIBV_ENABLE_IPO})
 
+option(LIBV_WERROR "Specify whether to treat warnings on compile as errors" FALSE)
+wish_werror(${LIBV_WERROR})
+
 # --- Flags ----------------------------------------------------------------------------------------
 
 wish_warning(
@@ -77,6 +80,8 @@ wish_warning(
 	GNU -Wshadow-compatible-local
 	GNU -Wsuggest-override
 	GNU -Wundef
+
+	GNU -Werror=return-type
 
 	#	more warning:
 	#GNU -Wmissing-include-dirs
@@ -301,11 +306,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 9.1.0
-	CMAKE_ARGS
-		-DFMT_DOC=OFF
-		-DFMT_TEST=OFF
-		-DBUILD_SHARED_LIBS=OFF
+	GIT_TAG 10.1.1
 	LINK fmt
 )
 
@@ -372,9 +373,7 @@ wish_create_external(
 wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0c171ee87fcfe35a7e0e0445adef06f92e0b6a91
-	# TODO: Switch to latest gli:
-#	GIT_TAG 779b99ac6656e4d30c3b24e96e0136a59649a869
+	GIT_TAG 779b99ac6656e4d30c3b24e96e0136a59649a869
 	CMAKE_ARGS
 		-DGLI_TEST_ENABLE=OFF
 )
@@ -489,20 +488,26 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME tsl_robin_map
+	GIT_REPOSITORY https://github.com/Tessil/robin-map
+	GIT_TAG v1.2.1
+)
+
+wish_create_external(
 	NAME soil2
-	GIT_REPOSITORY https://github.com/VaderY/SOIL2.git
-	GIT_TAG master
+	GIT_REPOSITORY https://github.com/SpartanJ/SOIL2.git
+	GIT_TAG 229324688c26f1e31da0171f3f5193f12253619e
 	LINK soil2 ${OPENGL_LIBRARIES}
 )
 
 wish_create_external(
 	NAME sol2
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG v3.3.0
-	CMAKE_ARGS
+	GIT_TAG v3.3.1
+#	CMAKE_ARGS
 #		-DSOL2_BUILD_LUA=ON
 #		-DSOL2_LUA_VERSION="5.4.4"
-		-DSOL2_DOCS=OFF
+#		-DBUILD_LUA_AS_DLL=OFF
 	LINK ext_lua
 )
 
@@ -580,14 +585,14 @@ wish_generator(
 wish_generator(
 	TARGET  codegen
 	COMMAND codegen
-#	RUNTIME_FILES app/codegen/plugin/*.lua (add DEPENDS on custom commands)
+	PLUGIN  app/codegen/plugin/*.lua
 	OUTPUT  REPLACE ".in.lua" ".hpp"
 	OUTPUT  REPLACE ".in.lua" ".cpp"
-# TODO P2: Enable header only and split gen
+# TODO P2: Enable header / source only and split generation:
 #	OUTPUT  REPLACE ".in.lua" ".hpp"
+#	OUTPUT  REPLACE ".in.lua" ".cpp"
 #	OUTPUT  REPLACE ".inh.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".cpp"
+#	OUTPUT  REPLACE ".inc.lua" ".cpp"
 )
 
 #wish_generator(
@@ -617,7 +622,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv::container INTERFACE
+	TARGET libv::container STATIC
+	SOURCE src/libv/container/*.cpp
 	LINK   libv::math
 )
 
@@ -697,10 +703,9 @@ wish_create_library(
 )
 
 wish_create_library(
-#	TARGET libv::math INTERFACE
 	TARGET libv::math STATIC
 	SOURCE src/libv/math/*.cpp
-	LINK   ext_glm # Remove (This will only happen with a vec concept / correct mat_t implementation)
+	LINK   ext_glm # Remove (Needs a correct mat_t implementation)
 	LINK   ext_boost # For gradient small_vector
 	LINK   ext_fmt
 	LINK   libv::fwd
@@ -745,6 +750,20 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv::re STATIC
+	SOURCE src/libv/re/*.cpp
+#	GENERATE codegen src/libv/re/material_adv/*.in.lua
+#	GENERATE codegen src/libv/re/shader/block/*.in.lua
+#	GENERATE codegen src/libv/re/shader/*.in.lua
+	LINK   libv::gl libv::math
+	LINK   libv::log libv::utility libv::container libv::mt
+	LINK   libv::fsw libv::res libv::vm4
+	LINK   libv::algo libv::range ext_range ext_ctre # For GLSL Source include loader
+	LINK   ext_cppcoro
+	LINK   ext_tsl_robin_map
+)
+
+wish_create_library(
 	TARGET libv::res STATIC
 	SOURCE src/libv/res/*.cpp
 	LINK   ext_fmt
@@ -753,6 +772,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv::rev STATIC
 	SOURCE src/libv/rev/*.cpp
+	GENERATE codegen src/libv/rev/material_adv/*.in.lua
 	GENERATE codegen src/libv/rev/shader/block/*.in.lua
 	GENERATE codegen src/libv/rev/shader/*.in.lua
 	LINK   libv::glr libv::gl libv::utility libv::fsw
@@ -845,6 +865,8 @@ wish_create_executable(
 	LINK   ext_fmt ext_range libv::lua libv::utility libv::algo
 )
 
+add_subdirectory(app/editor)
+
 wish_create_executable(
 	TARGET enum
 	SOURCE app/enum/*.cpp
@@ -855,7 +877,7 @@ wish_create_executable(
 	TARGET mimp
 	SOURCE app/mimp/*.cpp
 	LINK   libv::vm4imp libv::lua
-	LINK   libv::utility libv::algo
+	LINK   libv::utility libv::algo libv::fsw libv::arg
 #	LINK   ext_fmt ext_range libv::lua libv::utility libv::algo
 )
 
@@ -1007,6 +1029,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_coro_mt
+	SOURCE sandbox/libv_coro_mt_main.cpp
+	LINK   ext_cppcoro libv::mt libv::utility
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_container
 	SOURCE sandbox/libv_container_main.cpp
 	LINK   ext_fmt libv::container libv::utility libv::math
@@ -1138,11 +1166,15 @@ wish_create_executable(
 	LINK   libv::noise libv::utility libv::log ext_fmt
 )
 
+add_subdirectory(sandbox/noise)
+
 wish_create_executable(
 	TARGET sandbox_libv_physics
 	SOURCE sandbox/libv_physics_main.cpp
 	LINK   ext_rp3d libv::math
 )
+
+add_subdirectory(sandbox/re)
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection
@@ -1161,9 +1193,6 @@ wish_create_executable(
 	SOURCE sandbox/libv_rev_main.cpp
 	LINK   libv::log libv::rev ext_glfw #libv_utility libv::math
 )
-
-add_subdirectory(sandbox/rev_particle)
-add_subdirectory(sandbox/noise)
 
 wish_create_executable(
 	TARGET sandbox_libv_rev_res
@@ -1360,6 +1389,12 @@ wish_create_executable(
 	TARGET test_libv_range
 	SOURCE test/libv/range/*.cpp
 	LINK   ext_catch ext_fmt libv::range
+)
+
+wish_create_executable(
+	TARGET test_libv_re
+	SOURCE test/libv/re/*.cpp
+	LINK   ext_catch libv::re
 )
 
 wish_create_executable(

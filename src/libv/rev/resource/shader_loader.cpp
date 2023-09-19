@@ -33,7 +33,7 @@ ShaderLoader::ShaderLoader(libv::Nexus& nexus, std::filesystem::path base_includ
 }
 
 ShaderLoader::~ShaderLoader() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -204,7 +204,7 @@ void InternalShaderLoader::update_fs() {
 	}
 }
 
-void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
+void InternalShaderLoader::update_gl(libv::GL& gl) {
 	const auto fallback_to_default = [](auto& internal) {
 		// If this is the first load, create a new program to replace the default one
 		static constexpr auto fallback_red_vs = R"(
@@ -267,7 +267,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 
 			if (!gl(shader).status()) {
 				shader_compile_failed = true;
-				shader_compile_error = stage.source.translateErrorMessageFilenames(gl(shader).info());
+				shader_compile_error = stage.source.fixupErrorMessage(gl(shader).info());
 			} else {
 				gl(program).attach(shader);
 			}
@@ -322,7 +322,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 	libv::gl::checkGL();
 }
 
-void ShaderLoader::update(libv::gl::GL& gl) {
+void ShaderLoader::update(libv::GL& gl) {
 	auto lock = std::unique_lock(self->mutex);
 	self->update_fs();
 	self->update_gl(gl);

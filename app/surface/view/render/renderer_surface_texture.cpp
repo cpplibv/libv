@@ -52,7 +52,7 @@ void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuf
 
 	for (const auto&[_, chunk] : chunkMap) {
 		auto texture = chunk.texture;
-		glr.texture(texture, textureChannel_diffuse);
+		glr.texture(texture, textureUnit_diffuse);
 
 		auto guard = glr.model.push_guard();
 		glr.model.translate(libv::vec3f{chunk.pos - chunk.size * 0.5f, 0});

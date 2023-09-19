@@ -74,7 +74,7 @@ struct Sandbox {
 
 	Sandbox() {
 		gl.capability.blend.enable();
-		gl.capability.cullFace.enable();
+		gl.capability.cull.enable();
 		gl.capability.depthTest.enable();
 		gl.depthFunction.less();
 		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
@@ -106,26 +106,26 @@ struct Sandbox {
 		uint32_t dataTextureSkyZ0[]{255, 2139029759, 2139029759, 2139029759};
 
 		gl(shaderTest0Frag).create(libv::gl::ShaderType::Fragment);
-		gl(shaderTest0Frag).compile(libv::read_file_or_throw("res/shader/test0.fs"));
+		gl(shaderTest0Frag).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test0.fs"));
 		gl(shaderTest0Vert).create(libv::gl::ShaderType::Vertex);
-		gl(shaderTest0Vert).compile(libv::read_file_or_throw("res/shader/test0.vs"));
+		gl(shaderTest0Vert).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test0.vs"));
 		gl(programTest0).create();
 		gl(programTest0).link(shaderTest0Vert, shaderTest0Frag);
 		gl(programTest0).assign(uniformTest0matMVP, "matMVP");
 
 		gl(shaderTest1Frag).create(libv::gl::ShaderType::Fragment);
-		gl(shaderTest1Frag).compile(libv::read_file_or_throw("res/shader/test1.fs"));
+		gl(shaderTest1Frag).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test1.fs"));
 		gl(shaderTest1Vert).create(libv::gl::ShaderType::Vertex);
-		gl(shaderTest1Vert).compile(libv::read_file_or_throw("res/shader/test1.vs"));
+		gl(shaderTest1Vert).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test1.vs"));
 		gl(programTest1).create();
 		gl(programTest1).link(shaderTest1Frag, shaderTest1Vert);
 		gl(programTest1).assign(uniformTest1matMVP, "matMVP");
 		gl(programTest1).assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
 		gl(shaderTest2Frag).create(libv::gl::ShaderType::Fragment);
-		gl(shaderTest2Frag).compile(libv::read_file_or_throw("res/shader/test2.fs"));
+		gl(shaderTest2Frag).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test2.fs"));
 		gl(shaderTest2Vert).create(libv::gl::ShaderType::Vertex);
-		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/test2.vs"));
+		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/sandbox_gl/test2.vs"));
 		gl(programTest2).create();
 		gl(programTest2).link(shaderTest2Frag, shaderTest2Vert);
 		gl(programTest2).assign(uniformTest2matMVP, "matMVP");
@@ -134,9 +134,9 @@ struct Sandbox {
 		gl(programTest2).assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
 		gl(shaderDepthFrag).create(libv::gl::ShaderType::Fragment);
-		gl(shaderDepthFrag).compile(libv::read_file_or_throw("res/shader/depth.fs"));
+		gl(shaderDepthFrag).compile(libv::read_file_or_throw("res/shader/sandbox_gl/depth.fs"));
 		gl(shaderDepthVert).create(libv::gl::ShaderType::Vertex);
-		gl(shaderDepthVert).compile(libv::read_file_or_throw("res/shader/depth.vs"));
+		gl(shaderDepthVert).compile(libv::read_file_or_throw("res/shader/sandbox_gl/depth.vs"));
 		gl(programDepth).create();
 		gl(programDepth).link(shaderDepthFrag, shaderDepthVert);
 		gl(programDepth).assign(uniformDepthmatMVP, "matMVP");
@@ -146,7 +146,7 @@ struct Sandbox {
 //		gl(bufferVertexData).data(&dataVertex[0], sizeof(dataVertex[0]) * std::size(dataVertex), libv::gl::BufferUsage::StaticDraw);
 		const auto vertexDataSize = sizeof(dataVertex[0]) * std::size(dataVertex);
 		gl(bufferVertexData).data(nullptr, vertexDataSize, libv::gl::BufferUsage::StaticDraw);
-		auto* vramVertexData = gl(bufferVertexData).map(libv::gl::BufferAccessFull::Write);
+		auto* vramVertexData = gl(bufferVertexData).dsa_map(libv::gl::BufferAccessFull::Write);
 //		auto* vramVertexData = gl(bufferVertexData).mapRange(
 //				0,
 //				vertexDataSize,
@@ -156,7 +156,7 @@ struct Sandbox {
 		if (!vramVertexData)
 			throw std::runtime_error("Failed to map buffer data");
 		std::memcpy(vramVertexData, dataVertex, vertexDataSize);
-		auto vramSuccess = gl(bufferVertexData).unmap();
+		auto vramSuccess = gl(bufferVertexData).dsa_unmap();
 		if (!vramSuccess)
 			throw std::runtime_error("Failed to unmap buffer data");
 
@@ -249,10 +249,10 @@ struct Sandbox {
 
 		{
 			gl(programTest1).use();
-			gl.activeTexture(libv::gl::TextureChannel::diffuse);
+			gl.activeTexture(libv::gl::TextureUnit::diffuse);
 			gl(texture0).bind();
 			uniformTest1matMVP = gl.mvp();
-			uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
+			uniformTest1TextureDiffuseSampler = libv::gl::TextureUnit::diffuse;
 
 			gl(vertexArray).bind();
 			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 6);
@@ -263,12 +263,12 @@ struct Sandbox {
 
 		{
 			gl(programTest2).use();
-			gl.activeTexture(libv::gl::TextureChannel::sky);
+			gl.activeTexture(libv::gl::TextureUnit::environment);
 			gl(textureSky).bind();
 			uniformTest2matMVP = gl.mvp();
 			uniformTest2matM = gl.model;
 			uniformTest2EyePosW = gl.eye();
-			uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
+			uniformTest2TextureSkySampler = libv::gl::TextureUnit::environment;
 
 			gl(vertexArray).bind();
 			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 0, 6);

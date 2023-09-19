@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/context/context_ui.cpp
+// Project: libv.ui, File: src/libv/ui/context/context_style.cpp
 
 // hpp
 #include <libv/ui/context/context_style.hpp>
@@ -29,7 +29,7 @@ ContextStyle::ContextStyle() :
 }
 
 ContextStyle::~ContextStyle() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 // -------------------------------------------------------------------------------------------------

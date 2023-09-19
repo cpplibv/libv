@@ -980,14 +980,161 @@
 // =================================================================================================
 // Resource
 
-#include <iostream>
-#include <filesystem>
-#include <libv/sys/executable_path.hpp>
+// #include <iostream>
+// #include <filesystem>
+// #include <libv/sys/executable_path.hpp>
+//
+// int main(int, char** argv) {
+// 	std::cout << "cur: " << std::filesystem::current_path().generic_string() << std::endl;
+// 	std::cout << "exe: " << libv::sys::executable_path_fs().generic_string() << std::endl;
+// 	std::cout << "arg: " << std::filesystem::path(argv[0]).generic_string() << std::endl;
+//
+// 	return EXIT_SUCCESS;
+// }
 
-int main(int, char** argv) {
-	std::cout << "cur: " << std::filesystem::current_path().generic_string() << std::endl;
-	std::cout << "exe: " << libv::sys::executable_path_fs().generic_string() << std::endl;
-	std::cout << "arg: " << std::filesystem::path(argv[0]).generic_string() << std::endl;
+// =================================================================================================
+
+// #include <iostream>
+// #include <libv/sys/executable_path.hpp>
+// #include <libv/meta/for_constexpr.hpp>
+//
+// template <typename... T>
+// void foo(T... t) {
+// 	((std::cout << t << std::endl), ...);
+// }
+//
+// int main(int, char**) {
+// 	libv::meta::call_with_n_index<3>([&](auto... c) {
+// 		// foo(10 + c..., 20 + c...);
+// 		(foo(10 + c, 20 + c), ...);
+// 	});
+//
+// 	return EXIT_SUCCESS;
+// }
+
+// =================================================================================================
+
+// #include <fmt/printf.h>
+//
+//
+// int main(int, char**) {
+// 	for (uint32_t i = 0; i < 66; ++i) {
+// 		uint32_t mask = std::bit_ceil(i) - 1u;
+// 		fmt::print("i {} -> mask {} : {:b} -> {:b}\n", i, mask, i, mask);
+// 	}
+//
+// 	static constexpr uint32_t numBuffers = 5;
+// 	static constexpr uint32_t numBuffersBitMask = std::bit_ceil(numBuffers) - 1u;
+//
+// 	uint32_t currentBufferFrameIndex = 0;
+// 	const auto inc = [&]() {
+// 		++currentBufferFrameIndex;
+// 		if ((currentBufferFrameIndex & numBuffersBitMask) == numBuffers) { // Wrap around
+// 			currentBufferFrameIndex &= ~numBuffersBitMask;
+// 			currentBufferFrameIndex += numBuffersBitMask + 1u;
+// 		}
+// 	};
+//
+// 	for (int i = 0; i < 67; ++i) {
+// 		fmt::print("num {}, mask {}, i {}, inc {}\n", numBuffers, numBuffersBitMask, i, currentBufferFrameIndex);
+// 		inc();
+// 	}
+//
+// 	return EXIT_SUCCESS;
+// }
+
+// =================================================================================================
+
+#include <bit>
+#include <fmt/printf.h>
+#include <libv/container/small_vector.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/utility/align.hpp>
+#include <libv/utility/ceil_div.hpp>
+
+// int main(int, char**) {
+// 	static constexpr const auto maxBloomStepSize = 32u;
+// 	static_assert(std::has_single_bit(maxBloomStepSize));
+//
+// 	for (uint32_t i = 0; i < 300; ++i) {
+// 		const auto a = std::bit_ceil(i);
+// 		const auto b = std::min(a, maxBloomStepSize);
+// 		const auto size = libv::align_of_2(i, b);
+// 		const auto levels = std::bit_width(size);
+// 		const auto mips = std::min(levels, std::bit_width(maxBloomStepSize));
+//
+// 		fmt::print("i {} -> a {}, b {}, size {}, levels {}, mips {}\n", i, a, b, size, levels, mips);
+// 	}
+//
+// 	return EXIT_SUCCESS;
+// }
+
+// int main(int, char**) {
+// 	static constexpr const auto maxBloomStepSize = 32u;
+// 	static_assert(std::has_single_bit(maxBloomStepSize));
+//
+// 	// 1680 1050
+//
+// 	for (uint32_t i = 0; i < 300; ++i) {
+// 		const auto a = std::bit_ceil(i);
+// 		const auto b = std::min(a, maxBloomStepSize);
+// 		const auto size = libv::align_of_2(i, b);
+// 		const auto levels = std::bit_width(size);
+// 		const auto mips = std::min(levels, std::bit_width(maxBloomStepSize));
+//
+// 		fmt::print("i {} -> a {}, b {}, size {}, levels {}, mips {}\n", i, a, b, size, levels, mips);
+// 	}
+//
+// 	return EXIT_SUCCESS;
+// }
+
+
+[[nodiscard]] constexpr inline auto calculatePyramidInfo(libv::vec2ui framebufferSize, uint32_t maxBloomStepSize) noexcept {
+	assert(std::has_single_bit(maxBloomStepSize));
+	assert(maxBloomStepSize >= 8u);
+
+	const auto sourceSize = libv::max(framebufferSize, libv::vec2ui{1, 1});
+	const auto longerSide = std::max(sourceSize.x, sourceSize.y);
+
+	const auto alignment = std::min(std::bit_ceil(longerSide), maxBloomStepSize);
+	const auto levels = std::bit_width(libv::align_of_2(longerSide, alignment));
+	const auto numMips = std::min(levels, std::bit_width(maxBloomStepSize));
+
+	struct Result {
+		struct Mip {
+			libv::vec2ui position;
+			libv::vec2ui size;
+		};
+		libv::vec2ui storageSize;
+		libv::small_vector<Mip, 10> mips;
+	};
+
+	Result result;
+
+	libv::vec2ui activeSize = libv::ceil_div(sourceSize, 2u);
+	result.storageSize = libv::align_of_2(activeSize, alignment) + alignment + alignment;
+	// result.storageSize = libv::align_of_2(activeSize, alignment) + alignment; // Correct would be +2 alignment, but it would waste too much for little to no gain
+	result.mips.resize(numMips);
+	uint32_t activeAlignment = alignment;
+	// uint32_t activeAlignment = alignment / 2u; // Correct would be full and not half alignment, but it would waste too much for little to no gain
+	for (int i = 0; i < numMips; ++i) {
+		result.mips[i].position = libv::vec2ui::one(activeAlignment);
+		result.mips[i].size = activeSize;
+		activeSize = libv::ceil_div(activeSize, 2u);
+		activeAlignment /= 2u;
+	}
+
+	return result;
+}
+
+int main(int, char**) {
+	const auto framebufferSize = libv::vec2ui{1680, 1050};
+	const auto pyramid = calculatePyramidInfo(framebufferSize, 128u);
+
+	int mipID = 0;
+	fmt::print("framebufferSize: {}\n  mips: {}\n  storageSize: {}\n", framebufferSize, pyramid.mips.size(), pyramid.storageSize);
+	for (const auto& mip : pyramid.mips)
+		fmt::print("    {}: pos {}, size {}\n", mipID++, mip.position, mip.size);
 
 	return EXIT_SUCCESS;
 }

@@ -665,7 +665,7 @@ PatchApplier::PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const
 	});
 }
 
-PatchApplier::~PatchApplier() = default; // For the sake of forward declared ptr
+PatchApplier::~PatchApplier() = default; // For the sake of forward declared types
 
 bool PatchApplier::progress() {
 	const auto& patch = *self->patch;

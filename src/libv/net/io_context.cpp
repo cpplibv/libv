@@ -103,7 +103,7 @@ IOContext::IOContext(std::size_t thread_count) :
 	impl(std::make_unique<ImplIOContext>(thread_count)) {
 }
 
-IOContext::~IOContext() = default; // For the sake of forward declared ptr
+IOContext::~IOContext() = default; // For the sake of forward declared types
 
 boost::asio::io_context& IOContext::context() noexcept {
 	return impl->context();

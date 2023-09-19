@@ -28,7 +28,7 @@ RenderTarget::RenderTarget(RenderTarget&&) noexcept = default;
 RenderTarget& RenderTarget::operator=(RenderTarget&&) & noexcept = default;
 
 RenderTarget::~RenderTarget() {
-	// For the sake of forward declared ptr
+	// For the sake of forward declared types
 }
 
 void ImplRenderTarget::createMSFramebuffer() {

@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/gl/gl_fwd.hpp>
+#include <libv/gl/fwd.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/event/base_event.hpp>
 #include <libv/ui/event/event_component.hpp>
@@ -82,19 +82,19 @@ struct EventAfterUpdate : BaseEvent  {
 };
 
 // struct EventBeforeCreate : BaseEvent {
-// 	libv::gl::GL& gl;
+// 	libv::GL& gl;
 // 	explicit inline EventBeforeCreate(gl::GL& gl) : gl(gl) {}
 // };
 struct EventBeforeRender : BaseEvent {
-	libv::gl::GL& gl;
+	libv::GL& gl;
 	explicit inline EventBeforeRender(gl::GL& gl) : gl(gl) {}
 };
 // struct EventBeforeDestroy : BaseEvent {
-// 	libv::gl::GL& gl;
+// 	libv::GL& gl;
 // 	explicit inline EventBeforeDestroy(gl::GL& gl) : gl(gl) {}
 // };
 // struct EventAfterDestroy : BaseEvent {
-// 	libv::gl::GL& gl;
+// 	libv::GL& gl;
 // 	explicit inline EventAfterDestroy(gl::GL& gl) : gl(gl) {}
 // };
 
@@ -151,7 +151,7 @@ struct EventHostGeneral : EventHostGlobal<ComponentT> {
 // -------------------------------------------------------------------------------------------------
 
 struct BaseEventCanvasGL : BaseEvent {
-	libv::gl::GL& gl;
+	libv::GL& gl;
 	explicit inline BaseEventCanvasGL(gl::GL& gl) : gl(gl) {}
 };
 struct EventCanvasBeforeCreate : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
