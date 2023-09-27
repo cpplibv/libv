@@ -385,9 +385,9 @@ protected:
 			// const auto x = libv::noise_simplex_glsl(particle.position.x, particle.position.y);
 			// const auto y = libv::noise_simplex_glsl(particle.position.y, particle.position.z);
 			// const auto z = libv::noise_simplex_glsl(particle.position.z, particle.position.x);
-			const auto x = libv::noise_simplex_glsl(-20.f + particle.position.x * 0.5f, 20.f + moduleAge.count() * 0.2f);
-			const auto y = libv::noise_simplex_glsl(50.f + particle.position.y * 0.5f, 50.f + moduleAge.count() * 0.2f);
-			const auto z = libv::noise_simplex_glsl(-50.f + particle.position.z * 0.5f, -50.f + moduleAge.count() * 0.2f);
+			const auto x = libv::noise::simplex(0X5EED, -20.f + particle.position.x * 0.5f, 20.f + moduleAge.count() * 0.2f);
+			const auto y = libv::noise::simplex(0X5EED, 50.f + particle.position.y * 0.5f, 50.f + moduleAge.count() * 0.2f);
+			const auto z = libv::noise::simplex(0X5EED, -50.f + particle.position.z * 0.5f, -50.f + moduleAge.count() * 0.2f);
 			// const auto x = libv::noise_simplex(0x5EED, particle.position.x * 0.5f, moduleAge.count() * 0.2f);
 			// const auto y = libv::noise_simplex(0x5EED, 50.f + particle.position.y * 0.5f, 50.f + moduleAge.count() * 0.2f);
 			// const auto z = libv::noise_simplex(0x5EED, -50.f + particle.position.z * 0.5f, -50.f + moduleAge.count() * 0.2f);

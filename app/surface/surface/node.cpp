@@ -22,43 +22,36 @@ float NodeConstant::evaluate(float x, float y) noexcept {
 }
 
 float NodeValue::evaluate(float x, float y) noexcept {
-	return libv::noise_value(seed, x, y);
+	return libv::noise::value(seed, x, y);
 }
 
 float NodePerlin::evaluate(float x, float y) noexcept {
-	return libv::noise_perlin(seed, x, y);
+	return libv::noise::perlin(seed, x, y);
 }
 
 float NodeSimplex::evaluate(float x, float y) noexcept {
-	return libv::noise_simplex(seed, x, y);
-
-//	if (seed == 0)
-//	return libv::noise_simplex2S(seed, x, y);
-//	if (seed == 1)
-//	return libv::noise_simplex(seed, x, y);
-//	if (seed == 2)
-//	return libv::noise_simplex_glsl(x, y);
+	return libv::noise::simplex(seed, x, y);
 }
 
 float NodeCellular::evaluate(float x, float y) noexcept {
-	return libv::noise_cellular(seed, x, y, distanceFn, returnType, jitter);
+	return libv::noise::cellular(seed, x, y, distanceFn, returnType, jitter);
 }
 
 float NodeSimplexFractal::evaluate(float x, float y) noexcept {
-	return libv::noise_fractal(seed, x, y, libv::noise_simplex, octaves, amplitude, frequency, lacunarity, persistence);
+	return libv::noise::fractal(seed, x, y, libv::noise::simplex, octaves, amplitude, frequency, lacunarity, persistence);
 }
 
 float NodeFractal::evaluate(float x, float y) noexcept {
 	Seed not_used_seed = 0;
-	return libv::noise_fractal(not_used_seed, x, y, [&](Seed, float x0, float y0) {
+	return libv::noise::fractal(not_used_seed, x, y, [&](Seed, float x0, float y0) {
 				return input->evaluate(x0, y0);
 			},
 			octaves, amplitude, frequency, lacunarity, persistence);
 }
 
 float NodeWarp::evaluate(float x, float y) noexcept {
-	auto [wx, wy] = libv::warpFractalIndependent(seed, x, y, octaves, amplitude, frequency, lacunarity, persistence);
-	return input->evaluate(wx, wy);
+	auto [wx, wy] = libv::noise::fractal(seed, x, y, libv::noise::simplex_grad, octaves, amplitude, frequency, lacunarity, persistence);
+	return input->evaluate(x + wx, y + wy);
 }
 
 float NodeCoordinate::evaluate(float x, float y) noexcept {

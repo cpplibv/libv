@@ -119,7 +119,7 @@ height = {
 	heightSensitivity = 0.0,
 	nodes =
 			add {
-				warp {
+				warp_legacy {
 					seed = 98001,
 					octaves = 4,
 					amplitude = 50.0,
@@ -152,7 +152,7 @@ height = {
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
-				warp {
+				warp_legacy {
 					seed = 98001,
 					octaves = 3,
 					amplitude = 50.0,

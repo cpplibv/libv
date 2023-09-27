@@ -166,7 +166,7 @@ height = {
 		--		},
 		--	},
 		--}
-		--warp {
+		--warp_legacy {
 		--	seed = 98001,
 		--	octaves = 3,
 		--	amplitude = 50.0,

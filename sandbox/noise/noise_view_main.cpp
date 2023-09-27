@@ -8,7 +8,7 @@
 #include <libv/frame/icon_set.hpp>
 #include <libv/log/log.hpp>
 #include <libv/math/exp_moving_avg.hpp>
-#include <libv/noise/noise_2.hpp>
+#include <libv/noise/noise.hpp>
 #include <libv/res/resource_path.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
@@ -152,7 +152,8 @@ public:
 			float yf = static_cast<float>(y);
 			for (int x = 0; x < 1024; ++x) {
 				float xf = static_cast<float>(x);
-				auto seed_offset = x / 64;
+				// auto seed_offset = x / 64;
+				auto seed_offset = 0;
 				const auto uv = libv::vec2f{xf / 1024.f, yf / 1024.f} * 10.f;
 				const auto cpu = libv::noise::simplex(0x5EED + seed_offset, uv) * 0.5f + 0.5f;
 				// const auto cpu = libv::noise::cellular(0x5EED, xf / 1024.f, yf / 1024.f, 3.1415f) * 0.5f + 0.5f;

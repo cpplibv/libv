@@ -117,7 +117,7 @@ height = {
 			add {
 				mix {
 					constant(0),
-					warp {
+					warp_legacy {
 						seed = 5555555,
 						octaves = 5,
 						amplitude = 30.0,
@@ -144,7 +144,7 @@ height = {
 					lacunarity = 2.0,
 					persistence = 0.5,
 				},
-				warp {
+				warp_legacy {
 					seed = 44444,
 					octaves = 6,
 					amplitude = 50.0,

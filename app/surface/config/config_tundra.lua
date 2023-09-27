@@ -175,7 +175,7 @@ height = {
 		exponent = 2.0,
 		--exponent = 1.0,
 		add {
-			warp {
+			warp_legacy {
 				--value = 0.5,
 				seed = 423,
 				octaves = 6,
@@ -218,7 +218,7 @@ height = {
 	--	--}
 	--	add {
 	--		--perlin{},
-	--		warp {
+	--		warp_legacy {
 	--			--value = 0.5,
 	--			seed = 423,
 	--			octaves = 5,
@@ -332,7 +332,7 @@ fertility = {
 		{ 1.0, "green" }
 	},
 	nodes = add {
-		warp {
+		warp_legacy {
 			seed = 1233,
 			octaves = 2,
 			amplitude = 1,

@@ -79,7 +79,7 @@ local mask_claw =
 local claws =
 			mix {
 				constant(0),
-				warp {
+				warp_legacy {
 					seed = 21,
 					octaves = 5,
 					amplitude = 30.0,
@@ -100,7 +100,7 @@ local claws =
 			}
 
 local spots_small =
-		warp {
+		warp_legacy {
 			seed = 42,
 			octaves = 5,
 			amplitude = 1.0,
@@ -140,7 +140,7 @@ local spots_small =
 		}
 
 local spots_big =
-		warp {
+		warp_legacy {
 			seed = 0,
 			octaves = 5,
 			amplitude = 1.0,

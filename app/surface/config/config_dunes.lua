@@ -303,7 +303,7 @@ fertility = {
 		{ 1.0, "green" }
 	},
 	nodes = add {
-		warp {
+		warp_legacy {
 			seed = 1233,
 			octaves = 2,
 			amplitude = 1,

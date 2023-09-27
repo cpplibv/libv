@@ -16,7 +16,7 @@
 #include <libv/utility/approx.hpp>
 #include <libv/utility/read_file.hpp>
 // pro
-#include <libv/noise/noise_2.hpp>
+#include <libv/noise/noise.hpp>
 
 
 #include <iostream>

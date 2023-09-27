@@ -22,27 +22,12 @@ int main() {
 	float value6 = 0.f;
 
 	const auto numIteration = 8044200;
-	const auto seed = 5065233;
+	// const auto seed = 5065233;
 
 	for (int j = 0; j < 10; ++j) {
 		const auto fj = static_cast<float>(j - 2) * 0.053209f;
 		libv::Timer timer;
 
-		for (int i = 0; i < numIteration; ++i) {
-			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			value0 += libv::noise_simplex(seed, fi * fj, fi * 2.f);
-		}
-
-		fmt::print("Simplex      : {:6.3f}\n", timer.timef_ms().count());
-//		timer.reset();
-//
-//		for (int i = 0; i < numIteration; ++i) {
-//			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-//			value5 += libv::noise_simplex2S(seed, fi * fj, fi * 2.f);
-//		}
-//
-//		fmt::print("Simplex2S    : {:6.3f}\n", timer.timef_ms().count());
-		timer.reset();
 
 		for (int i = 0; i < numIteration; ++i) {
 			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
@@ -52,21 +37,14 @@ int main() {
 		fmt::print("GLM Simplex  : {:6.3f}\n", timer.timef_ms().count());
 		timer.reset();
 
+
 		for (int i = 0; i < numIteration; ++i) {
 			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			value4 += libv::noise_simplex_glsl(fi * fj, fi * 2.f);
+			value1 += libv::noise::simplex(12345, fi * fj, fi * 2.f);
 		}
 
-		fmt::print("Wombat GLSL V: {:6.3f}\n", timer.timef_ms().count());
+		fmt::print("Noise 2      : {:6.3f}\n", timer.timef_ms().count());
 		timer.reset();
-
-		for (int i = 0; i < numIteration; ++i) {
-			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;
-			value1 += libv::noise_simplex_g(fi * fj, fi * 2.f);
-		}
-
-		fmt::print("Wombat GLSL  : {:6.3f}\n", timer.timef_ms().count());
-//		timer.reset();
 //
 //		for (int i = 0; i < numIteration; ++i) {
 //			const auto fi = (static_cast<float>(i)  - static_cast<float>(numIteration) * 0.2f) * 0.01597f;

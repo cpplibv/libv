@@ -51,8 +51,8 @@ struct NodeSimplex : Node {
 struct NodeCellular : Node {
 	Seed seed = 0x5EED;
 
-	libv::CellularDistanceFunction distanceFn = libv::CellularDistanceFunction::euclidean;
-	libv::CellularReturnType returnType = libv::CellularReturnType::cellValue;
+	libv::noise::CellularDistance distanceFn = libv::noise::CellularDistance::euclidean;
+	libv::noise::CellularReturn returnType = libv::noise::CellularReturn::cellvalue;
 	float jitter = 1.0f;
 
 	virtual float evaluate(float x, float y) noexcept override;

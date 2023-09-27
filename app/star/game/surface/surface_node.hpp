@@ -6,7 +6,7 @@
 #include <boost/container/small_vector.hpp>
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/noise/noise_2.hpp>
+#include <libv/noise/noise.hpp>
 // std
 #include <memory>
 // pro

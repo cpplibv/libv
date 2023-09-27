@@ -1,0 +1,76 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.noise: simplex fq normalization to 1.0, Wombat can help with this, aka: P *= SIMPLEX_TRI_HEIGHT;    // scale space so we can have an approx feature size of 1.0
+
+libv.noise: 4D noises
+
+libv.noise: Noises with given repetition period (seamless looping)
+libv.noise: Research polar, vortex, inverse warp. Are they useful?
+libv.noise: Update __fastnoiselite.hpp and __fastnoiselite.glsl to the latest
+
+
+
+--- Paper ---------------------------------------------------------------------------------------
+
+fractal
+	octave:
+		how many layer of noise
+		1-15
+		def: 10
+	amplitude:
+		how extreme should the elevation be?
+		0.1-50
+		def: 1
+	frequency:
+		how much detail per unit of space
+		0.01 - 15
+		default: 1.5f
+	lacunarity:
+		how quickly should freq. grow per octave
+		1-10
+		2.0 is common
+	persistence/gain:
+		How quickly should amplitude shrink per octave
+		0.1 - 1.0
+		0.5 or 1/lacunarity
+

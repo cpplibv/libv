@@ -249,7 +249,7 @@ height = {
 	--	--}
 	--	add {
 	--		--perlin{},
-	--		warp {
+	--		warp_legacy {
 	--			--value = 0.5,
 	--			seed = 423,
 	--			octaves = 5,
@@ -318,7 +318,7 @@ temperature = {
 		 lacunarity = 2.0,
 		 persistence = 0.5,
 	 },
-	 --warp{
+	 --warp_legacy {
 		-- seed = 423,
 		-- octaves = 5,
 		-- amplitude = 4,
@@ -407,7 +407,7 @@ fertility =	{
 	},
 	nodes =
 	add{
-		warp{
+		warp_legacy {
 			seed = 1233,
 			octaves = 2,
 			amplitude = 1,

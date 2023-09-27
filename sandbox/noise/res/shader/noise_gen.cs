@@ -36,7 +36,8 @@ void main() {
 //		FNL_CELLULAR_DISTANCE_EUCLIDEAN,
 //		FNL_CELLULAR_RETURN_TYPE_CELLVALUE,
 //		abs(fract(time * 0.4) * 2 - 1) * 1.f) * 0.5 + 0.5;
-	uint seed_offset = coords.x / 64;
+//	uint seed_offset = coords.x / 64;
+	uint seed_offset = 0;
 	uint seed = 0x5EED + seed_offset;
 	float cpu = texture(texture_cpu, uv + .5 / textureSize(texture_cpu, 0).xy).r;
 	float gpu = simplex(seed, uv*10) * 0.5 + 0.5;
@@ -46,13 +47,20 @@ void main() {
 //	vec2 warp = fractal_simplex_grad_progressive(0x511D, vec3(uv * 2.f, time * 0.2), 5, sin(time * 0.6) * 8.f, 1.0f, 2.0f, 0.5f).xy;
 //	vec2 warp = fractal_simplex_grad_independent(0x511D, vec3(uv * 5.f, time * 0.2), 5, sin(time * 0.6) * 50.f, 1.0f, 2.0f, 0.5f).xy;
 //	vec2 warp = fractal_simplex_grad_progressive(0x511D, vec3(uv * 5.f, time * 0.2), 5, sin(time * 0.6) * 50.f, 1.0f, 2.0f, 0.5f).xy;
+	vec2 warp = fractal_simplex_grad_independent(0x511D, vec3(uv * 1.f, time * 0.2), 1, 35.f, 1.0f, 2.0f, 0.5f).xy;
 //	value = cpu;
+	gpu = abs(warp.y);
+
+	if (gpu > 1)
+		gpu = 0;
 
 //	float value = cellular(0x511D, vec3(uv * 20.f + warp, 32*20.f),
 //			FNL_CELLULAR_DISTANCE_EUCLIDEANSQ,
-//			FNL_CELLULAR_RETURN_TYPE_DISTANCE,
-////			FNL_CELLULAR_RETURN_TYPE_CELLVALUE,
-//			1.0f) * 0.5 + 0.5;
+////			FNL_CELLULAR_RETURN_TYPE_DISTANCE,
+//			FNL_CELLULAR_RETURN_TYPE_CELLVALUE,
+//			0.0f) * 0.5 + 0.5;
+//
+//	gpu = value;
 
 //	float value = cellular(0x511D, vec3(uv * 10.f + warp, 32*20.f),
 //			FNL_CELLULAR_DISTANCE_EUCLIDEAN,
@@ -77,6 +85,6 @@ void main() {
 //	else
 //		value = abs(cpu - value);
 
-	vec4 result = vec4(gpu - cpu, 0, 0, 1);
+	vec4 result = vec4(gpu, 0, 0, 1);
 	imageStore(target, coords, result);
 }

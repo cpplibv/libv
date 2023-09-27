@@ -5,7 +5,7 @@
 // libv
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
-#include <libv/noise/white.hpp>
+#include <libv/noise/noise_texture.hpp>
 #include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/ui.hpp>

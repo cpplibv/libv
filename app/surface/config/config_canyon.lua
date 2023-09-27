@@ -99,7 +99,7 @@ canyon=min {
 						lacunarity = 2.0,
 						persistence = 0.5,
 
-						value {
+						value_legacy {
 							seed = 200,
 						},
 					},
@@ -113,7 +113,7 @@ canyon=min {
 						lacunarity = 2.0,
 						persistence = 0.5,
 
-						value {
+						value_legacy {
 							seed = 125,
 						},
 					},
@@ -174,6 +174,7 @@ clamp{
 
 
 
+
 height = {
 	name = "height",
 	heightSensitivity = 0.0,
@@ -191,7 +192,6 @@ height = {
 		},
 		canyon,
 	mask
-
 	}
 
 }
@@ -205,7 +205,7 @@ temperature = {
 		{ 1.0, "red" }
 	},
 	nodes = add {
-		value {
+		value_legacy {
 			seed = 100,
 		},
 		constant {

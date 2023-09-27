@@ -42,6 +42,10 @@ value = function(args)
 	return args
 end
 
+value_legacy = function(args)
+	return add{value(args), constant(1.0)}
+end
+
 perlin = function(args)
 	args = args or {}
 	args.nodeType = "perlin"
@@ -70,6 +74,11 @@ warp = function(args)
 	args = args or {}
 	args.nodeType = "warp"
 	return args
+end
+
+warp_legacy = function(args)
+	args.amplitude = (args.amplitude or 0.0) * 38.283687591552734375
+	return warp(args)
 end
 
 fractal = function(args)

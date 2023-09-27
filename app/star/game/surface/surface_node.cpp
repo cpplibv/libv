@@ -42,20 +42,11 @@ float NodePerlin::evaluate(float x, float y) noexcept {
 
 // --- NodeSimplex ---------------------------------------------------------------------------------
 
-
 float NodeSimplex::evaluate(float x, float y) noexcept {
 	return libv::noise::simplex(seed, x, y);
 }
 
-//	if (seed == 0)
-//	return libv::noise_simplex2S(seed, x, y);
-//	if (seed == 1)
-//	return libv::noise_simplex(seed, x, y);
-//	if (seed == 2)
-//	return libv::noise_simplex_glsl(x, y);
-
 // --- NodeCellular --------------------------------------------------------------------------------
-
 
 float NodeCellular::evaluate(float x, float y) noexcept {
 	return libv::noise::cellular(seed, x, y, distanceFn, returnType, jitter);
