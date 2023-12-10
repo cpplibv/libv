@@ -25,8 +25,8 @@ RendererEditorGrid::RendererEditorGrid(libv::rev::ResourceManager& loader) :
 	position(+1, +1, 0);
 	position(-1, +1, 0);
 
-	index.quad(0, 1, 2, 3); // Front face quad
-	index.quad(0, 3, 2, 1); // Back face quad
+	index.quad(0, 1, 2, 3); // Up faceing quad
+	index.quad(0, 3, 2, 1); // Down faceing quad
 }
 
 void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {

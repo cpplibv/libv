@@ -95,7 +95,7 @@ private:
 private:
 	// OpenGL handler - GL Thread access only
 	GLSafeVertexArray vao;
-protected:
+public:
 	libv::gl::Primitive primitive = libv::gl::Primitive::Triangles;
 private:
 	libv::gl::AttributeType indexType = libv::gl::AttributeType::UINT;

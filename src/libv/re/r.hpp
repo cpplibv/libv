@@ -2,5 +2,5 @@
 
 #pragma once
 
-#include <libv/re/core/engine.hpp>
+#include <libv/re/core/engine.hpp> // IWYU pragma: export
 

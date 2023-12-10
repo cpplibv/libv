@@ -10,7 +10,8 @@ out vec4 outputColor;
 // -------------------------------------------------------------------------------------------------
 
 void main() {
-	outputColor = texture(textureSky, fragmentDirectionW).rgba;
+	outputColor.rgb = texture(textureSky, fragmentDirectionW).rgb;
+	outputColor.a = 0;
 
 	// Other features:
 	// equirectangular beside cubemapXYZ

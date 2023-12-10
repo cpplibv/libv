@@ -25,10 +25,11 @@ MaterialSkybox::MaterialSkybox(Texture_ptr sky) :
 
 	layers = layerBackground;
 
-	// state.depthFunction(libv::gl::TestFunction::LEqual);
+	// state.depthFunction(libv::gl::TestFunction::LEqual); // NormalZ
 	state.depthFunction(libv::gl::TestFunction::GEqual); // ReverseZ
 	state.depthWrite(false);
 	state.depthTest(true);
+	state.blend(false);
 
 	textureSky = std::move(sky);
 

@@ -29,7 +29,7 @@ Object::~Object() {
 
 void Object::queue(ContextQueue& ctx) {
 	const auto matM = transform.toMatrix();
-	if (!(material->layers & nonFrustumCullableLayers).passed() && !ctx.testVisibility(matM, mesh->boundingSphere()))
+	if (!(material->layers & layerNoFrustumCull).passed() && !ctx.testVisibility(matM, mesh->boundingSphere()))
 		return;
 
 	ctx.queue(this, matM, mesh.get(), material.get(), SubObjectIndex{0});
@@ -37,7 +37,7 @@ void Object::queue(ContextQueue& ctx) {
 
 void Object::queueOverride(ContextQueue& ctx, ContextQueueOverride& ov) {
 	const auto matM = transform.toMatrix();
-	if (!(material->layers & nonFrustumCullableLayers).passed() && !ctx.testVisibility(matM, mesh->boundingSphere()))
+	if (!(material->layers & layerNoFrustumCull).passed() && !ctx.testVisibility(matM, mesh->boundingSphere()))
 		return;
 
 	ctx.queue(this, matM, mesh.get(), ov.object.get(), SubObjectIndex{0});

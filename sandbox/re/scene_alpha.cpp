@@ -17,6 +17,7 @@
 #include <libv/re/mesh/mesh_plane.hpp>
 #include <libv/re/mesh/mesh_sphere.hpp>
 #include <libv/re/node/camera.hpp>
+#include <libv/re/node/editor_grid.hpp>
 #include <libv/re/node/lens_flare.hpp>
 #include <libv/re/node/light/light.hpp>
 #include <libv/re/node/model_static.hpp>
@@ -413,6 +414,9 @@ SandboxState::SandboxState(libv::Nexus& nexus) :
 	scene->add(libv::re::Object::create(libv::vec3f{-40, 10, 0}, libv::re::MaterialSolid::create({20, 10, 10, 1}), libv::re::MeshCube::create()));
 	scene->add(libv::re::Object::create(libv::vec3f{-40, 20, 0}, libv::re::MaterialSolid::create({30, 10, 10, 1}), libv::re::MeshCube::create()));
 	scene->add(libv::re::Object::create(libv::vec3f{-40, 30, 0}, libv::re::MaterialSolid::create({40, 10, 10, 1}), libv::re::MeshCube::create()));
+
+	// Grid
+	scene->add(libv::re::EditorGrid::create());
 }
 
 SandboxState::~SandboxState() {

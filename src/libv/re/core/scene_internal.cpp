@@ -135,7 +135,7 @@ void SceneInternal::queue(Node* node, const libv::mat4f& matM, Mesh* mesh, Mater
 	};
 
 	for (const auto& pass : passesWithNodes)
-		if (material->layers & pass->layerMask)
+		if ((material->layers & pass->layerMask) == pass->layerMask)
 			pass->renderNodeEntries.push_back(entry);
 }
 

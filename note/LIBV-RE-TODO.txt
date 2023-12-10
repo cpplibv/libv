@@ -1,13 +1,26 @@
 
-REV - Render Engine Vader
-
-
-
-
-
-
+RE - LIBV Render Engine
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if ((material->layers & pass->layerMask) == pass->layerMask)
+
+layer and layerNoFrustumCull causes some trouble
 
 
 
@@ -60,11 +73,12 @@ place.it:
 		for 'material sorting' instead of sorting 'objects' sort materials:
 			group the object under their material into a list inside the material (list gets cleared after each render)
 			and then sort the materials
-	light culling: spotlight culling, this is also needed on the CPU side
+	light culling: spotlight culling
+			\ this is also needed for frustum culling on the CPU side
 			https://simoncoenen.com/blog/programming/graphics/SpotlightCulling
 			https://bartwronski.com/2017/04/13/cull-that-cone/
 	Terminology:
-		Pipeline = sum of passes and render targets (?and render context)
+		Pipeline = sum of passes and render targets (?and render context) (ATM its not really)
 	Unity HDRP pipeline graph: https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@17.0/manual/images/HDRP-frame-graph-diagram.png
 
 
@@ -119,6 +133,7 @@ place.it:
 		PBR - IBL Image Based Lighting - Specular
 			https://www.youtube.com/watch?v=N_IofZ6MF8k&list=PLIbUZ3URbL0ESKHrvzXuHjrcLi7gxhBby&index=30
 		Shadow
+			libv.re: Multiple shadow casters: Use a texture2DArray or texture3D (glFramebufferTextureLayer)
 			PCF - Percentage-Closer Filtering
 				https://www.youtube.com/watch?v=NCptEJ1Uevg
 			PCSS - Percentage-Closer Soft Shadows
@@ -335,11 +350,14 @@ place.it:
 		Resolve analog-binary accidental collusion with time
 
 	UI
-		Events cleanup, and interaction with controls
-		Focus traversal
+		Events cleanup (control events), and interaction with controls
+		Focus/selection traversal
 		List component (and Pagination)
 		Scroll pane = scroll area + scroll bar + connecting them
 		Font outline render
+		Animations, transitions, responsiveness
+		Tooltips
+		A default style sheet
 
 	Marketing
 		Some screenshots (from the assets if not even a scene)
@@ -676,26 +694,15 @@ libv.rev: --- Render System Flow ---
 			bloom pyramid
 
 
-libv.rev: Shadow:
-	libv.rev: Multiple shadow casters: Use a texture3D (glFramebufferTextureLayer)
 
 Additional built-in blocks
 	libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-
-libv.ui: Adopt libv.re
-libv.ui: Move libv.sun overlay_shader_error.hpp to ui
-libv.ui: Accept injected Nexus
-
-!!! libv.ui: Style state (inheritance) ACL solution:
-		Go backward (?) (forward can also work?), use first match (dont inspect specificness)
-		this is how CSS does it too (just to order if first match and not last)
-libv.ui: "State" property: focus-within
-libv.ui: "State" property: nth (2nd 3rd is enough for now)
 
 
 cmake: Change from ${CMAKE_SOURCE_DIR}
 		to ${CMAKE_CURRENT_SOURCE_DIR}
 		wherever it makes sense
+		| might be done
 
 place.it:
 	http://www.opengl.org/wiki/Buffer_Object_Streaming

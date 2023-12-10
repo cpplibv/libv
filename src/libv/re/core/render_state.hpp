@@ -6,7 +6,7 @@
 #include <bit>
 #include <cstdint>
 // libv
-#include <libv/gl/enum.hpp>
+#include <libv/gl/enum.hpp> // IWYU pragma: export
 #include <libv/gl/fwd.hpp>
 #include <libv/meta/force_inline.hpp>
 

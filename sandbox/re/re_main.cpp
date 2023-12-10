@@ -49,14 +49,13 @@
 // #include <libv/rev/engine/render_pass.hpp>
 // #include <libv/rev/newapi/scene.hpp>
 // // #include <libv/rev/material/material_editor_grid.hpp>
-// #include <libv/rev/material_adv/material_editor_grid.hpp>
+
+#include <optional>
 
 
 // -------------------------------------------------------------------------------------------------
 
 static constexpr libv::vec2i window_size = {1680, 1050};
-
-bool enablePostProcessing = true;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -163,9 +162,6 @@ public:
 
 			if (event.keycode == libv::input::Keycode::Escape)
 				closeDefault();
-
-			if (event.keycode == libv::input::Keycode::P)
-				enablePostProcessing = !enablePostProcessing;
 
 			if (event.keycode == libv::input::Keycode::O)
 				setSwapInterval(getSwapInterval() ? 0 : 1);
@@ -282,70 +278,3 @@ int main(int argc, const char* const* argv) {
 // 	// libv::re::ParticleSystem particle_stars;
 // 	// libv::re::ParticleSystem particle_stars;
 //
-// =================================================================================================
-//
-// // resource_manager.update(glr.out_of_order_gl());
-// // engine.update(glr.out_of_order_gl());
-// //engine.render(glr.out_of_order_gl());
-//
-// // if (enablePostProcessing) {
-// // 	render_target.size(canvas_size.cast<int32_t>());
-// // 	post_processing.size(canvas_size.cast<int32_t>());
-// // }
-//
-// const auto guard_s = glr.state.push_guard();
-// const auto guard_m = glr.model.push_guard();
-// const auto guard_v = glr.view.push_guard();
-// const auto guard_p = glr.projection.push_guard();
-//
-// glr.state.enableBlend();
-// glr.state.blendSrc_SourceAlpha();
-// glr.state.blendDst_One_Minus_SourceAlpha();
-//
-// glr.state.enableCullFace();
-// glr.state.frontFaceCCW();
-// glr.state.cullBackFace();
-//
-// glr.state.polygonModeFill();
-//
-// glr.state.enableDepthTest();
-// glr.state.depthFunctionLess();
-//
-// // glr.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
-// // glr.setClearColor(0.f, 0.f, 0.f, 1.0f);
-// // glr.setClearColor(1.f, 1.f, 1.f, 1.0f);
-// glr.setClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-//
-// glr.projection = camera.projection(window_size.cast<float>());
-// glr.view = camera.view();
-// glr.model = libv::mat4f::identity();
-//
-// // --- Render the Scene ---
-//
-// // if (enablePostProcessing)
-// // 	glr.framebuffer_draw(render_target.framebuffer());
-// // else
-// // 	glr.framebuffer_draw_default();
-//
-// // glr.viewport({0, 0}, render_target.size());
-// glr.viewport({0, 0}, window_size);
-// glr.clearColor();
-// glr.clearDepth();
-//
-// {
-// 	// particleSet.render(glr, camera.frustum(canvas_size));
-// 	// renderer_particle.render(glr, uniform_stream, particleFountain);
-// 	// scene.render(glr, camera);
-// 	// scene.render(glr);
-// 	glr.callback([this](libv::GL& gl) {
-// 		// engine.render(gl);
-// 		scene.render(gl);
-// 	});
-// }
-//
-// // --- Post Processing ---
-//
-// // if (enablePostProcessing) {
-// // 	const auto& main_texture = render_target.resolve(glr);
-// // 	post_processing.pass(glr, main_texture);
-// // }

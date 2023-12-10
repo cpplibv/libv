@@ -13,7 +13,7 @@ namespace re {
 // -------------------------------------------------------------------------------------------------
 
 struct RenderLibrary {
-	RenderLibrary(libv::re::Settings settings, libv::Nexus& nexus, libv::GL& gl);
+	RenderLibrary(Settings settings, libv::Nexus& nexus, libv::GL& gl);
 	~RenderLibrary();
 };
 
