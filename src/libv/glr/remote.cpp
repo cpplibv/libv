@@ -21,7 +21,7 @@ namespace glr {
 
 class ImplRemote {
 public:
-	std::optional<libv::gl::GL> gl;
+	std::optional<libv::GL> gl;
 	std::vector<Queue> queues;
 	DestroyQueues destroyQueues;
 	std::thread::id contextThreadID;

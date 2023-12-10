@@ -156,6 +156,11 @@ libv.update: PAPER
                              ^^^^^ resource namespace
                     ^^^^^^^ program variant (dev, daily, experimental, stable)
         ^^^^^^^^^^ program / program url
+        OR Just have something more custom and simpler:
+			app.update/variant/patch/{filename}
+        OR namespace and file separately:
+			app.update/variant/patch
+			{filename}
 
 libv.net: Fix that the read/write limit currently cannot be used before the connect_* calls
 libv.net: IDEA that in the connection instead of forcing the handle of an incoming message place it into the queue that can be accessed in the callbacks

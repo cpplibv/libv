@@ -27,8 +27,8 @@ struct ConfigGroupGameplay : BaseConfigGroup {
 };
 
 struct ConfigGroupGraphics : BaseConfigGroup {
-	ConfigEntry<int32_t> window_size_x       {config, 1280, "window_size_x", "window_size_x desc"};
-	ConfigEntry<int32_t> window_size_y       {config, 800, "window_size_y", "window_size_y desc"};
+	ConfigEntry<int32_t> window_size_x       {config, 1680, "window_size_x", "window_size_x desc"};
+	ConfigEntry<int32_t> window_size_y       {config, 1050, "window_size_y", "window_size_y desc"};
 	ConfigEntry<bool> persist_window_size    {config, false, "persist_window_size", "persist_window_size desc"};
 
 	ConfigEntry<int32_t> window_position_x   {config, 0, "window_position_x", "window_position_x desc"};

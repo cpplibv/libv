@@ -1,6 +1,14 @@
 
 Star - System integration demo
 
+
+
+
+
+
+
+
+
 --- STACK ------------------------------------------------------------------------------------------
 
 
@@ -8,8 +16,36 @@ Star - System integration demo
 
 
 
-surface could use tessalation shaders:
-		https://www.youtube.com/watch?v=21gfE-zUym8
+
+
+
+libv.re: sort out how to use libv.re in CanvasSurface ctor
+
+
+
+
+libv.ui: controls:
+	scene controls: auto activates when the scene is part of the focus chain
+	canvas controls: auto activates when the canvas is focused
+	automated ways to register and bind defaults
+		prepared function, and a template func or class wrapper
+
+
+
+
+libv.re: improve glue layer, includes and ui integration
+libv.re: canvas might not be needed
+libv.re: multi-scene support (share buffers and render targets)
+libv.re: multi-canvas support (if possible: reuse render targets with different viewports (!careful with overriding the depth))
+libv.re: multi-scene with multi-canvas support
+
+
+
+
+
+
+
+
 
 
 
@@ -62,7 +98,6 @@ Organize star rev
 
 Organize star overlay
 
-libv.ui: kill ui_hub and replace it with nexus
 
 
 

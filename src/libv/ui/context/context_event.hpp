@@ -33,7 +33,7 @@ private:
 	std::unique_ptr<ImplContextEvent> self;
 
 public:
-	ContextEvent();
+	ContextEvent(libv::Nexus&& nexus);
 	~ContextEvent();
 
 public:

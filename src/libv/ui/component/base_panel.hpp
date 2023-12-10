@@ -34,49 +34,49 @@ public:
 
 public:
 	template <typename ComponentT>
-	LIBV_FORCE_INLINE ComponentT add() {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add() {
 		auto comp = ComponentT();
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT>
-	LIBV_FORCE_INLINE ComponentT add_n(std::string name) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_n(std::string name) {
 		auto comp = ComponentT::n(std::move(name));
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT>
-	LIBV_FORCE_INLINE ComponentT add_s(std::string_view style) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_s(std::string_view style) {
 		auto comp = ComponentT::s(style);
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT, typename... Args>
-	LIBV_FORCE_INLINE ComponentT add_a(Args&&... args) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_a(Args&&... args) {
 		auto comp = ComponentT::a(std::forward<Args>(args)...);
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT>
-	LIBV_FORCE_INLINE ComponentT add_ns(std::string name, std::string_view style) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_ns(std::string name, std::string_view style) {
 		auto comp = ComponentT::ns(std::move(name), style);
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT, typename... Args>
-	LIBV_FORCE_INLINE ComponentT add_na(std::string name, Args&&... args) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_na(std::string name, Args&&... args) {
 		auto comp = ComponentT::na(std::move(name), std::forward<Args>(args)...);
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT, typename... Args>
-	LIBV_FORCE_INLINE ComponentT add_sa(std::string_view style, Args&&... args) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_sa(std::string_view style, Args&&... args) {
 		auto comp = ComponentT::sa(style, std::forward<Args>(args)...);
 		add(comp);
 		return comp;
 	}
 	template <typename ComponentT, typename... Args>
-	LIBV_FORCE_INLINE ComponentT add_nsa(std::string name, std::string_view style, Args&&... args) {
+	[[maybe_unused]] LIBV_FORCE_INLINE ComponentT add_nsa(std::string name, std::string_view style, Args&&... args) {
 		auto comp = ComponentT::nsa(std::move(name), style, std::forward<Args>(args)...);
 		add(comp);
 		return comp;

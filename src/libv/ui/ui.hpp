@@ -10,6 +10,7 @@
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
 #include <libv/utility/nexus_fwd.hpp>
+#include <libv/utility/unique_function.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -27,12 +28,22 @@ namespace ui {
 // TODO P2: libv.ui: Resource debugger: font and texture view at first
 // TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<CoreComponent>> getComponentAt(int, int);) | Not just mouse region based!
 // TODO P2: libv.ui: Record or report create/layout/render/destroy statistics
-// TODO P3: libv.ui: Idea reminder: glr could be more light with signed objects, and this might be a completely different approve
+// TODO P3: libv.ui: Idea reminder: glr could be more light with signed objects, and this might be a completely different approach
 //			<0 means look at some global glr store, and its only a promise, in the future there will be an object
 //			=0 default ctor, noop
 //			>0 actual opengl object index
 // TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
 // TODO P5: libv.ui: (?) void setFocusPolicy(...);
+
+struct EventGLCreate {
+	libv::GL& gl;
+};
+
+struct EventGLDestroy {
+	libv::GL& gl;
+};
+
+// -------------------------------------------------------------------------------------------------
 
 class ImplUI;
 
@@ -45,6 +56,7 @@ private:
 public:
 	UI();
 	explicit UI(Settings setting);
+	UI(libv::Nexus nexus, Settings setting);
 	~UI();
 
 public:
@@ -77,6 +89,9 @@ public:
 public:
 	[[nodiscard]] EventHostGlobal<Component> event();
 	[[nodiscard]] EventHub event_hub();
+
+	void subscribe(libv::unique_function<void(const EventGLCreate&)>);
+	void subscribe(libv::unique_function<void(const EventGLDestroy&)>);
 
 public:
 	[[nodiscard]] libv::GL& gl();

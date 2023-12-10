@@ -31,6 +31,7 @@ public:
 private:
 	void register_nexus();
 	void register_controls();
+	void register_renderLibrary();
 	void unregister_nexus();
 //	void update();
 

@@ -92,7 +92,7 @@ struct Sandbox {
 	float angle = 0.f;
 	std::size_t frame_counter = 0;
 
-	libv::gl::GL gl;
+	libv::GL gl;
 
 	libv::gl::Attribute<0, libv::vec3f> attributePosition;
 	libv::gl::Attribute<8, libv::vec2f> attributeUV;

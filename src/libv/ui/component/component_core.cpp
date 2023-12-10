@@ -532,7 +532,7 @@ void CoreComponent::detachScan() {
 		flags.reset(Flag::mask_propagate);
 
 		doDetachChildren([this, &childFlags](Component& child) {
-			bool remove = get_core(child)->flags.match_any(Flag::pendingDetachSelf);
+			const bool remove = get_core(child)->flags.match_any(Flag::pendingDetachSelf);
 
 			if (get_core(child)->flags.match_any(Flag::pendingDetach))
 				get_core(child)->detachScan();

@@ -95,9 +95,9 @@ int main(int argc, const char** argv) {
 		star::log_star.info("Current path:  {}", std::filesystem::current_path().generic_string());
 		star::log_star.info("Executable:    {}/{}", path_dir.generic_string(), path_bin.generic_string());
 		star::log_star.info("Last modified: {:%Y.%m.%d %H:%M:%S}", lwt);
+		star::log_star.info("System:        {}", libv::sys::os_version());
 		star::log_star.info("Config file:   {}", arg_config.value());
 //		star::log_star.info("Resource path: {}", path_resource);
-		star::log_star.info("System:        {}", libv::sys::os_version());
 
 		// Run the game
 		auto game = star::GameClient(devMode, arg_config.value());

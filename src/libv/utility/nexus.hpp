@@ -66,10 +66,9 @@ private:
 	void aux_object_view_set(type_uid object_type, object_ptr ptr);
 	void aux_object_view_set(std::string name, type_uid object_type, object_ptr ptr);
 	[[nodiscard]] object_ptr aux_object_view_get(type_uid object_type) const noexcept;
-	[[nodiscard]] object_ptr aux_object_view_get(const std::string_view name, type_uid object_type) const noexcept;
-//	[[nodiscard]] object_ptr aux_object_view_get(const std::string_view name, type_uid object_type) const noexcept;
+	[[nodiscard]] object_ptr aux_object_view_get(std::string_view name, type_uid object_type) const noexcept;
 	void aux_object_view_remove(type_uid object_type) const noexcept;
-	void aux_object_view_remove(const std::string_view name, type_uid object_type) const noexcept;
+	void aux_object_view_remove(std::string_view name, type_uid object_type) const noexcept;
 //	void aux_object_view_push(type_uid object_type, object_ptr ptr);
 //	void aux_object_view_pop(type_uid object_type) noexcept;
 //	void aux_object_view_push(std::string name, type_uid object_type, object_ptr ptr);

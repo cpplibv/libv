@@ -74,77 +74,6 @@
 //
 // =================================================================================================
 //
-//
-//// ext
-//#include <boost/algorithm/string/replace.hpp>
-//#include <boost/container/flat_map.hpp>
-//#include <boost/core/demangle.hpp>
-//#include <boost/stacktrace.hpp>
-//#include <fmt/printf.h>
-//// libv
-//#include <libv/algo/slice.hpp>
-//// std
-//#include <iostream>
-//#include <libv/utility/endian.hpp>
-//#include <map>
-//#include <regex>
-//#include <string_view>
-//
-//
-//#ifndef WISH_SHORT_PATH_PREFIX
-//#    define WISH_SHORT_PATH_PREFIX ""
-//#endif
-//
-//void prettify(std::string& name) {
-//	std::vector<std::pair<std::string_view, std::string_view>> replace_map{
-//		{", ", ","},
-//		{" >", ">"},
-//		{"> ", ">"},
-//		{"__cxx11::", ""},
-//		{"std::basic_string<char,std::char_traits<char>,std::allocator<char>>", "std::string"},
-//		{"std::basic_string_view<char,std::char_traits<char>>", "std::string_view"},
-//	};
-//	//	std::vector<std::pair<std::regex, std::string>> pattern_map{
-//	//		{std::regex{"<(.*),boost::container::new_allocator<.*>>"}, "<$1>"},
-//	//		{std::regex{"<(.*),std::allocator<.*>>"}, "<$1>"},
-//	//		{std::regex{"<(.*),std::less<.*>>"}, "<$1>"},
-//	//	};
-//
-//	for (const auto& [from, to] : replace_map)
-//		boost::algorithm::replace_all(name, from, to);
-//
-//	//	for (const auto& [pattern, to] : pattern_map)
-//	//		name = std::regex_replace(name, pattern, to);
-//
-//	boost::algorithm::replace_all(name, ",", ", ");
-//}
-//
-//void bar(std::vector<std::vector<std::string>>) {
-//	int i = 0;
-//	for (const boost::stacktrace::frame& frame : boost::stacktrace::stacktrace()) {
-//		auto name = boost::core::demangle(("_" + frame.name()).c_str());
-//		prettify(name);
-//
-//		fmt::print(" {}# {:40} {}:{}\n",
-//				i++,
-//				name,
-//				libv::slice_prefix_view(frame.source_file(), WISH_SHORT_PATH_PREFIX),
-//				frame.source_line());
-//	}
-//}
-//
-//void foo(double, boost::container::flat_map<std::string_view, int>) {
-//	bar({});
-//}
-//
-//int main() {
-//	foo(0,{});
-//
-//	return 0;
-//}
-//
-// =================================================================================================
-//
 //// ext
 //#include <fmt/printf.h>
 //// std
@@ -257,64 +186,6 @@
 //	return EXIT_SUCCESS;
 //}
 
-//// =================================================================================================
-//
-//#include <iostream>
-//#include <fmt/printf.h>
-//#include <libv/mt/work_cooldown.hpp>
-//#include <libv/mt/worker_thread.hpp>
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//int main(int, const char**) {
-//
-//	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
-//	libv::mt::work_cooldown load_cd{std::chrono::milliseconds{100}};
-//
-//	const auto start = std::chrono::steady_clock::now();
-//
-//	for (int i = 0; i < 100; ++i) {
-//		std::this_thread::sleep_until(start + std::chrono::milliseconds{10 * i});
-//
-//		{
-//			const auto now = std::chrono::steady_clock::now();
-//			fmt::print("   i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
-//		}
-//
-//		worker_thread.execute_async([i, start] {
-//			const auto now = std::chrono::steady_clock::now();
-//			fmt::print("AS i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
-//		});
-//
-//		load_cd.execute_async([i, start] {
-//			const auto now = std::chrono::steady_clock::now();
-//			fmt::print("CD i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
-//		}, worker_thread);
-//	}
-//
-//	return EXIT_SUCCESS;
-//}
-//
-//// =================================================================================================
-//
-//#include <iostream>
-//#include <libv/utility/hex_dump.hpp>
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//int main(int, const char**) {
-//	for (int i = 0; i <= 64; ++i) {
-//		std::string str;
-//		for (int j = 0; j < i; ++j) {
-//			str += (j <= 'z' - 'a') ? 'a' + j : 'A' + (j - ('z' - 'a'));
-//		}
-//
-//		std::cout << libv::hex_dump_with_ascii(str) << std::endl;
-//	}
-//
-//	return EXIT_SUCCESS;
-//}
-//
 //// =================================================================================================
 //
 //#include <iostream>
@@ -785,9 +656,9 @@
 // 	}
 // }
 
-//// =================================================================================================
-// expected
-//
+// =================================================================================================
+// std::expected
+
 //#include <iostream>
 //#include <expected>
 //
@@ -994,147 +865,14 @@
 
 // =================================================================================================
 
-// #include <iostream>
-// #include <libv/sys/executable_path.hpp>
-// #include <libv/meta/for_constexpr.hpp>
-//
-// template <typename... T>
-// void foo(T... t) {
-// 	((std::cout << t << std::endl), ...);
-// }
-//
-// int main(int, char**) {
-// 	libv::meta::call_with_n_index<3>([&](auto... c) {
-// 		// foo(10 + c..., 20 + c...);
-// 		(foo(10 + c, 20 + c), ...);
-// 	});
-//
-// 	return EXIT_SUCCESS;
-// }
-
-// =================================================================================================
-
-// #include <fmt/printf.h>
-//
-//
-// int main(int, char**) {
-// 	for (uint32_t i = 0; i < 66; ++i) {
-// 		uint32_t mask = std::bit_ceil(i) - 1u;
-// 		fmt::print("i {} -> mask {} : {:b} -> {:b}\n", i, mask, i, mask);
-// 	}
-//
-// 	static constexpr uint32_t numBuffers = 5;
-// 	static constexpr uint32_t numBuffersBitMask = std::bit_ceil(numBuffers) - 1u;
-//
-// 	uint32_t currentBufferFrameIndex = 0;
-// 	const auto inc = [&]() {
-// 		++currentBufferFrameIndex;
-// 		if ((currentBufferFrameIndex & numBuffersBitMask) == numBuffers) { // Wrap around
-// 			currentBufferFrameIndex &= ~numBuffersBitMask;
-// 			currentBufferFrameIndex += numBuffersBitMask + 1u;
-// 		}
-// 	};
-//
-// 	for (int i = 0; i < 67; ++i) {
-// 		fmt::print("num {}, mask {}, i {}, inc {}\n", numBuffers, numBuffersBitMask, i, currentBufferFrameIndex);
-// 		inc();
-// 	}
-//
-// 	return EXIT_SUCCESS;
-// }
-
-// =================================================================================================
-
-#include <bit>
-#include <fmt/printf.h>
-#include <libv/container/small_vector.hpp>
-#include <libv/math/vec.hpp>
-#include <libv/utility/align.hpp>
-#include <libv/utility/ceil_div.hpp>
-
-// int main(int, char**) {
-// 	static constexpr const auto maxBloomStepSize = 32u;
-// 	static_assert(std::has_single_bit(maxBloomStepSize));
-//
-// 	for (uint32_t i = 0; i < 300; ++i) {
-// 		const auto a = std::bit_ceil(i);
-// 		const auto b = std::min(a, maxBloomStepSize);
-// 		const auto size = libv::align_of_2(i, b);
-// 		const auto levels = std::bit_width(size);
-// 		const auto mips = std::min(levels, std::bit_width(maxBloomStepSize));
-//
-// 		fmt::print("i {} -> a {}, b {}, size {}, levels {}, mips {}\n", i, a, b, size, levels, mips);
-// 	}
-//
-// 	return EXIT_SUCCESS;
-// }
-
-// int main(int, char**) {
-// 	static constexpr const auto maxBloomStepSize = 32u;
-// 	static_assert(std::has_single_bit(maxBloomStepSize));
-//
-// 	// 1680 1050
-//
-// 	for (uint32_t i = 0; i < 300; ++i) {
-// 		const auto a = std::bit_ceil(i);
-// 		const auto b = std::min(a, maxBloomStepSize);
-// 		const auto size = libv::align_of_2(i, b);
-// 		const auto levels = std::bit_width(size);
-// 		const auto mips = std::min(levels, std::bit_width(maxBloomStepSize));
-//
-// 		fmt::print("i {} -> a {}, b {}, size {}, levels {}, mips {}\n", i, a, b, size, levels, mips);
-// 	}
-//
-// 	return EXIT_SUCCESS;
-// }
+#include <iostream>
 
 
-[[nodiscard]] constexpr inline auto calculatePyramidInfo(libv::vec2ui framebufferSize, uint32_t maxBloomStepSize) noexcept {
-	assert(std::has_single_bit(maxBloomStepSize));
-	assert(maxBloomStepSize >= 8u);
-
-	const auto sourceSize = libv::max(framebufferSize, libv::vec2ui{1, 1});
-	const auto longerSide = std::max(sourceSize.x, sourceSize.y);
-
-	const auto alignment = std::min(std::bit_ceil(longerSide), maxBloomStepSize);
-	const auto levels = std::bit_width(libv::align_of_2(longerSide, alignment));
-	const auto numMips = std::min(levels, std::bit_width(maxBloomStepSize));
-
-	struct Result {
-		struct Mip {
-			libv::vec2ui position;
-			libv::vec2ui size;
-		};
-		libv::vec2ui storageSize;
-		libv::small_vector<Mip, 10> mips;
-	};
-
-	Result result;
-
-	libv::vec2ui activeSize = libv::ceil_div(sourceSize, 2u);
-	result.storageSize = libv::align_of_2(activeSize, alignment) + alignment + alignment;
-	// result.storageSize = libv::align_of_2(activeSize, alignment) + alignment; // Correct would be +2 alignment, but it would waste too much for little to no gain
-	result.mips.resize(numMips);
-	uint32_t activeAlignment = alignment;
-	// uint32_t activeAlignment = alignment / 2u; // Correct would be full and not half alignment, but it would waste too much for little to no gain
-	for (int i = 0; i < numMips; ++i) {
-		result.mips[i].position = libv::vec2ui::one(activeAlignment);
-		result.mips[i].size = activeSize;
-		activeSize = libv::ceil_div(activeSize, 2u);
-		activeAlignment /= 2u;
-	}
-
-	return result;
-}
+struct S {
+	int member;
+};
 
 int main(int, char**) {
-	const auto framebufferSize = libv::vec2ui{1680, 1050};
-	const auto pyramid = calculatePyramidInfo(framebufferSize, 128u);
-
-	int mipID = 0;
-	fmt::print("framebufferSize: {}\n  mips: {}\n  storageSize: {}\n", framebufferSize, pyramid.mips.size(), pyramid.storageSize);
-	for (const auto& mip : pyramid.mips)
-		fmt::print("    {}: pos {}, size {}\n", mipID++, mip.position, mip.size);
-
+	std::cout << "Hello World!" << std::endl;
 	return EXIT_SUCCESS;
 }

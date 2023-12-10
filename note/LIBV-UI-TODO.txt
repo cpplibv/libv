@@ -1,78 +1,35 @@
-libv.ui: Move x3 parser rules to globals with internal linkage
-libv.ui: Read nana 3rd party property tree lib API https://github.com/besh81/nana-extra
-libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations | context_render take care of this
-libv.ui: Implement system (aka unignorable) event handlers
-libv.ui: Improve event connection (event_proxy API): operator() / connect / connect_front / connect_system
-libv.ui: Implement UI global dynamic event host
-libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
-libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
-libv.ui: Add support for component inheritance
-libv.ui: Fix that component removal does not invalidates the parent's layout
-libv.ui: Fix and improve markInvalidLayout related code
-libv.ui: Remove down recursion from component removal
-libv.ui: Add explicit component update step to UI loop
-libv.ui: Fix the one frame flicker in panel_status_log on removed children
-libv.ui: Rename PanelStatusLog to PanelStatusLine
-libv.ui: Implement expire event for PanelStatusLine
-libv.ui: Fix PanelStatusLine's missing children detach cleanup
-libv.ui: Add context entering to EventHub event broadcasting
-libv.ui: Implement permanent entry support in PanelStatusLine
-libv.glr: Fix clear if the depth buffer mask was disabled
-libv.glr: Add missing state update before native callback
-libv.ui: Fix renderer native callback execution order
-libv: Add support for disabling observer_ptr and observer_ref validations
-libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime | auto ev = ui.event_hub(); ev.broadcast(e);
-libv.ui: Add component access to relative mouse position
-libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too | they already did
-libv.ui: Relative mouse coordinate access for a state
-libv.ui: Panel Status Log (aka first composite component) | It ended up being something else
-libv.ui: Layout testing
-libv.ui: Research Spacing and Margin interactions in javaFX, Decide if they should collapse into each other | Yes, And they should even collapse with justify gaps
-libv.ui: Panel line: Implement correct justify alignment including margin and spacing sharing
-libv.ui: Test layout line: Spacing, Padding, Margin
-libv.ui: Implement margin support in PanelLine
-libv.ui: Panel line: Implement margin alignment: only push elements if they would collide with the containers border
-libv.ui: Resolve missing layout invalidation with dynamic
-libv.ui: Changing dynamic size (text of button) causes flicker (maybe double layout) | layout ran after mouse update: A new step was introduced into UI loop
-libv.ui: Position change of a component does not always updates mouse regions
-libv.ui: Window resize does not always updates mouse regions
-libv.ui: Implement style sheets loading and hot reloading support
-libv.ui: Fix and rework layout invalidation and layout properties
-libv.ui: background bring back size() query, not used on background, but for foreground it will be
-libv.ui: In every component background should not contribute to layout1 size
-libv.ui: Padding pattern support for internal padding
-libv.ui: bordered_padding_pattern (stripes_border.png with proper border handling)
-libv.ui: Fix input local positions when using padding
-libv.ui.style: Style based on component state (bit-mask)
-libv.ui: Add background property to panels
-libv.ui: Card layout | Its ended up being a full layout with card show/enable management
-libv.ui: Issue: In the ui sandbox tabs not tracking active card properly
-libv.ui: For 'Tabs' selected style state
-libv.ui: In card layout create an event for card change
-libv.ui: Issue: In the ui sandbox 1 frame flicker on card removal | solved by switching active card before the frame ends
-libv.ui: Contents of property.hpp can be more hidden toward components (Especially the variant)
-libv.ui: Composite component style / property system
-libv.ui.property: complex composite component would result in "nested" property sets
-libv.ui.property: property system interaction with static_component system
-libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_system_front
-libv.ui.style: Do not track style changes, require ui to be prompted about change
-libv.ui.style: Verify that style change in child causes restyle in properties stored inside the parent
-libv.ui.SLC: Implement SLC - Static Layout Composition
-libv.ui.SLC: Document node function behaviours
-libv.ui: Rename scroll bar to slider
-libv.ui: style intrusive_ptr -> intrusive2_ptr
-libv.ui: Rename slider min/max to low/high
-libv.ui: Normalize and cleanup UI contexts
-libv.ui: Expose nexus from a context
-libv.ui: Adopt background fragment as Slider's bar: bar_* -> bar(Background)
-
-
-
 
 
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+!!! libv.ui: Style state (inheritance) ACL solution:
+		Go backward (?) (forward can also work?), use first match (dont inspect specificness)
+		this is how CSS does it too (just to order if first match and not last)
+libv.ui: "State" property: focus-within
+libv.ui: "State" property: nth (2nd 3rd is enough for now)
+
+
+libv.ui: Adopt libv.re
+libv.ui: Move libv.sun overlay_shader_error.hpp to ui
+libv.ui: Accept injected Nexus
+
 
 
 

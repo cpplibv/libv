@@ -65,6 +65,8 @@ public:
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
 struct EventBeforeUpdate : BaseEvent  {
 	time_point frame_time;
 	time_duration delta_time;
@@ -81,22 +83,10 @@ struct EventAfterUpdate : BaseEvent  {
 			frame_time(frameTime), delta_time(deltaTime) {}
 };
 
-// struct EventBeforeCreate : BaseEvent {
-// 	libv::GL& gl;
-// 	explicit inline EventBeforeCreate(gl::GL& gl) : gl(gl) {}
-// };
 struct EventBeforeRender : BaseEvent {
 	libv::GL& gl;
-	explicit inline EventBeforeRender(gl::GL& gl) : gl(gl) {}
+	explicit inline EventBeforeRender(libv::GL& gl) : gl(gl) {}
 };
-// struct EventBeforeDestroy : BaseEvent {
-// 	libv::GL& gl;
-// 	explicit inline EventBeforeDestroy(gl::GL& gl) : gl(gl) {}
-// };
-// struct EventAfterDestroy : BaseEvent {
-// 	libv::GL& gl;
-// 	explicit inline EventAfterDestroy(gl::GL& gl) : gl(gl) {}
-// };
 
 // -------------------------------------------------------------------------------------------------
 
@@ -116,10 +106,7 @@ public:
 
 	BasicEventProxyGlobal<ComponentT, EventBeforeUpdate> global_before_update{owner};
 	BasicEventProxyGlobal<ComponentT, EventAfterUpdate> global_after_update{owner};
-	// BasicEventProxyGlobal<ComponentT, EventBeforeCreate> global_before_create{owner};
 	BasicEventProxyGlobal<ComponentT, EventBeforeRender> global_before_render{owner};
-	// BasicEventProxyGlobal<ComponentT, EventBeforeDestroy> global_before_destroy{owner};
-	// BasicEventProxyGlobal<ComponentT, EventAfterDestroy> global_after_destroy{owner};
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -152,7 +139,7 @@ struct EventHostGeneral : EventHostGlobal<ComponentT> {
 
 struct BaseEventCanvasGL : BaseEvent {
 	libv::GL& gl;
-	explicit inline BaseEventCanvasGL(gl::GL& gl) : gl(gl) {}
+	explicit inline BaseEventCanvasGL(libv::GL& gl) : gl(gl) {}
 };
 struct EventCanvasBeforeCreate : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };
 struct EventCanvasAfterCreate : BaseEventCanvasGL { using BaseEventCanvasGL::BaseEventCanvasGL; };

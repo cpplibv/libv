@@ -119,7 +119,7 @@ wish_compiler_flags(
 	GNU -m64
 )
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 
 #wish_linker_flags(
 #	BUILD_TYPE Release GNU -mwindows

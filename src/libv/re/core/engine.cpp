@@ -31,7 +31,7 @@ Engine& r = re_storage.value();
 // -------------------------------------------------------------------------------------------------
 
 struct ImplEngine {
-	// libv::gl::GL gl; // In future GL ownership will be moved to libv.re from libv.ui
+	// libv::GL gl; // In future GL ownership will be moved to libv.re from libv.ui
 
 	libv::mt::ticket_machine pendingFrameBlockingWork;
 	libv::mt::worker_thread_pool threadFS{2, "re/fs"};

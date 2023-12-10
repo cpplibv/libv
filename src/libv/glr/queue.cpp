@@ -433,7 +433,7 @@ public:
 	libv::GL& gl;
 
 public:
-	ImplQueue(gl::GL& gl) :
+	ImplQueue(libv::GL& gl) :
 		gl(gl) {
 		programStack.emplace();
 		auto current_viewport = gl.getViewport();

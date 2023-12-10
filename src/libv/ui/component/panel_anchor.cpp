@@ -6,7 +6,6 @@
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/utility/min_max.hpp>
-#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/component/layout/layout_utility.hpp>

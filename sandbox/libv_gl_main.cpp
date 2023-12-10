@@ -29,7 +29,7 @@ constexpr uint32_t WINDOW_HEIGHT = 800;
 struct Sandbox {
 	float angle = 0.f;
 
-	libv::gl::GL gl;
+	libv::GL gl;
 
 	libv::gl::Attribute<0, libv::vec3f> attributePosition;
 	libv::gl::Attribute<2, libv::vec4f> attributeColor;

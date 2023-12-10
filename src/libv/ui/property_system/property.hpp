@@ -80,8 +80,10 @@ enum class PropertyDriver : uint8_t {
 
 // -------------------------------------------------------------------------------------------------
 
+struct AccessProperty;
+
 class BaseProperty {
-	friend class AccessProperty;
+	friend AccessProperty;
 
 private:
 	PropertyDriver driver = PropertyDriver::style;
@@ -97,7 +99,7 @@ public:
 
 template <typename T = void>
 class Property : public BaseProperty {
-	friend class AccessProperty;
+	friend AccessProperty;
 
 public:
 	using value_type = T;
@@ -113,7 +115,7 @@ public:
 
 template <>
 class Property<void> : public BaseProperty {
-	friend class AccessProperty;
+	friend AccessProperty;
 };
 
 /// PropertyB: Behaviour, no change in layout nor render

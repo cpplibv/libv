@@ -10,6 +10,8 @@
 compute-shader:
 	dx dy in compute shader: https://wickedengine.net/2022/05/08/derivatives-in-compute-shader/
 
+surface could use tessalation shaders:
+		https://www.youtube.com/watch?v=21gfE-zUym8
 
 
 Topology / biome controlled random generation

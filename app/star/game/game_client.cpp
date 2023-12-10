@@ -9,8 +9,11 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/exp_moving_avg.hpp>
+#include <libv/re/library.hpp>
+#include <libv/res/resource_path.hpp>
 #include <libv/sun/camera_control.hpp>
 #include <libv/sun/ui/overlay_shader_error.hpp>
+#include <libv/sun/ui/overlay_resource_error.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/scene_container.hpp>
@@ -19,7 +22,7 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
 #include <libv/utility/timer.hpp>
-#include <libv/res/resource_path.hpp>
+#include <optional>
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
@@ -37,33 +40,32 @@
 
 
 namespace star {
-
 // -------------------------------------------------------------------------------------------------
 
 struct ImplGameClient {
 	libv::Nexus nexus_;
 
-//	libv::mt::worker_thread scheduler_{"scheduler"};
-//	GameThread game_thread{ui, nexus};
+	//	libv::mt::worker_thread scheduler_{"scheduler"};
+	//	GameThread game_thread{ui, nexus};
 
-//	Config<ClientConfigGroup> config_;
-//	ConfigManager configManager{scheduler_, nexus_};
-//	Config<ClientConfig> config_;
-//	std::shared_ptr<ClientConfig> config_;
-//	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
-//	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
+	//	Config<ClientConfigGroup> config_;
+	//	ConfigManager configManager{scheduler_, nexus_};
+	//	Config<ClientConfig> config_;
+	//	std::shared_ptr<ClientConfig> config_;
+	//	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
+	//	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
 	std::shared_ptr<ClientConfig> config_;
-//	User user;
+	//	User user;
 	libv::ctrl::Controls controls;
 
-//	Renderer renderer{ui};
-
 	GameClientFrame frame;
+
+	std::optional<libv::re::RenderLibrary> renderLibrary;
 	libv::ui::UI ui;
 
 	explicit inline ImplGameClient(const std::filesystem::path& configFilepath) :
 			config_(make_config<ClientConfig>(nexus_, configFilepath)),
-			ui([&] {
+			ui(nexus_, [&] {
 				libv::ui::Settings settings;
 				settings.use_libv_res_resource_path = true;
 				settings.res_font.base_path = "res/font/";
@@ -85,6 +87,7 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 
 	register_controls();
 	register_nexus();
+	register_renderLibrary();
 
 	self->ui.attach(self->frame);
 	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style.lua")));
@@ -94,6 +97,12 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 
 GameClient::~GameClient() {
 	unregister_nexus();
+
+	// Move out the nexus and check if everyone cleaned itself up
+	auto nexus = std::move(self->nexus_);
+	self.reset();
+	assert(nexus.num_tracked() == 0);
+	assert(nexus.num_object() == 0);
 }
 
 void GameClient::register_controls() {
@@ -133,15 +142,31 @@ void GameClient::register_nexus() {
 	});
 }
 
+void GameClient::register_renderLibrary() {
+	// Render Library will most likely be moved into the UI at some point
+	self->ui.subscribe([this](const libv::ui::EventGLCreate& event) {
+		self->renderLibrary.emplace([&] {
+				libv::re::Settings settings;
+				// settings.model.trackFiles = devMode;
+				// settings.texture.trackFiles = devMode;
+				// settings.shader.trackFiles = devMode;
+				return settings;
+			}(),
+			self->nexus_,
+			event.gl);
+	});
+	self->ui.subscribe([this](const libv::ui::EventGLDestroy& event) {
+		(void) event;
+		self->renderLibrary.reset();
+	});
+}
+
 void GameClient::unregister_nexus() {
 	self->config_->unsubscribe(this);
 
 	self->nexus_.disconnect_all(this);
 	self->nexus_.object_view_remove<ClientConfig>();
 	self->nexus_.object_view_remove<libv::ctrl::Controls>();
-
-	assert(self->nexus_.num_tracked() == 0);
-	assert(self->nexus_.num_object() == 0);
 }
 
 libv::ui::Component GameClient::overlay_version(bool devMode) {
@@ -152,7 +177,7 @@ libv::ui::Component GameClient::overlay_fps() {
 	static constexpr auto fpsUpdatePeriod = std::chrono::milliseconds{250};
 
 	// TODO P4: Implement proper frame statistics
-	//			min, max, avg, window min, window max, window avg, 1% low
+	//			min, max, avg, window min, window max, window avg, 1% low, 0.1% low
 	//  		(including integration with UI and Game state statistics)
 	auto fps = libv::ui::Label::ns("fps", "overlay.fps");
 	self->ui.event().global_before_update([
@@ -177,7 +202,7 @@ void GameClient::init_ui(bool devMode) {
 	msc.identifier("main");
 	// msc.assign(createSceneMainMenu(self->nexus_));
 	// msc.assign(createSceneCredits(self->nexus_));
-	msc.assign(createSceneSurface(self->nexus_));
+	msc.assign(createSceneSurface(self->nexus_)); // Shortcut during development
 
 	// auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
 
@@ -185,6 +210,7 @@ void GameClient::init_ui(bool devMode) {
 	self->ui.add(overlay_version(devMode));
 	self->ui.add(overlay_fps());
 	self->ui.add(libv::sun::overlay_shader_error(true));
+	self->ui.add(libv::sun::overlay_resource_error(true));
 	// self->ui.event().global_before_update([this, fps, t = libv::Timer{}, avg = libv::exp_moving_avg<float>(60, 1, 0.8f)] mutable {
 	// 	self->config_->update();
 	//

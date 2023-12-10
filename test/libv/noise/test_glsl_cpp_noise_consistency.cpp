@@ -160,7 +160,7 @@ TEST_CASE("Test GLSL and C++ noise consistency", "[libv.noise]") {
 	glfw.window = glfwCreateWindow(100, 100, "unittest", nullptr, nullptr);
 	glfwMakeContextCurrent(glfw.window);
 
-	libv::gl::GL gl;
+	libv::GL gl;
 	gl.enableDebug();
 
 	// Execute the tests:

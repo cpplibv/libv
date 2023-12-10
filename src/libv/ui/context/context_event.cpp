@@ -20,7 +20,8 @@ struct ImplContextEvent {
 
 // -------------------------------------------------------------------------------------------------
 
-ContextEvent::ContextEvent() :
+ContextEvent::ContextEvent(libv::Nexus&& nexus) :
+	nexus(std::move(nexus)),
 	self(std::make_unique<ImplContextEvent>()) {
 }
 
