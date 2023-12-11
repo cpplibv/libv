@@ -135,6 +135,8 @@ void SceneInternal::queue(Node* node, const libv::mat4f& matM, Mesh* mesh, Mater
 	};
 
 	for (const auto& pass : passesWithNodes)
+		// NOTE: This checks allows layers to be used as flags, but
+		// disallows a pass to have the union of multiple layers
 		if ((material->layers & pass->layerMask) == pass->layerMask)
 			pass->renderNodeEntries.push_back(entry);
 }

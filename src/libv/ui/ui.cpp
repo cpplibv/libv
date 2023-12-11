@@ -38,7 +38,6 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
-#include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/lua/script_style.hpp>
 #include <libv/ui/settings.hpp>
@@ -647,11 +646,6 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 
 EventHostGlobal<Component> UI::event() {
 	return EventHostGlobal<Component>{self->root};
-}
-
-EventHub UI::event_hub() {
-	auto sp = std::shared_ptr<ContextEvent>(self, &self->context_event);
-	return EventHub(&self->context_ui, std::weak_ptr<ContextEvent>(sp));
 }
 
 void UI::subscribe(libv::unique_function<void(const EventGLCreate&)> func) {

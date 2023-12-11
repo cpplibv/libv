@@ -31,12 +31,17 @@
 #include <star/game/version.hpp>
 #include <star/log.hpp>
 
+
 //#include <libv/mt/worker_thread.hpp>
 //#include <libv/ui/event/event_overlay.hpp>
 //#include <libv/ui/event_hub.hpp>
 //#include <star/game/view/camera_control.hpp>
 //#include <star/game/view/canvas_control.hpp>
 //#include <libv/ui/context/context_state.hpp>
+
+// debug
+#include <libv/ui/component/button.hpp>
+#include <libv/ui/component/panel_line.hpp>
 
 
 namespace star {
@@ -90,7 +95,8 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	register_renderLibrary();
 
 	self->ui.attach(self->frame);
-	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style.lua")));
+	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/main.lua")));
+	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/surface.lua")));
 
 	init_ui(devMode);
 }

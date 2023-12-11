@@ -17,34 +17,32 @@
 
 
 
+libv.ui: Style import other lua files for common variables
+libv.ui: style script loading should match the way other resources are loaded
+		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
 
-
-!!! libv.ui: Style state (inheritance) ACL solution:
-		Go backward (?) (forward can also work?), use first match (dont inspect specificness)
-		this is how CSS does it too (just to order if first match and not last)
 libv.ui: "State" property: focus-within
 libv.ui: "State" property: nth (2nd 3rd is enough for now)
 
 
 libv.ui: Adopt libv.re
 libv.ui: Move libv.sun overlay_shader_error.hpp to ui
-libv.ui: Accept injected Nexus
 
 
 
 
 
-libv.ui: style script loading should match the way other resources are loaded
-		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
-
-libv.ui: Implement built-in support for child properties in BasePanel
-libv.ui: Cleanup child property access in Tooltip Container
+Tooltip
+	libv.ui: Implement built-in support for child properties in BasePanel
+	libv.ui: Cleanup child property access in Tooltip Container
 
 
 
 Slider value change should not invalidate layout
 	(make it a float region if it must)
 	mouse context range remap might be needed!
+libv.ui: Make sure that (only) position change does not invalidate layout
+
 
 Slider Bar "hover" style/state: separate  for the track and for the bar
 
@@ -168,11 +166,7 @@ libv.ui.SLC: BUG: line.assign_ratio_size is incorrect for:
 
 
 
-libv.ui: Nested style = Style as a property
 libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
-
-libv.ui: Accept injected Nexus
-libv.ui: Kill event_hub in favor of exposed nexus
 
 libv.ui.SLC: Add anchor support
 libv.ui.SLC: Add alignment support
@@ -297,7 +291,7 @@ libv.ui: Stateify every UI component (extended: active (and selected))
 
 libv.ui: Add missing button state switch on off component active release
 
-libv.ui: border fragment = chained/nested background fragments
+libv.ui: border fragment = chained/nested background fragments (decorator pattern)
 
 libv.ui: check on that "recent" modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
@@ -311,7 +305,7 @@ libv.ui: Style (resource) async loading
 	1000: Loading screen
 	 100: Main menu
 	   0: Default
-	-100: Rarely visited scenes
+	-100: Rarely visited scenes (credits, settings)
 
 libv.ui.property: scope / sheet / component type based style rules
 
@@ -357,9 +351,10 @@ libv.ui: Margin, Padding, Spacing and Alignment gaps
 					scroll_bar NO-OP
 					stretch NO-OP
 	libv.ui: Document what Padding/Margin/Spacing is: (Maybe in a table form)
+			OUTDATED collapse rules!
 			? Interaction with border
 			Padding:
-				Part of the component but not part of the component 'content area'
+				Part of the component but not part of the component's "content area"
 				Part of the background
 				Part of the size
 				Part of the mouse region
@@ -377,9 +372,6 @@ libv.ui: Margin, Padding, Spacing and Alignment gaps
 				Not part of the size
 				Not part of the mouse region
 				Does collapses with neighboring Margin, Container spacing and container justify gap
-
-libv.ui: Restructure: contexts, centralize and unify them, their construction, their referencing, improve naming (event -> comm)
-		organize which is public (like context_state), which is privet (like context_event)
 
 Cleanup / Implement
 	src/libv/ui/component/base_panel_static.*
@@ -403,9 +395,10 @@ place.it:
 
 libv.ui/libv.ctrl: Keyboard binding display (For useful fun)
 
-libv.ui: UI level storage system
-		context().storage<UIUserConfig>() : UIUserConfig&
-		should be accessible via UI too
+libv.ui: Storage system
+	libv.ui: UI level storage system
+			context().storage<UIUserConfig>() : UIUserConfig&
+			should be accessible via UI too
 	libv.ui: Component scoped storage system
 			context().scoped_storage<FloatFrame>(label) : FloatFrame&
 			should be accessible via UI too
@@ -415,8 +408,6 @@ libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadca
 		! There is one now for style script tracking, make it more ui-wise
 
 libv.ui: adopt libv.rev's Shader and ShaderLoader
-
-libv.ui: (?) Rename PanelAnchor to PanelAnchor
 
 libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
 		markInvalidLayout();
@@ -473,8 +464,6 @@ libv.ui.layout: size over 100% is not an error
 
 libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
 libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
-
-libv.ui: Make sure that (only) position change does not invalidates layout
 
 libv.ui: Idea: new raw texture, white with size of 1x1 px BUT on the getters it lies to 0x0 px so it would not effect layouts
 
@@ -871,6 +860,8 @@ PAPER: Component styled states:
 				}
 
 		- overriding: in case of multiple definition of the same property the last with matching state wins
+
+		- inheritance: If the requested property is not found the parents will be searched recursively
 
 
 

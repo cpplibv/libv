@@ -37,7 +37,8 @@ wish_resource_mapping(
 		MAPPING_FILE wish/resource_mapping.hpp
 		MAPPING_FUNCTION wish::resource_mapping
 
-		RESOURCE res/style.lua
+		RESOURCE res/style/main.lua
+		RESOURCE res/style/surface.lua
 		RESOURCE @/res/font/arialn.ttf
 		RESOURCE @/res/font/calibril.ttf
 		RESOURCE @/res/font/consola.ttf

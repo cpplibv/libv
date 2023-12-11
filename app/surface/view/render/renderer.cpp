@@ -7,7 +7,6 @@
 #include <libv/glr/queue.hpp>
 #include <libv/noise/white.hpp>
 #include <libv/ui/context/context_resource.hpp>
-#include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/read_file.hpp>

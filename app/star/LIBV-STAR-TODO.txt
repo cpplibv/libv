@@ -20,8 +20,9 @@ Star - System integration demo
 
 
 libv.re: sort out how to use libv.re in CanvasSurface ctor
-
-
+		If library init could happen before scene ctor it would do the trick
+libv.re: improve glue layer, includes and ui integration
+libv.re: canvas might not be needed
 
 
 libv.ui: controls:
@@ -32,13 +33,8 @@ libv.ui: controls:
 
 
 
-
-libv.re: improve glue layer, includes and ui integration
-libv.re: canvas might not be needed
-libv.re: multi-scene support (share buffers and render targets)
-libv.re: multi-canvas support (if possible: reuse render targets with different viewports (!careful with overriding the depth))
-libv.re: multi-scene with multi-canvas support
-
+libv.re integration:
+		wire in every settings
 
 
 
@@ -243,17 +239,12 @@ place.it:
 		sleeping, awake, tracked
 		runs different code
 
-	read: https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
-	research: push constants
-
 	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
 	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
 	Knowledge: Anisotropic filtering is useless for many textures
 	Knowledge: Mip maps are useless for some textures (UI textures dont care)
 
 ----------
-
-
 
 app.star: cleanup
 	config.cpp
@@ -286,28 +277,8 @@ config: customization of behaviour:
 	on_entry_change::do_nothing
 
 
-wish_generator(
-	TARGET  codegen
-	COMMAND codegen
-	OUTPUT  REPLACE ".in.lua" ".hpp"
-	OUTPUT  REPLACE ".in.lua" ".cpp"
-#	OUTPUT  REPLACE ".in.lua" ".hpp"
-#	OUTPUT  REPLACE ".inh.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".hpp"
-#	OUTPUT  REPLACE ".ins.lua" ".cpp"
-)
-
-
-
-
-
-libv.ui: Solve the issue with inheriting state selectors in styles
-			| maybe pure lua solution?
-			| or instrumentation
-			| or special states state_override("active")
 
 libv.ui: Warn whenever a UI component out lives the UI object itself
-
 
 
 

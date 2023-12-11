@@ -3,7 +3,7 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+// #include <string>
 
 
 namespace libv {
@@ -12,17 +12,17 @@ namespace re {
 // -------------------------------------------------------------------------------------------------
 
 struct LayerMask {
-	static inline std::string layerNames[32] = {
-		"DepthCaster",
-		"Opaque",
-		"Background",
-		"Transparent",
-		// "Water",
-		"OutlineCaster",
-		"ShadowCaster",
-		"Flare",
-		"HUD"
-	};
+	// static inline std::string layerNames[32] = {
+	// 	"DepthCaster",
+	// 	"Opaque",
+	// 	"Background",
+	// 	"Transparent",
+	// 	// "Water",
+	// 	"OutlineCaster",
+	// 	"ShadowCaster",
+	// 	"Flare",
+	// 	"HUD"
+	// };
 
 	uint32_t bitMask = 0;
 
@@ -53,9 +53,8 @@ constexpr LayerMask layerTransparent{1u << 4u};
 // constexpr LayerMask layerWater{1u << 5u};
 constexpr LayerMask layerOutlineCaster{1u << 6u};
 constexpr LayerMask layerShadowCaster{1u << 7u};
-// constexpr LayerMask layerLight{1u << 8u};
-constexpr LayerMask layerFlare = LayerMask{1u << 9u} | layerNoFrustumCull;
-constexpr LayerMask layerHUD = LayerMask{1u << 10u} | layerNoFrustumCull;
+constexpr LayerMask layerFlare = LayerMask{1u << 8u} | layerNoFrustumCull;
+constexpr LayerMask layerHUD = LayerMask{1u << 9u} | layerNoFrustumCull;
 
 // -------------------------------------------------------------------------------------------------
 

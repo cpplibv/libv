@@ -26,8 +26,6 @@ class ContextStyle;
 class ContextUI;
 class StyleAccess;
 
-class EventHub;
-
 class EventChar;
 class EventFocus;
 class EventKey;

@@ -88,7 +88,6 @@ public:
 
 public:
 	[[nodiscard]] EventHostGlobal<Component> event();
-	[[nodiscard]] EventHub event_hub();
 
 	void subscribe(libv::unique_function<void(const EventGLCreate&)>);
 	void subscribe(libv::unique_function<void(const EventGLDestroy&)>);

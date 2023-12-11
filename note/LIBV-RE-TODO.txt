@@ -18,11 +18,6 @@ RE - LIBV Render Engine
 
 
 
-if ((material->layers & pass->layerMask) == pass->layerMask)
-
-layer and layerNoFrustumCull causes some trouble
-
-
 
 
 
@@ -99,6 +94,10 @@ place.it:
 
 	RE
 		Better integration into UI component/canvas
+		multi-canvas
+			libv.re: multi-scene support (share buffers and render targets)
+			libv.re: multi-canvas support (if possible: reuse render targets with different viewports (!careful with overriding the depth))
+			libv.re: multi-scene with multi-canvas support
 		Late Update: Implement a late update system for mouse interactions
 				or cursor following effects (selection, highlight)
 				can have wierd and separate control flow

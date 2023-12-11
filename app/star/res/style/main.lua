@@ -151,7 +151,7 @@ ui.style("main-menu.menu.title") {
 	align_vertical = "center",
 	font_color = {1, 1, 1, 1},
 	font_size = 34,
-	margin = {0, 40, 0, 0}
+	margin = {0, 40, 0, 0},
 }
 
 ui.style("main-menu.menu.entry") {

@@ -24,7 +24,7 @@ namespace sun {
 // -------------------------------------------------------------------------------------------------
 
 libv::ui::Component overlay_resource_error(bool useStyles) {
-	auto line = libv::ui::PanelStatusLine::ns("overlay-shader", "overlay.resource.line");
+	auto line = libv::ui::PanelStatusLine::ns("overlay-resource", "overlay.resource.line");
 	if (!useStyles) {
 		line.anchor(libv::ui::Anchor::top_left);
 		line.size(libv::ui::parse_size_or_throw("D, D"));

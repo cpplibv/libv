@@ -9,6 +9,7 @@
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component_system/create_scene.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
+#include <libv/ui/property/background.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // pro
 //#include <star/game/scene/surface/camera.hpp>
@@ -91,6 +92,7 @@ struct CanvasSurface : libv::ui::CanvasBase {
 public:
 //	GameSession& game_session;
 
+	// Visuals
 	libv::re::Scene_ptr scene = libv::re::Scene::create("Surface Scene");
 	libv::re::Camera_ptr camera = libv::re::Camera::create();
 	libv::re::Canvas_ptr canvas = libv::re::Canvas::create();
@@ -103,6 +105,9 @@ public:
 	libv::time_point timeRealStart = libv::clock::now();
 	libv::time_point timeRealFrame = timeRealStart;
 	libv::time_duration_d timeSim{0};
+
+	// State
+	bool rotate = false;
 
 public:
 	explicit CanvasSurface(libv::Nexus& nexus, libv::ctrl::Controls& controls) {
@@ -130,13 +135,13 @@ public:
 
 		// controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 	}
-//	SpaceCanvas(libv::ctrl::Controls& controls, Renderer& renderer, GameSession& game_session, bool main_canvas);
 	~CanvasSurface() {
 		// controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera);
 	}
 
 public:
 	void enableControls(libv::ctrl::Controls& controls) {
+		(void) controls;
 		// TODO P1: app.space: Should not store it (?) only to bypass controls invalidation issue
 		// libv::ctrl::Controls& controls;
 		// std::optional<ControlVar> controlVar
@@ -153,11 +158,18 @@ public:
 	//
 	// 	controls.context_enter<CanvasControl>(&*controlVar);
 	// 	controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
+
 	}
 
 	void disableControls(libv::ctrl::Controls& controls) {
+		(void) controls;
 		// controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera);
 		// controls.context_leave_if_matches<CanvasControl>(&*controlVar);
+
+		// // TODO P2: Controls guard objects for safety
+		// auto& controls = *nexus.object_view_get<libv::ctrl::Controls>();
+		// controls.context_leave<libv::sun::BaseCameraOrbit>();
+		// controls.context_leave<SandboxState>();
 	}
 
 private:
@@ -169,6 +181,26 @@ private:
 				libv::re::MaterialSolid::create(libv::vec4f{0.f, 0.25, 0.25f, 1.f}),
 				libv::re::MeshSphere::create(12)));
 
+		//Debug gizmo: coordinates text
+		//	renderer.text.add_debug_coordinates_if_nothing_else();
+
+		//Debug gizmo: Camera orbit point
+		//	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
+
+		//Debug gizmo: Camera orientation gizmo in top right
+		// 	const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
+		// 	const auto orientation_gizmo_margin = 4.f;
+		//
+		// 	glr.projection = libv::mat4f::ortho(
+		// 			-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
+		// 			canvas_size,
+		// 			-orientation_gizmo_size,
+		// 			+orientation_gizmo_size);
+		// 	glr.view = camera.orientation_view().translate(-1, 0, 0);
+		// 	glr.model.scale(orientation_gizmo_size * 0.5f);
+		//
+		// 	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
+
 		focus();
 	}
 	virtual void update(libv::ui::time_duration timeDelta) override {
@@ -178,6 +210,9 @@ private:
 			unpauseNextFrame = false;
 			timeSim += timeDelta;
 		}
+
+		// if (rotate)
+		// 	camera->tmpCameraPlayer.orbit_yaw(static_cast<float>(timeDelta.count()) * libv::tau * 0.01f);
 	}
 	virtual void render(libv::glr::Queue& glr) override {
 		// NOTE: screen_picker update has to be placed around render, as canvas_size is only set after layout
@@ -196,158 +231,29 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-// struct SceneSurfaceState {
-//
-// 	// Visuals
-// 	libv::re::Scene_ptr scene;
-// 	libv::re::Camera_ptr camera;
-// 	libv::re::Canvas_ptr canvas;
-//
-// 	// libv::re::MaterialTest0_ptr matTest0;
-// 	// libv::re::Object_ptr sphereMoving0;
-// 	// libv::re::Object_ptr sphereMoving1;
-// 	// libv::re::Light_ptr movingLight0;
-// 	//
-// 	// libv::re::Node_ptr movingModel;
-//
-// 	// State
-// 	bool rotate = false;
-// 	int state = 0;
-//
-// 	// EditorGrid editorGrid{rev};
-//
-// 	// libv::re::ParticleEffect fountain;
-// 	// std::vector<libv::re::ParticleEffect> fountains;
-// 	// libv::re::ParticleEffect particleFountain{scene, particleLibrary.fountain};
-//
-// 	// ParticleEffect cameraDust;
-// 	//
-// 	// struct Ship {
-// 	// 	ShipType type;
-// 	// 	ParticleEffect* engineBloom = nullptr;
-// 	// };
-//
-// 	// std::vector<Ship> ships;
-//
-// 	libv::Nexus nexus;
-//
-//
-// 	SceneSurfaceState(libv::Nexus& nexus) :
-// 			scene(libv::re::Scene::create("Alpha")),
-// 			camera(libv::re::Camera::create()),
-// 			canvas(libv::re::Canvas::create()),
-// 			nexus(nexus) {
-
-// 		// RendererEditorGrid editorGrid{resource_context.loader};
-// 		// RendererDebug debug{resource_context};
-// 		// RendererGizmo gizmo{resource_context};
-// 		// RendererText text{resource_context};
-// 		//	text.font = ui.context().font("consola.ttf");
-//
-// 		// --- Render Debug shapes ---
-// 		// renderer.debug.render(glr, renderer.resource_context.uniform_stream);
-// 		// --- Text ---
-// 		// renderer.text.add_debug_coordinates_if_nothing_else();
-// 		// renderer.text.render(glr, renderer.resource_context.uniform_stream, screen_picker);
-//
-// 		// { // Camera orbit point
-// 		// 	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
-// 		// }
-// 		//
-// 		// { // Camera orientation gizmo in top right
-// 		// 	const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
-// 		// 	const auto orientation_gizmo_margin = 4.f;
-// 		//
-// 		// 	glr.projection = libv::mat4f::ortho(
-// 		// 			-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
-// 		// 			canvas_size,
-// 		// 			-orientation_gizmo_size,
-// 		// 			+orientation_gizmo_size);
-// 		// 	glr.view = camera.orientation_view().translate(-1, 0, 0);
-// 		// 	glr.model.scale(orientation_gizmo_size * 0.5f);
-// 		//
-// 		// 	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
-// 		// }
-// 	}
-//
-// 	SceneSurfaceState::~SceneSurfaceState() {
-// 		// TODO P2: Controls guard objects for safety
-// 		auto& controls = *nexus.object_view_get<libv::ctrl::Controls>();
-// 		controls.context_leave<libv::sun::BaseCameraOrbit>();
-// 		controls.context_leave<SandboxState>();
-// 	}
-//
-// 	void async_update(libv::time_point timeFrame, libv::time_duration timeDelta) {
-// 		this->timeRealFrame = timeFrame;
-//
-// 		if ((!paused && !slowMode) || unpauseNextFrame || (slowMode && (++slowModeCounter % 10) == 0)) {
-// 			unpauseNextFrame = false;
-// 			timeSim += timeDelta;
-// 		}
-//
-// 		// if (rotate)
-// 		// 	camera->tmpCameraPlayer.orbit_yaw(static_cast<float>(timeDelta.count()) * libv::tau * 0.01f);
-// 	}
-//
-// 	void create(libv::GL& gl) {
-// 		(void) gl;
-// 	}
-//
-// 	void destroy(libv::GL& gl) {
-// 		(void) gl;
-// 	}
-//
-// 	void render(libv::GL& gl, libv::vec2f canvasPosition, libv::vec2f canvasSize) {
-// 		// {
-// 		// 	const auto timeEffect = timeRealFrame - timeRealStart;
-// 		// 	const auto timeEffectLooping = static_cast<float>(std::fmod((timeEffect).count() + 1800.0, 3600.0) - 1800.0);
-// 		// }
-//
-// 		canvas->position(canvasPosition.cast<int32_t>());
-// 		canvas->size(canvasSize.cast<int32_t>());
-//
-// 		scene->render(libv::r, gl, *camera, canvas, timeSim.count(), (timeRealFrame - timeRealStart).count());
-// 	}
-// };
-
-// -------------------------------------------------------------------------------------------------
-
 struct SceneSurface {
 	std::string some_data;
 
 	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) const {
+		auto& controls = requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls");
+
 		auto layers = libv::ui::PanelAnchor::n("layers");
 
-		auto canvas = layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas",
-				nexus,
-				requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls")
-		);
+		auto canvas = layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas", nexus, controls);
 		canvas.z_index_offset(-100);
 		canvas.event().focus.connect([](libv::ui::CanvasAdaptorT<CanvasSurface>& self, const libv::ui::EventFocus& event) {
 			log_star.trace("Surface Canvas Focus: {}", event.gain());
 
+			(void) self;
 			// if (event.gain())
 			// 	self.object().enableControls(controls);
 			// else
 			// 	self.object().disableControls(controls);
 		});
 
-		auto line = layers.add_n<libv::ui::PanelLine>("line");
-		line.anchor(libv::ui::Anchor::bottom_center);
-		line.orientation(libv::ui::Orientation::down);
-		line.size(libv::ui::Size{libv::ui::dynamic(), libv::ui::dynamic()});
-
-		auto label = line.add_a<libv::ui::Label>("Surface: " + some_data);
-		label.align_horizontal(libv::ui::AlignHorizontal::center);
-		label.align_vertical(libv::ui::AlignVertical::center);
-		label.font_color({1, 1, 1, 1});
-		// label.size(libv::ui::Size{libv::ui::dynamic(), libv::ui::dynamic()});
-		// label.size(libv::ui::Size{libv::ui::dynamic() + libv::ui::ratio(1.f), libv::ui::dynamic()});
-		label.size(libv::ui::parse_size_or_throw("1rD, D"));
-
-		auto btn = line.add_a<libv::ui::Button>("Back to Main Menu");
-		btn.size(libv::ui::Size{libv::ui::dynamic(), libv::ui::dynamic()});
-		btn.size(libv::ui::parse_size_or_throw("1rD, D"));
+		auto line = layers.add_ns<libv::ui::PanelLine>("menu-line", "surface.menu.line");
+		auto label = line.add_sa<libv::ui::Label>("surface.menu.label", "Surface: " + some_data);
+		auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
 		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
 			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
 		});

@@ -7,7 +7,6 @@
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/sun/camera_control.hpp>
 #include <libv/ui/event/event_overlay.hpp>
-#include <libv/ui/event_system/event_hub.hpp>
 #include <libv/ui/settings.hpp>
 // pro
 #include <space/view/canvas_control.hpp>

@@ -79,7 +79,7 @@ void Style::set(StyleState state_mask, StyleState state_value, const std::string
 }
 
 libv::optional_ref<const PropertyDynamic> Style::get_optional(StyleState state, const std::string_view property) const {
-	// TODO P1: For performance flatten the hierarchy into each node (mark the flatten properties because they might have to be cleared or rebuilt, and maintain it during set/clear/inherit operations)
+	// TODO P5: For performance flatten the hierarchy into each node (mark the flatten properties because they might have to be cleared or rebuilt, and maintain it during set/clear/inherit operations)
 
 	const auto it = properties.find(property);
 	if (it != properties.end()) {
