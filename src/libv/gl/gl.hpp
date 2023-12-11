@@ -709,7 +709,7 @@ public:
 				0.5f, 0.5f, 0.5f, 1.0f};
 	}
 
-private:
+public:
 	template <typename T>
 	[[nodiscard]] inline T get(GLenum param) const {
 		T value;
@@ -729,7 +729,23 @@ private:
 		else if constexpr (std::is_same_v<GLdouble, T>)
 			glGetDoublev(param, &value);
 
-		else if constexpr (std::is_same_v<libv::vec3i, T>) {
+		else if constexpr (std::is_same_v<libv::vec3i, T>)
+			glGetIntegerv(param, value.data());
+
+		else if constexpr (std::is_same_v<libv::vec4f, T>)
+			glGetFloatv(param, value.data());
+
+		else
+			static_assert(false, "Type T is not supported");
+
+		return value;
+	}
+
+	template <typename T>
+	[[nodiscard]] inline T getIndexed(GLenum param) const {
+		T value;
+
+		if constexpr (std::is_same_v<libv::vec3i, T>) {
 			glGetIntegeri_v(param, 0, &value.x);
 			glGetIntegeri_v(param, 1, &value.y);
 			glGetIntegeri_v(param, 2, &value.z);
@@ -845,10 +861,10 @@ public:
 	}
 
 	[[nodiscard]] inline libv::vec3i getMaxComputeWorkGroupCount() const {
-		return versionOrGreater(4, 3) ? get<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_COUNT) : libv::vec3i{-1};
+		return versionOrGreater(4, 3) ? getIndexed<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_COUNT) : libv::vec3i{-1};
 	}
 	[[nodiscard]] inline libv::vec3i getMaxComputeWorkGroupSize() const {
-		return versionOrGreater(4, 3) ? get<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_SIZE) : libv::vec3i{-1};
+		return versionOrGreater(4, 3) ? getIndexed<libv::vec3i>(GL_MAX_COMPUTE_WORK_GROUP_SIZE) : libv::vec3i{-1};
 	}
 	[[nodiscard]] inline GLint getMaxComputeWorkGroupInvocations() const {
 		return versionOrGreater(4, 3) ? get<GLint>(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS) : -1;

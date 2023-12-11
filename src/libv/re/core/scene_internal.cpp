@@ -143,11 +143,113 @@ std::span<libv::vec2f> SceneInternal::queueDepthQuery(ReadbackQueryIndex& queryI
 	return pipeline->depthReadbackBuffer.request(queryIndex, count);
 }
 
+struct AdoptedGLState {
+	libv::gl::BlendEquation blendEquation;
+	libv::gl::BlendFunction blendFunctionSrc;
+	libv::gl::BlendFunction blendFunctionDst;
+	bool capabilityBlend;
+	bool capabilityCull;
+	bool capabilityDepthTest;
+	bool capabilityMultisample;
+	bool capabilityRasterizerDiscard;
+	bool capabilityScissorTest;
+	bool capabilityStencilTest;
+	bool capabilityTextureCubeMapSeamless;
+	uint32_t clipPlanes;
+	bool maskColorR;
+	bool maskColorG;
+	bool maskColorB;
+	bool maskColorA;
+	bool maskDepth;
+	uint8_t maskStencil;
+	libv::gl::TestFunction stencilFunction;
+	uint8_t stencilReference;
+	uint8_t stencilBitmask;
+	libv::gl::StencilAction stencilFail;
+	libv::gl::StencilAction depthFail;
+	libv::gl::StencilAction stencilAndDepthPass;
+	libv::gl::CullFace cullFace;
+	libv::gl::TestFunction depthFunction;
+	libv::gl::FrontFace frontFace;
+	libv::gl::PolygonMode polygonMode;
+	libv::gl::ClipOrigin clipOrigin;
+	libv::gl::ClipDepth clipDepth;
+	libv::vec4f clearColor;
+	float clearDepth;
+	uint8_t clearStencil;
+
+	void save(libv::GL& gl) {
+		blendEquation = gl.blendEquation.current;
+		blendFunctionSrc = gl.blendFunction.current_source;
+		blendFunctionDst = gl.blendFunction.current_destination;
+		capabilityBlend = gl.capability.blend.current;
+		capabilityCull = gl.capability.cull.current;
+		capabilityDepthTest = gl.capability.depthTest.current;
+		capabilityMultisample = gl.capability.multisample.current;
+		capabilityRasterizerDiscard = gl.capability.rasterizerDiscard.current;
+		capabilityScissorTest = gl.capability.scissorTest.current;
+		capabilityStencilTest = gl.capability.stencilTest.current;
+		capabilityTextureCubeMapSeamless = gl.capability.textureCubeMapSeamless.current;
+		clipPlanes = gl.clipPlanes.current;
+		maskColorR = gl.mask.color.currentR;
+		maskColorG = gl.mask.color.currentG;
+		maskColorB = gl.mask.color.currentB;
+		maskColorA = gl.mask.color.currentA;
+		maskDepth = gl.mask.depth.current;
+		maskStencil = gl.mask.stencil.bitmask;
+		stencilFunction = gl.stencil.function.function;
+		stencilReference = gl.stencil.function.reference;
+		stencilBitmask = gl.stencil.function.bitmask;
+		stencilFail = gl.stencil.operation.stencilFail;
+		depthFail = gl.stencil.operation.depthFail;
+		stencilAndDepthPass = gl.stencil.operation.stencilAndDepthPass;
+		cullFace = gl.cullFace.current;
+		depthFunction = gl.depthFunction.current;
+		frontFace = gl.frontFace.current;
+		polygonMode = gl.polygonMode.current;
+		clipOrigin = gl.clipOrigin;
+		clipDepth = gl.clipDepth;
+		// TODO P5: libv.gl: Setters and state tracking for clearColor, clearDepth and clearStencil
+		clearColor = gl.get<libv::vec4f>(GL_COLOR_CLEAR_VALUE);
+		clearDepth = gl.get<float>(GL_DEPTH_CLEAR_VALUE);
+		clearStencil = static_cast<uint8_t>(gl.get<GLint>(GL_STENCIL_CLEAR_VALUE));
+	}
+	void restore(libv::GL& gl) {
+		gl.blendEquation.set(blendEquation);
+		gl.blendFunction.set(blendFunctionSrc, blendFunctionDst);
+		gl.capability.blend.set(capabilityBlend);
+		gl.capability.cull.set(capabilityCull);
+		gl.capability.depthTest.set(capabilityDepthTest);
+		gl.capability.multisample.set(capabilityMultisample);
+		gl.capability.rasterizerDiscard.set(capabilityRasterizerDiscard);
+		gl.capability.scissorTest.set(capabilityScissorTest);
+		gl.capability.stencilTest.set(capabilityStencilTest);
+		gl.capability.textureCubeMapSeamless.set(capabilityTextureCubeMapSeamless);
+		gl.clipPlanes.set(clipPlanes);
+		gl.mask.color.set(maskColorR, maskColorG, maskColorB, maskColorA);
+		gl.mask.depth.set(maskDepth);
+		gl.mask.stencil.set(maskStencil);
+		gl.stencil.function.set(stencilFunction, stencilReference, stencilBitmask);
+		gl.stencil.operation.set(stencilFail, depthFail, stencilAndDepthPass);
+		gl.cullFace.set(cullFace);
+		gl.depthFunction.set(depthFunction);
+		gl.frontFace.set(frontFace);
+		gl.polygonMode.set(polygonMode);
+		gl.clipControl(clipOrigin, clipDepth);
+		gl.clearColor(clearColor);
+		gl.clearDepth(clearDepth);
+		gl.clearStencil(clearStencil);
+	}
+};
+
 void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const Canvas_ptr& canvas, double timeSimulation, double timeReal) {
 	if (!created) {
 		created = true;
 		create(gl);
 	}
+
+	AdoptedGLState prevGLState;
+	prevGLState.save(gl);
 
 	// --- Camera / Canvas variables ---
 
@@ -320,9 +422,7 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 	lastTimeSim = timeSimulation;
 
 	// Restore GL states
-	// TODO P1: Restore the previously used framebuffer / viewport / clip control, dont assume anything
-	gl.clipControl(libv::gl::ClipOrigin::LowerLeft, libv::gl::ClipDepth::NegativeOneToOne);
-	gl.clearDepth(1.f);
+	prevGLState.restore(gl);
 }
 
 // -------------------------------------------------------------------------------------------------
