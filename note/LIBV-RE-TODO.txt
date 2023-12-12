@@ -12,7 +12,6 @@ RE - LIBV Render Engine
 
 
 
-
 14 Forward+
 	4 Light culling compute shader
 	1 SSBO
@@ -85,6 +84,10 @@ place.it:
 			libv.re: multi-scene support (share buffers and render targets)
 			libv.re: multi-canvas support (if possible: reuse render targets with different viewports (!careful with overriding the depth))
 			libv.re: multi-scene with multi-canvas support
+				Things can be grouped if they are context, canvas or scene related
+				buffers are context
+				render targets are canvas
+				nodes are scene, etc
 		Late Update: Implement a late update system for mouse interactions
 				or cursor following effects (selection, highlight)
 				can have wierd and separate control flow
@@ -98,6 +101,9 @@ place.it:
 			2 component normal map glsl read:
 				N.xy = 2 * tex2D(image, texcoord).wy - 1;
 				N.z = sqrt(saturate(1 - N.x * N.x - N.y * N.y));
+			Normal Maps, Tangent Space & IBL • Shaders for Game Devs [Part 3]
+			https://www.youtube.com/watch?v=E4PHFnvMzFc
+				flipped uv or flipped scale causes the need for flipped bitangents (currently this is not supported)
 		Alpha Scene
 			texturing test_pattern_metal_a
 				rename everywhere, its no longer test_ its a proper texture
@@ -341,9 +347,9 @@ place.it:
 		List component (and Pagination)
 		Scroll pane = scroll area + scroll bar + connecting them
 		Font outline render
-		Animations, transitions, responsiveness
 		Tooltips
 		A default style sheet
+		Animations, transitions, responsiveness
 
 	Marketing
 		Some screenshots (from the assets if not even a scene)

@@ -82,7 +82,7 @@ struct TestCoreComponent : public libv::ui::CoreComponent {
 };
 
 void subscribe(TestContextMouse& ctx, libv::ui::CoreComponent& component, libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder order) {
-	ctx.subscribe(component);
+	ctx.libv::ui::ContextMouse::subscribe(component);
 	ctx.update(component, position, size, order);
 	ctx.enable(component, component.enable());
 }
@@ -146,7 +146,7 @@ public:
 	}
 
 	void subscribe(libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder order) {
-		ctx.subscribe(*this);
+		ctx.libv::ui::ContextMouse::subscribe(*this);
 		ctx.update(*this, position, size, order);
 		ctx.enable(*this, enable());
 	}

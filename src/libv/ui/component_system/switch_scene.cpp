@@ -13,11 +13,12 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 void switchParentScene(std::string_view sceneContainerID, const libv::ui::Component& component, libv::ui::Component newScene) {
-	auto it = component.parent();
-	while ((it = it.parent())) {
+	auto it = component;
+	while (it) {
 		auto sc = it.cast<libv::ui::SceneContainer>();
 		if (sc && sc.identifier() == sceneContainerID)
 			sc.assign(newScene);
+		it = it.parent();
 	}
 }
 

@@ -7,7 +7,7 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ClientConfigT;
+class ClientConfigT;
 template <typename ConfigT> class Config;
 using ClientConfig = Config<ClientConfigT>;
 

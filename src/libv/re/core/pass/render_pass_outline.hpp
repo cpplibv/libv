@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <libv/math/vec.hpp>
 #include <libv/re/fwd.hpp>
 #include <libv/re/core/pass/render_pass.hpp>
 

@@ -6,7 +6,6 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/math/constants.hpp>
 #include <libv/math/quat.hpp>
-#include <libv/re/core/canvas.hpp>
 #include <libv/re/core/engine.hpp>
 #include <libv/re/core/scene.hpp>
 #include <libv/re/material/material_solid.hpp>
@@ -86,7 +85,6 @@
 SandboxState::SandboxState(libv::Nexus& nexus) :
 		scene(libv::re::Scene::create("Alpha")),
 		camera(libv::re::Camera::create()),
-		canvas(libv::re::Canvas::create()),
 		nexus(nexus) {
 
 	camera->tmpCameraPlayer.look_at({-3.f, -6.f, 4.0f}, {0, 0, 0});
@@ -163,7 +161,6 @@ SandboxState::SandboxState(libv::Nexus& nexus) :
 		addDebugViewCtrl("post-process-up"       , "post-process-up-7"       , 7, libv::re::DebugCaptureMode::normal, "Shift + 7");
 		addDebugViewCtrl("post-process-up"       , "post-process-up-8"       , 8, libv::re::DebugCaptureMode::normal, "Shift + 8");
 		addDebugViewCtrl("post-process-up"       , "post-process-up-9"       , 9, libv::re::DebugCaptureMode::normal, "Shift + 9");
-		// addDebugViewCtrl("post-process-prefilter", "post-process-prefilter"  , 0, libv::re::DebugCaptureMode::normal, "KP4");
 		addDebugViewCtrl("flare"                 , "flare"                   , 0, libv::re::DebugCaptureMode::normal, "9");
 		addDebugViewCtrl("outline"               , "outline"                 , 0, libv::re::DebugCaptureMode::normal, "0");
 		addDebugViewCtrl("hud"                   , "hud"                     , 0, libv::re::DebugCaptureMode::normal, "-");
@@ -488,21 +485,19 @@ void SandboxState::destroy(libv::GL& gl){
 	(void) gl;
 }
 
-void SandboxState::render(libv::GL& gl, libv::vec2f canvasPosition, libv::vec2f canvasSize) {
+void SandboxState::render(libv::GL& gl, libv::vec2i canvasPosition, libv::vec2i canvasSize, libv::vec2f localMousePosition) {
 	{
 		const auto timeEffect = timeRealFrame - timeRealStart;
 		const auto timeEffectLooping = static_cast<float>(std::fmod((timeEffect).count() + 1800.0, 3600.0) - 1800.0);
 		matTest0->uniform_dynamic = timeEffectLooping;
 	}
 
-	auto& r = libv::re::r;
-
-	canvas->position(canvasPosition.cast<int32_t>());
-	canvas->size(canvasSize.cast<int32_t>());
-
-	scene->render(r, gl,
+	scene->render(
+			gl,
 			*camera,
-			canvas,
+			canvasPosition,
+			canvasSize,
+			localMousePosition,
 			timeSim.count(),
 			(timeRealFrame - timeRealStart).count());
 }

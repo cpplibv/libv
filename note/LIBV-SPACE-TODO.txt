@@ -87,8 +87,6 @@ https://www.youtube.com/watch?v=P6Y-Z1uPp4c
 Back to Basics: Concurrency - Mike Shah - CppCon 2021
 https://www.youtube.com/watch?v=pfIC-kle4b0
 
-Normal Maps, Tangent Space & IBL • Shaders for Game Devs [Part 3]
-https://www.youtube.com/watch?v=E4PHFnvMzFc
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 
@@ -300,18 +298,6 @@ Main areas of focus:
 
 libv.rev: PostProcess should respect original framebuffer and viewport values
 
-libv.ctrl: Box selection support
-		start
-			[press]
-		update tick
-			[hold]
-		end
-			[release]
-libv.ctrl: Accidental collusion with Ctrl+A[press] and A[hold]
-libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
-libv.ctrl: 'Acquire "mouse"' similarly as UI does it
-libv.ctrl: arg.reject_feature(); aka a way to reject the feature activation from within the feature: in this case the next candidates would be called
-
 
 
 
@@ -506,17 +492,10 @@ app.space: Command arrow improvements
 	app.space.debug: Make the debug command arrow shapes more uniform
 	app.space.debug: Make the debug command arrow shapes hooked into the options / settings / config persistent storage
 
-app.space: Line shader (Geometry shader with custom width support) (<1px width = transparency at 1 px)
+app.space: Line shader (Geometry shader with custom width support) (<1px width = transparency with 1 px width)
 
 app.space: headless server
 	To optimize the binary size and skip linking in shit for headless,
 	a separate executable needed without any symbol usage of non-headless gamemode
 
-
-
-blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
-		full screen quad pass with render_resolution / 2 with v blur shader
-		full screen quad pass with render_resolution / 2 with h blur shader
-		full screen quad pass with render_resolution / 8 with v blur shader
-		full screen quad pass with render_resolution / 8 with h blur shader
 

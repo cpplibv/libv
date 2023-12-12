@@ -34,7 +34,7 @@ int main(int argc, const char** argv) {
 			("-v", "--verbose")
 			("verbose", "Enables verbose mode");
 
-	// const auto arg_verbose = args.flag
+	// const auto arg_devMode = args.flag
 	// 		("-d", "--dev")
 	// 		("dev-mode", "Enables developer mode")
 	// 		.hidden(true);
@@ -66,15 +66,10 @@ int main(int argc, const char** argv) {
 		libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	} else {
 		libv::logger_stream.setFormat(devMode ?
-				"{severity} {module}: {message}, {file}:{line}\n" :
+				"{severity} {thread_id} {module}: {message}, {file}:{line}\n" :
 				"{severity} {module}: {message}\n");
 		libv::logger_stream.allow("star");
 		libv::logger_stream.deny_below(libv::Logger::Severity::Info);
-//		libv::logger_stream.deny_below("libv.gl", libv::Logger::Severity::Info);
-//		libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
-//		libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
-//		libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
-//		libv::logger_stream.deny_below("libv.net", libv::Logger::Severity::Info);
 	}
 
 	std::cout << libv::logger_stream;

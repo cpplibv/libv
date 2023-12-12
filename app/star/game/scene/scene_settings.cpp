@@ -11,12 +11,12 @@
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/selection_group.hpp>
+#include <libv/ui/component_system/bean.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/utility/parse_number.hpp>
 // pro
 #include <star/game/config/client_config.hpp>
-#include <star/game/scene/bean.hpp>
 
 
 namespace star {
@@ -223,9 +223,11 @@ struct SettingsBuilder {
 };
 
 libv::ui::Component createSceneSettings(libv::Nexus& nexus) {
-	auto& config = requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
+	auto& config = libv::ui::requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
 
-	libv::ui::PanelAnchor layers{"layers"};
+	// TODO P2: libv.ui: Ability to control max width 1200-1600 px (Replace limiter)
+	auto limiter = libv::ui::PanelAnchor::ns("limiter", "settings.limiter");
+	auto layers = limiter.add_n<libv::ui::PanelAnchor>("layers");
 
 	// Layers's ptr is used to subscribe/unsubscribe guard any subcomponent event handler
 	const auto owner_ptr = layers.ptr();
@@ -297,7 +299,7 @@ libv::ui::Component createSceneSettings(libv::Nexus& nexus) {
 		layers.add(builder.build(config));
 	}
 
-	return layers;
+	return limiter;
 }
 
 // -------------------------------------------------------------------------------------------------

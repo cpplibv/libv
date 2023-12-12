@@ -9,10 +9,10 @@
 #include <libv/ui/component/image.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component_system/bean.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
 // pro
 #include <star/game/scene/controls_layout.hpp>
-#include <star/game/scene/bean.hpp>
 
 #include <libv/ui/component/scroll_area.hpp>
 #include <libv/ui/component/scroll_pane.hpp>

@@ -85,7 +85,11 @@ public:
 		// canvas.resize(canvas_size.cast<int32_t>());
 		glr.callback([&](libv::GL& gl) {
 			// calculate_local_mouse_coord();
-			state->render(gl, canvas_position, canvas_size);
+			state->render(
+				gl,
+				(canvas_position + 0.5f).cast<int32_t>(),
+				(canvas_size + 0.5f).cast<int32_t>(),
+				calculate_local_mouse_coord());
 		});
 	}
 };

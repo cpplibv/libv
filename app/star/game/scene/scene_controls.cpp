@@ -7,10 +7,10 @@
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_board.hpp>
 #include <libv/ui/component/panel_line.hpp>
+// #include <libv/ui/component_system/bean.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
 // pro
 #include <star/game/scene/controls_layout.hpp>
-#include <star/game/scene/bean.hpp>
 //#include <star/game/config/client_config.hpp>
 
 
@@ -19,7 +19,7 @@ namespace star {
 // -------------------------------------------------------------------------------------------------
 
 libv::ui::Component createSceneControls(libv::Nexus& nexus) {
-//	auto& config = requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
+//	auto& config = libv::ui::requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
 
 	auto line = libv::ui::PanelLine::ns("controls-line", "settings.main");
 

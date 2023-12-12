@@ -26,6 +26,7 @@
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
+#include <star/game/control/time_control.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/game/version.hpp>
@@ -42,6 +43,8 @@
 // debug
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/panel_line.hpp>
+
+#include <libv/ui/component_system/switch_scene.hpp>
 
 
 namespace star {
@@ -113,7 +116,9 @@ GameClient::~GameClient() {
 
 void GameClient::register_controls() {
 	libv::sun::CameraControl::register_controls(self->controls);
-	libv::sun::CameraControl::bind_default_controls(self->controls);
+	libv::sun::CameraControl::bind_default_controls(self->controls, 1);
+	TimeControl::register_controls(self->controls);
+	TimeControl::bind_default_controls(self->controls);
 //	CanvasControl::register_controls(controls);
 //	CanvasControl::bind_default_controls(controls);
 
@@ -182,6 +187,10 @@ libv::ui::Component GameClient::overlay_version(bool devMode) {
 libv::ui::Component GameClient::overlay_fps() {
 	static constexpr auto fpsUpdatePeriod = std::chrono::milliseconds{250};
 
+	// 	// TODO P4: Implement proper statistics gathering (including integration with UI and Game state statistics)
+	// 	const auto dt = t.timef_s().count();
+	// 	avg.add(1.0f / dt, dt);
+	// 	fps.text(fmt::format("{:6.1f} FPS", avg.value()));
 	// TODO P4: Implement proper frame statistics
 	//			min, max, avg, window min, window max, window avg, 1% low, 0.1% low
 	//  		(including integration with UI and Game state statistics)
@@ -204,27 +213,19 @@ libv::ui::Component GameClient::overlay_fps() {
 void GameClient::init_ui(bool devMode) {
 	auto layers = libv::ui::PanelAnchor("layers");
 
-	auto msc = layers.add_n<libv::ui::SceneContainer>("sc-main");
-	msc.identifier("main");
-	// msc.assign(createSceneMainMenu(self->nexus_));
-	// msc.assign(createSceneCredits(self->nexus_));
-	msc.assign(createSceneSurface(self->nexus_)); // Shortcut during development
-
-	// auto fps = layers.add_ns<libv::ui::Label>("version", "overlay.fps");
+	auto msc = layers.add_na<libv::ui::SceneContainer>("sc-main", "main");
+	msc.event().attach.connect([this](const libv::ui::SceneContainer& signal) {
+		// Switch to the first scene on attach so the Render Library is already initalized
+		// libv::ui::switchParentScene("main", signal, createSceneMainMenu(self->nexus_));
+		// libv::ui::switchParentScene("main", signal, createSceneCredits(self->nexus_)); // Shortcut during development
+		libv::ui::switchParentScene("main", signal, createSceneSurface(self->nexus_)); // Shortcut during development
+	});
 
 	self->ui.add(std::move(layers));
 	self->ui.add(overlay_version(devMode));
 	self->ui.add(overlay_fps());
 	self->ui.add(libv::sun::overlay_shader_error(true));
 	self->ui.add(libv::sun::overlay_resource_error(true));
-	// self->ui.event().global_before_update([this, fps, t = libv::Timer{}, avg = libv::exp_moving_avg<float>(60, 1, 0.8f)] mutable {
-	// 	self->config_->update();
-	//
-	// 	// TODO P4: Implement proper statistics gathering (including integration with UI and Game state statistics)
-	// 	const auto dt = t.timef_s().count();
-	// 	avg.add(1.0f / dt, dt);
-	// 	fps.text(fmt::format("{:6.1f} FPS", avg.value()));
-	// });
 
 //	frame.onKey.output([&](const libv::input::EventKey& e) {
 //		if (e.keycode == libv::input::Keycode::F2 && e.action == libv::input::Action::press)

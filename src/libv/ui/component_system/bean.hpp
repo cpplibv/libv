@@ -10,12 +10,12 @@
 #include <string_view>
 
 
-namespace star {
+namespace libv::ui {
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-inline T& requireBean(libv::Nexus& nexus, std::string_view sceneName, std::string_view beanName) {
+[[nodiscard]] inline T& requireBean(libv::Nexus& nexus, std::string_view sceneName, std::string_view beanName) {
 	const auto bean = nexus.object_view_get<T>();
 	if (!bean)
 		throw std::runtime_error(libv::concat(sceneName, " scene creation failed: Missing bean: ", beanName));
@@ -25,4 +25,4 @@ inline T& requireBean(libv::Nexus& nexus, std::string_view sceneName, std::strin
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace star
+} // namespace libv::ui

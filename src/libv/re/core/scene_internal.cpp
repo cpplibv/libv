@@ -3,7 +3,6 @@
 #include <libv/re/core/scene_internal.hxx>
 
 #include <libv/gl/gl.hpp>
-#include <libv/re/core/canvas.hpp>
 #include <libv/re/core/context/context_queue.hpp>
 #include <libv/re/core/context/context_render.hpp>
 #include <libv/re/core/engine.hpp>
@@ -244,7 +243,14 @@ struct AdoptedGLState {
 	}
 };
 
-void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const Canvas_ptr& canvas, double timeSimulation, double timeReal) {
+void SceneInternal::render(
+		libv::GL& gl,
+		const Camera& camera,
+		libv::vec2i canvasPosition,
+		libv::vec2i canvasSize,
+		libv::vec2f localMousePosition,
+		double timeSimulation,
+		double timeReal) {
 	if (!created) {
 		created = true;
 		create(gl);
@@ -255,10 +261,12 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 
 	// --- Camera / Canvas variables ---
 
-	const auto canvasSizef = canvas->sizef();
-	const auto canvasSizei = canvas->sizei();
+	const auto canvasSizef = canvasSize.cast<float>();
 	const auto matP = camera.projectionRevereZInf(canvasSizef);
 	const auto matV = camera.view();
+	const auto near = camera.near();
+	const auto far = camera.far();
+
 	const auto matVP = matP * matV;
 	const auto matVPinv = matVP.inverse_copy();
 	const auto matVinv = matV.inverse_copy();
@@ -269,8 +277,6 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 
 	auto debugGroup_guard = gl.pushDebugGroup_guard("libv.re - Scene: " + name);
 
-	// !!!
-
 	pipeline->contextFrame.currentState = RenderState{};
 	pipeline->contextFrame.deltaTimeRealf = libv::time_duration_f{timeReal - lastTimeReal};
 	pipeline->contextFrame.deltaTimeSimf = libv::time_duration_f{timeSimulation - lastTimeSim};
@@ -278,22 +284,23 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 	if (!freezeViewFrustum)
 		pipeline->contextFrame.viewFrustum = camera.tmpCameraPlayer.frustum_culler(canvasSizef);
 	pipeline->contextFrame.eyeW = eyeW;
-	pipeline->contextFrame.near = camera.near();
+	pipeline->contextFrame.near = near;
 	pipeline->contextFrame.matV = matV;
-	pipeline->contextFrame.canvasSize = canvasSizei;
+	pipeline->contextFrame.canvasSize = canvasSize;
 
 	pipeline->uniformBuffer.gl_swap(gl);
 	pipeline->indirectCommandBuffer.gl_swap(gl);
 	pipeline->depthReadbackBuffer.gl_swap(gl);
 
-	pipeline->rtStack.top()->position(canvas->positioni());
+	pipeline->rtStack.top()->position(canvasPosition);
 	pipeline->rtStack.top()->sampleCount(4); // <<< Settings.msaa
 	pipeline->rtStack.top()->sampleFixed(false);
-	pipeline->rtStack.top()->gl_bindDraw(gl, canvas->sizei(), pipeline->rtStack.top()->sampleCount(), pipeline->rtStack.top()->sampleFixed());
+	pipeline->rtStack.top()->gl_bindDraw(gl, canvasSize, pipeline->rtStack.top()->sampleCount(), pipeline->rtStack.top()->sampleFixed());
 
 	ContextRender renderContext{gl, pipeline->contextFrame};
 	pipeline->debug.gl_frameStart(*pipeline, renderContext);
-	re.preRenderUpdate(gl);
+	// TODO P5: Multi-scene/canvas interaction with pre/post frame operations
+	libv::r.preRenderUpdate(gl);
 
 	BlockRenderPass blockRenderPass;
 	// const auto matPInverse = matP.inverse_copy();
@@ -313,9 +320,9 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 	blockRenderPass.timeRealUncapped = static_cast<float>(timeReal);
 	blockRenderPass.canvasSize = canvasSizef;
 	blockRenderPass.pixelSize = 1.f / canvasSizef;
-	// blockRenderPass.mousePosition = ...; // TODO P5: Canvas mousePosition for render pass block
-	blockRenderPass.cameraNear = camera.near();
-	blockRenderPass.cameraFar = camera.far();
+	blockRenderPass.mousePosition = localMousePosition;
+	blockRenderPass.cameraNear = near;
+	blockRenderPass.cameraFar = far;
 	const auto builtinUniformBlockOffsetPass = pipeline->uniformBuffer.write(blockRenderPass);
 
 	blockLights.numLightDirectionals = 0;
@@ -418,7 +425,8 @@ void SceneInternal::render(Engine& re, libv::GL& gl, const Camera& camera, const
 	// Cleanup, Frame end maintenance
 	pipeline->debug.gl_frameEnd(*pipeline, renderContext);
 	assert(pipeline->rtStack.stackSize() == 1);
-	re.postFrameUpdate(gl);
+	// TODO P5: Multi-scene/canvas interaction with pre/post frame operations
+	libv::r.postFrameUpdate(gl);
 
 	lastTimeReal = timeReal;
 	lastTimeSim = timeSimulation;

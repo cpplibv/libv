@@ -43,12 +43,13 @@ void Scene::remove(const Node_ptr& node) {
 	// As during rendering, sorting queueing the nodes are referenced by raw pointers:
 	// assert(current_scene_state != rendering);
 	// or if current_scene_state == rendering, keep_alive_queue.emplace_back(node)
-	// TODO P4: Use better container for self->nodes: O(n^2) remove
+	// TODO P3: Use better container for self->nodes: O(n^2) remove
+	// TODO P3: Hierarchical removal is more tricky
 	libv::erase_unstable(self->nodes, node);
 }
 
-void Scene::render(Engine& re, libv::GL& gl, const Camera& camera, const Canvas_ptr& canvas, double timeSimulation, double timeReal) {
-	self->render(re, gl, camera, canvas, timeSimulation, timeReal);
+void Scene::render(libv::GL& gl, const Camera& camera,  libv::vec2i canvasPosition, libv::vec2i canvasSize, libv::vec2f localMousePosition, double timeSimulation, double timeReal) {
+	self->render(gl, camera, canvasPosition, canvasSize, localMousePosition, timeSimulation, timeReal);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <libv/gl/fwd.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/re/common/debug_capture_mode.hpp>
 #include <libv/re/fwd.hpp>
 
@@ -40,7 +41,7 @@ public:
 	void remove(const Node_ptr& node);
 
 public:
-	void render(Engine& re, libv::GL& gl, const Camera& camera, const Canvas_ptr& canvas, double timeSimulation, double timeReal);
+	void render(libv::GL& gl, const Camera& camera, libv::vec2i canvasPosition, libv::vec2i canvasSize, libv::vec2f localMousePosition, double timeSimulation, double timeReal);
 	// void create(libv::GL& gl) { }
 	// void destroy(libv::GL& gl) { }
 	// void update(libv::GL& gl);

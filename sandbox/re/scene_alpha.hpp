@@ -62,7 +62,6 @@ struct SandboxState {
 	// Visuals
 	libv::re::Scene_ptr scene;
 	libv::re::Camera_ptr camera;
-	libv::re::Canvas_ptr canvas;
 
 	libv::re::MaterialTest0_ptr matTest0;
 	libv::re::Object_ptr sphereMoving0;
@@ -98,7 +97,7 @@ public:
 	void async_update(libv::time_point frameTime, libv::time_duration deltaTime);
 	void create(libv::GL& gl);
 	void destroy(libv::GL& gl);
-	void render(libv::GL& gl, libv::vec2f canvasPosition, libv::vec2f canvasSize);
+	void render(libv::GL& gl, libv::vec2i canvasPosition, libv::vec2i canvasSize, libv::vec2f localMousePosition);
 	// void render(libv::re::Engine& rev);
 	// void render(libv::re::RenderPass& rev);
 };

@@ -183,7 +183,12 @@ void CoreInputField::onChar(const EventChar& event) {
 }
 
 void CoreInputField::onKey(const EventKey& event) {
-	if (event.keycode == libv::input::Keycode::Backspace && event.action != libv::input::Action::release) {
+	// TODO P2: libv.ui: better/simpler access to modifiers
+	const auto shift = ui().state.key_pressed(libv::input::Keycode::ShiftLeft) || ui().state.key_pressed(libv::input::Keycode::ShiftRight);
+	const auto ctrl = ui().state.key_pressed(libv::input::Keycode::ControlLeft) || ui().state.key_pressed(libv::input::Keycode::ControlRight);
+	const auto pressOrRepeat = event.action != libv::input::Action::release;
+
+	if (event.keycode == libv::input::Keycode::Backspace && pressOrRepeat) {
 		if (caret > 0) {
 			text_.erase(caret - 1, 1);
 			caret--;
@@ -195,7 +200,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::Delete && event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::Delete && pressOrRepeat) {
 		if (caret < text_.length())
 			text_.erase(caret, 1);
 
@@ -207,13 +212,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	// TODO P2: libv.ui: better access to modifiers
-	const auto shift = ui().state.key_pressed(libv::input::Keycode::ShiftLeft) || ui().state.key_pressed(libv::input::Keycode::ShiftRight);
-	const auto ctrl = ui().state.key_pressed(libv::input::Keycode::ControlLeft) || ui().state.key_pressed(libv::input::Keycode::ControlRight);
-
-	// === TEMP ========================================================================================
-
-	if (shift && event.keycode == libv::input::Keycode::Enter && event.action != libv::input::Action::release) {
+	if (shift && event.keycode == libv::input::Keycode::Enter && pressOrRepeat) {
 		text_.insert(caret, '\n');
 
 		caret++;
@@ -224,66 +223,24 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (ctrl && event.keycode == libv::input::Keycode::Num1 && event.action == libv::input::Action::press)
-		return handler().align_horizontal(AlignHorizontal::left), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num2 && event.action == libv::input::Action::press)
-		return handler().align_horizontal(AlignHorizontal::center), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num3 && event.action == libv::input::Action::press)
-		return handler().align_horizontal(AlignHorizontal::right), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num4 && event.action == libv::input::Action::press)
-		return handler().align_horizontal(AlignHorizontal::justify), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num5 && event.action == libv::input::Action::press)
-		return handler().align_horizontal(AlignHorizontal::justify_all), event.stop_propagation();
-
-	if (ctrl && event.keycode == libv::input::Keycode::Num6 && event.action == libv::input::Action::press)
-		return handler().font(ui().resource.font("Achafexp.ttf")), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num7 && event.action == libv::input::Action::press)
-		return handler().font(ui().resource.font("consola.ttf")), event.stop_propagation();
-
-	if (ctrl && event.keycode == libv::input::Keycode::Num8 && event.action == libv::input::Action::press)
-		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) + 3)), event.stop_propagation();
-	if (ctrl && event.keycode == libv::input::Keycode::Num9 && event.action == libv::input::Action::press)
-		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
-
-	if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
-		caretStartTime = clock::now();
-		markInvalidLayout(false, false);
-		flagAuto(Flag::pendingRender);
-		fire(EventCaret{});
-		return event.stop_propagation();
-	}
-	if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
-		caretStartTime = clock::now();
-		markInvalidLayout(false, false);
-		flagAuto(Flag::pendingRender);
-		fire(EventCaret{});
-		return event.stop_propagation();
-	}
-
-	// =================================================================================================
-
-	if (event.keycode == libv::input::Keycode::Enter && event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::Enter && pressOrRepeat) {
 		fire(EventSubmit{});
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::KPEnter && event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::KPEnter && pressOrRepeat) {
 		fire(EventSubmit{});
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::C && event.action != libv::input::Action::release && ctrl) {
+	if (ctrl && event.keycode == libv::input::Keycode::C && pressOrRepeat) {
 		libv::sys::clipboard_text(text_.string());
 
 		caretStartTime = clock::now();
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::V && event.action != libv::input::Action::release && ctrl) {
+	if (ctrl && event.keycode == libv::input::Keycode::V && pressOrRepeat) {
 		const auto clip = libv::sys::clipboard_text();
 		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
@@ -295,7 +252,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::X && event.action != libv::input::Action::release && ctrl) {
+	if (ctrl && event.keycode == libv::input::Keycode::X && pressOrRepeat) {
 		libv::sys::clipboard_text(text_.string());
 		text_.clear();
 
@@ -308,7 +265,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::Left && event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::Left && pressOrRepeat) {
 		if (caret > 0)
 			caret--;
 		caretStartTime = clock::now();
@@ -317,7 +274,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::Right&& event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::Right && pressOrRepeat) {
 		if (caret < text_.length())
 			caret++;
 		caretStartTime = clock::now();
@@ -326,7 +283,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::Home&& event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::Home && pressOrRepeat) {
 		caret = 0;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -334,7 +291,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.keycode == libv::input::Keycode::End&& event.action != libv::input::Action::release) {
+	if (event.keycode == libv::input::Keycode::End && pressOrRepeat) {
 		caret = static_cast<uint32_t>(text_.length());
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);

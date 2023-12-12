@@ -12,19 +12,11 @@
 #include <libv/utility/nexus.hpp>
 // pro
 #include <star/game/control/requests.hpp>
-#include <star/game/scene/bean.hpp>
 
 
 namespace star {
 
 // -------------------------------------------------------------------------------------------------
-
-//libv::ui::Component layoutSceneMainMenu(libv::ui::Component&& content) {
-//	libv::ui::PanelAnchor layers{"layers"};
-//	layers.add(std::move(content));
-//
-//	return layers;
-//}
 
 libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 	const auto menuEntry = [&](std::string name, auto createFn) {

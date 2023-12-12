@@ -628,6 +628,47 @@ private:
 		libv::ui::attach_state<State>(panel_line)(panel_line);
 
 		return panel_line;
+
+		// Old testing stuff in input fields
+		// if (ctrl && event.keycode == libv::input::Keycode::Num1 && event.action == libv::input::Action::press)
+		// 	return handler().align_horizontal(AlignHorizontal::left), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num2 && event.action == libv::input::Action::press)
+		// 	return handler().align_horizontal(AlignHorizontal::center), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num3 && event.action == libv::input::Action::press)
+		// 	return handler().align_horizontal(AlignHorizontal::right), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num4 && event.action == libv::input::Action::press)
+		// 	return handler().align_horizontal(AlignHorizontal::justify), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num5 && event.action == libv::input::Action::press)
+		// 	return handler().align_horizontal(AlignHorizontal::justify_all), event.stop_propagation();
+		//
+		// if (ctrl && event.keycode == libv::input::Keycode::Num6 && event.action == libv::input::Action::press)
+		// 	return handler().font(ui().resource.font("Achafexp.ttf")), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num7 && event.action == libv::input::Action::press)
+		// 	return handler().font(ui().resource.font("consola.ttf")), event.stop_propagation();
+		//
+		// if (ctrl && event.keycode == libv::input::Keycode::Num8 && event.action == libv::input::Action::press)
+		// 	return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) + 3)), event.stop_propagation();
+		// if (ctrl && event.keycode == libv::input::Keycode::Num9 && event.action == libv::input::Action::press)
+		// 	return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
+		//
+		// if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
+		// 	const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
+		// 	caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		// 	caretStartTime = clock::now();
+		// 	markInvalidLayout(false, false);
+		// 	flagAuto(Flag::pendingRender);
+		// 	fire(EventCaret{});
+		// 	return event.stop_propagation();
+		// }
+		// if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
+		// 	const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
+		// 	caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
+		// 	caretStartTime = clock::now();
+		// 	markInvalidLayout(false, false);
+		// 	flagAuto(Flag::pendingRender);
+		// 	fire(EventCaret{});
+		// 	return event.stop_propagation();
+		// }
 	}
 
 	// -------------------------------------------------------------------------------------------------

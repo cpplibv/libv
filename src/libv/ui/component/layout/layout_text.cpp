@@ -84,11 +84,11 @@ void LayoutText::string(std::string value) {
 	dirty = true;
 }
 
-void LayoutText::limit(const libv::vec2f new_limit) {
-	if (limit_ == new_limit)
+void LayoutText::limit(const libv::vec2f newLimit) {
+	if (limit_ == newLimit)
 		return;
 
-	limit_ = new_limit;
+	limit_ = newLimit;
 	dirty = true;
 }
 
@@ -334,14 +334,14 @@ size_t LayoutText::getClosestCharacterIndexInline(libv::vec2f position) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec2f LayoutText::content(libv::vec2f new_limit) {
+libv::vec2f LayoutText::content(libv::vec2f newLimit) {
 	const auto lineAdvance = font_->getLineAdvance(fontSize_);
 
 	if (string_.empty())
 		return {0.f, lineAdvance};
 
-	if (new_limit.x < 0.0f)
-		new_limit.x = std::numeric_limits<float>::max();
+	if (newLimit.x < 0.0f)
+		newLimit.x = std::numeric_limits<float>::max();
 
 	auto codepointPrevious = uint32_t{0};
 	auto lineWidth = 0.0f;
@@ -354,7 +354,7 @@ libv::vec2f LayoutText::content(libv::vec2f new_limit) {
 
 		const auto requestedLineWidth = lineWidth + kerning.x + glyph.advance.x;
 
-		if (requestedLineWidth > new_limit.x || codepointCurrent == '\n') {
+		if (requestedLineWidth > newLimit.x || codepointCurrent == '\n') {
 			contentWidth = std::max(contentWidth, lineWidth);
 			contentHeight += lineAdvance;
 			lineWidth = 0.0f;

@@ -66,7 +66,8 @@ public:
 	void queue(const Light& light);
 	void queue(Node* node, const libv::mat4f& matM, Mesh* mesh, Material* material, SubObjectIndex subObjectIndex);
 	std::span<libv::vec2f> queueDepthQuery(ReadbackQueryIndex& queryIndex, uint32_t count);
-	void render(Engine& re, libv::GL& gl, const Camera& camera, const Canvas_ptr& canvas, double timeSimulation, double timeReal);
+	void render(libv::GL& gl, const Camera& camera, libv::vec2i canvasPosition, libv::vec2i canvasSize,
+			libv::vec2f localMousePosition, double timeSimulation, double timeReal);
 };
 
 // -------------------------------------------------------------------------------------------------

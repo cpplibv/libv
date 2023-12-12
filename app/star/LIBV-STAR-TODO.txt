@@ -16,8 +16,10 @@ Star - System integration demo
 
 
 
-
-
+libv.ui: layout bug:
+	info-bar time speed control buttons
+	size 50pxD, D = height correct
+	size 50px, D = height incorrect
 
 libv.ui: "Non-focusable" "kind of" components
 		if it was used with mouse in a canvas it does not focus
@@ -58,39 +60,7 @@ libv.ui: controls:
 	automated ways to register and bind defaults
 		prepared function, and a template func or class wrapper
 
-
-
-libv.re integration:
-		wire in every settings
-
-
-
-
-
-
-
-
-
-
- > ui > Slider value change should not invalidate layout
-			(make it a float region if it must)
-			mouse context range remap might be needed!
-
-
-
-
-compute test these noises:
-https://www.getrevue.co/profile/xordev/issues/gm-shaders-mini-noise-1437243
-	https://www.shadertoy.com/view/DdBGDh
-
-
-
-
-
-Improve design
-	Switch to nicer colors, bye bye blue background
-
-
+Organize surface scene is a mess
 
 controls / camera
 	Organize camera
@@ -111,18 +81,26 @@ controls / camera
 
 
 
-Organize star renderer
-	surface scene is a mess
-Organize star surface scene
-	use a style sheet
-Organize star rev
-	organize rev resource manager
-	use proper resource path
 
-Organize star overlay
+libv.re integration:
+		wire in every settings
 
 
 
+
+
+ > ui > Slider value change should not invalidate layout
+			(make it a float region if it must)
+			mouse context range remap might be needed!
+
+
+
+
+
+
+
+Improve design
+	Switch to nicer colors, bye bye blue background
 
 
 
@@ -153,6 +131,7 @@ app.star: Credits:
 		> commenting mesh_stream.clear(); doubled the performance 100->200
 		> not uploading new data at all 200->400
 		? Would DSA help anything?
+			| (yes), memory mapped buffer would help more
 
 		mesh_stream.clear()
 			off 200
@@ -192,6 +171,7 @@ app.star: Credits:
 			render caching/invalidation is upon us?
 			Advanced: glMultiDrawElementsIndirect
 			everything is a font shader?
+				\ and then a single glMultiDrawElementsIndirect draws everything? (needs ui atlas textures)
 
 		read / understand:
 			http://behindthepixels.io/assets/files/High-performance,%20Low-Overhead%20Rendering%20with%20OpenGL%20and%20Vulkan%20-%20Edward%20Liu.pdf
@@ -246,6 +226,9 @@ place.it:
 	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
 	Knowledge: Anisotropic filtering is useless for many textures
 	Knowledge: Mip maps are useless for some textures (UI textures dont care)
+
+	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
+
 
 ----------
 

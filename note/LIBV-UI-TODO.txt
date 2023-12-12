@@ -16,6 +16,17 @@
 
 
 
+libv.ui: Layout env size -1 support, everywhere... oh fork...
+	limit, parent -> 2 seperate size for layout2 env
+	-1 size in a dim = no anchor or alignment allowed in that dimension
+	also, I need a back channel to fetch scroll area final virtual size
+
+
+
+
+
+
+
 
 libv.ui: Style import other lua files for common variables
 libv.ui: style script loading should match the way other resources are loaded
@@ -24,13 +35,13 @@ libv.ui: style script loading should match the way other resources are loaded
 libv.ui: "State" property: focus-within
 libv.ui: "State" property: nth (2nd 3rd is enough for now)
 
+libv.ui: Ability to control max width
+
+
+
 
 libv.ui: Adopt libv.re
 libv.ui: Move libv.sun overlay_shader_error.hpp to ui
-
-
-
-
 
 Tooltip
 	libv.ui: Implement built-in support for child properties in BasePanel
@@ -38,6 +49,8 @@ Tooltip
 
 
 
+scroll bar change prompts layout, why? should it?
+	| it does to recache the bar position
 Slider value change should not invalidate layout
 	(make it a float region if it must)
 	mouse context range remap might be needed!
@@ -146,13 +159,6 @@ libv.ui: Scroll pane
 				mouse scroll N line
 				should scroll pane have a dummy font and font size just so it can have a config for "3 line"
 
-
-libv.ui: Layout env size -1 support, everywhere... oh fork...
-	limit, parent -> 2 seperate size for layout2 env
-
-	-1 size in a dim = no anchor or alignment in that dimension
-
-	also, I need a back channel to fetch scroll area final virtual size
 
 
 libv.ui.SLC: BUG: line.assign_ratio_size is incorrect for:
@@ -438,8 +444,6 @@ glow falloff is incorrect on corners, find a better solution
 	libv.ui: Overlay zoom mouse hovered pixel color display
 	| size = 0, falloff = 1 highlight perfectly the affected pixels
 
-scroll bar change prompts layout, why? should it? | it does to recache the bar position
-
 app.theme: --- PAPER ---
 	So the way theme generation works (plan):
 	- lua script containing the styles incl properties and the recepies for the atlases
@@ -448,7 +452,6 @@ app.theme: --- PAPER ---
 	- | NOPE
 	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
 
-libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 libv.ui: implement base_line alignment: most likely will need a vec2 get_base_line() function

@@ -10,6 +10,9 @@
 #include <libv/re/node/light/light.hpp>
 
 
+#include <libv/re/log.hpp>
+
+
 namespace libv {
 namespace re {
 
@@ -59,7 +62,11 @@ void LensFlare::add(Texture_ptr texture, float position, float size, float sizeR
 // -------------------------------------------------------------------------------------------------
 
 void LensFlare::queue(ContextQueue& ctx) {
-	const auto matM = transform.toMatrix();
+	const auto matM = target->transform.toMatrix();
+	// TODO P1: target->getMatM(); for hierarchical position
+	//		\ ctx.matWorld * target->transform.toMatrix() is incorrect, as matWorld is not the target's matWorld
+	//		| maybe a clever solution would be to go for the 'uploaded'/prepared matM's of each node, only issue is
+	//			how to make sure that target was already queued and its matM is already in the uniform buffer stream to fetch
 	const auto isLight = target->nodeType == NodeType::light;
 	const auto isDirectionalLight = isLight && static_cast<const Light&>(*target).type == LightType::directional;
 
@@ -112,6 +119,7 @@ void LensFlare::queue(ContextQueue& ctx) {
 // #ifdef LIBV_DEV_BUILD
 	// The normal culling logic for LensFlare would work perfectly fine without this test,
 	// this is only for pedantic debug visualisation with frozen view frustum.
+	// TODO P1: target->getMatM(); / bounding sphere size might change for hierarchical position
 	if (!ctx.testVisibility(matM, BoundingSphere{{}, visibilityTestTolerance}))
 		visibilityTestUV = libv::vec2f{-1, -1}; // UV (-1, -1) is implicitly off-screen, this way the animation is kept
 // #endif

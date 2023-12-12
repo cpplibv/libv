@@ -61,9 +61,8 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 		button2.show_tooltip(tooltip2);
 	}
 
-
 	button.event().mouse_movement.connect([tooltip](libv::ui::Button& button, libv::ui::EventMouseMovement event) mutable {
-		libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 1 enter: {}, leave: {}", event.enter, event.leave);
+		// libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 1 enter: {}, leave: {}", event.enter, event.leave);
 		if(event.enter)
 			tooltip.show(true);
 		if(event.leave)
@@ -71,7 +70,7 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 	});
 
 	button2.event().mouse_movement.connect([tooltip2](libv::ui::Button& button, libv::ui::EventMouseMovement event) mutable {
-		libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 2 enter: {}, leave: {}", event.enter, event.leave);
+		// libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 2 enter: {}, leave: {}", event.enter, event.leave);
 		if(event.enter)
 			tooltip2.show(true);
 		if(event.leave)

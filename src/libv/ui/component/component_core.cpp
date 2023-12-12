@@ -501,7 +501,6 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 
 		// Broadcast events
 		doAttach();
-
 		fire(EventAttach{});
 
 		// Maintain flags
@@ -642,7 +641,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 
 libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
 	const auto result = doLayout1(layout_env);
-	// log_ui.trace("Dynamic            {: :>4}, {}", xy(result), path());
+	log_ui.trace("Dynamic            {: :>4}, limit {} {}", xy(result), xy(layout_env.size), path());
 	return result;
 }
 
@@ -710,7 +709,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 		// Layout self and the children with the derived class
 		doLayout2(layout_env);
 		// TODO P5: A way to print, log or visualize layout events without always printing it into the log
-		// log_ui.trace("Layout  {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
+		log_ui.trace("Layout  {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 	} else if (flags.match_any(Flag::pendingLayoutChild)) {
 		// No need to re-layout this component, layout the children only
 		doForeachChildren([&layout_env, changedFloatPosition](Component& child) {
@@ -720,7 +719,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 			));
 		});
 		// TODO P5: A way to print, log or visualize layout events without always printing it into the log
-		// log_ui.trace("    |   {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
+		log_ui.trace("    |   {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 	}
 
 	flags.reset(Flag::pendingLayout);

@@ -6,6 +6,9 @@
 #include "test_layout_utility.hpp"
 #include <libv/ui/component/panel_line.hpp>
 
+// #include <libv/log/log.hpp>
+// #include <iostream>
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -1063,5 +1066,31 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(0, 170, 0, 1, 40, 0));
 			CHECK(comp3.bounds() == Bounds(0, 220, 0, 1, 80, 0));
 		}
+	}
+}
+
+TEST_CASE("Layout Line: 50px, D incorrect height bug", "[libv.ui.layout.line]") {
+	// std::cout << libv::logger_stream;
+	// libv::logger_stream.color(false);
+
+	TestPanel<libv::ui::PanelLine> panel;
+
+	panel.align_horizontal(libv::ui::AlignHorizontal::left);
+	panel.align_vertical(libv::ui::AlignVertical::bottom);
+	panel.orientation(libv::ui::Orientation::right);
+	panel.margin(5); // Will be ignored during layout
+	panel.size(libv::ui::parse_size_or_throw("1r, D"));
+
+	TestComponent comp0 = panel.add("40px, D", D{20, 20, 0});
+	TestComponent comp1 = panel.add("40px, D", D{20, 20, 0});
+	TestComponent comp2 = panel.add("40px, D", D{20, 20, 0});
+
+	SECTION("Orientation::up") {
+		CHECK(panel.layout1(1600, -1, 0) == approx_size(120, 20, 0));
+		panel.layout2(1600, 20);
+
+		CHECK(comp0.bounds() == Bounds( 0, 0, 0, 40, 20, 0));
+		CHECK(comp1.bounds() == Bounds(40, 0, 0, 40, 20, 0));
+		CHECK(comp2.bounds() == Bounds(80, 0, 0, 40, 20, 0));
 	}
 }

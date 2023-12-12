@@ -1,0 +1,312 @@
+
+RES - Resource
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.ctrl: Box selection support
+		start
+			[press]
+		update tick
+			[hold]
+		end
+			[release]
+libv.ctrl: Accidental collusion with Ctrl+A[press] and A[hold]
+libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
+libv.ctrl: 'Acquire "mouse"' similarly as UI does it
+libv.ctrl: arg.reject_feature(); aka a way to reject the feature activation from within the feature: in this case the next candidates would be called
+
+libv.ctrl: rename every "scale" to "multiplier"
+
+
+ -------------------------------------------------------------------------------------------------
+
+
+libv.ctrl: "alterator_feature" (with better name, maybe mode_feature) -> only stateful, like hold shift to show more information | its kind of an analog with ignored value, but not really, and it would be nice to have state getter for this, and that would make it a binary, but with properly guarded
+libv.ctrl: save xls from thesis archive
+
+
+ -------------------------------------------------------------------------------------------------
+
+
+ext.x3: make sure that every rule is static, BUT ! What about static initialization order fiasco?
+	libv.parse: move x3 parse rules to globals with internal linkage to improve performance
+	| constinit?
+ext.x3: make sure that no header dependency exposed by libv parsers (headers)
+
+libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
+libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
+libv.ctrl: Binding binary operation setting and serialization
+
+libv.ctrl: InputID, Input, AIA and DIA should be merged this way: both Input and InputID should be 64bit types, but one should contain the action related information, they should be converted to one another with extra info or info loss, inheritance or CRTP might save some work
+
+libv.ctrl: More specialized binding can hide normal feature if there is not context under it -> the order of context existence check and binding specialization test should be flipped
+libv.ctrl.routing: Unrelated analog event cancels button sequence
+libv.ctrl: Feature collection is collecting empty functions too
+
+
+libv.ctrl: Sequence: dead-key like behaviour
+		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
+
+		if there are dead-keys active
+			only consider dead-key set bindings
+		otherwise
+			consider every binding
+
+		if a combination got fulfilled
+			if it was a sequence's non-last combination or if it was not a sequence
+				collect into normal list
+			else
+				collect into ongoing_sequence list
+
+		select and filter (normal list AND ongoing_sequence list)
+		remove elements from ongoing_sequence that were not selected
+		broadcast among selected normal list
+
+
+		if (not ongoing_sequence.empty())
+			store ongoing_sequence as dead-key set and therefore enter dead-key mode
+
+
+		when to cancel a dead-key situation
+		if we are in a dead-key situation and any of the following occurs
+				event: that is not part of any new combination in dead-key set
+				event: not an opposite or holding of the previous history step of dead-key set
+				on time: sequence_timeout
+			then cancel dead-key situation by clearing the dead-key set and discarding the event
+
+
+
+
+libv.ctrl: Paper
+	TODO notes:
+		Issue: Binding input sub sequence collusion
+			Given 'Shift + E' and 'E' binding, inputting 'Shift + E' will incorrectly satisfy both
+			Mistake:
+				Assumption: Inputs are serial
+				Reality: Input might be parallel (Throw grenade with Shift + F while WASD active)
+				Additional note: Multi combination inputs are expected to be serial at all times.
+				Additional note: Due to this, heuristic might be acceptable?
+
+			Solution A: (heuristic) prefer the more specialized bindings (? based on setting of the binding) | causes issues with non valid shortcuts matching a smaller one
+			Solution B: (at most internally) specify as the E version as not pressed: Shift [free] + E
+			Solution C: modifier bits, but that would introduce the inability to define custom modifiers
+			Solution D: per binding exclusivity definition:
+				- yield toward more specialized
+				- require exclusivity
+				- ignore independent
+				- allow non-interfering independent changes
+				- allow non-interleaving independent states
+				- ...
+
+			Solution placement 1: controls settings
+			Solution placement 2: per binding
+			Solution placement 3: per feature
+
+				Research required: both source and usage examples in multiple domain and programs
+				Document findings
+				Research required: feature based interruptibility matrix
+
+			Additional note:
+				Callbacks passed events could/should have an absorb flag. Binding and features could demand certain absorbs properties like only one absorb or allow subset sequences to be fired or allow parallel and so on...
+
+		Issue: Need 2D input support (?), for example pie menu needs it too | that is UI absolute position
+
+		Click - Press > at most X time > Release
+		Double Click - Press > at most X time > Release > at most T time > Press > at most X time > Release
+
+	Outside of scope notes:
+		Issue: need a way to prevent scale above 1 on certain D->A time based bindings
+			Solution: just a flag for the analog feature to clamp scale to 0..1 or -1..1 before multiplying with time
+
+		Hidden features: option to register feature as non listable, but settable
+		Hidden binding: option to register a non listable binding, but still settable
+
+		Press type aka additional information on binding (AKA A/D converter):
+			N/A, Continuous (Hold), Press, Release, Double click, (Toggle), etc...
+			Threshold, Scale, Repeat rules, Offset, Ramp-up
+
+	input sources:
+		keyboard
+			codepoint = codepoint resolution into keycode/scancode + warning on the UI unless it is part of the safe (A-Z0-9 and (?) more) range
+			keycode
+			modifier
+			scancode = warning on the UI
+		mouse
+			button
+			scroll
+			move
+		gamepad (and gamepad any)
+			button
+			analog
+		joystick (and joystick any)
+			button
+			analog
+		time
+		events (API)
+		context (API)
+
+	input type (used for binding information)
+		button - select state change edge
+		analog (as joystick or gamepad) - linearization, deadzone
+		movement - normalization px to 0..1
+
+	digital input action:
+		press   - input::press
+		release - input::release
+		repeat  - input::repeat
+		any     - maps to press, repeat, release
+		hold    - event on each frame if input is 1 (held down)
+		free    - event on each frame if input is 0 (released) (virtual, disabled to due logic)
+		auto    - maps to press, release and hold depending on output
+
+		tap - for <N sec                      (outside of scope of initial release) (digital)
+		double tap - for <N sec within <M sec (outside of scope of initial release) (digital)
+		hold - for N sec                      (outside of scope of initial release) (analog or digital)
+
+	additional binding operation on analog features:
+		scale (includes invert with negative scale)
+		(?) position
+		(?) difference
+		(?) dimension select
+		(?) dimension direction select
+		(?) dimension convert
+		(?) threshold
+		(?) multiple analog
+		(?) gamepad axis dead-zone
+		(?) gamepad axis linearization
+
+	binding exclusivity:
+		???
+
+	additional presentation:
+		ability to list every feature
+		ability to list every binding
+		ability to list every warnings / errors
+		ability to search in features / bindings
+		ability to search in features / bindings based on the current state
+		ability to search in features / bindings based on input sequence
+
+	interesting usages examples, things to investigate:
+		app.editor.manipulator.grab = Left Mouse
+		app.editor.selection.move_x = X + Mouse X * 2
+		app.editor.selection.to_upper = Ctrl + U, U
+
+		half control - how would walk forward and walk forward toggle look like
+
+		circle_quick_menu and mouse position | real name found: pie menu
+			app.editor.circle_quick_menu.open = Ctrl + Space
+			app.editor.circle_quick_menu.select = Click
+			app.editor.circle_quick_menu.select = Space
+			app.editor.circle_quick_menu.switch = Mouse // How would this one work?
+			app.editor.circle_quick_menu.ccw = Up
+			app.editor.circle_quick_menu.ccw = Left
+			app.editor.circle_quick_menu.cw = Down
+			app.editor.circle_quick_menu.cw = Right
+
+		right click to move command, long right click to move command with final direction/shape
+
+
+libv.ctrl: Per binding decision of collusion handling by the user: priority, fall through, stop, stop if successful (feature can yield success or failure), call order, etc
+libv.ctrl: In feature callback ability to reject the event/binding and allow the next candidate to be called
+libv.ctrl: Binding profiles, and inheritance
+libv.ctrl: Gamepad/joystick analog should be time related, but mouse and scroll are event based
+libv.ctrl: Click and double click support would be nice
+libv.ctrl: User should not be exposed to stated sequence (binding does that)
+libv.ctrl: Idea: Stated and normal sequence common templated base class (?)
+libv.ctrl.parse: identifier parsing (_ skipper or adjusting infos to match current parser)
+libv.ctrl: Routing: Select sequence progression (beside bindings) based on more specialized
+
+libv.ctrl: Integration queue:
+	libv.frame.input: Add support for joysticks and game-pads
+
+	libv.ctrl: review glfwGetKeyName http://www.glfw.org/docs/latest/group__keys.html
+	libv.ctrl: review glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
+	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+
+	glfw.joystick: Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
+	glfw.joystick: Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
+	glfw.joystick: Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
+	glfw.joystick: Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
+	glfw.joystick: Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
+	glfw.joystick: Added glfwSetJoystickCallback for joystick connection and disconnection events
+	glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
+	glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
+
+libv.ctrl: Implementation queue:
+	libv.ctrl: Split analog dimension to dimension (X/Y) and aia (+/-)
+	libv.ctrl: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
+	libv.ctrl: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
+				In other word: an additional type between the current binding and feature, this would clean up string operations
+	libv.ctrl: Contexts information, state collusion information among contexts, use that for queries
+	libv.ctrl: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
+	libv.ctrl: Identifier level to_string should be parsable
+	libv.ctrl.parse: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
+	libv.ctrl.parse: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
+	libv.ctrl.parse: x3::eoi could improve matching, relax orders, optimize for most probably input
+	libv.ctrl.parse: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
+	libv.ctrl: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
+	libv.ctrl: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
+	libv.ctrl: event/feature chain interruptibility on colliding bindings:
+				add member to event: is_ambiguous
+				add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
+	libv.ctrl: Invalid sequence automated fixup | only if there is consent
+	libv.ctrl: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
+	libv.ctrl: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
+	libv.ctrl: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
+	libv.ctrl: feature registration show provide way for custom properties
+	libv.ctrl: hash based binding index for event where manually map everything to the most similar form
+	libv.ctrl: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
+	libv.ctrl: More introspection is possible: search feature by context with or without name
+	libv.ctrl: More introspection is possible: search binding with feature and sequence
+	libv.ctrl: More search possible: search_mode::wildcard (with . as the level separator)
+	libv.ctrl: More search possible: search_mode::any_word (with space as the word separator)
+	libv.ctrl: More search possible: search_mode::all_word (with space as the word separator)
+	libv.ctrl: Super flatten sequence and stated sequence
+	libv.ctrl: check_binding and check_feature are algorithm that should be generalized
+	libv.ctrl: Change in codepoint mapping can cause events with codepoint based inputs | dont care
+
+	libv.ctrl.profile: each binding entry would select: inherit (noop) / override / extend its parent binding entry
+
+	libv.ctrl: Idea: why not require codepoints to be inside the inputs events
+	libv.ctrl: Idea: dia as bitmask
+	libv.ctrl: Rep source type could be signed and analogs on negative, buttons on positive values
+	libv.ctrl: Ability to list every (active) context
+	libv.ctrl: Bind and profile api and serialization: override, empty override, append
+	libv.ctrl: A serialization... A serious one
+	libv.ctrl: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
+
+	libv.ctrl: Context level feature containers, or index so lookup faster (?)
+	libv.ctrl: Store more information about Context. Name, orthogonal and concurrent contexts
+	libv.ctrl: Idea of context groups, and under a group there are multiple types
+
+	libv.ctrl: IDEA: Soft enter contexts:
+			Soft enter would allow on demand context change based on unhandled events
+			Scenario:
+				A UI Object is focused
+				Mouse is above a canvas and no longer above the UI component
+					The Mouse hover effect marks the canvas to soft enter
+				On the canvas there is a binding for 'F1'
+				'F1' is pressed but no active context handles it
+				Soft entered contexts could auto enter and handle the event

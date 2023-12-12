@@ -194,9 +194,17 @@ ui.style("settings") {
 	caret_color = {1, 1, 1, 1},
 }
 
+ui.style("settings.limiter") {
+	--anchor = "center",
+	size = "1600px, 1r",
+	--orientation = "down",
+	--background = "red",
+	--padding = 25,
+}
+
 ui.style("settings.main") {
 	anchor = "center",
-	--size = "1r, 1r",
+	--size = "1200px, 1r",
 	orientation = "down",
 	--background = "red",
 	padding = 25,
