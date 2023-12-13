@@ -20,8 +20,9 @@ void decrease_ref_count(MaterialSkybox* ptr) {
 
 // -------------------------------------------------------------------------------------------------
 
-MaterialSkybox::MaterialSkybox(Texture_ptr sky) :
-	Material(r.shader.load("shader/re/skybox.vs", "shader/re/skybox.fs"), nullptr) {
+MaterialSkybox::MaterialSkybox(Texture_ptr sky, SkyboxType skyboxType) :
+	Material(r.shader.load("shader/re/skybox.vs", "shader/re/skybox.fs"), nullptr),
+	skyboxType(skyboxType) {
 
 	layers = layerBackground;
 
@@ -38,6 +39,16 @@ MaterialSkybox::MaterialSkybox(Texture_ptr sky) :
 }
 
 void MaterialSkybox::gl_update(ContextUpdate& ctx) {
+	switch (skyboxType.value) {
+	case SkyboxType::cubemapXYZ: [[fallthrough]];
+	case SkyboxType::cubemapZXY:
+		textureSky = unitSky;
+		break;
+	case SkyboxType::equirectangular:
+		textureSky = unitDiffuse;
+		break;
+	}
+
 	MaterialAccessor_gl_update access{ctx};
 	access_uniforms(access);
 }

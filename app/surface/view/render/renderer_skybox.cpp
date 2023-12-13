@@ -22,7 +22,6 @@ RendererSkybox::RendererSkybox(RendererResourceContext& rctx) :
 //		texture(rctx.loader.texture.load("builtin:white")) {
 //		texture(rctx.loader.texture.load("cube_debug_transparent.dds")) {
 //		texture(rctx.loader.texture.load("cube_nebula_purple_0001.dds")) {
-//		texture(rctx.loader.texture.load("cube_AmbienceExposure4k.dds")) {
 //		texture(rctx.loader.texture.load("cube_fluffball.dds")) {
 //		texture(rctx.loader.texture.load("cube_redDesertNight.dds")) {
 

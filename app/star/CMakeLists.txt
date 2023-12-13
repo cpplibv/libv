@@ -58,6 +58,8 @@ wish_resource_mapping(
 		# RE Defaults (With an empty scene)
 		# TODO P5: Consider making this set empty
 		RESOURCE @/res/shader/lib/color_spaces.glsl
+		RESOURCE @/res/shader/lib/constants.glsl
+		RESOURCE @/res/shader/lib/equirectangular.glsl
 		RESOURCE @/res/shader/lib/gamma.glsl
 		RESOURCE @/res/shader/lib/resample.glsl
 		RESOURCE @/res/shader/lib/tonemap.glsl
@@ -115,10 +117,20 @@ wish_resource_mapping(
 		RESOURCE @/res/texture/particle/star_03.png
 		RESOURCE @/res/texture/particle/star_06.png
 
-#		RESOURCE @/res/texture/sky/sky_debug_x_front_uv.dds
-		RESOURCE @/res/texture/sky/sky_debug_x_front_uv_srgb.dds
-#		RESOURCE @/res/texture/sky/sky_debug_x_front_uv_transparent.dds
-		RESOURCE @/res/texture/sky/sky_debug_x_front_uv_transparent_srgb.dds
+#		RESOURCE @/res/texture/sky/debug_x_front_uv_cube.dds
+		RESOURCE @/res/texture/sky/debug_x_front_uv_cube_srgb.dds
+#		RESOURCE @/res/texture/sky/debug_x_front_uv_transparent_cube.dds
+		RESOURCE @/res/texture/sky/debug_x_front_uv_transparent_cube_srgb.dds
+
+		# Surface
+		RESOURCE @/res/texture/sky/ambience_morning_green_cube_srgb.dds
+		RESOURCE @/res/texture/sky/ambience_morning_green_cube_hdr.dds
+		RESOURCE @/res/texture/sky/ambience_morning_green_eqrt_srgb.dds
+		RESOURCE @/res/texture/sky/ambience_morning_green_eqrt_hdr.dds
+		RESOURCE @/res/texture/sky/snowy_river_valley_cube_srgb.dds
+		RESOURCE @/res/texture/sky/snowy_river_valley_cube_hdr.dds
+		RESOURCE @/res/texture/sky/snowy_river_valley_eqrt_srgb.dds
+		RESOURCE @/res/texture/sky/snowy_river_valley_eqrt_hdr.dds
 
 		# Testing only
 		RESOURCE @/res/texture/stripes_border.png

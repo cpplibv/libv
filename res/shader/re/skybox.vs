@@ -5,7 +5,7 @@
 
 layout(location = VERTEX_ATTR_POSITION) in vec3 vertexPosition;
 
-out vec3 fragmentDirectionW;
+out vec3 fragmentDirectionUnW;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -17,5 +17,5 @@ void main() {
 //#else
 //    gl_Position = pos.xyww; // Set depth to 1.0 with xyww
 //#endif
-    fragmentDirectionW = vertexPosition;
+    fragmentDirectionUnW = vertexPosition;
 }

@@ -216,7 +216,7 @@ SandboxState::SandboxState(libv::Nexus& nexus) :
 	sphereMoving1->material->state.stencilOpStencilAndDepthPass(libv::gl::StencilAction::Replace);
 
 	scene->add(libv::re::Skybox::create(
-			libv::r.texture.load_async("texture/sky/sky_debug_x_front_uv_srgb.dds")));
+			libv::r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds")));
 
 	auto meshSmallSphere = libv::re::MeshSphere::create(12);
 	auto materialSmallSphere = libv::re::MaterialTest0::create();

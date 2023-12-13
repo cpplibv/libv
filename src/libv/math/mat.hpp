@@ -169,6 +169,17 @@ public:
 		return result;
 	}
 
+	[[nodiscard]] static constexpr inline mat_t create_rotate(const radian<T> angle) noexcept
+			requires (Column == 2 && Row == 2) {
+		mat_t result;
+		const auto s = std::sin(angle.value);
+		const auto c = std::cos(angle.value);
+		result[0][0] = c;
+		result[0][1] = s;
+		result[1][0] = -s;
+		result[1][1] = c;
+		return result;
+	}
 	constexpr inline mat_t& rotate(const radian<T> angle, const libv::vec3_t<T>& axis) noexcept
 			requires (Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mx() = glm::rotate(mx(), angle.value, to_glm(axis));

@@ -29,7 +29,6 @@ config = {
 	numVeggie = 50000,
 	skyboxTexture = "cube_nebula_green_0001.dds",
 	--skyboxTexture = "cube_redDesertNight.dds",
-	--skyboxTexture = "cube_AmbienceExposure4k.dds",
 
 --                      /\
 --  COLD|BARREN        /  \ Polar

@@ -4,6 +4,7 @@
 
 #include <libv/re/fwd.hpp>
 #include <libv/re/material/material.hpp>
+#include <libv/re/material/skybox_type.hpp>
 
 
 namespace libv {
@@ -17,33 +18,29 @@ public:
 	using cptr = MaterialSkybox_cptr;
 
 public:
-	enum class SkyboxType {
-		cubemapXYZ = 0,
-		// cubemapZXY = 1,
-		// equirectangular = 2,
-	};
-
-public:
 	Uniform<Texture> textureSky = unitSky;
-	// Uniform<uint32_t> skyboxType = libv::to_underlying(SkyboxType::cubemapXYZ);
-	// Uniform<float> horizonOffset = 0.f;
+	Uniform<SkyboxType> skyboxType = SkyboxType::cubemapXYZ;
+	Uniform<float> intensity = 1.f;
+	Uniform<float> horizonOffset = 0.f;
+	Uniform<libv::mat2f> matRotateZ = libv::mat2f::identity();
 
 	template <typename Access>
 	void access_uniforms(Access& access) {
 		Material::access_uniforms(access);
-		// access(textureDiffuse, "textureDiffuse");
 		access(textureSky, "textureSky");
-		// access(skyboxType, "skyboxType");
-		// access(horizonOffset, "horizonOffset");
+		access(skyboxType, "skyboxType");
+		access(intensity, "intensity");
+		access(horizonOffset, "horizonOffset");
+		access(matRotateZ, "matRotateZ");
 	}
 
 public:
-	explicit MaterialSkybox(Texture_ptr sky);
+	explicit MaterialSkybox(Texture_ptr sky, SkyboxType skyboxType = SkyboxType::cubemapXYZ);
 	inline MaterialSkybox(const MaterialSkybox&) noexcept = default;
 	[[nodiscard]] bool operator==(const MaterialSkybox& other) const noexcept = default;
 
-	[[nodiscard]] static LIBV_FORCE_INLINE ptr create(Texture_ptr sky) {
-		return ptr::make(std::move(sky));
+	[[nodiscard]] static LIBV_FORCE_INLINE ptr create(Texture_ptr sky, SkyboxType skyboxType = SkyboxType::cubemapXYZ) {
+		return ptr::make(std::move(sky), skyboxType);
 	}
 
 public:

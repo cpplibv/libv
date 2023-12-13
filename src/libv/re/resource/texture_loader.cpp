@@ -206,6 +206,7 @@ public:
 		} else {
 			// Everything else should have mipmaps
 			// (Could be improved as UI textures don't need mipmaps)
+			texture->set(libv::gl::Wrap::MirroredRepeat, libv::gl::Wrap::MirroredRepeat);
 			texture->set(libv::gl::MagFilter::Linear);
 			texture->set(libv::gl::MinFilter::LinearMipmapLinear);
 			texture->generateMipmaps();

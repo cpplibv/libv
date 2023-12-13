@@ -106,6 +106,9 @@ public:
 	libv::time_point timeRealFrame = timeRealStart;
 	libv::time_duration_d timeSim{0};
 
+	// Render
+	libv::re::Skybox_ptr skybox;
+
 	// State
 	bool rotate = false;
 
@@ -132,6 +135,22 @@ public:
 		// 	state.slowMode = event.value;
 		// 	state.slowModeCounter = 0;
 		// });
+
+		//Debug gizmo: coordinates text: renderer.text.add_debug_coordinates
+		//Debug gizmo: Camera orbit point: renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
+		//Debug gizmo: Camera orientation gizmo in top right
+		// 	const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
+		// 	const auto orientation_gizmo_margin = 4.f;
+		//
+		// 	glr.projection = libv::mat4f::ortho(
+		// 			-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
+		// 			canvas_size,
+		// 			-orientation_gizmo_size,
+		// 			+orientation_gizmo_size);
+		// 	glr.view = camera.orientation_view().translate(-1, 0, 0);
+		// 	glr.model.scale(orientation_gizmo_size * 0.5f);
+		//
+		// 	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
 
 		// controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 	}
@@ -175,8 +194,17 @@ public:
 private:
 	virtual void attach() override {
 		scene->add(libv::re::EditorGrid::create());
-		scene->add(libv::re::Skybox::create(
-				libv::r.texture.load_async("texture/sky/sky_debug_x_front_uv_srgb.dds")));
+		skybox = libv::re::Skybox::create(
+				// libv::r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds")));
+				// libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular));
+				// libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular));
+				// libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY));
+				// libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY));
+				// libv::r.texture.load_async("texture/sky/snowy_river_valley_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular));
+				// libv::r.texture.load_async("texture/sky/snowy_river_valley_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular));
+				// libv::r.texture.load_async("texture/sky/snowy_river_valley_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY));
+				libv::r.texture.load_async("texture/sky/snowy_river_valley_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		scene->add(skybox);
 		scene->add(libv::re::Object::create(libv::re::Transform{libv::vec3f{}, libv::quatf::identity(), libv::vec3f::one(3.f)},
 				libv::re::MaterialSolid::create(libv::vec4f{0.f, 0.25, 0.25f, 1.f}),
 				libv::re::MeshSphere::create(12)));
@@ -210,6 +238,10 @@ private:
 			unpauseNextFrame = false;
 			timeSim += timeDelta;
 		}
+
+		// skybox->horizonOffset(0.1f * std::sin(timeControl.timeSim.count()));
+		// skybox->intensity(2.0f + 2.0f * std::sin(timeControl.timeSim.count() * 0.5f));
+		// skybox->rotateZ(std::sin(timeControl.timeSim.count() * 0.1f));
 
 		// if (rotate)
 		// 	camera->tmpCameraPlayer.orbit_yaw(static_cast<float>(timeDelta.count()) * libv::tau * 0.01f);

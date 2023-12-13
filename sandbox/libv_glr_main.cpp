@@ -405,8 +405,8 @@ struct Sandbox {
 		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureUnit_diffuse);
 		sky_program.assign(sky_uniform_matMVP, "matMVP");
 
-		// const auto dataSky = libv::read_file_or_throw("res/texture/sky/sky_debug_x_front_uv.dds");
-		const auto dataSky = libv::read_file_or_throw("res/texture/sky/sky_debug_x_front_uv_transparent.dds");
+		// const auto dataSky = libv::read_file_or_throw("res/texture/sky/debug_x_front_uv_cube.dds");
+		const auto dataSky = libv::read_file_or_throw("res/texture/sky/debug_x_front_uv_transparent_cube.dds");
 		auto imageSky = libv::gl::load_image_or_throw(dataSky);
 		sky_texture0.load(std::move(imageSky));
 

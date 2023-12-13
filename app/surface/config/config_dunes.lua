@@ -28,7 +28,6 @@ config = {
 
 	skyboxTexture = "cube_fluffball.dds",
 	--skyboxTexture = "cube_redDesertNight.dds",
-	--skyboxTexture = "cube_AmbienceExposure4k.dds",
 }
 
 biomes = {

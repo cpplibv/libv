@@ -19,11 +19,38 @@ Star - System integration demo
 
 
 
-libv.re: sort out how to use libv.re in CanvasSurface ctor
-		If library init could happen before scene ctor it would do the trick
-libv.re: improve glue layer, includes and ui integration
-libv.re: canvas might not be needed
+libv.ui: "Non-focusable" "kind of" components
+		if it was used with mouse in a canvas it does not focus
+		but if it was focused with focus traversal it does focus
+		(or this is 2 orthogonal option)
 
+libv.ui: If focused component receives a not interesting event
+		but there is an active canvas who would react to it
+		then auto change focus to the canvas.
+		This is really tricky as controls and ui event systems conflict somewhat
+
+
+
+
+Implement time control with UI - controls - commands back and forth
+
+Integration, controls, ui and controls interactions
+	camera controls
+	canvas controls
+		currently [hold] might work with immediate change
+		but what about [press]
+	scene controls (simulation, space / pause)
+		(timeControls)
+		display pause/time control state on the ui
+	3D picking ray
+
+
+
+
+
+
+
+libv.re: improve glue layer, includes and ui integration
 
 libv.ui: controls:
 	scene controls: auto activates when the scene is part of the focus chain

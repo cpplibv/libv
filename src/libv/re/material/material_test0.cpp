@@ -37,14 +37,14 @@ MaterialTest0::MaterialTest0() {
 	texture0 = r.texture.load("builtin:up");
 	texture1 = texture0;
 	texture1 = unitAmbient;
-	texture2 = r.texture.load_async("texture/sky/sky_debug_x_front_uv_transparent_srgb.dds");
-	auto x = r.texture.load_delayed_async("texture/sky/sky_debug_x_front_uv_transparent_srgb.dds", VariantID{2});
+	texture2 = r.texture.load_async("texture/sky/debug_x_front_uv_transparent_cube_srgb.dds");
+	auto x = r.texture.load_delayed_async("texture/sky/debug_x_front_uv_transparent_cube_srgb.dds", VariantID{2});
 	x->swizzle("00rg");
 	texture3 = *x;
 	texture4 = r.texture.load_async("texture/stripes_border.png");
-	texture5 = r.texture.load_async("texture/sky/sky_debug_x_front_uv_srgb.dds");
+	texture5 = r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds");
 	textureSky = unitSky;
-	textureSky = r.texture.load_async("texture/sky/sky_debug_x_front_uv_transparent_srgb.dds");
+	textureSky = r.texture.load_async("texture/sky/debug_x_front_uv_transparent_cube_srgb.dds");
 
 	// uniform_color = libv::vec4f{1, 0, 0, 1};
 	block_custom->custom_block_color = libv::vec4f{0, 1, 0, 1};
@@ -78,7 +78,7 @@ MaterialTest0::MaterialTest0(const MaterialScanner& scan) {
 	texture5 = unitAmbient;
 	texture5 = r.texture.load_async("builtin:white");
 	textureSky = unitSky;
-	textureSky = r.texture.load_async("texture/sky/sky_debug_x_front_uv_transparent_srgb.dds");
+	textureSky = r.texture.load_async("texture/sky/debug_x_front_uv_transparent_cube_srgb.dds");
 
 	mode = scan.int32_or("mode", 0);
 	uniform_color = scan.vec4f_or("color_diffuse", {1, 1, 1, 1});

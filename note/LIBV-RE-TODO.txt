@@ -13,19 +13,6 @@ RE - LIBV Render Engine
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 14 Forward+
 	4 Light culling compute shader
 	1 SSBO
@@ -87,7 +74,7 @@ place.it:
 
 	Star:
 		Integrate libv.re
-		Some minimal game logic, part os space could be implemented
+		Some minimal game logic, part of space could be implemented
 
 	Ext:
 		Update everything (excluding assimp and sol2)
@@ -382,7 +369,6 @@ place.it:
 			lod root, childID, bone indices, vertex index, every index within its data container
 			bone weights each vertex sum == 1
 		libv.vm4: On load verify every indexing (nodeID materialID etc in range [maybe even vertex index range check too]) and the integrity (no node circles) of the loaded data
-
 
 
 -------------------------------------------------------------------------------------------------
@@ -707,6 +693,8 @@ place.it:
 	http://www.opengl.org/wiki/Buffer_Object_Streaming
 	#include <fmt/os.h> // For std::error_code
 
+	Textures:
+		https://polyhaven.com
 	Models:
 		https://polyhaven.com/models/nature
 		https://free3d.com/3d-models/tree
@@ -841,6 +829,11 @@ libv.re: Special uniform variant:
 libv.re: glsl_source_loader: Add query API, aka what would this include be resolve too
 		has to handling errors, query could result in error (it should probe the file, so: no such file, cannot open, etc)
 		has to handling no match, query could result in no mapping
+
+libv.re: integrated debug skybox (transparent debug_x_front_uv_transparent_cube_srgb)
+		simultaneously on top of a different skybox
+		2 skybox, different blending, order matters
+		clearing might have issues
 
 Realistic sky/atmo example https://threejs.org/examples/?q=sky#webgl_shaders_sky
 
