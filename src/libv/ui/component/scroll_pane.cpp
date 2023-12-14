@@ -59,7 +59,7 @@ public:
 //	virtual void doStyle(StyleAccess& access, ChildID childID) override;
 //	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
 	virtual void doRender(Renderer& r) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback) override;
@@ -137,8 +137,8 @@ void CoreScrollPane::access_layout(Access&& access) {
 	if (is_vertical && is_horizontal)
 		access(
 				SLC_Padding(this->padding_extent(),
-					SLC_LineStatic(spacing2().x, Orientation::right,
-						SLC_LineStatic(spacing2().y, Orientation::down,
+					SLC_LineStatic(spacing2().x, Orientation::right, AlignHorizontal::center, AlignVertical::center,
+						SLC_LineStatic(spacing2().y, Orientation::down, AlignHorizontal::center, AlignVertical::center,
 							SLC_Component(area),
 							SLC_Component(hbar)
 						),
@@ -150,7 +150,7 @@ void CoreScrollPane::access_layout(Access&& access) {
 	else if (is_vertical)
 		access(
 				SLC_Padding(this->padding_extent(),
-					SLC_LineStatic(spacing2().x, Orientation::right,
+					SLC_LineStatic(spacing2().x, Orientation::right, AlignHorizontal::center, AlignVertical::center,
 						SLC_Component(area),
 						SLC_Component(vbar)
 					)
@@ -160,7 +160,7 @@ void CoreScrollPane::access_layout(Access&& access) {
 	else if (is_horizontal)
 		access(
 				SLC_Padding(this->padding_extent(),
-					SLC_LineStatic(spacing2().y, Orientation::down,
+					SLC_LineStatic(spacing2().y, Orientation::down, AlignHorizontal::center, AlignVertical::center,
 						SLC_Component(area),
 						SLC_Component(hbar)
 					)
@@ -230,41 +230,35 @@ void CoreScrollPane::doDetachChildren(libv::function_ref<bool(Component&)> callb
 	access_children(callback);
 }
 
-libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& layout_env) {
-	libv::vec2f result;
-	access_layout([&](auto&& plan) {
-		result = libv::ui::layoutSLCPass1(layout_env.size, plan);
-	});
-	return {result, 0};
+libv::vec2f CoreScrollPane::doLayout1(const ContextLayout1& layoutEnv) {
+	return layoutSLCCorePass1(*this, layoutEnv);
 }
 
-void CoreScrollPane::doLayout2(const ContextLayout2& layout_env) {
-	// hbar.value_high(layout_env.size.x);
-	// vbar.value_high(layout_env.size.y);
+void CoreScrollPane::doLayout2(const ContextLayout2& layoutEnv) {
+	// hbar.value_high(layoutEnv.size.x);
+	// vbar.value_high(layoutEnv.size.y);
 //	vbar.value_step(10 * 2);
 //	hbar.value_step(10 * 2);
 
-	access_layout([&](auto&& plan) {
-		libv::ui::layoutSLCPass2(layout_env.size, layout_env, plan);
-	});
+	layoutSLCCorePass2(*this, layoutEnv);
 
 	hbar.value_low(0);
 	vbar.value_low(0);
 
 	if (area.content()) {
-		hbar.value_high(area.content().layout_size2().x - area.content().padding_extent().size().x);
-		vbar.value_high(area.content().layout_size2().y - area.content().padding_extent().size().y);
+		hbar.value_high(area.content().layout_size().x - area.content().padding_extent().size().x);
+		vbar.value_high(area.content().layout_size().y - area.content().padding_extent().size().y);
 	}
 
-	hbar.value_range(area.layout_size2().x);
-	vbar.value_range(area.layout_size2().y);
+	hbar.value_range(area.layout_size().x);
+	vbar.value_range(area.layout_size().y);
 }
 
 void CoreScrollPane::doRender(Renderer& r) {
 	const auto is_vertical = info(mode()).vertical();
 	const auto is_horizontal = info(mode()).horizontal();
 
-	background().render(r, {0, 0}, layout_size2(), *this);
+	background().render(r, {0, 0}, layout_size(), *this);
 
 	AccessParent::render(ref_core(area), r.enter(area));
 

@@ -3,9 +3,6 @@
 // hpp
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_anchor_core.hpp>
-// libv
-#include <libv/meta/for_constexpr.hpp>
-#include <libv/utility/min_max.hpp>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/component/layout/layout_utility.hpp>
@@ -31,69 +28,59 @@ void CorePanelAnchor::doStyleChild(StyleAccess& access, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelAnchor::doLayout1(const ContextLayout1& layout_env) {
-	const auto env_size = layout_env.size - padding_size3();
-
-	auto result = libv::vec3f{};
+libv::vec2f CorePanelAnchor::doLayout1(const ContextLayout1& layoutEnv) {
+	const auto contentLimit = layoutEnv.limit - padding_size();
+	const auto contentParent = layoutEnv.parent - padding_size();
+	auto result = libv::vec2f{};
 
 	for (auto& child : children | view_layouted()) {
-		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
-				libv::vec3f{};
+		const auto childMargin = child.core().margin_size();
+		const auto childLimit = contentLimit - childMargin;
+		const auto childParent = contentParent - childMargin;
+		const auto childUnlimited = layoutEnv.unlimited && child.size().dynamic2();
+		const auto childEnv = ContextLayout1{childUnlimited, childLimit, childParent};
+		const auto childDynamic = child.size().has_dynamic() ? AccessLayout::layout1(child.core(), childEnv) : libv::vec2f{};
+		const auto childEvalSize = child.size().eval(childDynamic, childParent) + childMargin;
 
-		libv::meta::for_constexpr<0, 3>([&](auto i) {
-			result[i] = libv::max(
-					result[i],
-					resolvePercent(
-							child.size()[i].pixel + (child.size()[i].dynamic ? child_dynamic[i] : 0.f),
-							child.size()[i].percent, child.core())
-						+ child.core().margin_size3()[i]
-			);
-		});
+		result = libv::max(result, childEvalSize);
 	}
 
-	return result + padding_size3();
+	return result + padding_size();
 }
 
-void CorePanelAnchor::doLayout2(const ContextLayout2& layout_env) {
-	const auto env_size = layout_env.size - padding_size3();
+void CorePanelAnchor::doLayout2(const ContextLayout2& layoutEnv) {
+	const auto contentAreaSize = layoutEnv.size - padding_size();
+	const auto contentLimit = contentAreaSize;
+	const auto contentParent = contentAreaSize;
 
 	for (auto& child : children | view_layouted()) {
 
 		// Size ---
 
-		auto size = libv::vec3f{};
+		const auto childMargin = child.core().margin_size();
+		const auto childLimit = contentLimit - childMargin;
+		const auto childParent = contentParent - childMargin;
+		const auto childEnv = ContextLayout1{{false, false}, childLimit, childParent};
+		const auto childDynamic = child.size().has_dynamic() ? AccessLayout::layout1(child.core(), childEnv) : libv::vec2f{};
+		const auto childEvalSize = child.size().eval(childDynamic, childParent);
+		const auto childRatioShare = child.size().ratio_mask2() * (childParent - childEvalSize);
 
-		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
-				libv::vec3f{};
-
-		libv::meta::for_constexpr<0, 3>([&](auto i) {
-			const auto has_ratio = child.size()[i].ratio != 0.f;
-
-			if (has_ratio)
-				size[i] = env_size[i] - child.margin_size3()[i];
-			else
-				size[i] =
-						child.size()[i].pixel +
-						child.size()[i].percent * 0.01f * env_size[i] +
-						(child.size()[i].dynamic ? child_dynamic[i] : 0.f);
-		});
+		const auto childSize = childEvalSize + childRatioShare;
 
 		// Position ---
 
 		const auto position =
-				+ padding_LB3()
-				+ child.core().margin_LB3()
-				+ info(child.anchor()).rate() * env_size
-				- info(child.anchor()).rate() * (size + child.core().margin_size3());
+				+ padding_LB()
+				+ child.core().margin_LB()
+				+ info(child.anchor()).rate() * contentAreaSize
+				- info(child.anchor()).rate() * (childSize + childMargin);
 
 		const auto roundedPosition = libv::vec::round(position);
-		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
+		const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 		AccessLayout::layout2(
 				child.core(),
-				layout_env.enter(roundedPosition, roundedSize)
+				layoutEnv.enter(roundedPosition, roundedSize)
 		);
 	}
 }

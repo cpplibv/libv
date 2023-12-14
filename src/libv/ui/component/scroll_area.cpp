@@ -68,7 +68,7 @@ public:
 	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
 	virtual void doRender(Renderer& r) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback) override;
@@ -143,109 +143,93 @@ void CoreScrollArea::doAttach() {
 	floatRegion(true);
 }
 
-libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& layout_env) {
+libv::vec2f CoreScrollArea::doLayout1(const ContextLayout1& layoutEnv) {
 	if (!client || !client->core().isLayouted())
-		return padding_size3();
+		return padding_size();
 
-	const auto is_vertical = mode() != ScrollMode::horizontal;
-	const auto is_horizontal = mode() != ScrollMode::vertical;
+	const auto isVertical = mode() != ScrollMode::horizontal;
+	const auto isHorizontal = mode() != ScrollMode::vertical;
 
-	const auto env_size = layout_env.size - padding_size3();
-	const auto client_env_size = libv::vec3f{
-			is_horizontal ? -1.0f : env_size.x,
-			is_vertical ? -1.0f : env_size.y,
-			env_size.z};
+	const auto contentLimit = layoutEnv.limit - padding_size();
+	const auto contentParent = layoutEnv.parent - padding_size();
 
-	auto result = libv::vec3f{};
+	auto& child = *client;
+	const auto childMargin = child.core().margin_size();
+	const auto childLimit = contentLimit - childMargin;
+	const auto childParent = contentParent - childMargin;
+	const auto childUnlimited = libv::vec2b(isHorizontal, isVertical) || layoutEnv.unlimited;
+	const auto childEnv = ContextLayout1{childUnlimited, childLimit, childParent};
+	const auto childDynamic = child.size().has_dynamic() ? AccessLayout::layout1(child.core(), childEnv) : libv::vec2f{};
+	const auto childEvalSize = child.size().eval(childDynamic, childParent) + childMargin;
 
-	const auto client_dynamic = client->size().has_dynamic() ?
-			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
-			libv::vec3f{};
-
-	libv::meta::for_constexpr<0, 3>([&](auto i) {
-		result[i] = std::max(
-				result[i],
-				resolvePercent(
-						client->size()[i].pixel + (client->size()[i].dynamic ? client_dynamic[i] : 0.f),
-						client->size()[i].percent, client->core())
-		);
-	});
-
-	return result + padding_size3();
+	return childEvalSize + padding_size();
 }
 
-void CoreScrollArea::doLayout2(const ContextLayout2& layout_env) {
+void CoreScrollArea::doLayout2(const ContextLayout2& layoutEnv) {
 	if (!client || !client->core().isLayouted())
 		return;
 
-	const auto is_vertical = mode() != ScrollMode::horizontal;
-	const auto is_horizontal = mode() != ScrollMode::vertical;
+	const auto isVertical = mode() != ScrollMode::horizontal;
+	const auto isHorizontal = mode() != ScrollMode::vertical;
 
-	const auto env_size = layout_env.size - padding_size3();
-	const auto client_env_size = libv::vec3f{
-			is_horizontal ? -1.0f : env_size.x,
-			is_vertical ? -1.0f : env_size.y,
-			env_size.z};
+	const auto contentAreaSize = layoutEnv.size - padding_size();
+	const auto contentLimit = contentAreaSize;
+	const auto contentParent = contentAreaSize;
 
 	// Size ---
 
-	auto size = libv::vec3f{};
+	auto& child = *client;
 
-	const auto client_dynamic = client->size().has_dynamic() ?
-			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
-			libv::vec3f{};
+	const auto childMargin = child.core().margin_size();
+	const auto childLimit = contentLimit - childMargin;
+	const auto childParent = contentParent - childMargin;
+	const auto childUnlimited = libv::vec2b(isHorizontal, isVertical);
+	const auto childEnv = ContextLayout1{childUnlimited, childLimit, childParent};
+	const auto childDynamic = child.size().has_dynamic() ? AccessLayout::layout1(child.core(), childEnv) : libv::vec2f{};
+	const auto childEvalSize = child.size().eval(childDynamic, childParent);
+	const auto childRatioShare = child.size().ratio_mask2() * (childParent - childEvalSize);
 
-	const auto client_area_size = libv::vec3f{
-			is_horizontal ? client_dynamic.x : env_size.x,
-			is_vertical ? client_dynamic.y : env_size.y,
-			env_size.z};
+	const auto childSize = childEvalSize + childRatioShare;
 
-	if (xy(client_area_size) != area_size) { // Update area size
+	const auto clientAreaSize = libv::vec2f{
+			isHorizontal ? childSize.x : contentAreaSize.x,
+			isVertical ? childSize.y : contentAreaSize.y};
+	// TODO P5: Implement "unlimited" sizes in layout2 and use a backchannel to determine clientAreaSize
+
+	if (clientAreaSize != area_size) { // Update area size
 		const auto old_area_size = area_size;
-		area_size = xy(client_area_size);
+		area_size = clientAreaSize;
 		fire(EventScrollArea{area_position, old_area_size});
 	}
 
-	libv::meta::for_constexpr<0, 3>([&](auto i) {
-		const auto has_ratio = client->size()[i].ratio != 0.f;
-
-		if (has_ratio)
-			size[i] = client_area_size[i]; // NOTE: Ratio uses the client area size
-		else
-			size[i] =
-					client->size()[i].pixel +
-					client->size()[i].percent * 0.01f * env_size[i] + // NOTE: Percent uses the scroll-area size
-					(client->size()[i].dynamic ? client_dynamic[i] : 0.f);
-	});
-
 	// Position ---
 
-	const auto client_area_anchor = info(client->anchor()).rate();
-	const auto client_anchor = info(client->anchor()).rate();
-	// NOTE: For now client_area_anchor is the same as client_anchor, if needed this could be a property of the scroll area
+	const auto clientAreaAnchor = info(client->anchor()).rate();
+	const auto clientAnchor = info(client->anchor()).rate();
+	// NOTE: For now clientAreaAnchor is the same as clientAnchor, if needed this could be a property of the scroll area
 
 	const auto position =
-			+ padding_LB3()
-			+ client_area_anchor * (layout_env.size - padding_size3())
-			- client_area_anchor * client_area_size
-			+ client_anchor * client_area_size
-			- client_anchor * size; // NOTE: Anchor uses layout env size and client size
+			+ padding_LB()
+			+ clientAreaAnchor * contentAreaSize
+			- clientAreaAnchor * clientAreaSize
+			+ clientAnchor * clientAreaSize
+			- clientAnchor * childSize; // NOTE: Anchor uses layout env size and client size
 
 	const auto roundedPosition = libv::vec::round(position);
-	const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
+	const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
-	AccessLayout::layout2(client->core(), layout_env.enter(roundedPosition, roundedSize));
+	AccessLayout::layout2(client->core(), layoutEnv.enter(roundedPosition, roundedSize));
 }
 
 void CoreScrollArea::doRender(Renderer& r) {
-	background().render(r, {0, 0}, layout_size2(), *this);
+	background().render(r, {0, 0}, layout_size(), *this);
 
 	if (!client)
 		return;
 
-	r.clip(padding_extent().left_bottom(), layout_size2() - padding_extent().size());
+	r.clip(padding_extent().left_bottom(), layout_size() - padding_extent().size());
 
-	const auto rounded_area_position = libv::vec3f(libv::vec::round(area_position), 0.f);
+	const auto rounded_area_position = libv::vec::round(area_position);
 	r.translate(rounded_area_position);
 
 	Renderer rc = r.enter(*client);

@@ -34,7 +34,7 @@ public:
 
 	void enable(CoreComponent& component, bool value);
 
-	void update(CoreComponent& component, libv::vec3f position, libv::vec3f size, MouseOrder order);
+	void update(CoreComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order);
 	void update_region(CoreComponent& component, libv::vec2f remap_offset);
 
 	void unsubscribe(CoreComponent& component);

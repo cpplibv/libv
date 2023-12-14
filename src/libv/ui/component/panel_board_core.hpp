@@ -38,7 +38,7 @@ public:
 public:
 	virtual void doStyle(StyleAccess& access) override;
 	virtual void doStyleChild(StyleAccess& access, ChildID childID) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 	virtual void doRender(Renderer& r) override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;

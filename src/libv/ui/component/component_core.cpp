@@ -639,18 +639,19 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 	return result;
 }
 
-libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
-	const auto result = doLayout1(layout_env);
-	log_ui.trace("Dynamic            {: :>4}, limit {} {}", xy(result), xy(layout_env.size), path());
+libv::vec2f CoreComponent::layout1(const ContextLayout1& layoutEnv) {
+	log_ui.trace("Dynamic enter                     , unlimited {} limit {} parent {} {}", layoutEnv.unlimited, layoutEnv.limit, layoutEnv.parent, path());
+	const auto result = doLayout1(layoutEnv);
+	log_ui.trace("Dynamic result           {: :>4}, unlimited {} limit {} parent {} {}", result, layoutEnv.unlimited, layoutEnv.limit, layoutEnv.parent, path());
 	return result;
 }
 
-void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, int32_t depth) {
+void CoreComponent::layout2FloatPositionUpdateScan(libv::vec2f floatPosition, int32_t depth) {
 	if (flags.match_any(Flag::floatRegion))
 		// Float positions can't change under a float region component
 		return;
 
-	log_ui.trace("MScan   {: :>4}, {: :>4}, A {}", xy(layout_position_), xy(layout_size_), path());
+	log_ui.trace("MScan   {: :>4}, {: :>4}, A {}", layout_position_, layout_size_, path());
 
 	doForeachChildren([parentFloatPosition = floatPosition, parentDepth = depth](Component& child) {
 		// Scan children and mouse update if needed
@@ -661,27 +662,27 @@ void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, in
 		const auto childDepth = parentDepth + 1;
 
 		if (child_core.flags.match_any(Flag::watchMouse | Flag::floatRegion))
-			child_core.ui().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth + child_core.property.z_index_offset()});
+			child_core.ui().mouse.update(child_core, childFloatPosition, size, MouseOrder{childDepth + child_core.property.z_index_offset()});
 
 		child_core.layout2FloatPositionUpdateScan(childFloatPosition, childDepth);
 	});
 }
 
-void CoreComponent::layout2(const ContextLayout2& layout_env) {
-	bool changedSize = layout_env.size != layout_size_;
-	bool changedPosition = layout_env.position != layout_position_;
-	bool changedBounds = changedSize || changedPosition;
+void CoreComponent::layout2(const ContextLayout2& layoutEnv) {
+	const bool changedSize = layoutEnv.size != layout_size_;
+	const bool changedPosition = layoutEnv.position != layout_position_;
+	const bool changedBounds = changedSize || changedPosition;
 
-	bool changedFloatPosition = layout_env.float_position_changed || changedPosition;
+	const bool changedFloatPosition = layoutEnv.float_position_changed || changedPosition;
 
 	if (changedPosition) {
 		flags.set(Flag::updatedPosition);
-		layout_position_ = layout_env.position;
+		layout_position_ = layoutEnv.position;
 	}
 
 	if (changedSize) {
 		flags.set(Flag::updatedSize);
-		layout_size_ = layout_env.size;
+		layout_size_ = layoutEnv.size;
 	}
 
 	if (changedBounds)
@@ -689,7 +690,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 
 	if ((changedFloatPosition || changedBounds) && flags.match_any(Flag::watchMouse | Flag::floatRegion))
 		// We update the mouse context
-		ui().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth + property.z_index_offset()});
+		ui().mouse.update(*this, layoutEnv.float_position, layoutEnv.size, MouseOrder{layoutEnv.depth + property.z_index_offset()});
 
 	if (!changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout))
 		// No need to re-layout this component sub-tree
@@ -698,28 +699,30 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 	if (changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout)) {
 		// No need to re-layout this component sub-tree, but the float position changed
 		// so mouse context has to be updated
-		layout2FloatPositionUpdateScan(layout_env.float_position, layout_env.depth);
+		layout2FloatPositionUpdateScan(layoutEnv.float_position, layoutEnv.depth);
 		return;
 	}
 
 	// Update float_position_changed based on this component and the current layout request
-	layout_env.float_position_changed = (layout_env.float_position_changed || changedFloatPosition) && !flags.match_any(Flag::floatRegion);
+	layoutEnv.float_position_changed = (layoutEnv.float_position_changed || changedFloatPosition) && !flags.match_any(Flag::floatRegion);
 
 	if (changedBounds || flags.match_any(Flag::pendingLayoutSelf)) {
 		// Layout self and the children with the derived class
-		doLayout2(layout_env);
 		// TODO P5: A way to print, log or visualize layout events without always printing it into the log
-		log_ui.trace("Layout  {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
+		// if (enableUILayoutTrace)
+		log_ui.trace("Layout enter  {: :>4}, {: :>4}, {} {}", layoutEnv.position, layoutEnv.size, layoutEnv.float_position_changed ? "A" : " ", path());
+		doLayout2(layoutEnv);
+		log_ui.trace("Layout result {: :>4}, {: :>4}, {} {}", layout_position_, layout_size_, layoutEnv.float_position_changed ? "A" : " ", path());
 	} else if (flags.match_any(Flag::pendingLayoutChild)) {
+		log_ui.trace("   |   enter  {: :>4}, {: :>4}, {} {}", layout_position_, layout_size_, layoutEnv.float_position_changed ? "A" : " ", path());
 		// No need to re-layout this component, layout the children only
-		doForeachChildren([&layout_env, changedFloatPosition](Component& child) {
-			get_core(child)->layout2(layout_env.enter(
+		doForeachChildren([&layoutEnv, changedFloatPosition](Component& child) {
+			get_core(child)->layout2(layoutEnv.enter(
 					get_core(child)->layout_position(),
 					get_core(child)->layout_size()
 			));
 		});
-		// TODO P5: A way to print, log or visualize layout events without always printing it into the log
-		log_ui.trace("    |   {: :>4}, {: :>4}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
+		log_ui.trace("   |   result {: :>4}, {: :>4}, {} {}", layout_position_, layout_size_, layoutEnv.float_position_changed ? "A" : " ", path());
 	}
 
 	flags.reset(Flag::pendingLayout);
@@ -769,7 +772,7 @@ void CoreComponent::renderDestroy(Renderer& r) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec4f CoreComponent::getInnerContentBounds() {
-	return {padding_LB(), layout_size2() - padding_size()};
+	return {padding_LB(), layout_size() - padding_size()};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -800,10 +803,10 @@ libv::observer_ptr<CoreComponent> CoreComponent::doFocusTraverse(const ContextFo
 	return libv::make_observer_ptr(this);
 }
 
-libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {
+libv::vec2f CoreComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	return padding_size3();
+	return padding_size();
 }
 
 void CoreComponent::doLayout2(const ContextLayout2& environment) {

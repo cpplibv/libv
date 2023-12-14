@@ -281,11 +281,11 @@ public:
 	}
 
 	void event(const libv::input::EventMousePosition& event) {
-		auto position = libv::vec::cast<float>(event.position);
+		auto position = event.position.cast<float>();
 
 		if (overlayZoomMode == OverlayZoomMode::view)
 			// Floor is used as mouse position are in pixel center coordinates
-			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.layout_size2(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
+			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.layout_size(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
 
 		context_mouse.event_position(position);
 		context_state.mouse_position_ = position;
@@ -466,7 +466,7 @@ public:
 					context_state.time_frame(),
 					context_state.time(),
 					context_state.mouse_position(),
-					root.layout_size2()
+					root.layout_size()
 			);
 
 			AccessRoot::render(root.core(), r);
@@ -519,7 +519,7 @@ public:
 						context_state.time_frame(),
 						context_state.time(),
 						context_state.mouse_position(),
-						root.layout_size2()
+						root.layout_size()
 				);
 				AccessRoot::render(root.core(), r);
 				context_render.execute_render(glr);
@@ -579,7 +579,7 @@ void UI::remove(Component component) {
 }
 
 void UI::setSize(libv::vec2i size_) noexcept {
-	AccessRoot::layout_size(self->root.core()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
+	AccessRoot::layout_size(self->root.core()) = size_.cast<float>();
 	AccessRoot::flagAuto(self->root.core(), Flag::pendingLayout);
 }
 

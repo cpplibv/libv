@@ -270,7 +270,7 @@ void CoreOverlayZoom::doAttach() {
 }
 
 void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {
-	framebufferSize_ = libv::vec::xy(libv::lround(environment.size).cast<int32_t>());
+	framebufferSize_ = libv::lround(environment.size).cast<int32_t>();
 
 	framebufferColor0 = libv::glr::Texture2D::R8_G8_B8_A8{};
 	framebufferColor0.storage(1, framebufferSize_);

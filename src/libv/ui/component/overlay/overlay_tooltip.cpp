@@ -53,7 +53,7 @@ public:
 	void access_layout(Access&& access) {
 		for (auto& tooltip: tooltips) {
 			access(
-					SLC_Anchor(tooltip.source_anchor, tooltip.target_anchor, tooltip.target,
+					SLC_ComponentAnchor(tooltip.source_anchor, tooltip.target_anchor, tooltip.target,
 						SLC_Padding(this->padding_extent(), SLC_Component(tooltip.component))
 					)
 			);
@@ -64,28 +64,22 @@ public:
 	void doUpdate() override {
 		for (auto& tooltip: tooltips) {
 			//If tooltip.target pos chanchaged relayout tooltip
-			if (tooltip.target.layout_position2() != tooltip.target_prev_pos || tooltip.target.layout_size2() != tooltip.target_prev_size) {
+			if (tooltip.target.layout_position() != tooltip.target_prev_pos || tooltip.target.layout_size() != tooltip.target_prev_size) {
 				//No need to precache bounds as during 'add' invalidation will always happen
-				tooltip.target_prev_pos = tooltip.target.layout_position2();
-				tooltip.target_prev_size = tooltip.target.layout_size2();
+				tooltip.target_prev_pos = tooltip.target.layout_position();
+				tooltip.target_prev_size = tooltip.target.layout_size();
 
 				markInvalidLayout(false, false);
 			}
 		}
 	}
 
-	libv::vec3f doLayout1(const ContextLayout1& layout_env) override {
-		libv::vec2f result;
-		access_layout([&](auto&& plan) {
-			result = libv::ui::layoutSLCPass1(layout_env.size, plan);
-		});
-		return {result, 0};
+	libv::vec2f doLayout1(const ContextLayout1& layoutEnv) override {
+		return libv::ui::layoutSLCCorePass1(*this, layoutEnv);
 	}
 
 	void doLayout2(const ContextLayout2& environment) override {
-		access_layout([&](auto&& plan) {
-			libv::ui::layoutSLCPass2(environment.size, environment, plan);
-		});
+		layoutSLCCorePass2(*this, environment);
 	}
 
 	void show_tooltip(Component target, Component tooltip,

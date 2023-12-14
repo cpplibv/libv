@@ -20,28 +20,24 @@
 
 // -------------------------------------------------------------------------------------------------
 
-using approx_size = libv::vec3_t<libv::approx<float, -3>>;
-using approx_pos = libv::vec3_t<libv::approx<float, -3>>;
+using approx_size = libv::vec2_t<libv::approx<float, -3>>;
+using approx_pos = libv::vec2_t<libv::approx<float, -3>>;
 
 struct Bounds {
-	libv::vec3f position;
-	libv::vec3f size;
+	libv::vec2f position;
+	libv::vec2f size;
 
-	Bounds(libv::vec3f position, libv::vec3f size) :
+	Bounds(libv::vec2f position, libv::vec2f size) :
 			position(position),
 			size(size) { }
 
 	Bounds(float px, float py, float sx, float sy) :
-			position(px, py, 0),
-			size(sx, sy, 0) { }
-
-	Bounds(float px, float py, float pz, float sx, float sy, float sz) :
-			position(px, py, pz),
-			size(sx, sy, sz) { }
+			position(px, py),
+			size(sx, sy) { }
 
 	bool friend operator==(const Bounds& lhs, const Bounds& rhs) {
-		const auto rhs_pos_approx = libv::vec3_t<libv::approx<float>>{rhs.position};
-		const auto rhs_size_approx = libv::vec3_t<libv::approx<float>>{rhs.size};
+		const auto rhs_pos_approx = libv::vec2_t<libv::approx<float>>{rhs.position};
+		const auto rhs_size_approx = libv::vec2_t<libv::approx<float>>{rhs.size};
 		return lhs.position == rhs_pos_approx && lhs.size == rhs_size_approx;
 	}
 
@@ -50,8 +46,8 @@ struct Bounds {
 	}
 };
 
-struct DynamicTag : libv::vec3f{
-	using libv::vec3f::vec3f;
+struct DynamicTag : libv::vec2f{
+	using libv::vec2f::vec2f;
 };
 struct MarginTag : libv::vec4f{
 	using libv::vec4f::vec4f;
@@ -65,14 +61,19 @@ using M = MarginTag;
 using P = PaddingTag;
 
 struct CoreTestComponent : libv::ui::CoreComponent {
-	libv::vec3f injected_dynamic_size;
+	libv::vec2f injectedDynamicSize;
+	libv::vec2b dynamicProvidedUnlimited;
+	libv::vec2f dynamicProvidedLimit;
+	libv::vec2f dynamicProvidedParent;
 
 	using CoreComponent::CoreComponent;
 
 protected:
-	virtual libv::vec3f doLayout1(const libv::ui::ContextLayout1& environment) override {
-		(void) environment;
-		return injected_dynamic_size + padding_size3();
+	virtual libv::vec2f doLayout1(const libv::ui::ContextLayout1& environment) override {
+		dynamicProvidedUnlimited = environment.unlimited;
+		dynamicProvidedLimit = environment.limit;
+		dynamicProvidedParent = environment.parent;
+		return injectedDynamicSize + padding_size();
 	}
 };
 
@@ -84,12 +85,21 @@ public:
 		return libv::ui::create_core_ptr<CoreType>(std::move(name));
 	}
 
-	void injected_dynamic_size(libv::vec3f v) {
-		self().injected_dynamic_size = v;
+	void injectedDynamicSize(libv::vec2f v) {
+		self().injectedDynamicSize = v;
 	}
 
-	Bounds bounds() const {
+	[[nodiscard]] Bounds bounds() const {
 		return {layout_position(), layout_size()};
+	}
+	[[nodiscard]] libv::vec2b providedUnlimited() const {
+		return self().dynamicProvidedUnlimited;
+	}
+	[[nodiscard]] libv::vec2f providedLimit() const {
+		return self().dynamicProvidedLimit;
+	}
+	[[nodiscard]] libv::vec2f providedParent() const {
+		return self().dynamicProvidedParent;
 	}
 };
 
@@ -109,7 +119,7 @@ private:
 
 	template <typename... Tags>
 	void apply(TestComponent& comp, DynamicTag t, Tags&&... tags) {
-		comp.injected_dynamic_size(t);
+		comp.injectedDynamicSize(t);
 		apply(comp, std::forward<Tags>(tags)...);
 	}
 
@@ -136,23 +146,28 @@ public:
 	}
 
 public:
-	libv::vec3f layout1(libv::vec3f constraint_size) {
-		return libv::ui::AccessRoot::layout1(this->core(), libv::ui::ContextLayout1{constraint_size});
+	libv::vec2f layout1(libv::vec2f limit, libv::vec2f parent) {
+		// !!!
+		// assert(limit.x != 0);
+		// assert(limit.y != 0);
+		return libv::ui::AccessRoot::layout1(this->core(), libv::ui::ContextLayout1{
+			libv::vec2b(limit.x < 0.f, limit.y < 0.f), limit, parent
+		});
 	}
-	libv::vec3f layout1(float cx, float cy, float cz = 0.f) {
-		return layout1({cx, cy, cz});
+	libv::vec2f layout1(libv::vec2f limit) {
+		return layout1(limit, limit);
 	}
-	void layout2(libv::vec3f pos, libv::vec3f size) {
+	libv::vec2f layout1(float cx, float cy) {
+		return layout1({cx, cy});
+	}
+	void layout2(libv::vec2f pos, libv::vec2f size) {
 		libv::ui::AccessRoot::layout2(this->core(), libv::ui::ContextLayout2{pos, size});
 	}
-	void layout2(float px, float py, float pz, float sx, float sy, float sz) {
-		layout2({px, py, pz}, {sx, sy, sz});
-	}
 	void layout2(float px, float py, float sx, float sy) {
-		layout2({px, py, 0}, {sx, sy, 0});
+		layout2({px, py}, {sx, sy});
 	}
-	void layout2(float sx, float sy, float sz = 0) {
-		layout2({0, 0, 0}, {sx, sy, sz});
+	void layout2(float sx, float sy) {
+		layout2({0, 0}, {sx, sy});
 	}
 };
 

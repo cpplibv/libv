@@ -21,7 +21,7 @@ namespace {
 
 namespace x3 = boost::spirit::x3;
 
-using SizeDim3 = std::tuple<SizeDim, SizeDim, SizeDim>;
+using SizeDim2 = std::tuple<SizeDim, SizeDim>;
 
 const auto fa_pixel = [](auto& ctx) {
 	if (std::not_equal_to<float>()(_val(ctx).pixel, 0.0f))
@@ -47,6 +47,12 @@ const auto fa_dynamic = [](auto& ctx) {
 	else
 		_val(ctx).dynamic = true;
 };
+const auto fa_min = [](auto& ctx) {
+	if (_val(ctx).mode == SizeDim::Mode::min)
+		_pass(ctx) = false;
+	else
+		_val(ctx).mode = SizeDim::Mode::min;
+};
 
 const auto dimension = x3::rule<class dimension_, SizeDim>{} =
 		+(
@@ -55,29 +61,26 @@ const auto dimension = x3::rule<class dimension_, SizeDim>{} =
 			(x3::float_ >> x3::no_case[x3::lit("r")])[fa_ratio] |
 			x3::no_case[x3::lit("dynamic")][fa_dynamic] |
 			x3::no_case[x3::lit("d")][fa_dynamic] |
+			x3::no_case[x3::lit("min")][fa_min] |
 			x3::lit("0")
 		);
 
-const auto size_rule = x3::rule<class size_rule_, SizeDim3>{} =
-		dimension >> x3::lit(',') >
-		dimension >
-		(x3::lit(',') >> dimension | x3::attr(ratio(1)));
+const auto size_rule = x3::rule<class size_rule_, SizeDim2>{} =
+		dimension >> x3::lit(',') >> dimension;
 
 } // namespace -------------------------------------------------------------------------------------
 
 std::optional<Size> parse_size_optional(const std::string_view str) {
-	SizeDim3 result;
+	SizeDim2 result;
 	std::get<0>(result).ratio = 0.0f;
 	std::get<1>(result).ratio = 0.0f;
-	std::get<2>(result).ratio = 0.0f;
 
 	auto it = str.begin();
 	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
 	auto success = x3::phrase_parse(it, str.end(), size_rule, x3::unicode::space, result);
 	success = success && it == str.end();
 
-	return success ? std::optional<Size>{
-			Size{std::get<0>(result), std::get<1>(result), std::get<2>(result)}} : std::nullopt;
+	return success ? std::optional<Size>{Size{std::get<0>(result), std::get<1>(result)}} : std::nullopt;
 
 	// TODO P5: Would be nice to implement paring error diagnostics, x3 should support it
 	//	https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/annotation.html

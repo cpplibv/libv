@@ -159,13 +159,13 @@ public:
 		glr.state.polygonModeFill();
 		glr.state.clipPlanes(4);
 
-		glr.projection = libv::mat4f::ortho(root.layout_position2(), root.layout_size2());
+		glr.projection = libv::mat4f::ortho(root.layout_position(), root.layout_size());
 		glr.view = libv::mat4f::identity();
 		glr.model = libv::mat4f::identity();
 
 		glr.viewport(
-				root.layout_position2().cast<int32_t>(),
-				root.layout_size2().cast<int32_t>()
+				root.layout_position().cast<int32_t>(),
+				root.layout_size().cast<int32_t>()
 		);
 	}
 
@@ -259,8 +259,8 @@ Renderer::Renderer(ImplContextRender& context, libv::glr::Queue& glr, const Comp
 	context(context),
 	glr(glr),
 	current_component(root),
-	clip_pos(current_component.layout_position2()),
-	clip_size(current_component.layout_size2()) {
+	clip_pos(current_component.layout_position()),
+	clip_size(current_component.layout_size()) {
 }
 
 Renderer::Renderer(const Renderer& parent_renderer, const Component& child) noexcept :
@@ -281,10 +281,10 @@ time_point Renderer::time_frame() const noexcept {
 
 // --- State ---------------------------------------------------------------------------------------
 
-void Renderer::translate(libv::vec3f value) noexcept {
-	glr.model.translate(value);
+void Renderer::translate(libv::vec2f value) noexcept {
+	glr.model.translate(libv::vec3f{value, 0});
 //	log_ui.info("translate: {} (offset={})", value, xy(glr.model * libv::vec4f{0, 0, 0, 1}));
-	clip_pos -= xy(value);
+	clip_pos -= value;
 }
 
 void Renderer::clip(libv::vec2f pos, libv::vec2f size) noexcept {
@@ -358,8 +358,8 @@ void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader
 	task.uniform_block[layout_UIInfo.matM] = glr.model.top();
 	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos;
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
-	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
-	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
+	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position();
+	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size();
 	task.uniform_block[layout_UIInfo.mouse_position] = context.mouse_position;
 	task.uniform_block[layout_UIInfo.ui_size] = context.ui_size;
 	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
@@ -532,8 +532,8 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 	task.uniform_block[layout_UIInfo.matM] = glr.model;
 	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos;
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
-	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
-	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
+	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position();
+	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size();
 	task.uniform_block[layout_UIInfo.mouse_position] = mouse_position;
 	task.uniform_block[layout_UIInfo.ui_size] = ui_size;
 	task.uniform_block[layout_UIInfo.time_frame] = current_time;
@@ -588,8 +588,8 @@ void Renderer::text(libv::vec2f pos, const LayoutTextData& vd, const Font2D_view
 	task.uniform_block[layout_UIInfo.matM] = glr.model.top().translate_copy({pos, 0});
 	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos - pos;
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
-	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
-	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
+	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position();
+	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size();
 	task.uniform_block[layout_UIInfo.mouse_position] = context.mouse_position;
 	task.uniform_block[layout_UIInfo.ui_size] = context.ui_size;
 	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;

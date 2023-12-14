@@ -81,7 +81,7 @@ struct TestCoreComponent : public libv::ui::CoreComponent {
 	}
 };
 
-void subscribe(TestContextMouse& ctx, libv::ui::CoreComponent& component, libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder order) {
+void subscribe(TestContextMouse& ctx, libv::ui::CoreComponent& component, libv::vec2f position, libv::vec2f size, libv::ui::MouseOrder order) {
 	ctx.libv::ui::ContextMouse::subscribe(component);
 	ctx.update(component, position, size, order);
 	ctx.enable(component, component.enable());
@@ -145,7 +145,7 @@ public:
 		(void) event;
 	}
 
-	void subscribe(libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder order) {
+	void subscribe(libv::vec2f position, libv::vec2f size, libv::ui::MouseOrder order) {
 		ctx.libv::ui::ContextMouse::subscribe(*this);
 		ctx.update(*this, position, size, order);
 		ctx.enable(*this, enable());
@@ -177,7 +177,7 @@ TEST_CASE("Mouse: subscribe and unsubscribe watcher test", "[libv.ui.event.mouse
 	TestContextMouse table;
 
 	TestCoreComponent watcher0("watcher0", PassThrough::on, Interaction::enable);
-	subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_update_layout(); // Register the new subscriptions
 	CHECK(watcher0.num_event == 1);
@@ -208,19 +208,19 @@ TEST_CASE("Mouse: multiple sub, notify with correct order", "[libv.ui.event.mous
 	watcher0.cb_button = [&](const auto&) { call_order.emplace_back(100); };
 	watcher0.cb_movement = [&](const auto&) { call_order.emplace_back(101); };
 	watcher0.cb_scroll = [&](const auto&) { call_order.emplace_back(102); };
-	subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
 	TestCoreComponent watcher2("watcher2", PassThrough::on, Interaction::enable);
 	watcher2.cb_button = [&](const auto&) { call_order.emplace_back(120); };
 	watcher2.cb_movement = [&](const auto&) { call_order.emplace_back(121); };
 	watcher2.cb_scroll = [&](const auto&) { call_order.emplace_back(122); };
-	subscribe(table, watcher2, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{2});
+	subscribe(table, watcher2, {0, 0}, {10, 10}, libv::ui::MouseOrder{2});
 
 	TestCoreComponent watcher1("watcher1", PassThrough::on, Interaction::enable);
 	watcher1.cb_button = [&](const auto&) { call_order.emplace_back(110); };
 	watcher1.cb_movement = [&](const auto&) { call_order.emplace_back(111); };
 	watcher1.cb_scroll = [&](const auto&) { call_order.emplace_back(112); };
-	subscribe(table, watcher1, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+	subscribe(table, watcher1, {0, 0}, {10, 10}, libv::ui::MouseOrder{1});
 
 	table.event_update_layout(); // Register the new subscriptions
 	CHECK(ranges::equal(call_order, std::array{121, 111, 101}));
@@ -255,10 +255,10 @@ TEST_CASE("Mouse: multiple sub, only notify intersected ones", "[libv.ui.event.m
 	TestContextMouse table;
 
 	TestCoreComponent watcher0("watcher0", PassThrough::on, Interaction::enable);
-	subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
 	TestCoreComponent watcher1("watcher1", PassThrough::on, Interaction::enable);
-	subscribe(table, watcher1, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher1, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_update_layout(); // Register the new subscriptions
 	CHECK(watcher0.num_event == 1);
@@ -296,7 +296,7 @@ TEST_CASE("Mouse: never intersect region", "[libv.ui.event.mouse]") {
 	TestCoreComponent watcher0("watcher0", PassThrough::on, Interaction::enable);
 
 	SECTION("Should not intersect zero sized region") {
-		subscribe(table, watcher0, {5, 5, 0}, {0, 0, 0}, libv::ui::MouseOrder{0});
+		subscribe(table, watcher0, {5, 5}, {0, 0}, libv::ui::MouseOrder{0});
 		table.event_update_layout(); // Register the new subscriptions
 
 		table.event_position({4, 4});
@@ -310,7 +310,7 @@ TEST_CASE("Mouse: never intersect region", "[libv.ui.event.mouse]") {
 	}
 
 	SECTION("Should intersect one sized region") {
-		subscribe(table, watcher0, {5, 5, 0}, {1, 1, 0}, libv::ui::MouseOrder{0});
+		subscribe(table, watcher0, {5, 5}, {1, 1}, libv::ui::MouseOrder{0});
 		table.event_update_layout(); // Register the new subscriptions
 
 		table.event_position({4, 4});
@@ -327,7 +327,7 @@ TEST_CASE("Mouse: never intersect region", "[libv.ui.event.mouse]") {
 	}
 
 	SECTION("Should intersect two sized region") {
-		subscribe(table, watcher0, {5, 5, 0}, {2, 2, 0}, libv::ui::MouseOrder{0});
+		subscribe(table, watcher0, {5, 5}, {2, 2}, libv::ui::MouseOrder{0});
 		table.event_update_layout(); // Register the new subscriptions
 
 		table.event_position({4, 4});
@@ -353,7 +353,7 @@ TEST_CASE("Mouse: new subscribe receives event from enter if created on top of m
 
 	TestCoreComponent watcher0("watcher0", PassThrough::on, Interaction::enable);
 
-	subscribe(table, watcher0, {0, 0, 0}, {5, 5, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher0, {0, 0}, {5, 5}, libv::ui::MouseOrder{0});
 	CHECK(watcher0.num_event == 0);
 	table.event_update_layout(); // Register the new subscriptions
 	CHECK(watcher0.num_event == 1);
@@ -367,22 +367,22 @@ TEST_CASE("Mouse: event update", "[libv.ui.event.mouse]") {
 	table.event_position({0, 0});
 
 	SECTION("simple moving watcher") {
-		subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 0);
 		table.event_update_layout(); // Register the new subscriptions
 		CHECK(watcher0.num_event == 1);
 
-		table.update(watcher0, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 1);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 2);
 
-		table.update(watcher0, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 2);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 2);
 
-		table.update(watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 2);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 3);
@@ -391,42 +391,42 @@ TEST_CASE("Mouse: event update", "[libv.ui.event.mouse]") {
 	}
 
 	SECTION("two staged moving watcher") {
-		subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 0);
 		CHECK(watcher1.num_event == 0);
 		table.event_update_layout(); // Register the new subscriptions
 		CHECK(watcher0.num_event == 1);
 		CHECK(watcher1.num_event == 0);
 
-		subscribe(table, watcher1, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+		subscribe(table, watcher1, {0, 0}, {10, 10}, libv::ui::MouseOrder{1});
 		CHECK(watcher0.num_event == 1);
 		CHECK(watcher1.num_event == 0);
 		table.event_update_layout(); // Register the new subscriptions #2
 		CHECK(watcher0.num_event == 2);
 		CHECK(watcher1.num_event == 1);
 
-		table.update(watcher0, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 2);
 		CHECK(watcher1.num_event == 1);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 2);
 
-		table.update(watcher1, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher1, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 2);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 3);
 
-		table.update(watcher0, {5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 3);
 		table.event_update_layout();
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 3);
 
-		table.update(watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+		table.update(watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 		CHECK(watcher0.num_event == 3);
 		CHECK(watcher1.num_event == 3);
 		table.event_update_layout();
@@ -441,7 +441,7 @@ TEST_CASE("Mouse: event leave", "[libv.ui.event.mouse]") {
 	TestCoreComponent watcher0("watcher0", PassThrough::on, Interaction::enable);
 	table.event_position({0, 0});
 
-	subscribe(table, watcher0, {0, 0, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher0, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 	CHECK(watcher0.num_event == 0);
 	table.event_update_layout(); // Register the new subscriptions
 	CHECK(watcher0.num_event == 1);
@@ -468,8 +468,8 @@ TEST_CASE("Mouse: Overlapping non pass-through components", "[libv.ui.event.mous
 	TestCoreComponent watcher0("watcher0", PassThrough::off, Interaction::enable);
 	TestCoreComponent watcher1("watcher1", PassThrough::off, Interaction::enable);
 
-	subscribe(table, watcher0, {2, 2, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
-	subscribe(table, watcher1, {6, 6, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+	subscribe(table, watcher0, {2, 2}, {10, 10}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher1, {6, 6}, {10, 10}, libv::ui::MouseOrder{1});
 	table.event_position({0, 0});
 	table.event_update_layout(); // Register the new subscriptions
 
@@ -507,7 +507,7 @@ TEST_CASE("Mouse: Disabled component has no mouse interaction", "[libv.ui.event.
 	TestContextMouse2 table;
 
 	TestCoreComponent2 watcher0(table, "w0", PassThrough::off, Interaction::disable);
-	watcher0.subscribe({2, 2, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	watcher0.subscribe({2, 2}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_position({0, 0});
 	table.event_update_layout(); // Register the new subscriptions
@@ -546,8 +546,8 @@ TEST_CASE("Mouse: Disabled component has no mouse interaction overlapping", "[li
 
 	TestCoreComponent2 watcher0(table, "w0", PassThrough::off, Interaction::disable);
 	TestCoreComponent2 watcher1(table, "w1", PassThrough::off, Interaction::disable);
-	watcher0.subscribe({2, 2, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
-	watcher1.subscribe({5, 5, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+	watcher0.subscribe({2, 2}, {10, 10}, libv::ui::MouseOrder{0});
+	watcher1.subscribe({5, 5}, {10, 10}, libv::ui::MouseOrder{1});
 
 	table.event_position({0, 0});
 	table.event_update_layout(); // Register the new subscriptions
@@ -600,9 +600,9 @@ TEST_CASE("Mouse: Disabled component has no mouse interaction overlapping middle
 	TestCoreComponent2 watcher0(table, "w0", PassThrough::on, Interaction::disable);
 	TestCoreComponent2 watcher1(table, "w1", PassThrough::on, Interaction::enable);
 	TestCoreComponent2 watcher2(table, "w2", PassThrough::on, Interaction::disable);
-	watcher0.subscribe({2, 2, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
-	watcher1.subscribe({4, 4, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
-	watcher2.subscribe({6, 6, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+	watcher0.subscribe({2, 2}, {10, 10}, libv::ui::MouseOrder{0});
+	watcher1.subscribe({4, 4}, {10, 10}, libv::ui::MouseOrder{1});
+	watcher2.subscribe({6, 6}, {10, 10}, libv::ui::MouseOrder{1});
 
 	table.event_position({0, 0});
 	table.event_update_layout(); // Register the new subscriptions

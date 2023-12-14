@@ -22,7 +22,7 @@ public:
 public:
 //	void add(Component component);
 //	void add(libv::vec3f position, Component component);
-//	void add(Component component, std::function<libv::vec3f()> position_scraper);
+//	void add(Component component, std::function<libv::vec3f()> positionTransformer);
 //	PositionSetterProxy add(Component component);
 };
 

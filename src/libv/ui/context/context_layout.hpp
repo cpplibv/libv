@@ -11,30 +11,56 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ContextLayout1 {
-	libv::vec3f size;
+class ContextLayout1 {
+public:
+	/// Indicator if the given direction is unlimited or not.
+	/// Unbounded dimensions can ignore limit and occupy as much space as they want.
+	libv::vec2b unlimited;
+	/// Max size that a node can acquire (negative values represents oversized children).
+	/// Includes the space that was already assigned to the component.
+	libv::vec2f limit;
+	/// Parent size (never infinite or negative). Falls back to viewport size if parent is not constrained.
+	libv::vec2f parent;
 
-	explicit ContextLayout1(libv::vec2f size) : size(size, 0) {}
-	explicit ContextLayout1(libv::vec3f size) : size(size) {}
+	ContextLayout1(libv::vec2b unlimited, libv::vec2f limit, libv::vec2f parent) :
+			unlimited(unlimited),
+			limit(limit),
+	        parent(parent) {
+	}
+
+	[[nodiscard]] static ContextLayout1 fix(libv::vec2f limit) {
+		return {libv::vec2b{false, false}, limit, limit};
+	}
+
+	[[nodiscard]] ContextLayout1 reduce(libv::vec2f reduceLimit, libv::vec2f reduceParent) const {
+		return {unlimited, limit - reduceLimit, parent - reduceParent};
+	}
+
+	[[nodiscard]] libv::vec2f minusOneIfUnlimited(libv::vec2f limit_) const {
+		return {
+			unlimited.x ? -1.f : limit_.x,
+			unlimited.y ? -1.f : limit_.y,
+		};
+	}
 };
 
-struct ContextLayout2 {
+class ContextLayout2 {
 public:
-	libv::vec3f float_position;
+	libv::vec2f float_position;
 	mutable bool float_position_changed = false; // Mutable as CoreComponent::layout2 sets it after it 'enters' a child (there are better ways for this)
 
-	libv::vec3f position;
-	libv::vec3f size;
+	libv::vec2f position;
+	libv::vec2f size;
 
 	int depth = 0;
 
 public:
-	constexpr inline ContextLayout2(libv::vec3f position, libv::vec3f size)  noexcept :
+	constexpr inline ContextLayout2(libv::vec2f position, libv::vec2f size)  noexcept :
 		position(position),
 		size(size) { }
 
 private:
-	constexpr inline ContextLayout2(libv::vec3f abs_position, bool float_position_changed, libv::vec3f position, libv::vec3f size, int depth) noexcept :
+	constexpr inline ContextLayout2(libv::vec2f abs_position, bool float_position_changed, libv::vec2f position, libv::vec2f size, int depth) noexcept :
 		float_position(abs_position),
 		float_position_changed(float_position_changed),
 		position(position),
@@ -42,22 +68,12 @@ private:
 		depth(depth) { }
 
 public:
-	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec3f position_, libv::vec3f size_) const noexcept {
+	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec2f position_, libv::vec2f size_) const noexcept {
 		return ContextLayout2{
 				float_position + position_,
 				float_position_changed,
 				position_,
 				size_,
-				depth + 1
-		};
-	}
-
-	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec2f position_, libv::vec2f size_) const noexcept {
-		return ContextLayout2{
-				float_position + libv::vec3f(position_, 0.f),
-				float_position_changed,
-				libv::vec3f(position_, 0.f),
-				libv::vec3f(size_, 0.f),
 				depth + 1
 		};
 	}

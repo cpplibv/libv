@@ -225,9 +225,7 @@ struct SettingsBuilder {
 libv::ui::Component createSceneSettings(libv::Nexus& nexus) {
 	auto& config = libv::ui::requireBean<ClientConfig>(nexus, "Controls", "ClientConfig");
 
-	// TODO P2: libv.ui: Ability to control max width 1200-1600 px (Replace limiter)
-	auto limiter = libv::ui::PanelAnchor::ns("limiter", "settings.limiter");
-	auto layers = limiter.add_n<libv::ui::PanelAnchor>("layers");
+	auto layers = libv::ui::PanelAnchor::n("layers");
 
 	// Layers's ptr is used to subscribe/unsubscribe guard any subcomponent event handler
 	const auto owner_ptr = layers.ptr();
@@ -299,7 +297,7 @@ libv::ui::Component createSceneSettings(libv::Nexus& nexus) {
 		layers.add(builder.build(config));
 	}
 
-	return limiter;
+	return layers;
 }
 
 // -------------------------------------------------------------------------------------------------

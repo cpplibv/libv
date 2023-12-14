@@ -59,7 +59,7 @@ namespace ui {
 //protected:
 //	virtual void doAttach() override;
 //	virtual void doStyle(StyleAccess& access) override;
-//	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+//	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;
 //	virtual void doRender(Renderer& r) override;
 //};
@@ -197,15 +197,15 @@ namespace ui {
 //	access.self(*this);
 //}
 //
-//libv::vec3f CoreRadioButton::doLayout1(const ContextLayout1& environment) {
-//	const auto dynamic_size_text = text_.content(xy(environment.size.x));
+//libv::vec2f CoreRadioButton::doLayout1(const ContextLayout1& environment) {
+//	const auto dynamic_size_text = text_.content(environment.size.x);
 //	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 //
 //	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
 //}
 //
 //void CoreRadioButton::doLayout2(const ContextLayout2& environment) {
-//	text_.limit(libv::vec::xy(environment.size));
+//	text_.limit(libv::vec::environment.size);
 //}
 //
 //void CoreRadioButton::doRender(Renderer& r) {

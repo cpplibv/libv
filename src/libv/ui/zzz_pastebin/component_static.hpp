@@ -238,7 +238,7 @@ private:
 		});
 	};
 
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override final {
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override final {
 		bool layouted = false;
 
 		ComponentStaticAccess::access(self(), [&environment, this, &layouted](auto& member) {

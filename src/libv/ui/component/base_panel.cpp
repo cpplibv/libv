@@ -96,7 +96,7 @@ void CoreBasePanel::doStyle(StyleAccess& access) {
 }
 
 void CoreBasePanel::doRender(Renderer& r) {
-	background().render(r, {0, 0}, layout_size2(), *this);
+	background().render(r, {0, 0}, layout_size(), *this);
 
 	for (auto& child : children) {
 		Renderer rc = r.enter(child);

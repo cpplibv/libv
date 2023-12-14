@@ -218,6 +218,7 @@ void GameClient::init_ui(bool devMode) {
 		// Switch to the first scene on attach so the Render Library is already initalized
 		// libv::ui::switchParentScene("main", signal, createSceneMainMenu(self->nexus_));
 		// libv::ui::switchParentScene("main", signal, createSceneCredits(self->nexus_)); // Shortcut during development
+		// libv::ui::switchParentScene("main", signal, createSceneSettings(self->nexus_)); // Shortcut during development
 		libv::ui::switchParentScene("main", signal, createSceneSurface(self->nexus_)); // Shortcut during development
 	});
 

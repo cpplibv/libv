@@ -35,7 +35,7 @@ void CorePanelBoard::doStyleChild(StyleAccess& access, ChildID childID) {
 }
 
 void CorePanelBoard::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 
 	for (auto& child : children) {
 		Renderer rc = r.enter(child.component);
@@ -99,8 +99,8 @@ void CorePanelBoard::doForeachChildren(libv::function_ref<void(Component&)> call
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelBoard::doLayout1(const ContextLayout1& layout_env) {
-	(void) layout_env;
+libv::vec2f CorePanelBoard::doLayout1(const ContextLayout1& layoutEnv) {
+	(void) layoutEnv;
 
 	libv::vec2f LB{};
 	libv::vec2f RT{};
@@ -112,18 +112,18 @@ libv::vec3f CorePanelBoard::doLayout1(const ContextLayout1& layout_env) {
 
 	const auto contentSize = RT - LB;
 
-	return libv::vec3f{contentSize + margin_size(), 0.f};
+	return contentSize + margin_size();
 }
 
-void CorePanelBoard::doLayout2(const ContextLayout2& layout_env) {
+void CorePanelBoard::doLayout2(const ContextLayout2& layoutEnv) {
 	for (auto& child : children) {
-		const auto position = margin_LB() + child.position;
+		const auto position = padding_LB() + child.position;
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + child.size) - roundedPosition;
 
 		AccessLayout::layout2(
 				child.component.core(),
-				layout_env.enter(libv::vec3f{roundedPosition, 0.f}, libv::vec3f{roundedSize, 0.f})
+				layoutEnv.enter(roundedPosition, roundedSize)
 		);
 	}
 }

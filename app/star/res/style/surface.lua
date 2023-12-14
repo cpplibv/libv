@@ -68,7 +68,8 @@ ui.style("game.info-bar.group") {
 	size = "D, D",
 	padding = {8, 2},
 	spacing = 8,
-	background = "rgba(0.5, 0.5, 0.5, 0.9)",
+	--background = "rgba(0.5, 0.5, 0.5, 0.9)",
+	background = "mediumblue",
 }
 
 ui.style("game.info-bar.label") {
@@ -78,7 +79,7 @@ ui.style("game.info-bar.label") {
 ui.style("game.info-bar.time.pause") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	size = "50px, D",
+	size = "60px, D1r",
 	stripped_background_interactive,
 }
 
@@ -86,7 +87,7 @@ ui.style("game.info-bar.time.speed") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	--size = "40px, D",
-	size = "40px, D",
+	size = "40px, D1r",
 	stripped_background_interactive,
 }
 

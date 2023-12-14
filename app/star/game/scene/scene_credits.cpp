@@ -46,7 +46,7 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 	line.add_sa<libv::ui::Label>("settings.title", "Credits");
 
 	auto scroll = line.add_s<libv::ui::ScrollPane>("credits.scroll");
-	auto vis_line = libv::ui::PanelLine::s("credits.line");
+	auto vis_line = libv::ui::PanelLine::ns("scrolled-vertical-line", "credits.line");
 	scroll.content(vis_line);
 	scroll.mode(libv::ui::ScrollMode::vertical);
 
@@ -60,7 +60,7 @@ libv::ui::Component createSceneCredits(libv::Nexus& nexus) {
 	}
 
 	vis_line.add_sa<libv::ui::Label>("credits.segment", "Third-Party libraries and tools");
-//	for (int i = 0; i < 10; ++i)
+	// for (int i = 0; i < 10; ++i)
 	for (const auto& thirdParty : makeThirdPartyList()) {
 		auto panel = vis_line.add_s<libv::ui::PanelLine>("credits.third-party.panel");
 		panel.add_s<libv::ui::Image>("credits.third-party.separator");

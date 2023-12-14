@@ -7,7 +7,7 @@ project(libv)
 #set(CMAKE_BUILD_TYPE DEBUG)
 #set(CMAKE_BUILD_TYPE RELEASE)
 
-set(WISH_REQUEST_VERSION v5.4.4)
+set(WISH_REQUEST_VERSION v5.5.0)
 include(cmake/wish.cmake)
 
 # -------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ include(cmake/wish.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
-wish_configurations(debug dev DEFAULT release package)
+wish_configurations(debug optdebug dev DEFAULT release package)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")

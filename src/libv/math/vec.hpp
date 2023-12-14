@@ -608,6 +608,23 @@ template <std::size_t N, typename T, typename K>
 	return result;
 }
 
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator&&(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() && std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] && rhs.data()[i];
+	});
+	return result;
+}
+template <std::size_t N, typename T, typename K>
+[[nodiscard]] constexpr LIBV_FORCE_INLINE auto operator||(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+	vec_t<N, decltype(std::declval<T>() || std::declval<K>())> result{};
+	libv::meta::for_constexpr<0, N>([&](int i) {
+		result.data()[i] = lhs.data()[i] || rhs.data()[i];
+	});
+	return result;
+}
+
 // operator*(vec, scalar) --------------------------------------------------------------------------
 
 template <std::size_t N, typename T, typename K>

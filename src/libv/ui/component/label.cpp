@@ -46,7 +46,7 @@ public:
 
 public:
 	virtual void doStyle(StyleAccess& access) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;
 };
@@ -117,20 +117,22 @@ void CoreLabel::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreLabel::doLayout1(const ContextLayout1& environment) {
-	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
+libv::vec2f CoreLabel::doLayout1(const ContextLayout1& layoutEnv) {
+	const auto dynamic_size_text = text_.content(
+			layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size())
+		) + padding_size();
 
-	return {dynamic_size_text, 0.f};
+	return dynamic_size_text;
 }
 
-void CoreLabel::doLayout2(const ContextLayout2& environment) {
-	text_.limit(xy(environment.size) - padding_size());
+void CoreLabel::doLayout2(const ContextLayout2& layoutEnv) {
+	text_.limit(layoutEnv.size - padding_size());
 }
 
 void CoreLabel::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 
-	if (!r.cull_test({0, 0}, layout_size2()))
+	if (!r.cull_test({0, 0}, layout_size()))
 		return;
 	r.text(padding_LB(), text_,
 			property.font_color(),

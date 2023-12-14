@@ -108,24 +108,16 @@ std::string Component::path() const noexcept {
 	return ptr_->path();
 }
 
-libv::vec3f Component::layout_position() const noexcept {
+libv::vec2f Component::layout_position() const noexcept {
 	return ptr_->layout_position();
 }
 
-libv::vec2f Component::layout_position2() const noexcept {
-	return ptr_->layout_position2();
+libv::vec2f Component::layout_position_absolute() const noexcept {
+	return ptr_->layout_position_absolute();
 }
 
-libv::vec2f Component::layout_position2_absolute() const noexcept {
-	return ptr_->layout_position2_absolute();
-}
-
-libv::vec3f Component::layout_size() const noexcept {
+libv::vec2f Component::layout_size() const noexcept {
 	return ptr_->layout_size();
-}
-
-libv::vec2f Component::layout_size2() const noexcept {
-	return ptr_->layout_size2();
 }
 
 // -------------------------------------------------------------------------------------------------

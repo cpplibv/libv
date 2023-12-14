@@ -185,6 +185,7 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 				("whitesmoke", color(0.9608f, 0.9608f, 0.9608f, 1.0000f))
 				("yellow", color(1.0000f, 1.0000f, 0.0000f, 1.0000f))
 				("yellowgreen", color(0.6039f, 0.8039f, 0.1961f, 1.0000f))
+
 				("transparent", color(0.0000f, 0.0000f, 0.0000f, 0.0000f))
 				// </editor-fold>
 			;

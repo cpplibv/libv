@@ -53,8 +53,8 @@ private:
 	ChildID childID = 0;
 	uint32_t ref_count = 0;
 
-	libv::vec3f layout_position_; /// Component position relative to parent in pixels, bottom_left corner
-	libv::vec3f layout_size_;     /// Component size in pixels
+	libv::vec2f layout_position_; /// Component position relative to parent in pixels, bottom_left corner
+	libv::vec2f layout_size_;     /// Component size in pixels
 
 //protected:
 private:
@@ -126,13 +126,13 @@ public:
 		flags.set(Flag::slot);
 	}
 
-	[[nodiscard]] inline libv::vec3f layout_position() const noexcept {
+	[[nodiscard]] inline libv::vec2f layout_position() const noexcept {
 		return layout_position_;
 	}
 	[[nodiscard]] inline libv::vec2f layout_position2() const noexcept {
 		return libv::vec2f{layout_position_.x, layout_position_.y};
 	}
-	libv::vec2f layout_position2_absolute() const noexcept {
+	[[nodiscard]] libv::vec2f layout_position_absolute() const noexcept {
 		libv::vec2f result;
 
 		for (auto it = this; true; it = it->parent_) {
@@ -143,11 +143,8 @@ public:
 
 		return result;
 	}
-	[[nodiscard]] inline libv::vec3f layout_size() const noexcept {
+	[[nodiscard]] inline libv::vec2f layout_size() const noexcept {
 		return layout_size_;
-	}
-	[[nodiscard]] inline libv::vec2f layout_size2() const noexcept {
-		return libv::vec2f{layout_size_.x, layout_size_.y};
 	}
 
 public:
@@ -202,25 +199,13 @@ public:
 	[[nodiscard]] inline libv::vec2f margin_LB() const noexcept {
 		return xy(property.margin());
 	}
-	/// x: left, y: down, z: 0
-	[[nodiscard]] inline libv::vec3f margin_LB3() const noexcept {
-		return {margin_LB(), 0.0f};
-	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f margin_RT() const noexcept {
 		return zw(property.margin());
 	}
-	/// x: right, y: top, z: 0
-	[[nodiscard]] inline libv::vec3f margin_RT3() const noexcept {
-		return {margin_RT(), 0.0f};
-	}
 	/// x: left + right, y: down + top
 	[[nodiscard]] inline libv::vec2f margin_size() const noexcept {
 		return margin_LB() + margin_RT();
-	}
-	/// x: left + right, y: down + top, z: 0
-	[[nodiscard]] inline libv::vec3f margin_size3() const noexcept {
-		return {margin_size(), 0.0f};
 	}
 
 	// --- Padding ---
@@ -252,25 +237,13 @@ public:
 	[[nodiscard]] inline libv::vec2f padding_LB() const noexcept {
 		return xy(property.padding());
 	}
-	/// x: left, y: down, z: 0
-	[[nodiscard]] inline libv::vec3f padding_LB3() const noexcept {
-		return {padding_LB(), 0.0f};
-	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f padding_RT() const noexcept {
 		return zw(property.padding());
 	}
-	/// x: right, y: top, z: 0
-	[[nodiscard]] inline libv::vec3f padding_RT3() const noexcept {
-		return {padding_RT(), 0.0f};
-	}
 	/// x: left + right, y: down + top
 	[[nodiscard]] inline libv::vec2f padding_size() const noexcept {
 		return padding_LB() + padding_RT();
-	}
-	/// x: left + right, y: down + top, z: 0
-	[[nodiscard]] inline libv::vec3f padding_size3() const noexcept {
-		return {padding_size(), 0.0f};
 	}
 
 public:
@@ -351,9 +324,9 @@ private:
 	void styleScan();
 	void styleScanAll();
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
-	libv::vec3f layout1(const ContextLayout1& environment);
+	libv::vec2f layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
-	void layout2FloatPositionUpdateScan(libv::vec3f floatPosition, int32_t depth);
+	void layout2FloatPositionUpdateScan(libv::vec2f floatPosition, int32_t depth);
 	void render(Renderer& r);
 	void renderDestroy(Renderer& r);
 
@@ -368,7 +341,7 @@ public:
 	virtual void doStyle(StyleAccess& access);
 	virtual void doStyleChild(StyleAccess& access, ChildID childID);
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment);
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment);
 	virtual void doLayout2(const ContextLayout2& environment);
 	virtual void doCreate(Renderer& r);
 	virtual void doRender(Renderer& r);

@@ -114,8 +114,8 @@ public:
 public:
 	virtual void doAttach() override;
 	virtual void doStyle(StyleAccess& access) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
-	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& layoutEnv) override;
+	virtual void doLayout2(const ContextLayout2& layoutEnv) override;
 	virtual void doRender(Renderer& r) override;
 };
 
@@ -228,8 +228,8 @@ inline CoreSlider::BarBounds CoreSlider::bar_bounds() const noexcept {
 
 	const auto value_extent = std::abs(value_high_ - value_low_);
 
-	const auto size_x = static_cast<double>(layout_size2()[orient.dim_control]);
-	const auto size_y = static_cast<double>(layout_size2()[orient.dim_secondary]);
+	const auto size_x = static_cast<double>(layout_size()[orient.dim_control]);
+	const auto size_y = static_cast<double>(layout_size()[orient.dim_secondary]);
 
 	// NOTE: std::clamp is not usable as min should have priority (0 size should yield 0 sized bar)
 	const auto size_bar_x = value_extent < value_range_ ?
@@ -276,7 +276,7 @@ void CoreSlider::onMouseButton(const EventMouseButton& event) {
 					libv::remap_clamp<double>(
 						local_mouse[orient.dim_control] - local_drag,
 						0,
-						layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
+						layout_size()[orient.dim_control] - bar.size[orient.dim_control],
 						orient.control_inverted ? value_high_ : value_low_,
 						orient.control_inverted ? value_low_ : value_high_);
 			handler().value(local_value);
@@ -338,7 +338,7 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 
 	if (value_extent < value_range_) {
 		// Handle special case with oversized (range) bar
-		const auto side_a = local_mouse[orient.dim_control] < layout_size2()[orient.dim_control] * 0.5f;
+		const auto side_a = local_mouse[orient.dim_control] < layout_size()[orient.dim_control] * 0.5f;
 		const auto toward_min = side_a == orient.control_inverted;
 		const auto local_value = toward_min ? value_low_ : value_high_;
 		handler().value(local_value);
@@ -352,7 +352,7 @@ void CoreSlider::onMouseMovement(const EventMouseMovement& event) {
 	const auto local_value = libv::remap_clamp<double>(
 			local_mouse[orient.dim_control] - local_drag,
 			0,
-			layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
+			layout_size()[orient.dim_control] - bar.size[orient.dim_control],
 			orient.control_inverted ? value_high_ : value_low_,
 			orient.control_inverted ? value_low_ : value_high_);
 
@@ -381,25 +381,25 @@ void CoreSlider::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreSlider::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
+libv::vec2f CoreSlider::doLayout1(const ContextLayout1& layoutEnv) {
+	(void) layoutEnv;
 
 // const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
 //	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
 
 //	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
 // 	return {dynamic_size_bar, 0.f};
-	return {property.bar_visual().size(), 0.f};
+	return property.bar_visual().size();
 }
 
-void CoreSlider::doLayout2(const ContextLayout2& environment) {
-	(void) environment;
+void CoreSlider::doLayout2(const ContextLayout2& layoutEnv) {
+	(void) layoutEnv;
 
 	bar_bounds_ = bar_bounds(); // Cache bar_bounds
 }
 
 void CoreSlider::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 
 	property.bar_visual().render(r, bar_bounds_.position, bar_bounds_.size, *this);
 }

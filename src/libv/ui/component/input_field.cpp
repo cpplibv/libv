@@ -77,7 +77,7 @@ public:
 public:
 	virtual void doAttach() override;
 	virtual void doStyle(StyleAccess& access) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;
 };
@@ -389,21 +389,23 @@ void CoreInputField::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreInputField::doLayout1(const ContextLayout1& environment) {
-	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
+libv::vec2f CoreInputField::doLayout1(const ContextLayout1& layoutEnv) {
+	const auto dynamic_size_text = text_.content(
+				layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size())
+			) + padding_size();
 //	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
 //	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
-	return {dynamic_size_text, 0.f};
+	return dynamic_size_text;
 }
 
 void CoreInputField::doLayout2(const ContextLayout2& environment) {
-	text_.limit(xy(environment.size) - padding_size());
+	text_.limit(environment.size - padding_size());
 	caretPosition = text_.getCharacterPosition(caret);
 }
 
 void CoreInputField::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 
 	r.text(padding_LB(), text_,
 			property.font_color(),

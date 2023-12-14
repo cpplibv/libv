@@ -29,7 +29,7 @@ public:
 
 public:
 	virtual void doStyle(StyleAccess& access) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec2f doLayout1(const ContextLayout1& environment) override;
 	virtual void doRender(Renderer& r) override;
 };
 
@@ -51,15 +51,13 @@ void CoreImage::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreImage::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-	const auto dynamic_size_image = property.background().size().cast<float>() + padding_size();
-
-	return {dynamic_size_image, 0.f};
+libv::vec2f CoreImage::doLayout1(const ContextLayout1& layoutEnv) {
+	(void) layoutEnv;
+	return property.background().size().cast<float>() + padding_size();
 }
 
 void CoreImage::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 }
 
 // =================================================================================================

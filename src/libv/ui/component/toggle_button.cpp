@@ -47,29 +47,27 @@ void CoreToggleButton::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreToggleButton::doLayout1(const ContextLayout1& environment) {
+libv::vec2f CoreToggleButton::doLayout1(const ContextLayout1& layoutEnv) {
 	const auto dynamic_size_text_on = text_on.measure_content_size(
-				xy(environment.size) - padding_size(),
-				CoreButton::property.font(), CoreButton::property.font_size()
-			) + padding_size();
+			layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size()),
+			CoreButton::property.font(), CoreButton::property.font_size()
+		) + padding_size();
 
 	const auto dynamic_size_text_off = text_off.measure_content_size(
-				xy(environment.size) - padding_size(),
-				CoreButton::property.font(), CoreButton::property.font_size()
-			) + padding_size();
+			layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size()),
+			CoreButton::property.font(), CoreButton::property.font_size()
+		) + padding_size();
 
-	const auto dynamic_size_text = libv::vec::max(dynamic_size_text_on, dynamic_size_text_off);
-
-	return {dynamic_size_text, 0.f};
+	return libv::vec::max(dynamic_size_text_on, dynamic_size_text_off);
 }
 
 void CoreToggleButton::doLayout2(const ContextLayout2& environment) {
-	text_on.invalidateLayout2(xy(environment.size) - padding_size());
-	text_off.invalidateLayout2(xy(environment.size) - padding_size());
+	text_on.invalidateLayout2(environment.size - padding_size());
+	text_off.invalidateLayout2(environment.size - padding_size());
 }
 
 void CoreToggleButton::doRender(Renderer& r) {
-	CoreButton::property.background().render(r, {0, 0}, layout_size2(), *this);
+	CoreButton::property.background().render(r, {0, 0}, layout_size(), *this);
 
 	r.text(padding_LB(),
 			property.selection() ?

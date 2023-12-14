@@ -271,14 +271,14 @@ void ContextMouse::enable(CoreComponent& component, bool value) {
 	it->pendingUpdate = true;
 }
 
-void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order) {
+void ContextMouse::update(CoreComponent& component, libv::vec2f abs_position, libv::vec2f size, MouseOrder order) {
 	auto it = self->container.find(&component);
 
 	if (it == nullptr)
 		return log_ui.warn("Attempted to update a not subscribed component: {} {}", static_cast<void*>(&component), component.path());
 
-	it->cornerBL = xy(abs_position);
-	it->cornerTR = xy(abs_position) + xy(size) - 1.f;
+	it->cornerBL = abs_position;
+	it->cornerTR = abs_position + size - 1.f;
 	it->order = order;
 	it->pendingUpdate = true;
 }

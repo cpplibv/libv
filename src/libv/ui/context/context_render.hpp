@@ -68,7 +68,7 @@ public: // --- Context ---
 	[[nodiscard]] time_point time_frame() const noexcept;
 
 public: // --- State ---
-	void translate(libv::vec3f value) noexcept;
+	void translate(libv::vec2f value) noexcept;
 	void clip(libv::vec2f pos, libv::vec2f size) noexcept;
 
 public: // --- Auxiliary ---

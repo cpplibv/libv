@@ -96,20 +96,20 @@ public:
 	}
 
 private:
-	static constexpr libv::vec3f table_rate[] = {
-			libv::vec3f{0.0f, 1.0f, 0.0f}, // top_left
-			libv::vec3f{0.5f, 1.0f, 0.0f}, // top_center
-			libv::vec3f{1.0f, 1.0f, 0.0f}, // top_right
-			libv::vec3f{0.0f, 0.5f, 0.0f}, // center_left
-			libv::vec3f{0.5f, 0.5f, 0.0f}, // center_center
-			libv::vec3f{1.0f, 0.5f, 0.0f}, // center_right
-			libv::vec3f{0.0f, 0.0f, 0.0f}, // bottom_left
-			libv::vec3f{0.5f, 0.0f, 0.0f}, // bottom_center
-			libv::vec3f{1.0f, 0.0f, 0.0f}, // bottom_right
+	static constexpr libv::vec2f table_rate[] = {
+			libv::vec2f{0.0f, 1.0f}, // top_left
+			libv::vec2f{0.5f, 1.0f}, // top_center
+			libv::vec2f{1.0f, 1.0f}, // top_right
+			libv::vec2f{0.0f, 0.5f}, // center_left
+			libv::vec2f{0.5f, 0.5f}, // center_center
+			libv::vec2f{1.0f, 0.5f}, // center_right
+			libv::vec2f{0.0f, 0.0f}, // bottom_left
+			libv::vec2f{0.5f, 0.0f}, // bottom_center
+			libv::vec2f{1.0f, 0.0f}, // bottom_right
 	};
 
 public:
-	[[nodiscard]] constexpr inline libv::vec3f rate() const noexcept {
+	[[nodiscard]] constexpr inline libv::vec2f rate() const noexcept {
 		return table_rate[static_cast<underlying_type>(enum_value_)];
 	}
 };

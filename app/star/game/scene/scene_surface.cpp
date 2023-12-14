@@ -122,12 +122,12 @@ public:
 	libv::re::Camera_ptr camera = libv::re::Camera::create();
 	// CameraControl cameraControl;
 
-	// Render
-	libv::re::Skybox_ptr skybox;
-
 	// ...
 	Surface surface{scene};
 	TimeControl timeControl;
+
+	// Render
+	libv::re::Skybox_ptr skybox;
 
 	// UI
 	libv::ui::Label parentLabel;
@@ -266,6 +266,7 @@ private:
 		auto leftLine = panel.add_s<libv::ui::PanelLine>("game.info-bar.group");
 		{
 			auto lbl0 = leftLine.add_sa<libv::ui::Label>("game.info-bar.label", "Left");
+			// !!! Toggle buttons and button groups
 			auto btnPause = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.pause", "][");
 			// btnPause.event().submit.connect([] {
 			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{0});
@@ -278,7 +279,7 @@ private:
 			// btnX2.event().submit.connect([] {
 			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{2});
 			// });
-			auto btnX4 = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.speed", "x4xxx");
+			auto btnX4 = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.speed", "x4");
 			// btnX4.event().submit.connect([] {
 			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{4});
 			// });

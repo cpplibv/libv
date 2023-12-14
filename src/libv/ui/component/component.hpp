@@ -98,11 +98,9 @@ public:
 	[[nodiscard]] const std::string& name() const noexcept;
 	[[nodiscard]] std::string path() const noexcept;
 
-	[[nodiscard]] libv::vec3f layout_position() const noexcept;
-	[[nodiscard]] libv::vec2f layout_position2() const noexcept;
-	[[nodiscard]] libv::vec2f layout_position2_absolute() const noexcept;
-	[[nodiscard]] libv::vec3f layout_size() const noexcept;
-	[[nodiscard]] libv::vec2f layout_size2() const noexcept;
+	[[nodiscard]] libv::vec2f layout_position() const noexcept;
+	[[nodiscard]] libv::vec2f layout_position_absolute() const noexcept;
+	[[nodiscard]] libv::vec2f layout_size() const noexcept;
 
 public:
 	void size(const Size& value) noexcept;
@@ -137,25 +135,13 @@ public:
 	[[nodiscard]] inline libv::vec2f margin_LB() const noexcept {
 		return xy(margin());
 	}
-	/// x: left, y: down, z: 0
-	[[nodiscard]] inline libv::vec3f margin_LB3() const noexcept {
-		return {margin_LB(), 0.0f};
-	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f margin_RT() const noexcept {
 		return zw(margin());
 	}
-	/// x: right, y: top, z: 0
-	[[nodiscard]] inline libv::vec3f margin_RT3() const noexcept {
-		return {margin_RT(), 0.0f};
-	}
 	/// x: left + right, y: down + top
 	[[nodiscard]] inline libv::vec2f margin_size() const noexcept {
 		return margin_LB() + margin_RT();
-	}
-	/// x: left + right, y: down + top, z: 0
-	[[nodiscard]] inline libv::vec3f margin_size3() const noexcept {
-		return {margin_size(), 0.0f};
 	}
 
 	// --- Padding ---
@@ -180,25 +166,13 @@ public:
 	[[nodiscard]] inline libv::vec2f padding_LB() const noexcept {
 		return xy(padding());
 	}
-	/// x: left, y: down, z: 0
-	[[nodiscard]] inline libv::vec3f padding_LB3() const noexcept {
-		return {padding_LB(), 0.0f};
-	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f padding_RT() const noexcept {
 		return zw(padding());
 	}
-	/// x: right, y: top, z: 0
-	[[nodiscard]] inline libv::vec3f padding_RT3() const noexcept {
-		return {padding_RT(), 0.0f};
-	}
 	/// x: left + right, y: down + top
 	[[nodiscard]] inline libv::vec2f padding_size() const noexcept {
 		return padding_LB() + padding_RT();
-	}
-	/// x: left + right, y: down + top, z: 0
-	[[nodiscard]] inline libv::vec3f padding_size3() const noexcept {
-		return {padding_size(), 0.0f};
 	}
 
 public:

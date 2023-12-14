@@ -6,6 +6,7 @@
 #include <libv/math/vec.hpp>
 #include <libv/meta/force_inline.hpp>
 #include <libv/utility/float_equal.hpp>
+#include <libv/utility/min_max.hpp>
 // std
 #include <utility>
 
@@ -16,31 +17,43 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct SizeDim {
+	enum class Mode : uint8_t {
+		max,
+		min,
+		// add,
+	};
+	Mode mode = Mode::max;
+	bool dynamic = false; /// Yield all available space and shrink to the dynamic size
 	float pixel = 0.0f;   /// Fixed size
 	float percent = 0.0f; /// Parent size percentile
 	float ratio = 1.0f;   /// Parent leftover space ratio
-	bool dynamic = false; /// Yield all available space and shrink to the dynamic size
 
 	constexpr LIBV_FORCE_INLINE SizeDim() noexcept = default;
 	constexpr LIBV_FORCE_INLINE SizeDim(float pixel, float percent, float ratio, bool dynamic) noexcept :
-		pixel(pixel), percent(percent), ratio(ratio), dynamic(dynamic) { }
+		dynamic(dynamic), pixel(pixel), percent(percent), ratio(ratio) { }
 
-//	static inline SizeDim add(const SizeDim& a, const SizeDim& b) {
-//		return SizeDim{
-//			a.pixel + b.pixel,
-//			a.percent + b.percent,
-//			a.ratio + b.ratio,
-//			a.dynamic || b.dynamic
-//		};
-//	}
-//	static inline SizeDim max(const SizeDim& a, const SizeDim& b) {
-//		return SizeDim{
-//			std::max(a.pixel, b.pixel),
-//			std::max(a.percent, b.percent),
-//			std::max(a.ratio, b.ratio),
-//			a.dynamic || b.dynamic
-//		};
-//	}
+	constexpr LIBV_FORCE_INLINE float eval(float dynamicValue, float parent) const {
+		parent = std::max(parent, 0.f);
+		switch (mode) {
+		case Mode::max: {
+			float result = libv::max(
+					pixel,
+					percent * 0.01f * parent,
+					dynamic ? dynamicValue : 0.f);
+			return result;
+		}
+		case Mode::min: {
+			float result = pixel;
+			if (libv::float_not_equal(percent, 0.f))
+				result = std::min(result, percent * 0.01f * parent);
+			if (dynamic)
+				result = std::min(result, dynamicValue);
+			return result;
+		}
+		}
+		assert(false && "Invalid Mode enum value");
+		return 0.f;
+	}
 
 	template <typename OStream>
 	friend OStream& operator<<(OStream& os, const SizeDim& size) {
@@ -53,6 +66,10 @@ struct SizeDim {
 		if (size.dynamic)
 			os << "D";
 		return os;
+	}
+
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool has_ratio() const noexcept {
+		return libv::float_not_equal(ratio, 0.f);
 	}
 
 	[[nodiscard]] constexpr inline bool operator==(const SizeDim& other) const noexcept = default;
@@ -74,11 +91,11 @@ struct SizeDim {
 // -------------------------------------------------------------------------------------------------
 
 struct Size {
-	libv::vec3_t<SizeDim> value;
+	libv::vec2_t<SizeDim> value;
 
 	constexpr LIBV_FORCE_INLINE Size() noexcept = default;
-	constexpr LIBV_FORCE_INLINE Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) noexcept :
-		value(std::move(x), std::move(y), std::move(z)) {}
+	constexpr LIBV_FORCE_INLINE Size(SizeDim x, SizeDim y) noexcept :
+		value(std::move(x), std::move(y)) {}
 
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE SizeDim& operator[](std::size_t dim) noexcept {
 		return value[dim];
@@ -88,7 +105,7 @@ struct Size {
 	}
 
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool has_dynamic() const noexcept {
-		return value.x.dynamic || value.y.dynamic || value.z.dynamic;
+		return value.x.dynamic || value.y.dynamic;
 	}
 
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f pixel2() const noexcept {
@@ -99,6 +116,9 @@ struct Size {
 	}
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f ratio2() const noexcept {
 		return {value.x.ratio, value.y.ratio};
+	}
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2b dynamic2() const noexcept {
+		return {value.x.dynamic, value.y.dynamic};
 	}
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f ratio_mask2() const noexcept {
 		return {
@@ -113,6 +133,15 @@ struct Size {
 		};
 	}
 
+public:
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE libv::vec2f eval(libv::vec2f dynamicValue, libv::vec2f parent) const {
+		return {
+			value.x.eval(dynamicValue.x, parent.x),
+			value.y.eval(dynamicValue.y, parent.y)
+		};
+	}
+
+public:
 	template <typename OStream>
 	friend LIBV_FORCE_INLINE OStream& operator<<(OStream& os, const Size& size) {
 		os << size.value;

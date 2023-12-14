@@ -112,13 +112,13 @@ public:
 //	std::size_t getClosestLineIndex(libv::vec2f position);
 
 	/// @param limit - The maximum available space that can be used to layout
-	/// @note Negative \c limit values are representing unbounded limits
+	/// @note Negative \c limit values are representing unlimited limits
 	/// @return the necessary space to layout while obeying the \c limit
 	[[nodiscard]] libv::vec2f content(libv::vec2f limit);
 
 	/// @param x - The maximum available width that can be used to layout
 	/// @param y - The maximum available height that can be used to layout
-	/// @note Negative \c x and \c y values are representing unbounded limits
+	/// @note Negative \c x and \c y values are representing unlimited limits
 	/// @return the necessary space to layout while obeying the \c limit
 	[[nodiscard]] inline libv::vec2f content(const float x, const float y) {
 		return content({x, y});

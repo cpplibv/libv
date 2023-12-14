@@ -48,7 +48,7 @@ void Light::queue(ContextQueue& ctx) {
 
 		switch (attenuationFormula) {
 		case LightAttenuationFormula::physical:
-			// Physical formula is unbounded, cutoff at threshold
+			// Physical formula is unlimited, cutoff at threshold
 			// Formula: sqr(range) / sqr(dist + range)
 			return (1.f / std::sqrt(threshold) - 1.f) * range;
 		case LightAttenuationFormula::lisyarus: [[fallthrough]];

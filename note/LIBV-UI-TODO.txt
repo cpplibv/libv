@@ -12,34 +12,27 @@
 
 
 
-
-
-
-
-libv.ui: Layout env size -1 support, everywhere... oh fork...
-	limit, parent -> 2 seperate size for layout2 env
-	-1 size in a dim = no anchor or alignment allowed in that dimension
-	also, I need a back channel to fetch scroll area final virtual size
-
-
-
-
-
-
-
-
 libv.ui: Style import other lua files for common variables
-libv.ui: style script loading should match the way other resources are loaded
+libv.ui: Style script loading should match the way other resources are loaded
 		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
 
 libv.ui: "State" property: focus-within
-libv.ui: "State" property: nth (2nd 3rd is enough for now)
+libv.ui: "State" property: nth (2nd 3rd is enough for now, maybe first and last too)
+libv.ui: Slider "hover" style/state should be separate for the track and the bar
 
-libv.ui: Ability to control max width
+Layout invalidation:
+	scroll bar change prompts layout, why? should it?
+		| it does to recache the bar position
+	Slider value change should not invalidate layout
+		(make it a float region if it must)
+		mouse context range remap might be needed!
+	libv.ui: Make sure that (only) position change does not invalidate layout
 
 
+=================================================================================================
 
 
+libv.ui: InputField might not does proper CPU culling (at least in ui sandbox legacy tab)
 libv.ui: Adopt libv.re
 libv.ui: Move libv.sun overlay_shader_error.hpp to ui
 
@@ -47,18 +40,20 @@ Tooltip
 	libv.ui: Implement built-in support for child properties in BasePanel
 	libv.ui: Cleanup child property access in Tooltip Container
 
+Layout
+	SLC
+		libv.ui.SLC: Add anchor support
+		libv.ui.SLC: Add layers support (to support scroll pane with overlayed scroll bar)
+
+	libv.ui: Layout2 could also use unlimited-ness like Layout1
+		unlimited in a dim = no anchor or alignment allowed in that dimension
+			\ fail gracefully, produce a warning and do the only doable anchor/alignment
+		and need a back channel to fetch scroll area final virtual size.
+		For simplicity a viable shortcut would be to have separate unlimited line layout
+		type only for scrollable lists
 
 
-scroll bar change prompts layout, why? should it?
-	| it does to recache the bar position
-Slider value change should not invalidate layout
-	(make it a float region if it must)
-	mouse context range remap might be needed!
-libv.ui: Make sure that (only) position change does not invalidate layout
-
-
-Slider Bar "hover" style/state: separate  for the track and for the bar
-
+ -------------------------------------------------------------------------------------------------
 
 place.it: "Well behaved layout" flag bit could be also used for mouse events
 libv.ui: Hover and focus styles state should be auto handled
@@ -66,27 +61,6 @@ libv.ui: Hover and focus styles state should be auto handled
 
 
 
-
-
-Whaaaat, should be the size of scrollable lists?
-	limit, parent -> 2 seperate size for layout2 env
-	-1 size in a dim = no anchor or alignment in that dimension
-	also, I need a back channel to fetch scroll area final virtual size
-
-
-Another size type?
-	S = Stretch
-	S = Scroll
-	F = Flow
-
-	Upon encountering such an object, recurse into it without
-	consideration to the size, but the issue is, size should be known
-	before we call the object in case it need to be anchored/aligned
-	in its parent and currently pos/size are mouse-region abs
-		... unless we say, that flow objects just cannot be anchored
-		... or unless scroll area just layouts like that
-		...
-	But... Long lists, I dont wanna precalc everything
 
 
 
@@ -161,22 +135,12 @@ libv.ui: Scroll pane
 
 
 
-libv.ui.SLC: BUG: line.assign_ratio_size is incorrect for:
-		area 1r,1r vbar 25px,1r hbar 200px,25px
-
-
-
-
 
 
 
 
 
 libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
-
-libv.ui.SLC: Add anchor support
-libv.ui.SLC: Add alignment support
-libv.ui.SLC: Add layers support (to support scroll pane with overlayed scroll bar)
 
 
 
@@ -340,9 +304,9 @@ libv.ui: Margin, Padding, Spacing and Alignment gaps
 	libv.ui: padding support in every component (layout)
 			scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)
 	libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
-				panel_full DONE?
-				panel_line (Partial)
-				panel_anchor (Partial)
+				panel_full 'DONE'
+				panel_line DONE
+				panel_anchor DONE
 			panel_grid
 			scroll_pane
 			scroll_area
@@ -688,9 +652,6 @@ event
 	libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Time the events (it will be a lot of timestamp)
 	libv.ui.event.host: UI global event host (optional) support for component hierarchical up-walking iteration over handlers
 	libv.ui.event.host: UI component hierarchically scoped custom event host (just like UI global)
-	libv.ui.event.host: UI global event host support for named global channels
-			context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
-			context().events().fire("shader_reload", ShaderReportFailure{});
 
 interactive
 	libv.ui: Ability to select, copy or click link from Labels if the specific properties are set to allow it
@@ -794,11 +755,9 @@ lua
 libv.ui: include check everything / fwd everything
 libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count | maybe not store, only give an option to log the current values each frame, maybe with a default stat collector
 
-libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers nor 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
-
-libv.ui: font failure to load means fallback | verify
-libv.ui: shader failure to load means fallback | verify
-libv.ui: shader dynamic loading from file
+libv.ui.font: font failure to load means fallback | verify
+libv.ui.shader: shader failure to load means fallback | verify
+libv.ui.shader: shader dynamic loading from file
 
 libv.ui.font: fallback to Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) | add it back to fallback consolas_min font | https://www.fileformat.info/info/unicode/char/fffd/index.htm
 libv.ui.font: fallback to ascii '?'
@@ -855,6 +814,10 @@ PAPER: Re-entering event loop problem and solution:
 		if (!reentry_guard)
 			return;
 
+	Second solution idea (not yet implemented):
+		Have a second function for every function that could result in an event broadcast
+		text(), text_silent()
+		value(), value_silent()
 
 
 PAPER: Component styled states:
@@ -897,8 +860,11 @@ PAPER: SLC - Static Layout Composition
 		return: Change in reservation in the area
 
 	Rules:
+		These rules have been changed compared to the original rules
+		to better match necessary capabilities.
+
 		Pixel size:
-			Fix size in pixels
+			Fix (minimal) size in pixels
 		Percent size:
 			Percent size of the parent excluding the padding
 		Dynamic size:

@@ -108,14 +108,14 @@ struct FragmentText : BaseFragment {
 
 	libv::vec3f fragmentLayout1(const ContextLayout1& environment) {
 		return text.measure_content_size(
-				xy(environment.size),
+				environment.size,
 				property.font(),
 				property.font_size());
 	}
 
 	void fragmentLayout2(const ContextLayout2& environment) {
 		text.layout2(
-				xy(environment.size),
+				environment.size,
 				property.font(),
 				property.font_size(),
 				property.align_horizontal(),

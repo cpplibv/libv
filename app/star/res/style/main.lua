@@ -186,27 +186,14 @@ ui.style("main-menu.menu.entry") {
 
 -- === Settings ====================================================================================
 
-	--align_horizontal = "left",
-	--align_horizontal = "justify_all",
-	--anchor = "center_center",
-
 ui.style("settings") {
 	caret_color = {1, 1, 1, 1},
 }
 
-ui.style("settings.limiter") {
-	--anchor = "center",
-	size = "1600px, 1r",
-	--orientation = "down",
-	--background = "red",
-	--padding = 25,
-}
-
 ui.style("settings.main") {
 	anchor = "center",
-	--size = "1200px, 1r",
+	size = "min 100% 1600px, 1r",
 	orientation = "down",
-	--background = "red",
 	padding = 25,
 }
 
@@ -339,7 +326,8 @@ ui.style("settings.entry.value.option.button") {
 			--},
 }
 
--- =================================================================================================
+-- === Credits =====================================================================================
+-- Uses settings.main, settings.title, settings.ctrl...
 
 ui.style("controls.visual.line") {
 	align_horizontal = "center";
@@ -398,6 +386,13 @@ ui.style("credits") {
 	font_size = 14,
 }
 
+ui.style("credits.main") {
+	anchor = "center",
+	size = "min 100% 1600px, 1r",
+	orientation = "down",
+	padding = 25,
+}
+
 ui.style("credits.scroll") {
 	--background = "#77F6",
 
@@ -411,11 +406,6 @@ ui.style("credits.scroll") {
 		background = {type = "border", color = {0.0, 0.0, 0.0, 0.5}, texture = "light_border.png"},
 		size = "25px, 1r",
 	},
-}
-
-ui.style("credits.main") {
-	orientation = "down",
-	padding = 25,
 }
 
 ui.style("credits.line") {

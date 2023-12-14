@@ -13,22 +13,23 @@
 // --- Tooltip ---------------------------------------------------------------------------------------
 
 libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
+	(void) ui;
 	libv::ui::PanelLine card{"Tooltip"};
 	libv::ui::PanelLine line{"TooltipLine"};
 	card.style("tooltip.card");
 	line.style("tooltip.line");
 
-	libv::ui::Button button;
+	libv::ui::Button button1;
 	{
-		button.text("«Nothing is true; everything is permitted»\n"
+		button1.text("«Nothing is true; everything is permitted»\n"
 				 "\n"
 				 "Most of the important things in the world have been accomplished by people who\n"
 				 "have kept on trying when there seemed to be no hope at all.");
-		button.align_horizontal(libv::ui::AlignHorizontal::center);
-		button.align_vertical(libv::ui::AlignVertical::center);
-		button.font_color({1, 0.5, 0.5, 1});
+		button1.align_horizontal(libv::ui::AlignHorizontal::center);
+		button1.align_vertical(libv::ui::AlignVertical::center);
+		button1.font_color({1, 0.5, 0.5, 1});
 		//lbl.font_size(120);
-		button.style("tooltip.button1");
+		button1.style("tooltip.button1");
 	}
 	libv::ui::Button button2;
 	{
@@ -49,7 +50,7 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 		tooltip.align_vertical(libv::ui::AlignVertical::center);
 		tooltip.font_color({1, 1, 1, 1});
 		tooltip.show(false);
-		button.show_tooltip(tooltip);
+		button1.show_tooltip(tooltip);
 	}
 
 	auto tooltip2 = libv::ui::Label::nsa("tooltip2", "tooltip.tooltip01", "Tooltip2 text");
@@ -61,7 +62,8 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 		button2.show_tooltip(tooltip2);
 	}
 
-	button.event().mouse_movement.connect([tooltip](libv::ui::Button& button, libv::ui::EventMouseMovement event) mutable {
+	button1.event().mouse_movement.connect([tooltip](libv::ui::Button& button, libv::ui::EventMouseMovement event) mutable {
+		(void) button;
 		// libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 1 enter: {}, leave: {}", event.enter, event.leave);
 		if(event.enter)
 			tooltip.show(true);
@@ -70,6 +72,7 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 	});
 
 	button2.event().mouse_movement.connect([tooltip2](libv::ui::Button& button, libv::ui::EventMouseMovement event) mutable {
+		(void) button;
 		// libv::ui::log_ui.fatal_if(event.enter || event.leave, "tooltip 2 enter: {}, leave: {}", event.enter, event.leave);
 		if(event.enter)
 			tooltip2.show(true);
@@ -79,7 +82,7 @@ libv::ui::Component createTabTooltip(libv::ui::UI& ui) {
 
 	line.spacing(10);
 
-	line.add(button);
+	line.add(button1);
 	line.add(button2);
 	card.add(std::move(line));
 	card.add_a<libv::ui::Label>("Text");

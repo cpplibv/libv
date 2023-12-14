@@ -16,10 +16,6 @@ Star - System integration demo
 
 
 
-libv.ui: layout bug:
-	info-bar time speed control buttons
-	size 50pxD, D = height correct
-	size 50px, D = height incorrect
 
 libv.ui: "Non-focusable" "kind of" components
 		if it was used with mouse in a canvas it does not focus

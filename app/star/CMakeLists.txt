@@ -135,7 +135,6 @@ wish_resource_mapping(
 		# Testing only
 		RESOURCE @/res/texture/stripes_border.png
 		RESOURCE @/res/texture/hexagon_metal_0001_diffuse.dds
-		RESOURCE @/res/texture/cube_AmbienceExposure4k.dds
 		RESOURCE @/res/model/building_delnan_16P_tex.0038_med.game.vm4
 		RESOURCE @/res/model/fighter_01_eltanin.vm4
 		RESOURCE @/res/model/test_sphere.vm4

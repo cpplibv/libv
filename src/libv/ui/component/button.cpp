@@ -90,26 +90,26 @@ void CoreButton::doStyle(StyleAccess& access) {
 	access.self(*this);
 }
 
-libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {
+libv::vec2f CoreButton::doLayout1(const ContextLayout1& layoutEnv) {
 	const auto dynamic_size_text = text_.measure_content_size(
-				xy(environment.size) - padding_size(),
+				layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size()),
 				property.font(), property.font_size()
 			) + padding_size();
 
-//	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
+//	const auto dynamic_size_text = text_.content(layoutEnv.size - padding_size()) + padding_size();
 //	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
 //	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
-	return {dynamic_size_text, 0.f};
+	return dynamic_size_text;
 }
 
-void CoreButton::doLayout2(const ContextLayout2& environment) {
-	text_.invalidateLayout2(xy(environment.size) - padding_size());
-//	text_.layout(xy(environment.size) - padding_size(), property.font(), property.font_size(), property.align_horizontal(), property.align_vertical());
+void CoreButton::doLayout2(const ContextLayout2& layoutEnv) {
+	text_.invalidateLayout2(layoutEnv.size - padding_size());
+//	text_.layout(layoutEnv.size - padding_size(), property.font(), property.font_size(), property.align_horizontal(), property.align_vertical());
 }
 
 void CoreButton::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), *this);
+	property.background().render(r, {0, 0}, layout_size(), *this);
 
 	r.text(padding_LB(),
 //			text_.vertices_data(),
