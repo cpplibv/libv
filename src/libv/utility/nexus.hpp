@@ -40,6 +40,7 @@ public:
 	using object_ptr = void*;
 
 private:
+	// TODO P2: Replace with intrusive2_ptr
 	std::shared_ptr<ImplNexus> self;
 
 public:

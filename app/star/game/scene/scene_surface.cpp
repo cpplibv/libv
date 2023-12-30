@@ -46,6 +46,7 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <star/log.hpp>
 #include <star/game/control/time_control.hpp>
+#include <star/game/control/requests.hpp>
 
 
 // <<< Improve the following re includes:
@@ -66,6 +67,10 @@
 // Testing / debugging only:
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ctrl/feature_register.hpp>
+
+#include <libv/ui/component/toggle_button.hpp>
+
+#include <libv/ui/context/context_event.hpp>
 
 
 namespace star {
@@ -93,23 +98,48 @@ namespace star {
 
 struct Surface {
 	libv::re::Scene_ptr scene;
+	libv::re::Skybox_ptr skybox;
 	std::vector<libv::re::Node_ptr> balls;
+	libv::re::Node_ptr centerBall;
 	// Terrain, Buildings, Enviroment, etc
 
 	explicit Surface(const libv::re::Scene_ptr& scene) :
 		scene(scene) {
+		skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/epping_forest_01_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		scene->add(skybox);
+
 		const auto meshBall = libv::re::MeshSphere::create(12);
 		const auto materialBall = libv::re::MaterialSolid::create(libv::vec4f{0.5f, 0.25f, 0.25f, 1.f});
+		balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{+10, 0, 0}, libv::quatf::identity(), libv::vec3f::one(1.f)}, materialBall, meshBall));
 		balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{+5, 0, 0}, libv::quatf::identity(), libv::vec3f::one(1.f)}, materialBall, meshBall));
-		balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{ 0, 0, 0}, libv::quatf::identity(), libv::vec3f::one(3.f)}, materialBall, meshBall));
+		centerBall = balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{ 0, 0, 0}, libv::quatf::identity(), libv::vec3f::one(3.f)}, materialBall, meshBall));
 		balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{-5, 0, 0}, libv::quatf::identity(), libv::vec3f::one(1.f)}, materialBall, meshBall));
+		balls.emplace_back(libv::re::Object::create(libv::re::Transform{libv::vec3f{-10, 0, 0}, libv::quatf::identity(), libv::vec3f::one(1.f)}, materialBall, meshBall));
 
 		for (const auto& ball : balls)
 			scene->add(ball);
 	}
+
+	void update(float timeSim) {
+		centerBall->transform.position.y = std::sin(timeSim) * 2.f;
+	}
+
+	// void nextSky() {
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds"));
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+	// }
+
 	~Surface() {
 		for (const auto& ball : balls)
 			scene->remove(ball);
+		scene->remove(skybox);
 	}
 };
 
@@ -126,9 +156,6 @@ public:
 	Surface surface{scene};
 	TimeControl timeControl;
 
-	// Render
-	libv::re::Skybox_ptr skybox;
-
 	// UI
 	libv::ui::Label parentLabel;
 
@@ -137,6 +164,7 @@ public:
 
 public:
 	explicit CanvasSurface(libv::Nexus& nexus, libv::ctrl::Controls& controls, libv::ui::Label parentLabel) :
+		timeControl(nexus),
 		parentLabel(std::move(parentLabel)) {
 		// controls(controls) {
 		(void) nexus;
@@ -151,17 +179,6 @@ public:
 		// ControllerOrbit controller(camera, canvas);
 
 		scene->add(libv::re::EditorGrid::create());
-		skybox = libv::re::Skybox::create(
-				// libv::r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds")));
-				// libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular));
-				// libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular));
-				// libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY));
-				// libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY));
-				// libv::r.texture.load_async("texture/sky/snowy_river_valley_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular));
-				// libv::r.texture.load_async("texture/sky/snowy_river_valley_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular));
-				// libv::r.texture.load_async("texture/sky/snowy_river_valley_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY));
-				libv::r.texture.load_async("texture/sky/snowy_river_valley_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		scene->add(skybox);
 
 		//Debug gizmo: Coordinates text: renderer.text.add_debug_coordinates
 		//Debug gizmo: Camera orbit point: renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
@@ -230,9 +247,14 @@ private:
 		// skybox->intensity(2.0f + 2.0f * std::sin(timeControl.timeSim.count() * 0.5f));
 		// skybox->rotateZ(std::sin(timeControl.timeSim.count() * 0.1f));
 
-		parentLabel.text(fmt::format("Canvas: paused {}", timeControl.paused));
+		if (timeControl.paused)
+			parentLabel.text(fmt::format("Canvas: paused"));
+		else
+			parentLabel.text(fmt::format("Canvas: x{}", timeControl.simulationSpeed()));
 		// if (rotate)
 		// 	camera->tmpCameraPlayer.orbit_yaw(static_cast<float>(timeDelta.count()) * libv::tau * 0.01f);
+
+		surface.update(timeControl.timeSim.count());
 	}
 	virtual void render(libv::glr::Queue& glr) override {
 		// NOTE: screen_picker update has to be placed around render, as canvas_size is only set after layout
@@ -254,57 +276,62 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] libv::ui::Component createInfoBar(libv::Nexus& nexus) {
-	(void) nexus;
-	// auto& controls = libv::ui::requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls");
-
-	// auto layers = libv::ui::PanelAnchor::n("layers");
-	// auto label1 = libv::ui::Label::s("surface.menu.label");
-
+[[nodiscard]] libv::ui::Component createInfoBar(libv::Nexus& nexus, TimeControl& timeControl) {
 	auto panel = libv::ui::PanelLine::ns("info-bar", "game.info-bar.panel");
+	const void* slot = panel.ptr();
+	panel.event().detach.connect_system([nexus, slot] mutable {
+		nexus.disconnect_slot_all(slot);
+	});
+
+	const auto timeEvent = [&]<typename Req, typename Cmd>(libv::ui::ToggleButton& btn, Req req, Cmd cmd) {
+		btn.event().submit.connect([nexus, &timeControl, req](const libv::ui::EventSubmit& event) {
+			timeControl.request(req);
+			event.reject_submit();
+		});
+		nexus.connect_channel_and_call<Cmd>(&timeControl, slot, [btn, cmd](const Cmd& event) mutable {
+			btn.select_silent(event == cmd);
+		}, timeControl.currentCommandTimeSpeed());
+	};
+
 	{
 		auto leftLine = panel.add_s<libv::ui::PanelLine>("game.info-bar.group");
 		{
 			auto lbl0 = leftLine.add_sa<libv::ui::Label>("game.info-bar.label", "Left");
-			// !!! Toggle buttons and button groups
-			auto btnPause = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.pause", "][");
-			// btnPause.event().submit.connect([] {
-			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{0});
-			// });
-			auto btnX1 = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.speed", "x1");
-			// btnX1.event().submit.connect([] {
-			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{1});
-			// });
-			auto btnX2 = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.speed", "x2");
-			// btnX2.event().submit.connect([] {
-			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{2});
-			// });
-			auto btnX4 = leftLine.add_sa<libv::ui::Button>("game.info-bar.time.speed", "x4");
-			// btnX4.event().submit.connect([] {
-			// 	nexus.broadcast_channel(gameChannel, RequestTimeControl{4});
-			// });
+
+			auto btnPause = leftLine.add_sa<libv::ui::ToggleButton>("game.info-bar.time.pause", "[II]", "II");
+			auto btnSpeed1 = leftLine.add_sa<libv::ui::ToggleButton>("game.info-bar.time.speed", "[1]", "1");
+			auto btnSpeed2 = leftLine.add_sa<libv::ui::ToggleButton>("game.info-bar.time.speed", "[2]", "2");
+			auto btnSpeed3 = leftLine.add_sa<libv::ui::ToggleButton>("game.info-bar.time.speed", "[4]", "4");
+			timeEvent(btnPause, RequestTimeTogglePause{}, CommandTimeSpeed{0});
+			timeEvent(btnSpeed1, RequestTimeSpeed{1}, CommandTimeSpeed{1});
+			timeEvent(btnSpeed2, RequestTimeSpeed{2}, CommandTimeSpeed{2});
+			timeEvent(btnSpeed3, RequestTimeSpeed{3}, CommandTimeSpeed{3});
 		}
 		auto gap = panel.add_s<libv::ui::Gap>("game.info-bar.gap");
 		auto rightLine = panel.add_s<libv::ui::PanelLine>("game.info-bar.group");
 		{
 			auto lbl0 = rightLine.add_sa<libv::ui::Label>("game.info-bar.label", "Right");
-
 		}
 	}
-	// // auto label1 = line.add_s<libv::ui::Label>("surface.menu.label");
-	// line.add(label1);
-	// auto input = line.add_s<libv::ui::InputField>("surface.menu.label");
-	// input.text("Test input field");
-	// auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
-	// btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-	// 	libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
-	// });
 
 	return panel;
 }
 
 struct SceneSurface {
-	std::string some_data;
+	std::string someData;
+
+	[[nodiscard]] libv::ui::PanelLine createMenu(libv::Nexus& nexus) const {
+		auto line = libv::ui::PanelLine::ns("menu-line", "surface.menu.line");
+		auto noop = line.add_sa<libv::ui::Button>("surface.menu.button", "Does nothing");
+		auto label0 = line.add_sa<libv::ui::Label>("surface.menu.label", "Surface: " + someData);
+		auto input = line.add_s<libv::ui::InputField>("surface.menu.label");
+		input.text("Test input field");
+		auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
+		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
+			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
+		});
+		return line;
+	}
 
 	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) const {
 		auto& controls = libv::ui::requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls");
@@ -323,18 +350,10 @@ struct SceneSurface {
 				self.object().disableControls(controls);
 		});
 
-		layers.add(createInfoBar(nexus));
-		auto line = layers.add_ns<libv::ui::PanelLine>("menu-line", "surface.menu.line");
-		auto noop = line.add_sa<libv::ui::Button>("surface.menu.button", "Does nothing");
-		auto label0 = line.add_sa<libv::ui::Label>("surface.menu.label", "Surface: " + some_data);
-		// auto label1 = line.add_s<libv::ui::Label>("surface.menu.label");
-		line.add(label1);
-		auto input = line.add_s<libv::ui::InputField>("surface.menu.label");
-		input.text("Test input field");
-		auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
-		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
-		});
+		layers.add(createInfoBar(nexus, canvas.object().timeControl));
+		auto menu = createMenu(nexus);
+		menu.add(label1, 0);
+		layers.add(menu);
 
 		return layers;
 	}
@@ -343,43 +362,6 @@ struct SceneSurface {
 libv::ui::Component createSceneSurface(libv::Nexus& nexus) {
 	return libv::ui::createScene<SceneSurface>("Some data passed to Surface scene")(nexus);
 }
-
-// struct SceneInGame {
-// 	std::string some_data;
-//	TimeControl timeControl;
-//
-// 	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) const {
-// 		auto& controls = libv::ui::requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls");
-//
-// 		auto layers = libv::ui::PanelAnchor::n("layers");
-//
-// 		auto canvas = layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas", nexus, controls);
-// 		canvas.z_index_offset(-100);
-// 		canvas.event().focus.connect([&controls](libv::ui::CanvasAdaptorT<CanvasSurface>& self, const libv::ui::EventFocus& event) {
-// 			log_star.trace("Surface Canvas Focus: {}", event.gain());
-//
-// 			if (event.gain())
-// 				self.object().enableControls(controls);
-// 			else
-// 				self.object().disableControls(controls);
-// 		});
-//
-// 		auto line = layers.add_ns<libv::ui::PanelLine>("menu-line", "surface.menu.line");
-// 		auto label = line.add_sa<libv::ui::Label>("surface.menu.label", "Surface: " + some_data);
-// 		auto input = line.add_s<libv::ui::InputField>("surface.menu.label");
-// 		input.text("Test input field");
-// 		auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
-// 		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
-// 			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
-// 		});
-//
-// 		return layers;
-// 	}
-// };
-//
-// libv::ui::Component createSceneInGame(libv::Nexus& nexus) {
-// 	return libv::ui::createScene<SceneInGame>("Some data passed to InGame scene")(nexus);
-// }
 
 // -------------------------------------------------------------------------------------------------
 

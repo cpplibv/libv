@@ -38,8 +38,8 @@ public:
 
 	[[nodiscard]] libv::vec2f minusOneIfUnlimited(libv::vec2f limit_) const {
 		return {
-			unlimited.x ? -1.f : limit_.x,
-			unlimited.y ? -1.f : limit_.y,
+			unlimited.x ? -1.f : std::max(limit_.x, 0.f),
+			unlimited.y ? -1.f : std::max(limit_.y, 0.f),
 		};
 	}
 };

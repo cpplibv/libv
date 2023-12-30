@@ -4,6 +4,7 @@
 
 // fwd
 #include <libv/ui/fwd.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 // std
 #include <memory>
 
@@ -26,6 +27,8 @@ public:
 	// ContextRender& render; // No need to expose render context for now
 	ContextStyle& style;
 	ContextTooltip& tooltip;
+
+	libv::Nexus& nexus;
 
 private:
 	std::unique_ptr<ImplContextUI> self;

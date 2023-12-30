@@ -17,20 +17,49 @@ Star - System integration demo
 
 
 
-libv.ui: "Non-focusable" "kind of" components
-		if it was used with mouse in a canvas it does not focus
-		but if it was focused with focus traversal it does focus
-		(or this is 2 orthogonal option)
-
-libv.ui: If focused component receives a not interesting event
-		but there is an active canvas who would react to it
-		then auto change focus to the canvas.
-		This is really tricky as controls and ui event systems conflict somewhat
 
 
 
 
-Implement time control with UI - controls - commands back and forth
+UI Focus
+	libv.ui: "Non-focusable" "kind of" components
+			if it was used with mouse in a canvas it does not focus
+			but if it was focused with focus traversal it does focus
+			(or this is 2 orthogonal option)
+			New concept: Focusability
+				"Active focus on mouse interaction"
+					\ onMouse: focuses the component, grabs input
+					\ onKeyboard: normal focus
+				"Passive focus on mouse interaction"
+					\ onMouse: does not focuses the component and does not grabs input, but if there is a focus traversal from keyboard it will start from this component
+					\ onKeyboard: normal focus
+				"Focusable"
+					\ onMouse/onKeyboard: normal focus
+
+	libv.ui: If focused component receives a not interesting event
+			but there is an active canvas who would react to it
+			then auto change focus to the canvas.
+			This is really tricky as controls and ui event systems conflict somewhat
+
+
+
+
+
+
+
+
+
+UI Layout Invalidation
+	libv.ui: If a child in panel_anchor or panel_full has not been invalidated,
+			and the bounds of the panel did not change
+			do not layout (calculate dynamic size) that component
+			(only issue if the component does have dynamic size, in this case it must be called)
+
+UI Event
+	libv.ui: Style state active gets stuck when: toggle button pressed -> mouse moved out -> mouse released
+
+
+
 
 Integration, controls, ui and controls interactions
 	camera controls

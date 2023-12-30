@@ -4,18 +4,10 @@
 #include <libv/ui/component/toggle_button.hpp>
 #include <libv/ui/component/toggle_button_core.hpp>
 // pro
-#include <libv/ui/component/component_core.hpp>
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/event/event_focus.hpp>
-#include <libv/ui/event/event_keyboard.hpp>
-#include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/property_system/property_access.hpp>
-#include <libv/ui/resource/font_2D.hpp>
-#include <libv/ui/resource/shader_font.hpp>
-#include <libv/ui/resource/shader_image.hpp>
 #include <libv/ui/style/style_state.hpp>
 
 
@@ -84,7 +76,21 @@ core_ptr ToggleButton::create_core(std::string name) {
 	return create_core_ptr<CoreType>(std::move(name));
 }
 
-bool ToggleButton::castable(libv::ui::core_ptr core) noexcept {
+core_ptr ToggleButton::create_core(std::string name, std::string text) {
+	auto p = create_core_ptr<CoreType>(std::move(name));
+	p->text_on.string(text);
+	p->text_off.string(std::move(text));
+	return p;
+}
+
+core_ptr ToggleButton::create_core(std::string name, std::string textOn, std::string textOff) {
+	auto p = create_core_ptr<CoreType>(std::move(name));
+	p->text_on.string(std::move(textOn));
+	p->text_off.string(std::move(textOff));
+	return p;
+}
+
+bool ToggleButton::castable(core_ptr core) noexcept {
 	return dynamic_cast<CoreType*>(core) != nullptr;
 }
 
@@ -111,7 +117,17 @@ const std::string& ToggleButton::text_off() const noexcept {
 }
 
 void ToggleButton::select(bool value) noexcept {
-	style_state(libv::ui::StyleState::select, value);
+	if (self().property.selection() == value)
+		return;
+	style_state(StyleState::select, value);
+	AccessProperty::manual(self(), self().property.selection, value);
+	// TODO P4: Broadcast select/submit event
+}
+
+void ToggleButton::select_silent(bool value) noexcept {
+	if (self().property.selection() == value)
+		return;
+	style_state(StyleState::select, value);
 	AccessProperty::manual(self(), self().property.selection, value);
 }
 

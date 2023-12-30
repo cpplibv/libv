@@ -40,7 +40,6 @@ void main() {
 		sampleSky = texture(textureSky, direction.xzy).rgba;
 		break;
 	case typeEquirectangular:
-//		sampleSky = texture(textureDiffuse, dirToEquirectangularUV(normalize(fragmentDirectionUnW))).rgba;
 		sampleSky = textureLod(textureDiffuse, dirToEquirectangularUV(direction), 0).rgba;
 		break;
 	}

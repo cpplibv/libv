@@ -17,6 +17,8 @@ public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "toggle";
 	[[nodiscard]] static core_ptr create_core(std::string name);
+	[[nodiscard]] static core_ptr create_core(std::string name, std::string text);
+	[[nodiscard]] static core_ptr create_core(std::string name, std::string textOn, std::string textOff);
 	[[nodiscard]] static bool castable(core_ptr) noexcept;
 
 public:
@@ -28,11 +30,17 @@ public:
 
 public:
 	void select(bool value) noexcept;
+	void select_silent(bool value) noexcept;
 	[[nodiscard]] bool select() const noexcept;
 
 	inline bool toggle() noexcept {
 		bool value = !select();
 		select(value);
+		return value;
+	}
+	inline bool toggle_silent() noexcept {
+		bool value = !select();
+		select_silent(value);
 		return value;
 	}
 };

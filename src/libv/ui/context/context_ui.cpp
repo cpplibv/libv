@@ -4,6 +4,7 @@
 #include <libv/ui/context/context_ui.hpp>
 // pro
 #include <libv/ui/ui.hpp> // Only for focus access
+#include <libv/ui/context/context_event.hpp> // To initialize the nexus reference
 
 
 namespace libv {
@@ -37,6 +38,7 @@ ContextUI::ContextUI(UI& ui,
 	resource(resource),
 	style(style),
 	tooltip(tooltip),
+	nexus(event.nexus),
 	self(std::make_unique<ImplContextUI>(ui)) {
 }
 
