@@ -122,8 +122,8 @@ void Combination::normalize() {
 	}
 
 	// Fixing not valid inputs
-	// TODO P2: libv.control: During normalization throw out invalid inputs
-	// TODO P5: libv.control: Attempt to fix invalid input combination, but only if there is client consent
+	// TODO P2: libv.ctrl: During normalization throw out invalid inputs
+	// TODO P5: libv.ctrl: Attempt to fix invalid input combination, but only if there is client consent
 
 	// Sort inputs
 	std::sort(inputs.begin(), inputs.end());

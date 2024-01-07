@@ -24,7 +24,7 @@ auto validate(std::string_view str) {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Sequence validation", "[libv.control]") {
+TEST_CASE("Sequence validation", "[libv.ctrl]") {
 	CHECK(validate("A") == validation_result::success);
 	CHECK(validate("A, A [hold]") == validation_result::success);
 

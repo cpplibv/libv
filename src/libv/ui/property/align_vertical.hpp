@@ -38,7 +38,7 @@ private:
 public:
 	explicit(false) constexpr inline AlignVertical_type(enum_type value) noexcept :
 		enum_value_(value) {
-		assert(underlying() >= 0 && underlying() < 5);
+		assert(static_cast<underlying_type>(enum_value_) >= 0 && static_cast<underlying_type>(enum_value_) < 5);
 	}
 
 	explicit(false) constexpr inline operator enum_type() const noexcept {

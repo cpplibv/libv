@@ -22,6 +22,7 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
 #include <libv/utility/timer.hpp>
+// std
 #include <optional>
 // pro
 #include <star/game/config/client_config.hpp>
@@ -48,13 +49,13 @@
 
 
 namespace star {
+
 // -------------------------------------------------------------------------------------------------
 
 struct ImplGameClient {
 	libv::Nexus nexus_;
 
-	//	libv::mt::worker_thread scheduler_{"scheduler"};
-	//	GameThread game_thread{ui, nexus};
+	//	Scheduler scheduler{"client-scheduler"};
 
 	//	Config<ClientConfigGroup> config_;
 	//	ConfigManager configManager{scheduler_, nexus_};
@@ -63,6 +64,7 @@ struct ImplGameClient {
 	//	std::shared_ptr<ClientConfig> configManager{scheduler_, nexus_};
 	//	auto config = star::ClientConfig::loadFromJSON(scheduler, nexus, libv::read_file_or_throw(arg_config.value()));
 	std::shared_ptr<ClientConfig> config_;
+
 	//	User user;
 	libv::ctrl::Controls controls;
 
@@ -98,6 +100,7 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	register_renderLibrary();
 
 	self->ui.attach(self->frame);
+	self->ui.attachControls(self->controls);
 	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/main.lua")));
 	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/surface.lua")));
 
@@ -119,8 +122,10 @@ void GameClient::register_controls() {
 	libv::sun::CameraControl::bind_default_controls(self->controls, 1);
 	TimeControl::register_controls(self->controls);
 	TimeControl::bind_default_controls(self->controls);
-//	CanvasControl::register_controls(controls);
-//	CanvasControl::bind_default_controls(controls);
+//	SurfaceControl::register_controls(controls);
+//	SurfaceControl::bind_default_controls(controls);
+//	StarMapControl::register_controls(controls);
+//	StarMapControl::bind_default_controls(controls);
 
 	self->ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
 		log_star.info("Controls intercepted: {}", event.controls_intercepted());
@@ -128,7 +133,7 @@ void GameClient::register_controls() {
 		self->controls.ignore_events(event.controls_intercepted());
 	});
 
-	self->controls.attach(self->frame);
+	// self->controls.attach(self->frame);
 }
 
 void GameClient::register_nexus() {

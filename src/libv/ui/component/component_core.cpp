@@ -5,6 +5,7 @@
 // pro
 #include <libv/ui/component_system/core_ptr.hpp>
 #include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_focus.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -157,20 +158,18 @@ void CoreComponent::watchKey(bool value) noexcept {
 
 void CoreComponent::watchFocus(bool value) noexcept {
 	if (value) {
-		flagAuto(Flag::focusable | Flag::watchFocus);
-		return;
-	}
+		flagAuto(Flag::focusable);
+	} else {
+		if (!flags.match_any(Flag::focusableSelf))
+			return;
 
-	if (!flags.match_any(Flag::focusableSelf))
-		return;
+		if (flags.match_mask(Flag::focusableChild))
+			flags.reset(Flag::focusableSelf); // There is a child with focusable, no need to purge flag
+		else
+			flagPurge(Flag::focusable);
 
-	if (flags.match_mask(Flag::focusableChild))
-		flags.reset(Flag::focusableSelf | Flag::watchFocus); // There is a child with focus, no need to purge flag
-	else
-		flagPurge(Flag::focusable | Flag::watchFocus);
-
-	if (isAttached() && flags.match_any(Flag::focused)) {
-		ui().detachFocused(*this);
+		if (isAttached() && flags.match_any(Flag::focused))
+			ui().focus.detachFocused(*this);
 	}
 }
 
@@ -217,7 +216,7 @@ bool CoreComponent::isWatchKey() const noexcept {
 }
 
 bool CoreComponent::isWatchFocus() const noexcept {
-	return flags.match_any(Flag::watchFocus);
+	return flags.match_any(Flag::focusableSelf);
 }
 
 bool CoreComponent::isWatchMouse() const noexcept {
@@ -291,7 +290,7 @@ bool CoreComponent::enable() const noexcept {
 	return !flags.match_any(Flag::disabled);
 }
 
-void CoreComponent::focus() noexcept {
+void CoreComponent::focus(FocusMode mode) noexcept {
 	// Note: focus has to be sync to allow correct event processing
 	if (!isAttached())
 		log_ui.error("Attempted to focus a non-attached component. Attempt ignored. {}", path());
@@ -300,7 +299,7 @@ void CoreComponent::focus() noexcept {
 		log_ui.error("Attempted to focus a non-focusable component. Attempt ignored. {}", path());
 
 	else
-		ui().focus(*this);
+		ui().focus.focus(*this, mode);
 }
 
 void CoreComponent::markRemove() noexcept {
@@ -431,24 +430,28 @@ void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
 	}
 }
 
-void CoreComponent::focusGain(CoreComponent& component) {
-	if (!component.flags.match_any(Flag::watchFocus))
+void CoreComponent::focusGain(CoreComponent& component, bool active) {
+	if (!component.flags.match_any(Flag::focusableSelf))
 		return;
 
 	component.flags.set(Flag::focused);
-	const auto event = EventFocus(true);
-	component.onFocus(event);
-	component.fire(event);
+	if (active) {
+		const auto event = EventFocus(true);
+		component.onFocus(event);
+		component.fire(event);
+	}
 }
 
-void CoreComponent::focusLoss(CoreComponent& component) {
-	if (!component.flags.match_any(Flag::watchFocus))
+void CoreComponent::focusLoss(CoreComponent& component, bool active) {
+	if (!component.flags.match_any(Flag::focusableSelf))
 		return;
 
 	component.flags.reset(Flag::focused);
-	const auto event = EventFocus(false);
-	component.onFocus(event);
-	component.fire(event);
+	if (active) {
+		const auto event = EventFocus(false);
+		component.onFocus(event);
+		component.fire(event);
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -560,10 +563,11 @@ void CoreComponent::detach() {
 	if (flags.match_any(Flag::floatRegion))
 		ui().mouse.unsubscribe_region(*this);
 
-	if (flags.match_any(Flag::focused)) {
+	if (flags.match_any(Flag::focusable))
 		flagPurge(Flag::focusable);
-		ui().detachFocused(*this);
-	}
+
+	if (flags.match_any(Flag::focused))
+		ui().focus.detachFocused(*this);
 
 //	if (flags.match_any(Flag::focusLinked))
 //		uixt().detachFocusLinked(*this);

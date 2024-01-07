@@ -2,16 +2,14 @@
 
 #pragma once
 
-// fwd
 #include <libv/ui/fwd.hpp>
-// ext
-#include <boost/container/flat_set.hpp>
-// libv
+#include <libv/ui/chrono.hpp>
+#include <libv/ui/context/context_ui.hpp> // IWYU pragma: export // For convenience
+
+#include <libv/container/flat_set.hpp>
+
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/memory/observer_ptr.hpp>
-// pro
-#include <libv/ui/chrono.hpp>
 
 
 namespace libv {
@@ -36,11 +34,9 @@ class ContextState {
 
 	bool mouse_over_ = false; /// Mouse is over the frame content area
 
-	boost::container::flat_set<libv::input::Keycode> pressed_keys;
-	boost::container::flat_set<libv::input::Scancode> pressed_scancodes;
-	boost::container::flat_set<libv::input::MouseButton> pressed_mouses;
-
-	libv::observer_ptr<CoreComponent> focus_ = nullptr;
+	libv::flat_set<libv::input::Keycode> pressed_keys;
+	libv::flat_set<libv::input::Scancode> pressed_scancodes;
+	libv::flat_set<libv::input::MouseButton> pressed_mouses;
 
 	// TODO P4: libv.ui: modifier lock keys: caps-lock, num-lock, scroll-lock
 	// TODO P4: libv.ui: pressed timestamps (?)
@@ -113,11 +109,6 @@ public:
 
 	[[nodiscard]] inline bool mouse_released(libv::input::MouseButton key) const noexcept {
 		return not pressed_mouses.contains(key);
-	}
-
-public:
-	[[nodiscard]] constexpr inline libv::observer_ptr<CoreComponent> focus() const noexcept {
-		return focus_;
 	}
 };
 

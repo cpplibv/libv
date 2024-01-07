@@ -3,7 +3,7 @@
 #pragma once
 
 // fwd
-#include <libv/math/vec_fwd.hpp>
+#include <libv/math/vec_fwd.hpp> // IWYU pragma: export
 // ext
 #include <libv/fwd/ext/fmt_fwd.hpp>
 // libv

@@ -2,10 +2,7 @@
 
 #pragma once
 
-// libv
-#include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/memory/observer_ref.hpp>
 
 
 namespace libv {
@@ -13,20 +10,46 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreComponent;
-
-struct ContextFocusTraverse {
-	degrees<float> direction;
-	// libv::vec3f direction;
+class ContextFocusTraverse {
+public:
+	bool forward = true;
+	bool backward = false;
+	libv::vec2f direction;
 
 public:
-	constexpr inline bool isForward() const noexcept {
-		return degrees<float>(45).value > direction.value || direction.value >= degrees<float>(225).value;
+	[[nodiscard]] static ContextFocusTraverse makeForward() {
+		return {true, false, {1.f, 0.f}};
+	}
+	[[nodiscard]] static ContextFocusTraverse makeBackward() {
+		return {false, true, {-1.f, 0.f}};
+	}
+	[[nodiscard]] static ContextFocusTraverse makeDirection(libv::vec2f dir) {
+		const auto forwardLike = dir.x - dir.y > 0.f;
+		return {forwardLike, !forwardLike, dir};
 	}
 
-	constexpr inline bool isBackward() const noexcept {
-		return degrees<float>(45).value <= direction.value && direction.value < degrees<float>(225).value;
+public:
+	[[nodiscard]] constexpr inline bool isForward() const noexcept {
+		return forward;
 	}
+
+	[[nodiscard]] constexpr inline bool isBackward() const noexcept {
+		return backward;
+	}
+
+// private:
+// 	mutable bool focus_rejected_ = false; // Only relevant on focus gain
+//
+// public:
+// 	explicit constexpr inline ContextEventFocus(bool focus) noexcept : EventFocus(focus) { }
+//
+// 	constexpr inline void reject_focus() const noexcept {
+// 		focus_rejected_ = true;
+// 	}
+//
+// 	[[nodiscard]] constexpr inline bool focus_rejected() const noexcept {
+// 		return focus_rejected_;
+// 	}
 };
 
 // -------------------------------------------------------------------------------------------------

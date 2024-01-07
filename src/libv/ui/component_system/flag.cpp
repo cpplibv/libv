@@ -42,7 +42,7 @@ std::string to_string(Flag_t flags) {
 	if (flags.match_any(Flag::focusableSelf)) os << "focusableSelf,";
 	if (flags.match_any(Flag::watchChar)) os << "watchChar,";
 	if (flags.match_any(Flag::watchKey)) os << "watchKey,";
-	if (flags.match_any(Flag::watchFocus)) os << "watchFocus,";
+	// if (flags.match_any(Flag::watchFocus)) os << "watchFocus,";
 	if (flags.match_any(Flag::watchMouse)) os << "watchMouse,";
 	if (flags.match_any(Flag::floatRegion)) os << "floatRegion,";
 //	if (flags.match_any(Flag::focusLinked)) os << "focusLinked,";

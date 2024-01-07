@@ -9,9 +9,8 @@
 #include <libv/input/event.hpp>
 #include <libv/lua/lua.hpp>
 #include <libv/math/remap.hpp>
+#include <libv/mt/queue_concurrent.hpp>
 #include <libv/utility/histogram.hpp>
-#include <libv/utility/memory/observer_ptr.hpp>
-#include <libv/utility/memory/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
@@ -28,7 +27,8 @@
 #include <libv/ui/component/overlay/overlay_tooltip.hpp>
 #include <libv/ui/component/overlay/overlay_zoom.hxx>
 #include <libv/ui/component/panel_anchor.hpp>
-#include <libv/ui/component/panel_full.hpp>
+#include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_focus.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
@@ -103,7 +103,11 @@ public:
 			libv::input::EventMouseButton,
 			libv::input::EventMouseEnter,
 			libv::input::EventMousePosition,
-			libv::input::EventMouseScroll
+			libv::input::EventMouseScroll,
+			libv::input::EventGamepadAnalog,
+			libv::input::EventGamepadButton,
+			libv::input::EventJoystickButton,
+			libv::input::EventJoystickAnalog
 	>;
 
 public:
@@ -113,6 +117,7 @@ public:
 	UI& ui;
 	Settings settings;
 
+	ContextFocus context_focus;
 	ContextEvent context_event;
 	ContextMouse context_mouse;
 	ContextState context_state;
@@ -121,16 +126,16 @@ public:
 	ContextStyle context_style;
 	ContextTooltip context_tooltip;
 
-	ContextUI context_ui{ui, settings, context_event, context_mouse, context_state, context_resource, context_style, context_tooltip};
+	ContextUI context_ui{context_event.nexus, settings, context_focus, context_event, context_mouse, context_state, context_resource, context_style, context_tooltip};
 	bool context_render_created = false;
 
 public:
+	std::unique_ptr<UnhandledInputEventHandler> controls;
 	std::vector<EventVariant> event_queue;
 	std::mutex event_queue_m;
 
 public:
-	std::vector<std::function<void()>> loop_tasks;
-	std::mutex loop_tasks_m;
+	libv::mt::queue_concurrent<std::function<void()>> loop_tasks;
 
 public:
 	libv::fsw::Watcher fsw;
@@ -149,7 +154,6 @@ public:
 
 //	bool overlayCursorEnable = false;
 //	std::shared_ptr<OverlayCursor> overlayCursor = std::make_shared<OverlayCursor>(root);
-
 //	std::shared_ptr<OverlayPref> overlayPref = std::make_shared<OverlayPref>(root);
 //	std::shared_ptr<OverlayStack> overlayStack = std::make_shared<OverlayStack>(root);
 
@@ -161,57 +165,26 @@ public:
 		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
 		root((current_thread_context(context_ui), "")) {
 
-		// Delayed initialization necessary because context_tooltip contains a Component, and it requires the contexts
-		context_tooltip.init();
+		// Delayed context initialization
+		context_focus.init(&root.core()); // sometimes has to (re)start the focus traversal from the root
+		context_tooltip.init(); // contains a Component, and it requires the contexts
 
+		// Overlays
 		root.add(context_tooltip.overlay());
 	}
 
 	~ImplUI() {
+		// context_tooltip.terminate();
+
 		clear_current_thread_context();
 	}
 
 public:
-	void focus(libv::observer_ptr<CoreComponent> old_focus, libv::observer_ptr<CoreComponent> new_focus) {
-		if (new_focus == old_focus)
-			return;
-
-		if (old_focus == nullptr) {
-			log_ui.trace("Focus set to: {}", new_focus->path());
-			AccessRoot::focusGain(*new_focus);
-
-		} else if (new_focus == nullptr) {
-			log_ui.trace("Focus clear from: {}", old_focus->path());
-			AccessRoot::focusLoss(*old_focus);
-
-		} else {
-			log_ui.trace("Focus set from: {} to: {}", old_focus->path(), new_focus->path());
-			AccessRoot::focusLoss(*old_focus);
-			AccessRoot::focusGain(*new_focus);
-		}
-	}
-
-	libv::observer_ptr<CoreComponent> focusTraverse(libv::observer_ptr<CoreComponent> old_focus, degrees<float> direction) {
-		ContextFocusTraverse ctx{direction};
-
-		libv::observer_ptr<CoreComponent> new_focus = nullptr;
-
-		if (old_focus != nullptr) // Traversee to next
-			new_focus = AccessRoot::focusTraverse(*old_focus, ctx);
-
-		if (new_focus == nullptr) // End reached, Loop around
-			new_focus = AccessRoot::focusTraverse(root.core(), ctx);
-
-		focus(old_focus, new_focus);
-		return new_focus;
-	}
-
-public:
 	void event(const libv::input::EventChar& event) {
-		if (context_state.focus_ == nullptr)
+		if (context_focus.current() == nullptr)
 			return;
 
-		AccessRoot::eventChar(*context_state.focus_, EventChar(event));
+		AccessRoot::eventChar(*context_focus.current(), EventChar(event));
 	}
 
 	void event(const libv::input::EventKey& event) {
@@ -239,19 +212,20 @@ public:
 			}
 		}
 
-//		if (event.key == libv::input::Key::F11 && event.action == libv::input::Action::press) {
-//			overlayCursorEnable = !overlayCursorEnable;
-//
-//			if (overlayCursorEnable)
-////				root.add(overlayZoom);
-//			else
-////				root.remove(overlayZoom);
-//
-//			log_ui.info("Switch overlay mode: {} to {}", "cursor", overlayCursorEnable ? "on" : "off");
-//		}
+		// if (event.key == libv::input::Key::F11 && event.action == libv::input::Action::press) {
+		// 	overlayCursorEnable = !overlayCursorEnable;
+		// 	log_ui.info("Switch overlay mode: {} to {}", "cursor", overlayCursorEnable ? "on" : "off");
+		//
+		// 	if (overlayCursorEnable)
+		// 		root.add(overlayCursor);
+		// 	else
+		// 		root.remove(overlayCursor);
+		// }
 
-		if (context_state.focus_ != nullptr)
-			AccessRoot::eventKey(*context_state.focus_, EventKey(event));
+		EventKey uiEvent{event};
+		if (context_focus.current() != nullptr)
+			AccessRoot::eventKey(*context_focus.current(), uiEvent);
+		const auto eventHandled = uiEvent.propagation_stopped();
 
 		if (event.action != libv::input::Action::release) {
 			context_state.pressed_keys.insert(event.keycode);
@@ -260,14 +234,22 @@ public:
 			context_state.pressed_keys.erase(event.keycode);
 			context_state.pressed_scancodes.erase(event.scancode);
 		}
+
+		if (!eventHandled)
+			if (controls)
+				controls->event(event, eventHandled);
 	}
 
 	void event(const libv::input::EventMouseButton& event) {
-		context_mouse.event_button(event.button, event.action);
+		const auto eventHandled = context_mouse.event_button(event.button, event.action);
 		if (event.action != libv::input::Action::release)
 			context_state.pressed_mouses.insert(event.button);
 		else
 			context_state.pressed_mouses.erase(event.button);
+
+		if (!eventHandled)
+			if (controls)
+				controls->event(event, eventHandled);
 	}
 
 	void event(const libv::input::EventMouseEnter& event) {
@@ -287,14 +269,42 @@ public:
 			// Floor is used as mouse position are in pixel center coordinates
 			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.layout_size(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
 
-		context_mouse.event_position(position);
+		const auto eventHandled = context_mouse.event_position(position);
 		context_state.mouse_position_ = position;
+
+		if (!eventHandled)
+			if (controls)
+				controls->event(event, eventHandled);
 	}
 
 	void event(const libv::input::EventMouseScroll& event) {
 		const auto offset = libv::vec::cast<float>(event.offset);
-		context_mouse.event_scroll(offset);
+		const auto eventHandled = context_mouse.event_scroll(offset);
 		context_state.scroll_position_ = offset;
+
+		if (!eventHandled)
+			if (controls)
+				controls->event(event, eventHandled);
+	}
+
+	void event(const libv::input::EventGamepadAnalog& event) {
+		if (controls)
+			controls->event(event, false);
+	}
+
+	void event(const libv::input::EventGamepadButton& event) {
+		if (controls)
+			controls->event(event, false);
+	}
+
+	void event(const libv::input::EventJoystickButton& event) {
+		if (controls)
+			controls->event(event, false);
+	}
+
+	void event(const libv::input::EventJoystickAnalog& event) {
+		if (controls)
+			controls->event(event, false);
 	}
 
 	void create() {
@@ -367,6 +377,12 @@ public:
 					}
 				}, *current_event);
 			}
+			try {
+				if (controls)
+					controls->update(context_state.time_delta());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during event in UI: {}. Discarding time update event.", ex.what());
+			}
 
 			stat.event.sample(timer.time_ns());
 		}
@@ -382,24 +398,9 @@ public:
 
 		// --- UI loop tasks ---
 		{
-			// TODO P5: libv.mt: Usual pattern to lift the entry out of locking scope, candidate for generalization
-			//				libv.mt: queue
-			std::size_t i = 0;
-			std::function<void()> current_task;
-			while (true) {
-				{
-					std::unique_lock lock{loop_tasks_m};
-					if (i != loop_tasks.size()) {
-						current_task = std::move(loop_tasks[i]);
-						i++;
-					} else {
-						loop_tasks.clear();
-						break;
-					}
-				}
-
+			while (auto task = loop_tasks.try_pop()) {
 				try {
-					current_task();
+					(*task)();
 				} catch (const std::exception& ex) {
 					log_ui.error("Exception occurred during UI loop task execution in UI: {}", ex.what());
 				}
@@ -586,8 +587,7 @@ void UI::setSize(libv::vec2i size_) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void UI::execute_in_ui_loop(std::function<void()> func) {
-	std::unique_lock lock{self->loop_tasks_m};
-	self->loop_tasks.emplace_back(std::move(func));
+	self->loop_tasks.push(std::move(func));
 }
 
 void UI::foreach_recursive_component(libv::function_ref<void(const Component&)> func) {
@@ -659,6 +659,31 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 	self->event_queue.emplace_back(event);
 }
 
+void UI::event(const libv::input::EventGamepadAnalog& event) {
+	std::unique_lock lock{self->event_queue_m};
+	self->event_queue.emplace_back(event);
+}
+
+void UI::event(const libv::input::EventGamepadButton& event) {
+	std::unique_lock lock{self->event_queue_m};
+	self->event_queue.emplace_back(event);
+}
+
+void UI::event(const libv::input::EventJoystickButton& event) {
+	std::unique_lock lock{self->event_queue_m};
+	self->event_queue.emplace_back(event);
+}
+
+void UI::event(const libv::input::EventJoystickAnalog& event) {
+	std::unique_lock lock{self->event_queue_m};
+	self->event_queue.emplace_back(event);
+}
+
+void UI::unhandledEventHandler(std::unique_ptr<UnhandledInputEventHandler> handler) {
+	std::unique_lock lock{self->event_queue_m};
+	self->controls = std::move(handler);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 EventHostGlobal<Component> UI::event() {
@@ -711,30 +736,6 @@ void UI::update() {
 
 void UI::destroy() {
 	self->destroy();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void UI::focus(CoreComponent& component) {
-	current_thread_context(context());
-
-	self->focus(self->context_state.focus_, libv::make_observer_ptr(&component));
-	self->context_state.focus_ = libv::make_observer_ptr(&component);
-}
-
-void UI::detachFocused(CoreComponent& component) {
-	current_thread_context(context());
-
-	(void) component;
-	assert(libv::make_observer_ptr(&component) == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
-	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, degrees<float>{315});
-}
-
-void UI::detachFocusLinked(CoreComponent& component) {
-	current_thread_context(context());
-
-	(void) component;
-	assert(false && "Not yet implemented"); // TODO P5: implement focus link
 }
 
 // -------------------------------------------------------------------------------------------------

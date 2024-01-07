@@ -106,6 +106,8 @@ struct Surface {
 	explicit Surface(const libv::re::Scene_ptr& scene) :
 		scene(scene) {
 		skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/epping_forest_01_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/lago_disola_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
 		scene->add(skybox);
 
 		const auto meshBall = libv::re::MeshSphere::create(12);
@@ -120,8 +122,8 @@ struct Surface {
 			scene->add(ball);
 	}
 
-	void update(float timeSim) {
-		centerBall->transform.position.y = std::sin(timeSim) * 2.f;
+	void update(double timeSim) {
+		centerBall->transform.position.z = std::sin(static_cast<float>(timeSim)) * 2.f;
 	}
 
 	// void nextSky() {
@@ -162,13 +164,16 @@ public:
 	// State
 	bool rotate = false;
 
+	// Not so sure if stays here like this:
+	libv::ctrl::Controls& controls;
+
 public:
 	explicit CanvasSurface(libv::Nexus& nexus, libv::ctrl::Controls& controls, libv::ui::Label parentLabel) :
 		timeControl(nexus),
-		parentLabel(std::move(parentLabel)) {
+		parentLabel(std::move(parentLabel)),
+		controls(controls) {
 		// controls(controls) {
 		(void) nexus;
-		(void) controls;
 
 		// TODO P2: Proper camera control management
 		// TODO P2: Proper control management
@@ -202,30 +207,30 @@ public:
 		// controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera);
 	}
 
-public:
-	void enableControls(libv::ctrl::Controls& controls) {
+private:
+	virtual void attach() override {
+		focus(libv::ui::FocusMode::active);
 		// (void) controls;
 		// TODO P1: app.space: Should not store it (?) only to bypass controls invalidation issue
 		// libv::ctrl::Controls& controls;
 		// std::optional<ControlVar> controlVar
 
-	// 	if (!controlVar)
-	// 		// TODO P1: app.space:
-	// 		controlVar.emplace(
-	// 				*this,
-	// 				playout,
-	// 				playout.simulation->universe->galaxy,
-	// //				player,
-	// 				game_session.player
-	// 		);
-	//
-	// 	controls.context_enter<CanvasControl>(&*controlVar);
-	// 	controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
+		// 	if (!controlVar)
+		// 		// TODO P1: app.space:
+		// 		controlVar.emplace(
+		// 				*this,
+		// 				playout,
+		// 				playout.simulation->universe->galaxy,
+		// //				player,
+		// 				game_session.player
+		// 		);
+		//
+		// 	controls.context_enter<CanvasControl>(&*controlVar);
+		// 	controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 		controls.context_enter<libv::sun::BaseCameraOrbit>(&camera->tmpCameraPlayer);
 		controls.context_enter<TimeControl>(&timeControl);
 	}
-
-	void disableControls(libv::ctrl::Controls& controls) {
+	virtual void detach() override {
 		controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera->tmpCameraPlayer);
 		controls.context_leave_if_matches<TimeControl>(&timeControl);
 		// controls.context_leave_if_matches<CanvasControl>(&*controlVar);
@@ -234,11 +239,6 @@ public:
 		// auto& controls = *nexus.object_view_get<libv::ctrl::Controls>();
 		// controls.context_leave<libv::sun::BaseCameraOrbit>();
 		// controls.context_leave<SandboxState>();
-	}
-
-private:
-	virtual void attach() override {
-		focus();
 	}
 	virtual void update(libv::ui::time_duration timeDelta) override {
 		timeControl.update(timeDelta);
@@ -341,14 +341,6 @@ struct SceneSurface {
 
 		auto canvas = layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas", nexus, controls, label1);
 		canvas.z_index_offset(-100);
-		canvas.event().focus.connect([&controls](libv::ui::CanvasAdaptorT<CanvasSurface>& self, const libv::ui::EventFocus& event) {
-			log_star.trace("Surface Canvas Focus: {}", event.gain());
-
-			if (event.gain())
-				self.object().enableControls(controls);
-			else
-				self.object().disableControls(controls);
-		});
 
 		layers.add(createInfoBar(nexus, canvas.object().timeControl));
 		auto menu = createMenu(nexus);

@@ -10,7 +10,7 @@
 
 namespace lc = libv::ctrl;
 
-TEST_CASE("InputID should match any aliases", "[libv.control.inputid]") {
+TEST_CASE("InputID should match any aliases", "[libv.ctrl.inputid]") {
 
 	const auto test = [](const auto... lhs){
 		return [=](const auto... rhs){

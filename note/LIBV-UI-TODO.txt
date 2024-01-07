@@ -12,22 +12,6 @@
 
 
 
-libv.ui: Style import other lua files for common variables
-libv.ui: Style script loading should match the way other resources are loaded
-		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
-
-libv.ui: "State" property: focus-within
-libv.ui: "State" property: nth (2nd 3rd is enough for now, maybe first and last too)
-libv.ui: Slider "hover" style/state should be separate for the track and the bar
-
-Layout invalidation:
-	scroll bar change prompts layout, why? should it?
-		| it does to recache the bar position
-	Slider value change should not invalidate layout
-		(make it a float region if it must)
-		mouse context range remap might be needed!
-	libv.ui: Make sure that (only) position change does not invalidate layout
-
 
 =================================================================================================
 
@@ -40,11 +24,9 @@ Tooltip
 	libv.ui: Implement built-in support for child properties in BasePanel
 	libv.ui: Cleanup child property access in Tooltip Container
 
-Layout
-	SLC
-		libv.ui.SLC: Add anchor support
-		libv.ui.SLC: Add layers support (to support scroll pane with overlayed scroll bar)
+place.it: "Well behaved layout" flag bit could be also used for mouse events
 
+Layout
 	libv.ui: Layout2 could also use unlimited-ness like Layout1
 		unlimited in a dim = no anchor or alignment allowed in that dimension
 			\ fail gracefully, produce a warning and do the only doable anchor/alignment
@@ -52,17 +34,8 @@ Layout
 		For simplicity a viable shortcut would be to have separate unlimited line layout
 		type only for scrollable lists
 
-
- -------------------------------------------------------------------------------------------------
-
-place.it: "Well behaved layout" flag bit could be also used for mouse events
-libv.ui: Hover and focus styles state should be auto handled
-
-
-
-
-
-
+	SLC
+		libv.ui.SLC: Add anchor/layers support (to support scroll pane with overlapping scroll bar)
 
 Pagination
 		Pagination support
@@ -114,77 +87,12 @@ Pagination
 		But: Pagination != Scroll size solution
 
 
-
-
-
-
-libv.ui: Scroll pane
-	libv.ui: Implement scroll pane anchor behaviour
-			anchor = "top-left"
-
-	libv.ui: Ensure that scroll pane scrolling doent causes any layout invalidation
-		if the content of the scroll area size is Dynamic then it causes a Dynamic
-		layout query. Otherwise, its good
-
-		content background is incorrect, bc content size in incorrect
-			might be layout (-1) issue
-
-		libv.ui: Scroll speed (user setting (3 line) and discovery (which font and which size))
-				mouse scroll N line
-				should scroll pane have a dummy font and font size just so it can have a config for "3 line"
-
-
-
-
-
-
-
-
 libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
-
-
 
 
 
 ----------------------------------------------------------------------------------------------------
 
-
-libv.ui: scroll_area only the "scroll pane" area without scroll bar
-	libv.ui: scroll area layout
-	libv.ui: scroll area render
-	libv.ui: scroll area (mouse) control
-	libv.ui: (?) scroll area size should equal or inherit(upward) it's content size
-			issue: If I want a scroll plane size to be content, I have to set the plane, the area and the line
-			idea: scroll area is not a component, but a component adaptor
-				what is a component adaptor? How does it fit a component hierarchy, how does it alters the behaviours?
-	libv.ui: container in scroll area, nested rendering alters clipping and control
-	libv.ui: scroll area in scroll area, nested rendering alters clipping and control
-
-	libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
-	libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
-
-	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
-			component bounds
-			clip bounds
-			| texture: id, layer, mode, bounds
-
-	problem: composition of components to create complex components
-		issue: create/attach/foreach/traverse/etc function implementations
-		issue: pollutes component hierarchy
-		issue: nested properties
-		issue: scroll area size propagation: if content is 50% area has to be set to 50% and content to 100%, so the size rules are messed up | would be nice to not deal with this issue, but transparent wrapping
-
-libv.ui: scroll_pane = client area + scroll bars
-	libv.ui: clipping vertex shader (with on/off)
-	libv.ui: shader clip plane (scissors), (effects every ui shader)
-			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
-			| or just use a viewport call and correct the projection matrix | would not allow 3D transforms
-			| clip planes should be the most generic solution
-	libv.ui: style sub component
-	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
-	libv.ui: mouse remapping regions and/or dimension and/or hubs to handle scroll panes and windows
-
-libv.ui: Create a real scroll_bar = slider + buttons
 
 libv.ui: Improve clipping
 	libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
@@ -213,13 +121,6 @@ libv.ui: static_component system (lite)
 	libv.ui: Check on the _pastebin/legacy codes for this one
 	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 
-libv.ui: To fix property init
-		| scroll bar should not calculate any fucking layout in non layout
-		| it does it so it can process mouse event
-	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
-	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
-	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
-
 libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
 		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
 		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
@@ -239,11 +140,6 @@ properties / style
 
 
 libv.ui: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
-
-libv.ui: Allow focus not yet attached components
-libv.ui: Clicks into nothingness should clear focus
-		| True, but define nothingness first
-		| Callback/hook system for "unhandled" mouse click -> if noone would react to it -> clear focus
 
 libv.ui: Font subpixel options: OFF RGB BGR
 
@@ -297,51 +193,27 @@ libv.ui: Background fragment
 
 libv.ui: Alignment justify should not 'start' at top left but from the orientation's starting point (therefore AlignVertical rate 1.0 for justifieds are incorrect)
 
-libv.ui: Margin, Padding, Spacing and Alignment gaps
-	libv.ui: Make panel_line margin not collapsing with padding
-	libv.ui: Make panel_line alignment not considering padding region
-	libv.ui: Make panel_anchor child margin push away border if there is not enough space
-	libv.ui: padding support in every component (layout)
-			scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)
-	libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
-				panel_full 'DONE'
-				panel_line DONE
-				panel_anchor DONE
-			panel_grid
-			scroll_pane
-			scroll_area
-					label_image NO-OP
-					button NO-OP
-					check_box NO-OP
-					image NO-OP
-					input_field NO-OP
-					label NO-OP
-					quad NO-OP
-					radio_button NO-OP
-					scroll_bar NO-OP
-					stretch NO-OP
-	libv.ui: Document what Padding/Margin/Spacing is: (Maybe in a table form)
-			OUTDATED collapse rules!
-			? Interaction with border
-			Padding:
-				Part of the component but not part of the component's "content area"
-				Part of the background
-				Part of the size
-				Part of the mouse region
-				Does not collapses
-			Margin:
-				Not part of the component
-				Not part of the background (Invisible)
-				Not part of the size
-				Not part of the mouse region
-				Does collapses with neighboring Margin, Container spacing and container justify gap
-			Spacing:
-				Container mandated margin (only) between elements
-				Not part of the background (Invisible)
-				Not part of the component
-				Not part of the size
-				Not part of the mouse region
-				Does collapses with neighboring Margin, Container spacing and container justify gap
+libv.ui: Migrate grid layout to the new Margin, Padding, Spacing and Alignment formulas
+
+libv.ui: Document what Padding/Margin/Spacing is: (Maybe in a table form)
+		OUTDATED collapse rules!
+		? Interaction with border
+		Padding:
+			Part of the component but not part of the component's "content area"
+			Part of the background
+			Part of the size
+			Part of the mouse region
+		Margin:
+			Not part of the component
+			Not part of the background (Invisible)
+			Not part of the size
+			Not part of the mouse region
+		Spacing:
+			Container mandated margin (only) between elements
+			Not part of the background (Invisible)
+			Not part of the component
+			Not part of the size
+			Not part of the mouse region
 
 Cleanup / Implement
 	src/libv/ui/component/base_panel_static.*
@@ -384,37 +256,7 @@ libv.ui: Fix layout invalidation up propagation possibility (remove access to fl
 		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
 
 
---- Theme ---
-
-https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html
-table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
-        scroll.getViewportBounds().getWidth(), scroll.viewportBoundsProperty()));
-    grid.getChildren().add(imageHolder);
-
-
-
-app.theme: use event_reentry_guard in control.slider.event().change
-app.theme: create theme exporter: json and atlas texture
-
-app.theme: connect the theme gen with a running app to live update
-app.theme: clean up C++ blend/effect implementations
-
 libv.ui: multithreading cooldown for ui frame iteration update callbacks. Aka: once_per_n_frame instead of X ms
-
-glow falloff is incorrect on corners, find a better solution
-	idea: it is 0-1 1-0: in the first range falloff should be a noop bc those values can be considered 1 AA
-	libv.ui: Overlay zoom mouse hovered pixel color display
-	| size = 0, falloff = 1 highlight perfectly the affected pixels
-
-app.theme: --- PAPER ---
-	So the way theme generation works (plan):
-	- lua script containing the styles incl properties and the recepies for the atlases
-	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
-	- from c++ ui run the generated lua script to acquire the theme
-	- | NOPE
-	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
 
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
@@ -447,14 +289,12 @@ libv.ui: toggle (toggle button)
 
 libv.ui: default style and theme set
 
-libv.ui: card layout
-libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
+libv.ui: Progress bar: Indicate progress by displaying a partially filled bar. 3 main part: bg, bar, spark
+ 		Progress bar can have unknown max value, have a mode for it
 libv.ui: list layout / component
 libv.ui: table layout - only the columns and/or rows have size aka (more strict grid)
 		An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
 libv.ui: not owning container views (list and/or table)
-libv.ui: progressbar
-		Indicate progress by displaying a partially filled bar.
 
 
 
@@ -500,9 +340,6 @@ libv.ui: separator / group (bordered and captioned)
 
 libv.ui: OverlayZoom use linearized zoom (like the Camera2 in vm4viewer)
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
-
-libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
-		| use enum generator
 
 libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .core() usages wherever possible
@@ -632,20 +469,15 @@ ui
 		libv.ui: async_task<T> work_async(const function<progress_report(multi_entry_call, stop_token)>& task);
 	libv.ui: ContextStat (not ContextState, stat is for ui statistics)
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
-	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: idea: For (debug overlay) UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
 cleanup
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target (2D)
-	libv.ui: cleanup context_ui redundant codes
+	libv.ui: context_resource and libv.gl:image verify that targets are matching the requested target (2D)
 	libv.ui: fatal log before every assert
 
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | need this as component level dynamically (camera controls need global, for other ui actions local is enough)
 	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
-	libv.ui: Mouse acquire should leave any over component (?)
-	libv.ui: Mouse release should enter any over component (?) (respect non-pass_through)
-	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 
 event
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met | context_mouse.cpp
@@ -710,21 +542,6 @@ ctrl
 	libv.ui.ctrl: ui.redo-non-destructive // emacs style redo, not the default
 	libv.ui.ctrl: ui.undo-non-destructive // emacs style undo, not the default
 
-focus
-	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
-	libv.ui.focus: easy way to trigger Focus traversal from events/components
-	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traversal
-	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
-	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further
-	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
-	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
-
-	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
-	libv.ui.focus: Focus traversal order: (index) position based
-
-style
-	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthesized styles?
-
 overlay
 	libv.ui: generic orthogonal component level overlay system
 		libv.ui: overlay ui errors/warnings: A generalized ui error report system (console with extras)
@@ -767,9 +584,35 @@ libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is
 
 libv.ui: String2D scream at the user if the API get a \r (or any non printable character beside \n \t), and ignore it
 
-libv.ui.event: slot / signal flags could be unflagged if a disconnect leaves an empty entry in the event context
 
 
+--- Theme ---
+
+https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html
+table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
+        scroll.getViewportBounds().getWidth(), scroll.viewportBoundsProperty()));
+    grid.getChildren().add(imageHolder);
+
+app.theme: use event_reentry_guard in control.slider.event().change
+app.theme: create theme exporter: json and atlas texture
+
+app.theme: connect the theme gen with a running app to live update
+app.theme: clean up C++ blend/effect implementations
+
+glow falloff is incorrect on corners, find a better solution
+	idea: it is 0-1 1-0: in the first range falloff should be a noop bc those values can be considered 1 AA
+	libv.ui: Overlay zoom mouse hovered pixel color display
+	| size = 0, falloff = 1 highlight perfectly the affected pixels
+
+app.theme: --- PAPER ---
+	So the way theme generation works (plan):
+	- lua script containing the styles incl properties and the recepies for the atlases
+	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
+	- from c++ ui run the generated lua script to acquire the theme
+	- | NOPE
+	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
 
 
 === PAPERS ========================================================================================

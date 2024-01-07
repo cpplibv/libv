@@ -49,7 +49,7 @@ namespace ui {
 //			Meaning we need to find the closest remapping point if we attach a MouseRegion | by walking up the component hierarchy
 //	- When the scroll pane moves under the mouse, does it count as mouse movement? | No, but it can count as a leave.
 //
-//	- What about hotkey with condition that mouse is over ui or canvas object | not sure, but it feels like a "not my problem" for the event system, sounds like hotkey context switches | libv.control contexts are solving this problem
+//	- What about hotkey with condition that mouse is over ui or canvas object | not sure, but it feels like a "not my problem" for the event system, sounds like hotkey context switches | libv.ctrl contexts are solving this problem
 //	- What about drag and drop / drag payload / drag hover payload | it would be nice to have a generic ui drag payload
 
 
@@ -487,7 +487,7 @@ void ContextMouse::event_leave() {
 	notify_hits(hits, event);
 }
 
-void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Action action) {
+bool ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Action action) {
 	//	debug();
 
 	// Define event
@@ -502,7 +502,7 @@ void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Act
 			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
 			component_notify(entry->target, event);
 		}
-		return;
+		return event.propagation_stopped();
 	}
 
 	// Gather hits
@@ -521,6 +521,8 @@ void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Act
 
 	sort_hits(hits);
 	notify_hits(hits, event);
+
+	return event.propagation_stopped();
 }
 
 namespace {
@@ -543,7 +545,7 @@ void gather_over_for_leave(HitELs& hits, MouseRegionContainer::Node& node, libv:
 
 } // namespace
 
-void ContextMouse::event_position(libv::vec2f position_new) {
+bool ContextMouse::event_position(libv::vec2f position_new) {
 	// Define event
 	const auto movement = position_new - self->mouse_position;
 	self->mouse_position = position_new;
@@ -560,7 +562,7 @@ void ContextMouse::event_position(libv::vec2f position_new) {
 			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
 			component_notify(entry->target, event);
 		}
-		return;
+		return event.propagation_stopped();
 	}
 
 	// Gather hits
@@ -593,9 +595,11 @@ void ContextMouse::event_position(libv::vec2f position_new) {
 
 	sort_hits(hits);
 	notify_hits(hits, event);
+
+	return event.propagation_stopped();
 }
 
-void ContextMouse::event_scroll(libv::vec2f movement) {
+bool ContextMouse::event_scroll(libv::vec2f movement) {
 	// Define event
 	self->scroll_position += movement;
 	const auto position = self->scroll_position;
@@ -611,7 +615,7 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
 			component_notify(entry->target, event);
 		}
-		return;
+		return event.propagation_stopped();
 	}
 
 	// Gather hits
@@ -630,6 +634,8 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 
 	sort_hits(hits);
 	notify_hits(hits, event);
+
+	return event.propagation_stopped();
 }
 
 void ContextMouse::event_update_layout() {
@@ -675,7 +681,7 @@ void ContextMouse::event_update_layout() {
 		return true;
 	});
 
-//	if noone had pendingUpdate [and/or no enter / leave event was be generated]
+//	if noone had pendingUpdate [and/or no enter/leave event has been generated]
 //		return
 
 	sort_hits(hits);

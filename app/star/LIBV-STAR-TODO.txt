@@ -20,45 +20,12 @@ Star - System integration demo
 
 
 
-
-UI Focus
-	libv.ui: "Non-focusable" "kind of" components
-			if it was used with mouse in a canvas it does not focus
-			but if it was focused with focus traversal it does focus
-			(or this is 2 orthogonal option)
-			New concept: Focusability
-				"Active focus on mouse interaction"
-					\ onMouse: focuses the component, grabs input
-					\ onKeyboard: normal focus
-				"Passive focus on mouse interaction"
-					\ onMouse: does not focuses the component and does not grabs input, but if there is a focus traversal from keyboard it will start from this component
-					\ onKeyboard: normal focus
-				"Focusable"
-					\ onMouse/onKeyboard: normal focus
-
-	libv.ui: If focused component receives a not interesting event
-			but there is an active canvas who would react to it
-			then auto change focus to the canvas.
-			This is really tricky as controls and ui event systems conflict somewhat
+Settings page needs a scroll pane
+Credits page needs an 'Accordion' for every license or details
+Credits page should not directly include third party licenses, there could be another page for it from the credits
 
 
-
-
-
-
-
-
-
-UI Layout Invalidation
-	libv.ui: If a child in panel_anchor or panel_full has not been invalidated,
-			and the bounds of the panel did not change
-			do not layout (calculate dynamic size) that component
-			(only issue if the component does have dynamic size, in this case it must be called)
-
-UI Event
-	libv.ui: Style state active gets stuck when: toggle button pressed -> mouse moved out -> mouse released
-
-
+--- ---------------------------------------------------------------------------------------------
 
 
 Integration, controls, ui and controls interactions
@@ -66,16 +33,10 @@ Integration, controls, ui and controls interactions
 	canvas controls
 		currently [hold] might work with immediate change
 		but what about [press]
-	scene controls (simulation, space / pause)
+	scee / pause)
 		(timeControls)
 		display pause/time control state on the ui
 	3D picking ray
-
-
-
-
-
-
 
 libv.re: improve glue layer, includes and ui integration
 
@@ -104,30 +65,12 @@ controls / camera
 	bind_default_controls(libv::ctrl::BindingRegister controls)
 		per application
 
-
-
-
 libv.re integration:
 		wire in every settings
 
 
 
-
-
- > ui > Slider value change should not invalidate layout
-			(make it a float region if it must)
-			mouse context range remap might be needed!
-
-
-
-
-
-
-
-Improve design
-	Switch to nicer colors, bye bye blue background
-
-
+-------------------------------------------------------------------------------------------------
 
 
 libv.ui: Choose the null component constructor(s):
@@ -137,12 +80,8 @@ libv.ui: Choose the null component constructor(s):
 	ComponentT{null_component}
 	ComponentT::null()
 
-app.star: whats next?
-	have a surface
-	pretty design, ui elements, edit stylesheet
-	updater - self update
-		on demand generation, keep last M
-		release level to indicate auto generation of patch paths
+app.star: Improve design
+	Switch to nicer colors, bye bye blue background
 
 app.star: Credits:
 		performance: text/ui rendering
@@ -156,7 +95,7 @@ app.star: Credits:
 		> commenting mesh_stream.clear(); doubled the performance 100->200
 		> not uploading new data at all 200->400
 		? Would DSA help anything?
-			| (yes), memory mapped buffer would help more
+			| (yes, but only a little), memory mapped buffer would help more
 
 		mesh_stream.clear()
 			off 200
@@ -198,6 +137,8 @@ app.star: Credits:
 			everything is a font shader?
 				\ and then a single glMultiDrawElementsIndirect draws everything? (needs ui atlas textures)
 
+		| Current (or new) issues is layout takes too long
+
 		read / understand:
 			http://behindthepixels.io/assets/files/High-performance,%20Low-Overhead%20Rendering%20with%20OpenGL%20and%20Vulkan%20-%20Edward%20Liu.pdf
 			You make it fast by not making any GL API calls, like bind buffer or draw, per object. Instead use multidraw*indirect, index ubo/ssbo with draw id for per object uniforms. Combine with persistently mapped buffers.
@@ -206,6 +147,11 @@ app.star: Credits:
 
 		libv.ui: Component flag to report a component is well behaving in renders for early hierarchical culling
 				(aka no render fragment exists the component layout_position and layout_size)
+
+		idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
+				component bounds
+				clip bounds
+				| texture: id, layer, mode, bounds
 
 ---
 
@@ -235,42 +181,33 @@ libv.ui: Cleanup duty:
 			return component_like.ptr();
 		}
 
-libv.ui: Setting: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
-
-
-
-
-----------
-
-place.it:
-	idea: tracked entities as "sleeping ones", not 2 but 3 update state
-		sleeping, awake, tracked
-		runs different code
-
-	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
-	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
-	Knowledge: Anisotropic filtering is useless for many textures
-	Knowledge: Mip maps are useless for some textures (UI textures dont care)
-
-	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
+libv.ui: Settings: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
 
 
 ----------
+
+app.star: Pretty design, ui elements, edit stylesheet
+
+libv.ui: Warn whenever a UI component out lives the UI object itself
 
 app.star: cleanup
 	config.cpp
 		update became weird again
 
 app.star: Settings
+	libv.ui: PageLayouts (card layout? tabs layout?)
 	grouping / separators / paging
 	tooltips with description
-
-libv.ui: PageLayouts
 
 star: Separate "save/apply": preview and commit changes, or maybe the auto-save is fine as it is
 	star: Make save/apply buttons inactive if there is no change
 
-config: customization of behaviour:
+app.star: Config customizations of behaviour:
+	Currently implemented:
+		on_corrupt_file::reset_to_default
+		on_missing_file::create_default
+		on_entry_change::auto_save(60s, 300s) // warmup, cooldown
+
 	on_corrupt_file::exit
 	on_corrupt_file::exit_and_alert
 	on_corrupt_file::prompt_user // reset or exit
@@ -284,25 +221,27 @@ config: customization of behaviour:
 	on_missing_file::exit_and_alert
 	on_missing_file::prompt_user // in-memory default, create default or exit
 
-	on_entry_change::auto_save(5s, 30s) // warmup, cooldown
+	on_entry_change::auto_save(60s, 300s) // warmup, cooldown
 	on_entry_change::do_nothing
-
-
-
-libv.ui: Warn whenever a UI component out lives the UI object itself
-
-
 
 
 =================================================================================================
 
-
-app.star: Settings page back clear the focus while apply will rotate it to next
-
 app.star: Self-Updater
+		on demand generation, keep last M
+		release level to indicate auto generation of patch paths
 
+place.it:
+	idea: tracked entities as "sleeping ones", not 2 but 3 update state
+		sleeping, awake, tracked
+		runs different code
 
+	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
+	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
+	Knowledge: Anisotropic filtering is useless for many textures
+	Knowledge: Mip maps are useless for some textures (UI textures dont care)
 
+	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
 
 
 

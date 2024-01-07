@@ -36,7 +36,7 @@ What do I need from libv to make a 'minimal' working iris program?
 		5 Resolve analog-binary accidental collusion with time
 
 	libv.serial
-		3 Safe container resize/reserve on deserialization
+		SAFETY: Safe container resize/reserve on deserialization
 
 	libv.state
 		5 Generated source for state machines
@@ -52,6 +52,9 @@ What do I need from libv to make a 'minimal' working iris program?
 		The std uniform_int_distribution and uniform_real_distribution
 		might not be portable across compilers, pick an implementation and
 		use a fix libv version of it
+
+	libv.vm4
+		SAFETY: Verify IDs on load
 
 	libv.update
 		Resource
@@ -302,8 +305,6 @@ libv.gl.glsl: Warning for non generic directory separator in include path (backl
 libv.gl.glsl: Warning option for mixed indentation in different lines and/or files
 libv.gl.glsl: Warning for line trailing white space
 
-app.vm4_viewer: camera movement should acquire and 'mutex' mouse position
-
 app: about page with executable path, build and compiler information, git hash and software version
 libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
 
@@ -322,14 +323,10 @@ app.vm4_viewer: Add project level size comparison functionality
 app.vm4_viewer: Thumbnails and thumbnail generation
 app.vm4_viewer: Better focus camera based on the actual view angles and model ineast of the BSO
 
-app.vm4_viewer.shader: uniform (sun) auto iteration and name auto chaining
-app.vm4_viewer.shader: ui feedback for glsl shader reload success
-app.vm4_viewer.shader: ui feedback for glsl shader failed include
-app.vm4_viewer.shader: use a fallback shader on init failure
-app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
-
 libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
 libv.console: should depend on libv.arg
+libv.console: should use eval?
+libv.console: could it be just a rewrite engine for lua commands? (aka spawn unit 0 0 0 -> spawn("unit", 0, 0, 0))
 
 
 --- Checkpoint ---
@@ -428,8 +425,6 @@ libv.gl: glsl preprocessor support for "#pragma vertex" and "#pragma fragment" t
 
 libv.glr: texture, do not store the whole image, only have pending chunks, this will get rid of a lot of memcopy nightmare
 libv.glr: optimize every remote resource with head access
-libv.ui: switch of direct glr usage to a UI wrapper bulk renderer
-libv.ui: question: for bulk rendering would stencil buffer help for fonts | yes-kind of but alpha makes it tricky
 libv.glr: IDEA: An Entry object the group every call/state to a single render operation, both in queue and on the user API
 libv.glr: Make the reordering explicit and opt-in
 libv.glr: Refactor the variants

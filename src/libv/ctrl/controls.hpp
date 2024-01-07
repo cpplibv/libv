@@ -106,14 +106,14 @@ public:
 	void ignore_events(bool value);
 
 public:
-	void event(const libv::input::EventKey& event);
-	void event(const libv::input::EventMouseButton& event);
-	void event(const libv::input::EventMousePosition& event);
-	void event(const libv::input::EventMouseScroll& event);
-	void event(const libv::input::EventGamepadAnalog& event);
-	void event(const libv::input::EventGamepadButton& event);
-	void event(const libv::input::EventJoystickButton& event);
-	void event(const libv::input::EventJoystickAnalog& event);
+	void event(const libv::input::EventKey& event, bool allowProcess = true);
+	void event(const libv::input::EventMouseButton& event, bool allowProcess = true);
+	void event(const libv::input::EventMousePosition& event, bool allowProcess = true);
+	void event(const libv::input::EventMouseScroll& event, bool allowProcess = true);
+	void event(const libv::input::EventGamepadAnalog& event, bool allowProcess = true);
+	void event(const libv::input::EventGamepadButton& event, bool allowProcess = true);
+	void event(const libv::input::EventJoystickButton& event, bool allowProcess = true);
+	void event(const libv::input::EventJoystickAnalog& event, bool allowProcess = true);
 
 	void update(duration delta_time);
 	void update_since_last_update();

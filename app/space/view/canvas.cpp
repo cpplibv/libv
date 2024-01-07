@@ -169,7 +169,7 @@ void SpaceCanvas::disableControls(libv::ctrl::Controls& controls) {
 
 void SpaceCanvas::attach() {
 	if (main_canvas)
-		focus();
+		focus(libv::ui::FocusMode::active);
 }
 
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {

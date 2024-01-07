@@ -34,6 +34,7 @@ static constexpr std::string_view caret_color = "caret_color";
 static constexpr std::string_view caret_shader = "caret_shader";
 static constexpr std::string_view color = "color";
 static constexpr std::string_view column_count = "column_count";
+static constexpr std::string_view focus_mode = "focus_mode";
 static constexpr std::string_view focus_select_policy = "focus_select_policy";
 static constexpr std::string_view font = "font";
 static constexpr std::string_view font_color = "font_color";

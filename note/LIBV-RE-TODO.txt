@@ -7,13 +7,6 @@ RE - LIBV Render Engine
 
 
 
-res: Skyboxes:
-		delete fluffball,
-		acquire "clear" dark cloudy
-		acquire "clear" mixed cloudy
-		acquire "clear" clear sunny
-		acquire 2 nebula / star from space
-libv.re: Sky equirectangular and cubemaps are misaligned and inverted (possible import issue)
 
 
 
@@ -67,7 +60,7 @@ place.it:
 	Terminology:
 		Pipeline = sum of passes and render targets (?and render context) (ATM its not really)
 	Unity HDRP pipeline graph: https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@17.0/manual/images/HDRP-frame-graph-diagram.png
-	Frustum culling optimization:
+	Frustum culling optimization idea:
 			Start will culling shadow frustum and do the
 			camera frustum cull on only the passed objects
 			(careful as this would need deduplication on shadow frustum edges)
@@ -387,7 +380,7 @@ libv.re:
 				corruptedai.com
 				https://corruptedai.com
 				HomeDownloadsAbout. Login. Project Iris. Corrupted AI Software. Comming soon... Join the discord.corruptedai.com server. ©2022-2023 Császár Mátyás [Vader], ...
-			this ^ is wierd, have a proper one
+			this ^ is wierd, have a proper one with description
 
 	libv.vm4: Verify model after loading it
 			materialID must be <= materials.size
@@ -404,10 +397,12 @@ libv.re:
 https://litasa.github.io/blog/2017/09/04/OpenGL-MultiDrawIndirect-with-Individual-Textures
 rendering questions:
 	How can multi rendering work with different texture sizes
+	I need at least 3-4 sizes support dynamically (512, 1024, 2048)
 
-glsl common header with:
-		clamp01
-		sq or sqr
+
+glsl common header with: (that could be always included)
+		clamp01, saturate
+		sq (x * x)
 		constants
 
 canvas
@@ -863,7 +858,7 @@ libv.re: integrated debug skybox (transparent debug_x_front_uv_transparent_cube_
 		2 skybox, different blending, order matters
 		clearing might have issues
 
-Realistic sky/atmo example https://threejs.org/examples/?q=sky#webgl_shaders_sky
+Generated realistic sky/atmo example https://threejs.org/examples/?q=sky#webgl_shaders_sky
 
 
 libv.re: C++23 Deducing this: scast<>() and rcast<>() for material, mesh and nodes

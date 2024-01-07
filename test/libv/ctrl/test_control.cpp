@@ -60,7 +60,7 @@ const auto event_mouse_left_release = li::EventMouseButton{li::MouseButton::Left
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Control shall not execute any feature without input event", "[libv.control]") {
+TEST_CASE("Control shall not execute any feature without input event", "[libv.ctrl]") {
 	MockContext context;
 	lc::Controls controls;
 	MockFeatureAction feature_action;
@@ -84,7 +84,7 @@ TEST_CASE("Control shall not execute any feature without input event", "[libv.co
 	CHECK(context.access_count == 0);
 }
 
-TEST_CASE("Control shall execute features", "[libv.control]") {
+TEST_CASE("Control shall execute features", "[libv.ctrl]") {
 	MockContext context;
 	lc::Controls controls;
 	MockFeatureAction feature_action;
@@ -898,7 +898,7 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 	CHECK(feature_never_binary.empty());
 }
 
-TEST_CASE("Select more specialized binding in case of collision", "[libv.control]") {
+TEST_CASE("Select more specialized binding in case of collision", "[libv.ctrl]") {
 	MockContext context;
 	lc::Controls controls;
 	MockFeatureAction feature_action;
@@ -924,7 +924,7 @@ TEST_CASE("Select more specialized binding in case of collision", "[libv.control
 	CHECK(feature_never_action.empty());
 }
 
-TEST_CASE("Reset sequence on unrelated event", "[libv.control]") {
+TEST_CASE("Reset sequence on unrelated event", "[libv.ctrl]") {
 	MockContext context;
 	lc::Controls controls;
 	MockFeatureAction feature_action;
@@ -1092,7 +1092,7 @@ TEST_CASE("Reset sequence on unrelated event", "[libv.control]") {
 	CHECK(feature_never_binary.empty());
 }
 
-TEST_CASE("Routing scale and impulse", "[libv.control]") {
+TEST_CASE("Routing scale and impulse", "[libv.ctrl]") {
 	MockContext context;
 	lc::Controls controls;
 	MockFeatureAnalog feature_abi;
@@ -1167,16 +1167,16 @@ TEST_CASE("Routing scale and impulse", "[libv.control]") {
 	CHECK(feature_aas.empty());
 }
 
-//TEST_CASE("Feature execution with context", "[libv.control]") { }
-//TEST_CASE("Feature execution with overloaded context", "[libv.control]") { }
-//TEST_CASE("Feature execution with void context", "[libv.control]") { }
-//TEST_CASE("Feature no execution without context", "[libv.control]") { }
+//TEST_CASE("Feature execution with context", "[libv.ctrl]") { }
+//TEST_CASE("Feature execution with overloaded context", "[libv.ctrl]") { }
+//TEST_CASE("Feature execution with void context", "[libv.ctrl]") { }
+//TEST_CASE("Feature no execution without context", "[libv.ctrl]") { }
 //
-//TEST_CASE("Context overloading features with the same names", "[libv.control]") { }
-//TEST_CASE("Context overloading features stack push", "[libv.control]") { }
-//TEST_CASE("Context overloading features stack pop", "[libv.control]") { }
+//TEST_CASE("Context overloading features with the same names", "[libv.ctrl]") { }
+//TEST_CASE("Context overloading features stack push", "[libv.ctrl]") { }
+//TEST_CASE("Context overloading features stack pop", "[libv.ctrl]") { }
 //
-//TEST_CASE("Missing context means no features activity", "[libv.control]") { }
-//TEST_CASE("Enter context with instant binding fulfilment causes features activity", "[libv.control]") { }
-//TEST_CASE("Leave context with fulfilled bindings causes features activity", "[libv.control]") { }
-//TEST_CASE("New binding with instant fulfilment causes features activity", "[libv.control]") { }
+//TEST_CASE("Missing context means no features activity", "[libv.ctrl]") { }
+//TEST_CASE("Enter context with instant binding fulfilment causes features activity", "[libv.ctrl]") { }
+//TEST_CASE("Leave context with fulfilled bindings causes features activity", "[libv.ctrl]") { }
+//TEST_CASE("New binding with instant fulfilment causes features activity", "[libv.ctrl]") { }

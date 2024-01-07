@@ -7,6 +7,7 @@
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/background.hpp>
 #include <libv/ui/property/color.hpp>
+#include <libv/ui/property/focus_mode.hpp>
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/shader_font.hpp>
@@ -46,6 +47,9 @@ public:
 	[[nodiscard]] const Color& font_color() const noexcept;
 
 	// TODO P5: Shader font set/get
+
+	void focus_mode(FocusMode value);
+	[[nodiscard]] FocusMode focus_mode() const noexcept;
 
 public:
 	void text(std::string value);

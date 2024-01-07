@@ -14,7 +14,7 @@ namespace lc = libv::ctrl;
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Compatibility assumption checks", "[libv.control]") {
+TEST_CASE("Compatibility assumption checks", "[libv.ctrl]") {
 	CHECK(libv::to_value(lc::AnalogDimension::x) == libv::to_value(lc::MouseMovement::x));
 	CHECK(libv::to_value(lc::AnalogDimension::x_plus) == libv::to_value(lc::MouseMovement::x_plus));
 	CHECK(libv::to_value(lc::AnalogDimension::x_minus) == libv::to_value(lc::MouseMovement::x_minus));

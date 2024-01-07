@@ -2,11 +2,8 @@
 
 #pragma once
 
-// fwd
 #include <libv/ui/fwd.hpp>
 #include <libv/utility/nexus_fwd.hpp>
-// std
-#include <memory>
 
 
 namespace libv {
@@ -18,8 +15,10 @@ class ImplContextUI;
 
 class ContextUI {
 public:
+	libv::Nexus& nexus;
 	Settings& settings;
 
+	ContextFocus& focus;
 	ContextEvent& event;
 	ContextMouse& mouse;
 	ContextState& state;
@@ -28,32 +27,17 @@ public:
 	ContextStyle& style;
 	ContextTooltip& tooltip;
 
-	libv::Nexus& nexus;
-
-private:
-	std::unique_ptr<ImplContextUI> self;
-
 public:
-	explicit ContextUI(UI& ui,
+	ContextUI(
+			libv::Nexus& nexus,
 			Settings& settings,
+			ContextFocus& focus,
 			ContextEvent& event,
 			ContextMouse& mouse,
 			ContextState& state,
 			ContextResource& resource,
 			ContextStyle& style,
 			ContextTooltip& tooltip);
-	~ContextUI();
-
-	ContextUI(const ContextUI&) = delete;
-	ContextUI(ContextUI&&) = delete;
-	ContextUI& operator=(const ContextUI&) = delete;
-	ContextUI& operator=(ContextUI&&) = delete;
-
-public:
-	// TODO P4: Move to a new focus context
-	void focus(CoreComponent& component);
-	void detachFocused(CoreComponent& component);
-	void detachFocusLinked(CoreComponent& component);
 };
 
 // -------------------------------------------------------------------------------------------------

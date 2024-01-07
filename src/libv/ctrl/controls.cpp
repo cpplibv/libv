@@ -828,7 +828,7 @@ void Controls::ignore_events(bool value) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Controls::event(const libv::input::EventKey& event) {
+void Controls::event(const libv::input::EventKey& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -846,6 +846,8 @@ void Controls::event(const libv::input::EventKey& event) {
 
 	if (it == self->codepoint_mappings.end()) {
 		// Process event
+		if (!allowProcess)
+			return;
 		self->process_button([&](const auto inputID) {
 			return
 					alias_match(InputID{Keycode{event.keycode}}, inputID) ||
@@ -860,6 +862,8 @@ void Controls::event(const libv::input::EventKey& event) {
 			self->pressed_codepoints.emplace(it->second);
 
 		// Process event
+		if (!allowProcess)
+			return;
 		self->process_button([&](const auto inputID) {
 			return
 					alias_match(InputID{Keycode{event.keycode}}, inputID) ||
@@ -869,7 +873,7 @@ void Controls::event(const libv::input::EventKey& event) {
 	}
 }
 
-void Controls::event(const libv::input::EventMouseButton& event) {
+void Controls::event(const libv::input::EventMouseButton& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -881,13 +885,15 @@ void Controls::event(const libv::input::EventMouseButton& event) {
 	}
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto impulse = self->impulse_button * self->impulse_mouse_button;
 
 	const auto event_matcher = [&](const auto inputID) { return alias_match(InputID{MouseButton{event.button}}, inputID); };
 	self->process_button(event_matcher, event.action, impulse);
 }
 
-void Controls::event(const libv::input::EventMousePosition& event) {
+void Controls::event(const libv::input::EventMousePosition& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -896,6 +902,8 @@ void Controls::event(const libv::input::EventMousePosition& event) {
 	self->mouse_position = event.position;
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto scale = self->scale_analog * self->scale_mouse_move;
 	self->process_analog(
 			InputID{event.position.x >= 0 ? MouseMovement::x_plus : MouseMovement::x_minus},
@@ -905,7 +913,7 @@ void Controls::event(const libv::input::EventMousePosition& event) {
 			Origin::mouse);
 }
 
-void Controls::event(const libv::input::EventMouseScroll& event) {
+void Controls::event(const libv::input::EventMouseScroll& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -913,6 +921,8 @@ void Controls::event(const libv::input::EventMouseScroll& event) {
 	self->scroll_position = event.offset;
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto scale = self->scale_analog * self->scale_scroll;
 	self->process_analog(
 			InputID{event.offset.x >= 0 ? MouseScroll::x_plus : MouseScroll::x_minus},
@@ -922,7 +932,7 @@ void Controls::event(const libv::input::EventMouseScroll& event) {
 			Origin::scroll);
 }
 
-void Controls::event(const libv::input::EventGamepadAnalog& event) {
+void Controls::event(const libv::input::EventGamepadAnalog& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -931,6 +941,8 @@ void Controls::event(const libv::input::EventGamepadAnalog& event) {
 	sow.analogs[event.analogID] = event.position;
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto scale = self->scale_analog * self->scale_gamepad_analog * sow.scale_analog;
 	self->process_analog(
 			InputID{event.gamepadID, event.analogID, event.position.x >= 0 ? AnalogDimension::x_plus : AnalogDimension::x_minus},
@@ -940,7 +952,7 @@ void Controls::event(const libv::input::EventGamepadAnalog& event) {
 			Origin::gp_analog);
 }
 
-void Controls::event(const libv::input::EventGamepadButton& event) {
+void Controls::event(const libv::input::EventGamepadButton& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -954,13 +966,15 @@ void Controls::event(const libv::input::EventGamepadButton& event) {
 	}
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto impulse = self->impulse_button * self->impulse_gamepad_button * sow.impulse_button;
 
 	const auto event_matcher = [&](const auto inputID) { return alias_match(InputID{event.gamepadID, event.button}, inputID); };
 	self->process_button(event_matcher, event.action, impulse);
 }
 
-void Controls::event(const libv::input::EventJoystickAnalog& event) {
+void Controls::event(const libv::input::EventJoystickAnalog& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -969,6 +983,8 @@ void Controls::event(const libv::input::EventJoystickAnalog& event) {
 	sow.analogs[event.analogID] = event.position;
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto scale = self->scale_analog * self->scale_joystick_analog * sow.scale_analog;
 	self->process_analog(
 			InputID{event.joystickID, event.analogID, event.position.x >= 0 ? AnalogDimension::x_plus : AnalogDimension::x_minus},
@@ -978,7 +994,7 @@ void Controls::event(const libv::input::EventJoystickAnalog& event) {
 			Origin::js_analog);
 }
 
-void Controls::event(const libv::input::EventJoystickButton& event) {
+void Controls::event(const libv::input::EventJoystickButton& event, bool allowProcess) {
 	if (self->ignore_events)
 		return;
 
@@ -992,6 +1008,8 @@ void Controls::event(const libv::input::EventJoystickButton& event) {
 	}
 
 	// Process event
+	if (!allowProcess)
+		return;
 	const auto impulse = self->impulse_button * self->impulse_joystick_button * sow.impulse_button;
 
 	const auto event_matcher = [&](const auto inputID) { return alias_match(InputID{event.joystickID, event.button}, inputID); };
@@ -1017,7 +1035,6 @@ void Controls::update_since_last_update() {
 
 	aux_update(self->last_update_timer.time());
 }
-
 
 // -------------------------------------------------------------------------------------------------
 

@@ -41,7 +41,7 @@ private:
 public:
 	explicit(false) constexpr inline Orientation2_type(enum_type value) noexcept :
 		enum_value_(value) {
-		assert(underlying() >= 0 && underlying() < 8);
+		assert(static_cast<underlying_type>(enum_value_) >= 0 && static_cast<underlying_type>(enum_value_) < 8);
 	}
 
 	explicit(false) constexpr inline operator enum_type() const noexcept {

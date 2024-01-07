@@ -32,6 +32,7 @@ public:
 //	virtual void onMouseMovement(const EventMouseMovement& event) override;
 
 	virtual void doAttach() override;
+	virtual void doDetach() override;
 	virtual void doUpdate() override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doCreate(Renderer& r) override;
@@ -51,8 +52,9 @@ CoreCanvasAdaptor::CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBas
 }
 
 void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
-	event.stop_propagation();
-	focus();
+	(void) event;
+	// event.stop_propagation();
+	focus(FocusMode::active);
 }
 
 //void CoreCanvasAdaptor::onMouseMovement(const EventMouseMovement& event) {
@@ -61,6 +63,10 @@ void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
 
 void CoreCanvasAdaptor::doAttach() {
 	canvas_object->attach();
+}
+
+void CoreCanvasAdaptor::doDetach() {
+	canvas_object->detach();
 }
 
 void CoreCanvasAdaptor::doUpdate() {
@@ -149,8 +155,8 @@ libv::ui::ContextUI& CanvasBase::ui() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void CanvasBase::focus() {
-	core->focus();
+void CanvasBase::focus(FocusMode mode) {
+	core->focus(mode);
 }
 
 // -------------------------------------------------------------------------------------------------

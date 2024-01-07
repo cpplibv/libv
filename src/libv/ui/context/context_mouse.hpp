@@ -2,16 +2,15 @@
 
 #pragma once
 
-// fwd
 #include <libv/ui/fwd.hpp>
-// libv
+#include <libv/ui/context/context_ui.hpp> // IWYU pragma: export // For convenience
+#include <libv/ui/event/mouse_order.hpp>
+
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
-// std
+
 #include <memory>
-// pro
-#include <libv/ui/event/mouse_order.hpp>
 
 
 namespace libv {
@@ -63,9 +62,12 @@ public:
 public:
 	void event_enter();
 	void event_leave();
-	void event_button(libv::input::MouseButton mouse, libv::input::Action action);
-	void event_position(libv::vec2f position);
-	void event_scroll(libv::vec2f movement);
+	/// @return true is the event propagation was stopped (aka some component absorbed the event)
+	bool event_button(libv::input::MouseButton mouse, libv::input::Action action);
+	/// @return true is the event propagation was stopped (aka some component absorbed the event)
+	bool event_position(libv::vec2f position);
+	/// @return true is the event propagation was stopped (aka some component absorbed the event)
+	bool event_scroll(libv::vec2f movement);
 
 	/// Event update is necessary to support multiple 'subscribe' and 'update' changes atomically
 	void event_update_layout();

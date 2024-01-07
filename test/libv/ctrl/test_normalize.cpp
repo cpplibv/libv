@@ -25,7 +25,7 @@ auto parse(std::string_view str) {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Sequence normalization", "[libv.control]") {
+TEST_CASE("Sequence normalization", "[libv.ctrl]") {
 	// Normalized input is unchanged
 	CHECK(normal("A") == parse("A"));
 	CHECK(normal("A + B") == parse("A + B"));

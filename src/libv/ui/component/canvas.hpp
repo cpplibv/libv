@@ -37,10 +37,11 @@ public:
 	[[nodiscard]] libv::ui::ContextUI& ui() const noexcept;
 
 public:
-	void focus();
+	void focus(FocusMode mode);
 
 protected:
 	virtual void attach() { }
+	virtual void detach() { }
 	virtual void update(libv::ui::time_duration delta_time) { (void) delta_time; }
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
 	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }

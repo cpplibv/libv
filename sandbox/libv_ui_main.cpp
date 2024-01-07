@@ -1010,7 +1010,7 @@ public:
 			if (e.keycode == libv::input::Keycode::F) {
 				log_sandbox.info("Print Flags:");
 				tabs.main.foreach_recursive_children([](libv::ui::Component& child) {
-					log_sandbox.info("{}{}{}{}{}{}{}|{}|{}{}{}{}{} : {}",
+					log_sandbox.info("{}{}{}{}{}{}{}|{}|{}{}{}{} : {}",
 							child.flags().match_any(libv::ui::Flag::render) ? "R" : "-",
 							child.flags().match_any(libv::ui::Flag::layout) ? "L" : "-",
 							child.flags().match_any(libv::ui::Flag::disabled) ? "D" : "-",
@@ -1023,7 +1023,7 @@ public:
 
 							child.flags().match_any(libv::ui::Flag::watchChar) ? "Ch" : "- ",
 							child.flags().match_any(libv::ui::Flag::watchKey) ? "Ke" : "- ",
-							child.flags().match_any(libv::ui::Flag::watchFocus) ? "Fo" : "- ",
+							// child.flags().match_any(libv::ui::Flag::watchFocus) ? "Fo" : "- ",
 							child.flags().match_any(libv::ui::Flag::watchMouse) ? "Mo" : "- ",
 							child.flags().match_any(libv::ui::Flag::floatRegion) ? "Fr" : "- ",
 							child.path()

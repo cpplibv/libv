@@ -282,7 +282,7 @@ std::unique_ptr<Scene> SurfaceCanvas::createScene(SceneType scene) {
 }
 
 void SurfaceCanvas::attach() {
-	focus();
+	focus(libv::ui::FocusMode::active);
 }
 
 void SurfaceCanvas::setupRenderStates(libv::glr::Queue& glr) {

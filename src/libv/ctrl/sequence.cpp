@@ -37,7 +37,7 @@ std::string Sequence::to_string() const {
 void Sequence::normalize() {
 	for (auto& combination : combinations)
 		combination.normalize();
-	// TODO P2: libv.control: During normalization throw out empty combinations
+	// TODO P2: libv.ctrl: During normalization throw out empty combinations
 }
 
 validation_result Sequence::validate() const noexcept {

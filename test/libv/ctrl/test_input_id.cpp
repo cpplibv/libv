@@ -9,7 +9,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Test more_specialized", "[libv.control]") {
+TEST_CASE("Test more_specialized", "[libv.ctrl]") {
 	const auto test_spec = [](const auto& a, const auto& b) {
 		return libv::ctrl::more_specialized(
 				libv::ctrl::parse_input_id_or_throw(a),
@@ -33,7 +33,7 @@ TEST_CASE("Test more_specialized", "[libv.control]") {
 	CHECK( 0 == test_spec("GP 1 B 1", "GP B 2")); // Not alias
 }
 
-TEST_CASE("Test alias_match", "[libv.control]") {
+TEST_CASE("Test alias_match", "[libv.ctrl]") {
 	const auto test_alias = [](const auto& a, const auto& b) {
 		return libv::ctrl::alias_match(
 				libv::ctrl::parse_input_id_or_throw(a),

@@ -1,77 +1,6 @@
 
 Space - System integration demo
 
-libv.rev: Implement shader management
-app.space: Improve arrow with geometry shader
-app.space: Add grid
-visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
-visual.grid: For grids expand and fade out line endings
-visual.grid: For grids fade out lines based on ray incident angle, lines should fade into the sky-box as seamlessly as possible
-visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
-visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
-app.space: Move origin gizmo into top right corner into screen space
-app.space: Burn a frame icon set into the binary and use it
-app.space: Have space working from the correct dir
-app.space: Screen picker integration - Place something onto the 3D world on mouse click
-app.space: Fleet that moves (without any arrow)
-app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
-app.space: Sim state manipulation only with commands
-app.space: Fleet with arrow and movement toward target (primitive)
-app.space: Add support for command arrow 'intent' (color) specification
-app.space: Revive the original debug arrow spiral
-app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
-app.space: Add support for command arrow animation offset
-app.space: Add support for chained command arrows
-app.space: Basic hacky networking
-libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
-app.space: Cannibalize style.lua from vm4_viewer
-app.space: Rename player -> user (and the ID, and the members vars in CTOs)
-app.space.net: Networking (Stage 2)
-app.space.net: Introduction with name, Protocol messages
-app.space.net: Lobby with list of connected clients
-app.space.net: Implement lobby snapshot sending/loading on connect
-app.space: Solve canvas and ui ctrl conflict
-app.space: Commands have a conflicting name, resolve it with an acronym like CTO (Command Transfer Object)
-app.space: Structure the whole program: UML time is upon us | Still not the cleanest, but improved
-app.space: 3D fleet picking
-app.space: Selected fleet highlight
-app.space: edge highlight (fresnel shader) https://forum.playcanvas.com/t/solved-custom-shader-fresnel/17355
-app.space: 3D secondary fleet picking
-app.space: Fleet selection, selection based commands
-app.space: Multi fleet selection
-app.space: Rename files *_behaviour -> *_control
-app.space: Move cto apply functions into universe
-app.space: Move canvas and camera files under view
-app.space: Adopt libv.rev post-processing
-app.space: Default focus canvas
-app.space: Add Controls help overlay (Simple, list only)
-app.space: Fleet visualisation with a simple model and orientation
-libv.rev: Bloom textures should not repeat, they could clamp
-app.space: F1 menu, list every control bindings
-app.space: Implement basic 2D text rendering over a 3D anchor point
-app.space: Implement Universe Snapshots
-app.space: Modernize and integrate model rendering for ships in fleets
-app.space: Fleet visual: Generate random number of ships and position them appropriately (simple mesh)
-app.space: Serialization of pointers/views
-app.space: Serialization of Snapshots in isLocal/isShared mode
-app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
-app.space: Planets
-app.space: Factions
-app.space: Common base for entities
-app.space: Mitigate the compile-time regression
-app.space: Rename universe folder to sim
-libv.ui: Add support for Z-Index offset (Mouse only for now)
-app.space: Fix Z-Index issue with mp menu
-libv.net: Fix lifetime extension during termination of connection and acceptor
-libv.net: Fix io_context executor early termination by adding a work_guard to every io_context user
-libv.net: Fix crash when cancelling an async write in mtcp connection
-app.space: Fix entity leak on snapshot universe loading
-libv.ui: Fix incorrect ref_count management in components
-libv.net: Fix incorrect ref_count management in HandlerGuards
-app.space: Fix simple disconnect as a non-connected client will do long timeout
-app.space: Remove dead component during galaxy update
-libv.math: gradient
-
 
 
 
@@ -104,11 +33,8 @@ visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 ui
 	libv.ui: color picker
 	libv.ui: gradient picker
-	libv.ui: Component / Style composition (Tabs component)
-			style/property nesting
-			static composition
 	libv.ui: components
-		libv.ui: toggle
+		libv.ui: accordion
 		libv.ui: drop down
 		libv.ui: number input
 		libv.ui: number slider
@@ -184,12 +110,6 @@ Simulation
 		app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
 
 
-
-place.it:
-	ui events: propagation pass: capture pass, bubbling pass:
-		bubbling pass what we currently have
-		capture pass would precede it, in reverse order
-			granting the ability to capture an event a parent
 
 
 
@@ -272,18 +192,17 @@ app.space: Controls: Canvas controls should be more eager even it canvas is not 
 Main areas of focus:
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
-	libv.gen: New lib/app to gen source code
-		libv.gen: CMake wish integration to predetermine generated output source files
-				wish_create_exe(
-					Generator src/to/dir/**.in.lua
-				from that "Generator src/to/dir/**.in.lua" is executed in multiple steps
-					first step is only inspection to determine generated output files at configure time
-					second step is simple generation during build time
-					we might need a fake target that reruns the cmake if the output files list changes
-							^ and actually this is the hard part
-						\ Maybe start a daemon or be a daemon that is started at first compilation (shut it down after X min of inactivity)
-								\ still requires everything
-					Maybe output a .cmake file that is included that only contains the output files
+	libv.gen: CMake wish integration to predetermine generated output source files
+			wish_create_exe(
+				Generator src/to/dir/**.in.lua
+			from that "Generator src/to/dir/**.in.lua" is executed in multiple steps
+				first step is only inspection to determine generated output files at configure time
+				second step is simple generation during build time
+				we might need a fake target that reruns the cmake if the output files list changes
+						^ and actually this is the hard part
+					\ Maybe start a daemon or be a daemon that is started at first compilation (shut it down after X min of inactivity)
+							\ still requires everything
+				Maybe output a .cmake file that is included that only contains the output files
 
 	app.space: Visual: Fleet selecting 4 corner animation / highlight effect
 
@@ -292,7 +211,6 @@ Main areas of focus:
 	app.space: In game menu
 	app.space: Multiplayer lobby list
 	app.space: Map generation with lua
-	libv.ui: Component / Style composition (Tabs component)
 
 
 
@@ -302,8 +220,6 @@ libv.rev: PostProcess should respect original framebuffer and viewport values
 
 
 place.it:
-	ext: Adopt expected (should be coming in C++23): https://github.com/TartanLlama/expected
-
 	ranges chunk, pairwise and slide (might be in ranges::v3, but planned to come with C++23)
 		std::views::chunk(column_count)
 			could replace the column count view used by ui grid
@@ -360,17 +276,6 @@ app.space.net: Networking PAPER:
 
 
 
-
-place.it:
-	CI/CD:
-		jenkins: pull
-		jenkins: build (parameterized with branch and version number (and git commit count))
-		jenkins: package
-		jenkins: ssh upload the release package to the update master
-		jenkins: trigger the update master
-		update-master: by default every release marked as internal
-		update-master: on some GUI mark this release not internal and mark update routes to be built
-		jenkins could ping update-master on build start (option to auto release feature)
 
 
 app.space: Simulation

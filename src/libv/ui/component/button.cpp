@@ -8,15 +8,11 @@
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
-#include <libv/ui/context/context_resource.hpp>
-#include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
-#include <libv/ui/event/event_keyboard.hpp>
+// #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/property_system/property_access.hpp>
 #include <libv/ui/resource/font_2D.hpp>
-#include <libv/ui/resource/shader_font.hpp>
-#include <libv/ui/resource/shader_image.hpp>
 #include <libv/ui/style/style_state.hpp>
 
 
@@ -40,11 +36,13 @@ void CoreButton::onFocus(const EventFocus& event) {
 }
 
 void CoreButton::onMouseButton(const EventMouseButton& event) {
+	event.stop_propagation();
+
 	if (event.action == libv::input::Action::release && event.button == libv::input::MouseButton::Left)
 		style_state(StyleState::active, false);
 
 	if (event.action == libv::input::Action::press)
-		focus();
+		focus(property.focus_mode());
 
 	fire(EventMouseButton{event});
 
@@ -56,6 +54,8 @@ void CoreButton::onMouseButton(const EventMouseButton& event) {
 }
 
 void CoreButton::onMouseMovement(const EventMouseMovement& event) {
+	event.stop_propagation();
+
 	if (event.enter)
 		style_state(StyleState::hover, true);
 
@@ -71,6 +71,7 @@ void CoreButton::onMouseMovement(const EventMouseMovement& event) {
 }
 
 void CoreButton::onMouseScroll(const EventMouseScroll& event) {
+	// event.stop_propagation();
 	fire(EventMouseScroll{event});
 }
 
@@ -186,6 +187,14 @@ void Button::font_color(Color value) {
 
 const Color& Button::font_color() const noexcept {
 	return self().property.font_color();
+}
+
+void Button::focus_mode(FocusMode value) {
+	AccessProperty::manual(self(), self().property.focus_mode, std::move(value));
+}
+
+FocusMode Button::focus_mode() const noexcept {
+	return self().property.focus_mode();
 }
 
 // -------------------------------------------------------------------------------------------------

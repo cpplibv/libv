@@ -41,7 +41,7 @@ const auto sink_callback = [](auto...) {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Feature introspection", "[libv.control]") {
+TEST_CASE("Feature introspection", "[libv.ctrl]") {
 	TestContext0 context0;
 	TestContext1 context1;
 	TestContext2 context2;
@@ -178,7 +178,7 @@ TEST_CASE("Feature introspection", "[libv.control]") {
 	}
 }
 
-TEST_CASE("Binding introspection", "[libv.control]") {
+TEST_CASE("Binding introspection", "[libv.ctrl]") {
 	TestContext0 context0;
 	TestContext1 context1;
 	lc::Controls controls;

@@ -47,129 +47,129 @@ const auto event_key_a_release = li::EventKey{li::Keycode::A, li::Scancode{30}, 
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Bind to missing feature", "[libv.control]") {
+TEST_CASE("Bind to missing feature", "[libv.ctrl]") {
 	lc::Controls controls;
 	controls.bind("test.missing", parse("A"));
 }
 
-TEST_CASE("Binding keycode", "[libv.control]") {
+TEST_CASE("Binding keycode", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding codepoint", "[libv.control]") {
+TEST_CASE("Binding codepoint", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding modifier", "[libv.control]") {
+TEST_CASE("Binding modifier", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding scancode", "[libv.control]") {
+TEST_CASE("Binding scancode", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mouse button", "[libv.control]") {
+TEST_CASE("Binding mouse button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mouse scroll", "[libv.control]") {
+TEST_CASE("Binding mouse scroll", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mouse move", "[libv.control]") {
+TEST_CASE("Binding mouse move", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding gamepad button", "[libv.control]") {
+TEST_CASE("Binding gamepad button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding gamepad any button", "[libv.control]") {
+TEST_CASE("Binding gamepad any button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding gamepad analog", "[libv.control]") {
+TEST_CASE("Binding gamepad analog", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding gamepad any analog", "[libv.control]") {
-	SECTION("to action feature") { }
-	SECTION("to analog feature") { }
-	SECTION("to binary feature") { }
-}
-
-TEST_CASE("Binding timed: button + time", "[libv.control]") {
-	SECTION("to action feature") { }
-	SECTION("to analog feature") { }
-	SECTION("to binary feature") { }
-}
-TEST_CASE("Binding timed: analog + time", "[libv.control]") {
-	SECTION("to action feature") { }
-	SECTION("to analog feature") { }
-	SECTION("to binary feature") { }
-}
-TEST_CASE("Binding timed mix: button + button + time", "[libv.control]") {
-	SECTION("to action feature") { }
-	SECTION("to analog feature") { }
-	SECTION("to binary feature") { }
-}
-TEST_CASE("Binding timed mix: button + analog + time", "[libv.control]") {
+TEST_CASE("Binding gamepad any analog", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
 
-TEST_CASE("Binding mix: analog + analog", "[libv.control]") {
+TEST_CASE("Binding timed: button + time", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: analog + button", "[libv.control]") {
+TEST_CASE("Binding timed: analog + time", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: button + button", "[libv.control]") {
+TEST_CASE("Binding timed mix: button + button + time", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: analog + analog + analog", "[libv.control]") {
+TEST_CASE("Binding timed mix: button + analog + time", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: analog + analog + button", "[libv.control]") {
+
+TEST_CASE("Binding mix: analog + analog", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: analog + button + button", "[libv.control]") {
+TEST_CASE("Binding mix: analog + button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: button + analog + analog", "[libv.control]") {
+TEST_CASE("Binding mix: button + button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: button + analog + button", "[libv.control]") {
+TEST_CASE("Binding mix: analog + analog + analog", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }
 }
-TEST_CASE("Binding mix: button + button + button", "[libv.control]") {
+TEST_CASE("Binding mix: analog + analog + button", "[libv.ctrl]") {
+	SECTION("to action feature") { }
+	SECTION("to analog feature") { }
+	SECTION("to binary feature") { }
+}
+TEST_CASE("Binding mix: analog + button + button", "[libv.ctrl]") {
+	SECTION("to action feature") { }
+	SECTION("to analog feature") { }
+	SECTION("to binary feature") { }
+}
+TEST_CASE("Binding mix: button + analog + analog", "[libv.ctrl]") {
+	SECTION("to action feature") { }
+	SECTION("to analog feature") { }
+	SECTION("to binary feature") { }
+}
+TEST_CASE("Binding mix: button + analog + button", "[libv.ctrl]") {
+	SECTION("to action feature") { }
+	SECTION("to analog feature") { }
+	SECTION("to binary feature") { }
+}
+TEST_CASE("Binding mix: button + button + button", "[libv.ctrl]") {
 	SECTION("to action feature") { }
 	SECTION("to analog feature") { }
 	SECTION("to binary feature") { }

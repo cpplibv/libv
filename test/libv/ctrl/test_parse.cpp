@@ -26,7 +26,7 @@ const auto utf8_codepoint = [](std::string_view input) {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("Sequence to_string", "[libv.control.parse]") {
+TEST_CASE("Sequence to_string", "[libv.ctrl.parse]") {
 	lc::Sequence s;
 	lc::Combination c;
 	lc::Input iW{lc::Keycode::W, lc::DigitalInputAction::press};
@@ -44,7 +44,7 @@ TEST_CASE("Sequence to_string", "[libv.control.parse]") {
 	CHECK(s.to_string_name() == "LCtrl + W [press], LCtrl + W [press]");
 }
 
-TEST_CASE("Parse inputID general", "[libv.control.parse]") {
+TEST_CASE("Parse inputID general", "[libv.ctrl.parse]") {
 	const auto test = [](std::string_view input, auto... args) {
 		const auto result = lc::parse_input_id_or_throw(input);
 		const auto expected = lc::InputID(args...);
@@ -440,7 +440,7 @@ TEST_CASE("Parse inputID general", "[libv.control.parse]") {
 	CHECK(not lc::parse_input_id_optional("Joystick1"));
 }
 
-TEST_CASE("Parse inputID with multi word keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with multi word keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("NumLck") == lc::InputID{lc::Keycode::NumLock});
 	CHECK(lc::parse_input_id_or_throw("NumLk") == lc::InputID{lc::Keycode::NumLock});
 	CHECK(lc::parse_input_id_or_throw("NumLock") == lc::InputID{lc::Keycode::NumLock});
@@ -462,7 +462,7 @@ TEST_CASE("Parse inputID with multi word keycode", "[libv.control.parse]") {
 	CHECK(lc::parse_input_id_or_throw("altgr") == lc::InputID{lc::Keycode::AltRight});
 }
 
-TEST_CASE("Parse inputID with num keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with num keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("0") == lc::InputID{lc::Keycode::Num0});
 	CHECK(lc::parse_input_id_or_throw("1") == lc::InputID{lc::Keycode::Num1});
 	CHECK(lc::parse_input_id_or_throw("num0") == lc::InputID{lc::Keycode::Num0});
@@ -471,7 +471,7 @@ TEST_CASE("Parse inputID with num keycode", "[libv.control.parse]") {
 	CHECK(lc::parse_input_id_or_throw("Num 1") == lc::InputID{lc::Keycode::Num1});
 }
 
-TEST_CASE("Parse inputID with kp keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with kp keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("KP minus") == lc::InputID{lc::Keycode::KPMinus});
 	CHECK(lc::parse_input_id_or_throw("KPminus") == lc::InputID{lc::Keycode::KPMinus});
 	CHECK(lc::parse_input_id_or_throw("Kp -") == lc::InputID{lc::Keycode::KPMinus});
@@ -505,7 +505,7 @@ TEST_CASE("Parse inputID with kp keycode", "[libv.control.parse]") {
 	CHECK(lc::parse_input_id_or_throw("numpadnum0") == lc::InputID{lc::Keycode::KPNum0});
 }
 
-TEST_CASE("Parse inputID with pg keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with pg keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("PAGE UP") == lc::InputID{lc::Keycode::PageUp});
 	CHECK(lc::parse_input_id_or_throw("PAGEUP") == lc::InputID{lc::Keycode::PageUp});
 	CHECK(lc::parse_input_id_or_throw("PG Up") == lc::InputID{lc::Keycode::PageUp});
@@ -516,7 +516,7 @@ TEST_CASE("Parse inputID with pg keycode", "[libv.control.parse]") {
 	CHECK(lc::parse_input_id_or_throw("pgup") == lc::InputID{lc::Keycode::PageUp});
 }
 
-TEST_CASE("Parse inputID with sided keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with sided keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("LCTRL") == lc::InputID{lc::Keycode::ControlLeft});
 	CHECK(lc::parse_input_id_or_throw("l ctrl") == lc::InputID{lc::Keycode::ControlLeft});
 	CHECK(lc::parse_input_id_or_throw("lctrl") == lc::InputID{lc::Keycode::ControlLeft});
@@ -542,7 +542,7 @@ TEST_CASE("Parse inputID with sided keycode", "[libv.control.parse]") {
 	CHECK(lc::parse_input_id_or_throw("shiftr") == lc::InputID{lc::Keycode::ShiftRight});
 }
 
-TEST_CASE("Parse inputID with named keycode", "[libv.control.parse]") {
+TEST_CASE("Parse inputID with named keycode", "[libv.ctrl.parse]") {
 	CHECK(lc::parse_input_id_or_throw("A") == lc::InputID{lc::Keycode::A});
 	CHECK(lc::parse_input_id_or_throw("a") == lc::InputID{lc::Keycode::A});
 
@@ -560,7 +560,7 @@ TEST_CASE("Parse inputID with named keycode", "[libv.control.parse]") {
 
 // =================================================================================================
 
-TEST_CASE("Parse Input general", "[libv.control.parse]") {
+TEST_CASE("Parse Input general", "[libv.ctrl.parse]") {
 	const auto test = [](std::string_view input, auto... args) {
 		const auto result = lc::parse_input_or_throw(input);
 		const auto expected = lc::Input{args...};
@@ -628,7 +628,7 @@ TEST_CASE("Parse Input general", "[libv.control.parse]") {
 	CHECK(not lc::parse_input_optional("JS2 A1:X+ [press]"));
 }
 
-TEST_CASE("Parse Combination general", "[libv.control.parse]") {
+TEST_CASE("Parse Combination general", "[libv.ctrl.parse]") {
 	const auto test = [](std::string_view input, auto... args) {
 		const auto result = lc::parse_combination_or_throw(input);
 		const auto expected = lc::Combination{args...};
@@ -705,7 +705,7 @@ TEST_CASE("Parse Combination general", "[libv.control.parse]") {
 	CHECK(not lc::parse_combination_optional("'+'++"));
 }
 
-TEST_CASE("Parse Sequence general", "[libv.control.parse]") {
+TEST_CASE("Parse Sequence general", "[libv.ctrl.parse]") {
 	const auto test = [](std::string_view input, auto... args) {
 		const auto result = lc::parse_sequence_or_throw(input);
 		const auto expected = lc::Sequence{args...};
@@ -743,7 +743,7 @@ TEST_CASE("Parse Sequence general", "[libv.control.parse]") {
 	CHECK(not lc::parse_sequence_optional("Ctrl + ,',',"));
 }
 
-TEST_CASE("InputID test to string round trip", "[libv.control.parse]") {
+TEST_CASE("InputID test to string round trip", "[libv.ctrl.parse]") {
 	const auto test = [](auto... args) {
 		const auto expected = lc::InputID{args...};
 

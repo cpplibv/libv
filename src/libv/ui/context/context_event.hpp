@@ -2,10 +2,10 @@
 
 #pragma once
 
-// std
-#include <memory>
-// libv
+#include <libv/ui/context/context_ui.hpp> // IWYU pragma: export // For convenience
 #include <libv/utility/nexus.hpp>
+
+#include <memory>
 
 
 namespace libv {
@@ -18,8 +18,9 @@ class ImplContextEvent;
 /// Context event is the main UI event hub. Every event signal and slot is connected inside.
 ///
 /// Connection types are:
-/// - Normal: Normal connection between two component
-/// - Global: Connection between UI Global signal and a normal component
+/// - Global: Connection between UI Global signal and a normal component or an outside callback
+/// - Normal: Connection between two component
+/// - External: Connection between a component and an outside callback
 class ContextEvent {
 public:
 	libv::Nexus nexus;

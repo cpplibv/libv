@@ -39,11 +39,12 @@ public:
 		PropertyL2<AlignVertical> align_vertical;
 
 //		TextProperties text_properties;
-
 //		PropertyL2<> align_horizontal;
 //		PropertyL2<> align_vertical;
 //		PropertyL1L2<> font;
 //		PropertyL1L2<> font_size;
+
+		PropertyB<FocusMode> focus_mode;
 	} property;
 
 	template <typename T> static void access_properties(T& ctx);
@@ -110,6 +111,11 @@ void CoreButton::access_properties(T& ctx) {
 			[](auto& c) -> auto& { return c.property.align_vertical; },
 			AlignVertical::top,
 			pgr::appearance, pnm::align_vertical, "Vertical alignment of the text"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.focus_mode; },
+			FocusMode::active,
+			pgr::behaviour, pnm::focus_mode, "Focus mode of the button"
 	);
 	ctx.synthesize(
 			T::handler_setter(&Button::text),

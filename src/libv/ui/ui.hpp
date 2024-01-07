@@ -26,14 +26,8 @@ namespace ui {
 
 // TODO P2: libv.ui: Implement global Setting and local property to disable Font2D LCD sub pixel rendering (both are required to be true to enable it)
 // TODO P2: libv.ui: Resource debugger: font and texture view at first
-// TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<CoreComponent>> getComponentAt(int, int);) | Not just mouse region based!
-// TODO P2: libv.ui: Record or report create/layout/render/destroy statistics
-// TODO P3: libv.ui: Idea reminder: glr could be more light with signed objects, and this might be a completely different approach
-//			<0 means look at some global glr store, and its only a promise, in the future there will be an object
-//			=0 default ctor, noop
-//			>0 actual opengl object index
-// TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
-// TODO P5: libv.ui: (?) void setFocusPolicy(...);
+// TODO P2: libv.ui: UI Debugger: Component stack on Hover (Not just mouse region based!) Go for full scan
+// TODO P2: libv.ui: Record or report create/layout12/render/destroy statistics
 
 struct EventGLCreate {
 	libv::GL& gl;
@@ -41,6 +35,23 @@ struct EventGLCreate {
 
 struct EventGLDestroy {
 	libv::GL& gl;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct UnhandledInputEventHandler {
+	virtual ~UnhandledInputEventHandler() = default;
+	virtual void event(const libv::input::EventChar& event, bool handled) = 0;
+	virtual void event(const libv::input::EventKey& event, bool handled) = 0;
+	virtual void event(const libv::input::EventMouseButton& event, bool handled) = 0;
+	virtual void event(const libv::input::EventMouseEnter& event, bool handled) = 0;
+	virtual void event(const libv::input::EventMousePosition& event, bool handled) = 0;
+	virtual void event(const libv::input::EventMouseScroll& event, bool handled) = 0;
+	virtual void event(const libv::input::EventGamepadAnalog& event, bool handled) = 0;
+	virtual void event(const libv::input::EventGamepadButton& event, bool handled) = 0;
+	virtual void event(const libv::input::EventJoystickButton& event, bool handled) = 0;
+	virtual void event(const libv::input::EventJoystickAnalog& event, bool handled) = 0;
+	virtual void update(libv::ui::time_duration deltaTime) = 0;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -85,6 +96,12 @@ public:
 	void event(const libv::input::EventMouseEnter& event);
 	void event(const libv::input::EventMousePosition& event);
 	void event(const libv::input::EventMouseScroll& event);
+	void event(const libv::input::EventGamepadAnalog& event);
+	void event(const libv::input::EventGamepadButton& event);
+	void event(const libv::input::EventJoystickButton& event);
+	void event(const libv::input::EventJoystickAnalog& event);
+
+	void unhandledEventHandler(std::unique_ptr<UnhandledInputEventHandler> handler);
 
 public:
 	[[nodiscard]] EventHostGlobal<Component> event();
@@ -103,25 +120,19 @@ public:
 	[[nodiscard]] ContextUI& context();
 
 	template <typename Frame> void attach(Frame& frame);
+	template <typename Controls> void attachControls(Controls& controls);
 
 public:
 	void create();
 	void update();
 	void destroy();
-
-private:
-	void focus(CoreComponent& component);
-	void detachFocused(CoreComponent& component);
-	void detachFocusLinked(CoreComponent& component);
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename Frame>
 void UI::attach(Frame& frame) {
-//	frame.onSize.output([this](const auto& e) {
-//		this->setSize(e.size);
-//	});
+	// frame.onSize is not used, onFramebufferSize is more accurate
 	frame.onFramebufferSize.output([this](const auto& e) {
 		this->setSize(e.size);
 	});
@@ -146,6 +157,19 @@ void UI::attach(Frame& frame) {
 		this->event(e);
 	});
 
+	frame.onGamepadAnalog.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onGamepadButton.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onJoystickAnalog.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onJoystickButton.output([this](const auto& e) {
+		this->event(e);
+	});
+
 	frame.onContextCreate.output([&](const auto&) {
 		this->create();
 	});
@@ -155,6 +179,53 @@ void UI::attach(Frame& frame) {
 	frame.onContextDestroy.output([&](const auto&) {
 		this->destroy();
 	});
+}
+
+template <typename Controls>
+void UI::attachControls(Controls& controls) {
+	struct Handler : UnhandledInputEventHandler {
+		Controls& controls;
+
+		explicit Handler(Controls& controls) : controls(controls) {}
+
+		virtual void event(const libv::input::EventChar& event, bool handled) override {
+			(void) event;
+			(void) handled;
+		}
+		virtual void event(const libv::input::EventKey& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventMouseButton& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventMouseEnter& event, bool handled) override {
+			(void) event;
+			(void) handled;
+		}
+		virtual void event(const libv::input::EventMousePosition& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventMouseScroll& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventGamepadAnalog& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventGamepadButton& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventJoystickButton& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void event(const libv::input::EventJoystickAnalog& event, bool handled) override {
+			controls.event(event, !handled);
+		}
+		virtual void update(libv::ui::time_duration deltaTime) override {
+			controls.update(deltaTime);
+		}
+	};
+
+	this->unhandledEventHandler(std::make_unique<Handler>(controls));
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -208,8 +208,8 @@ void Component::style_state(StyleState state, bool value) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void Component::focus() {
-	ptr_->focus();
+void Component::focus(FocusMode mode) {
+	ptr_->focus(mode);
 }
 
 void Component::enable(bool value) {

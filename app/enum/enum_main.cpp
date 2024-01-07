@@ -184,7 +184,7 @@ public:
 		out("public:\n");
 		out("	explicit(false) constexpr inline {}(enum_type value) noexcept :\n", class_enum_type_name);
 		out("		enum_value_(value) {{\n");
-		out("		assert(underlying() >= 0 && underlying() < {});\n", enum_entries.size());
+		out("		assert(static_cast<underlying_type>(enum_value_) >= 0 && static_cast<underlying_type>(enum_value_) < {});\n", enum_entries.size());
 		out("	}}\n");
 		out("\n");
 		out("	explicit(false) constexpr inline operator enum_type() const noexcept {{\n");

@@ -171,6 +171,7 @@ void CoreInputField::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void CoreInputField::onChar(const EventChar& event) {
+	event.stop_propagation();
 	text_.insert(caret, event.unicode);
 
 	caret++;
@@ -179,13 +180,13 @@ void CoreInputField::onChar(const EventChar& event) {
 	flagAuto(Flag::pendingRender);
 	fire(EventChange{});
 	fire(EventCaret{});
-	event.stop_propagation();
 }
 
 void CoreInputField::onKey(const EventKey& event) {
 	// TODO P2: libv.ui: better/simpler access to modifiers
 	const auto shift = ui().state.key_pressed(libv::input::Keycode::ShiftLeft) || ui().state.key_pressed(libv::input::Keycode::ShiftRight);
 	const auto ctrl = ui().state.key_pressed(libv::input::Keycode::ControlLeft) || ui().state.key_pressed(libv::input::Keycode::ControlRight);
+	const auto alt = ui().state.key_pressed(libv::input::Keycode::AltLeft) || ui().state.key_pressed(libv::input::Keycode::AltRight);
 	const auto pressOrRepeat = event.action != libv::input::Action::release;
 
 	if (event.keycode == libv::input::Keycode::Backspace && pressOrRepeat) {
@@ -298,6 +299,23 @@ void CoreInputField::onKey(const EventKey& event) {
 		fire(EventCaret{});
 		return event.stop_propagation();
 	}
+
+	// Heuristic to detect and absorb Key events that could result in printable charachters while allowing
+	// non-text related input propgation. This is not perfect and can never be perfect due to the funamental
+	// nature of how charachter input works.
+	// If this heuristic fails the only issue it generates that a printable keystroke maybe used by
+	// others (like controls hotkey) and it could execute both an unrelated operation and an append of a new
+	// character. As a last resort this can be worked around by the user pasting in the charachter and/or
+	// remapping the controls.
+	//                  | char ctrl alt  shft | Printable
+	// A                | 1    0    0    *    | 1
+	// F1               | 0    0    0    *    | 0
+	// Ctrl F1          | 0    1    0    *    | 0
+	// Ctrl S           | 1    1    0    *    | 0
+	// Ctrl Alt J       | 1    1    1    0    | 1 (AltGr aka Ctrl+Alt used for alt charachters)
+	// Ctrl Shift Alt A | 1    1    1    1    | 0
+	if (pressOrRepeat && libv::input::isPrintableCharacterKey(event.keycode) && (!ctrl || (alt && !shift)))
+		event.stop_propagation();
 }
 
 void CoreInputField::onFocus(const EventFocus& event) {
@@ -328,7 +346,7 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 
 	if (!isFocused() && event.action == libv::input::Action::press)
 		// NOTE: This focus causes a second EventCaret, could be fixed, but not really important
-		focus();
+		focus(FocusMode::active);
 
 	if (event.action == libv::input::Action::press) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
@@ -339,31 +357,31 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 }
 
 void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
-//	if (event.enter)
-//		set(property.bg_color, property.bg_color() + 0.2f);
-//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-//
-//	if (event.leave)
-//		set(property.bg_color, property.bg_color() - 0.2f);
-//		reset(property.bg_color);
-//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-
-	// === TEMP ========================================================================================
-	if (ui().state.key_pressed(libv::input::Keycode::F1)) {
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position - padding_LB()));
-		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{});
-	}
-	if (ui().state.key_pressed(libv::input::Keycode::F2)) {
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
-		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{});
-	}
-	// =================================================================================================
-
 	event.stop_propagation();
+
+	// if (event.enter)
+	// 	set(property.bg_color, property.bg_color() + 0.2f);
+	// 	// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+	//
+	// if (event.leave)
+	// 	set(property.bg_color, property.bg_color() - 0.2f);
+	// 	reset(property.bg_color);
+	// 	// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+
+	// // === TEMP ========================================================================================
+	// if (ui().state.key_pressed(libv::input::Keycode::F1)) {
+	// 	caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position - padding_LB()));
+	// 	caretStartTime = clock::now();
+	// 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	// 	fire(EventCaret{});
+	// }
+	// if (ui().state.key_pressed(libv::input::Keycode::F2)) {
+	// 	caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
+	// 	caretStartTime = clock::now();
+	// 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	// 	fire(EventCaret{});
+	// }
+	// // =================================================================================================
 }
 
 void CoreInputField::onMouseScroll(const EventMouseScroll& event) {

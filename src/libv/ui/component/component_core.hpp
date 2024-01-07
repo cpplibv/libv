@@ -18,8 +18,10 @@
 #include <libv/ui/component_system/flag.hpp>
 #include <libv/ui/component_system/generate_name.hpp>
 #include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_resource.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/focus_mode.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
@@ -278,7 +280,7 @@ public:
 	void enable(bool value) noexcept;
 	[[nodiscard]] bool enable() const noexcept;
 
-	void focus() noexcept;
+	void focus(FocusMode mode) noexcept;
 	void markRemove() noexcept;
 	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
 	void style(libv::intrusive2_ptr<Style> style) noexcept;
@@ -305,8 +307,8 @@ private:
 private:
 	static void eventChar(CoreComponent& component, const EventChar& event);
 	static void eventKey(CoreComponent& component, const EventKey& event);
-	static void focusGain(CoreComponent& component);
-	static void focusLoss(CoreComponent& component);
+	static void focusGain(CoreComponent& component, bool active);
+	static void focusLoss(CoreComponent& component, bool active);
 
 private:
 	virtual void onChar(const EventChar& event);
@@ -490,11 +492,11 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) styleScanAll(CoreComponent& component) {
 		return component.styleScanAll();
 	}
-	static inline decltype(auto) focusGain(CoreComponent& component) {
-		return CoreComponent::focusGain(component);
+	static inline decltype(auto) focusGain(CoreComponent& component, bool active) {
+		return CoreComponent::focusGain(component, active);
 	}
-	static inline decltype(auto) focusLoss(CoreComponent& component) {
-		return CoreComponent::focusLoss(component);
+	static inline decltype(auto) focusLoss(CoreComponent& component, bool active) {
+		return CoreComponent::focusLoss(component, active);
 	}
 	static inline decltype(auto) focusTraverse(CoreComponent& component, const ContextFocusTraverse& context) {
 		return component.focusTraverse(context);

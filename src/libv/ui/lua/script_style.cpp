@@ -25,6 +25,7 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/parse/parse_anchor.hpp>
+#include <libv/ui/parse/parse_focus_mode.hpp>
 #include <libv/ui/parse/parse_orientation.hpp>
 #include <libv/ui/parse/parse_orientation2.hpp>
 #include <libv/ui/parse/parse_scroll_mode.hpp>
@@ -638,6 +639,7 @@ public:
 		//		property_loaders.emplace(pnm::caret_shader, _______);
 		property_loaders.emplace(pnm::color, conv_fn(libv::lua::convert_color));
 		property_loaders.emplace(pnm::column_count, convert_enum_value<ColumnCount>());
+		property_loaders.emplace(pnm::focus_mode, convert_string_parse(&libv::ui::parse_focus_mode_optional));
 //		property_loaders.emplace(pnm::focus_select_policy, _______);
 		property_loaders.emplace(pnm::font, convert_font);
 //		property_loaders.emplace(pnm::font_outline, convert_font_outline);

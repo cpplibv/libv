@@ -16,6 +16,7 @@ class Component;
 class CoreComponent;
 
 class ContextEvent;
+class ContextFocus;
 class ContextFocusTraverse;
 class ContextLayout1;
 class ContextLayout2;

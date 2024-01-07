@@ -27,26 +27,26 @@ namespace ui {
 enum class StyleState : uint32_t {
 	none           = 0,
 
-	disable        = 1u << 0u, // 1
-	hover          = 1u << 1u, // 2
-	focus          = 1u << 2u, // 4
+	disable        = 1u << 0u, //
+	hover          = 1u << 1u, //
+	// hover_within   = 1u << 2u, //
+	focus          = 1u << 3u, //
+	// focus_within   = 1u << 4u, //
 
-	active         = 1u << 3u, // 8
+	active         = 1u << 5u, //
 
-	select         = 1u << 4u, // 16 - Tab is active
+	select         = 1u << 6u, // Tab is active
 
-	progress       = 1u << 5u, // 32
-	done           = 1u << 6u, // 64
-	error          = 1u << 7u, // 128
+	progress       = 1u << 7u, //
+	done           = 1u << 8u, //
+	error          = 1u << 9u, //
 
-//	_              = 1u << 8u,
-//	_              = 1u << 9u,
-//	_              = 1u << 10u,
-//	_              = 1u << 11u,
-//	_              = 1u << 12u,
-//	_              = 1u << 13u,
-//	_              = 1u << 14u,
-//	_              = 1u << 15u,
+	// mod2           = 1u << 10u, // ChildIndex % 2 == 0
+	// mod3           = 1u << 11u, // ChildIndex % 3 == 0
+	// first          = 1u << 12u, // ChildIndex == 0
+	// last           = 1u << 13u, // ChildIndex == N-1
+	// _              = 1u << 14u,
+	// _              = 1u << 15u,
 
 	custom0        = 1u << 16u,
 	custom1        = 1u << 17u,

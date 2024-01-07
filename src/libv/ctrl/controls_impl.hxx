@@ -26,7 +26,7 @@ namespace ctrl {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: generalized double buffered template
+// TODO P5: Generalize double buffered template
 class DeadkeySet {
 	using container_type = boost::container::flat_set<Binding*>;
 

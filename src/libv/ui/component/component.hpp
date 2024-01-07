@@ -16,6 +16,7 @@
 #include <libv/ui/event_system/event_host.hpp>
 #include <libv/ui/event_system/event_reentry_guard.hpp>
 #include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/focus_mode.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
@@ -186,7 +187,7 @@ public:
 	void style_state(StyleState state, bool value) noexcept;
 
 public:
-	void focus();
+	void focus(FocusMode mode);
 
 	void enable(bool value);
 	[[nodiscard]] bool enable() const;

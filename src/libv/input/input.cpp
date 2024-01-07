@@ -9,7 +9,139 @@ namespace input {
 
 // -------------------------------------------------------------------------------------------------
 
-std::string_view to_string(const Action value) {
+bool isPrintableCharacterKey(const Keycode keycode) noexcept {
+	switch (keycode) {
+	case Keycode::Space: [[fallthrough]];
+	case Keycode::Apostrophe: [[fallthrough]];
+	case Keycode::Comma: [[fallthrough]];
+	case Keycode::Minus: [[fallthrough]];
+	case Keycode::Period: [[fallthrough]];
+	case Keycode::Slash: [[fallthrough]];
+	case Keycode::Num0: [[fallthrough]];
+	case Keycode::Num1: [[fallthrough]];
+	case Keycode::Num2: [[fallthrough]];
+	case Keycode::Num3: [[fallthrough]];
+	case Keycode::Num4: [[fallthrough]];
+	case Keycode::Num5: [[fallthrough]];
+	case Keycode::Num6: [[fallthrough]];
+	case Keycode::Num7: [[fallthrough]];
+	case Keycode::Num8: [[fallthrough]];
+	case Keycode::Num9: [[fallthrough]];
+	case Keycode::Semicolon: [[fallthrough]];
+	case Keycode::Equals: [[fallthrough]];
+	case Keycode::A: [[fallthrough]];
+	case Keycode::B: [[fallthrough]];
+	case Keycode::C: [[fallthrough]];
+	case Keycode::D: [[fallthrough]];
+	case Keycode::E: [[fallthrough]];
+	case Keycode::F: [[fallthrough]];
+	case Keycode::G: [[fallthrough]];
+	case Keycode::H: [[fallthrough]];
+	case Keycode::I: [[fallthrough]];
+	case Keycode::J: [[fallthrough]];
+	case Keycode::K: [[fallthrough]];
+	case Keycode::L: [[fallthrough]];
+	case Keycode::M: [[fallthrough]];
+	case Keycode::N: [[fallthrough]];
+	case Keycode::O: [[fallthrough]];
+	case Keycode::P: [[fallthrough]];
+	case Keycode::Q: [[fallthrough]];
+	case Keycode::R: [[fallthrough]];
+	case Keycode::S: [[fallthrough]];
+	case Keycode::T: [[fallthrough]];
+	case Keycode::U: [[fallthrough]];
+	case Keycode::V: [[fallthrough]];
+	case Keycode::W: [[fallthrough]];
+	case Keycode::X: [[fallthrough]];
+	case Keycode::Y: [[fallthrough]];
+	case Keycode::Z: [[fallthrough]];
+	case Keycode::BracketOpen: [[fallthrough]];
+	case Keycode::Backslash: [[fallthrough]];
+	case Keycode::BracketClose: [[fallthrough]];
+	case Keycode::Backtick: [[fallthrough]];
+	case Keycode::World1: [[fallthrough]];
+	case Keycode::World2: [[fallthrough]];
+	case Keycode::KPNum0: [[fallthrough]];
+	case Keycode::KPNum1: [[fallthrough]];
+	case Keycode::KPNum2: [[fallthrough]];
+	case Keycode::KPNum3: [[fallthrough]];
+	case Keycode::KPNum4: [[fallthrough]];
+	case Keycode::KPNum5: [[fallthrough]];
+	case Keycode::KPNum6: [[fallthrough]];
+	case Keycode::KPNum7: [[fallthrough]];
+	case Keycode::KPNum8: [[fallthrough]];
+	case Keycode::KPNum9: [[fallthrough]];
+	case Keycode::KPDot: [[fallthrough]];
+	case Keycode::KPSlash: [[fallthrough]];
+	case Keycode::KPAsterisk: [[fallthrough]];
+	case Keycode::KPMinus: [[fallthrough]];
+	case Keycode::KPPlus: [[fallthrough]];
+	case Keycode::KPEqual:
+		return true;
+	case Keycode::Unknown: [[fallthrough]];
+	case Keycode::Escape: [[fallthrough]];
+	case Keycode::Enter: [[fallthrough]];
+	case Keycode::Tab: [[fallthrough]];
+	case Keycode::Backspace: [[fallthrough]];
+	case Keycode::Insert: [[fallthrough]];
+	case Keycode::Delete: [[fallthrough]];
+	case Keycode::Right: [[fallthrough]];
+	case Keycode::Left: [[fallthrough]];
+	case Keycode::Down: [[fallthrough]];
+	case Keycode::Up: [[fallthrough]];
+	case Keycode::PageUp: [[fallthrough]];
+	case Keycode::PageDown: [[fallthrough]];
+	case Keycode::Home: [[fallthrough]];
+	case Keycode::End: [[fallthrough]];
+	case Keycode::CapsLock: [[fallthrough]];
+	case Keycode::ScrollLock: [[fallthrough]];
+	case Keycode::NumLock: [[fallthrough]];
+	case Keycode::PrintScreen: [[fallthrough]];
+	case Keycode::Pause: [[fallthrough]];
+	case Keycode::F1: [[fallthrough]];
+	case Keycode::F2: [[fallthrough]];
+	case Keycode::F3: [[fallthrough]];
+	case Keycode::F4: [[fallthrough]];
+	case Keycode::F5: [[fallthrough]];
+	case Keycode::F6: [[fallthrough]];
+	case Keycode::F7: [[fallthrough]];
+	case Keycode::F8: [[fallthrough]];
+	case Keycode::F9: [[fallthrough]];
+	case Keycode::F10: [[fallthrough]];
+	case Keycode::F11: [[fallthrough]];
+	case Keycode::F12: [[fallthrough]];
+	case Keycode::F13: [[fallthrough]];
+	case Keycode::F14: [[fallthrough]];
+	case Keycode::F15: [[fallthrough]];
+	case Keycode::F16: [[fallthrough]];
+	case Keycode::F17: [[fallthrough]];
+	case Keycode::F18: [[fallthrough]];
+	case Keycode::F19: [[fallthrough]];
+	case Keycode::F20: [[fallthrough]];
+	case Keycode::F21: [[fallthrough]];
+	case Keycode::F22: [[fallthrough]];
+	case Keycode::F23: [[fallthrough]];
+	case Keycode::F24: [[fallthrough]];
+	case Keycode::F25: [[fallthrough]];
+	case Keycode::KPEnter: [[fallthrough]];
+	case Keycode::ShiftLeft: [[fallthrough]];
+	case Keycode::ControlLeft: [[fallthrough]];
+	case Keycode::AltLeft: [[fallthrough]];
+	case Keycode::SuperLeft: [[fallthrough]];
+	case Keycode::ShiftRight: [[fallthrough]];
+	case Keycode::ControlRight: [[fallthrough]];
+	case Keycode::AltRight: [[fallthrough]];
+	case Keycode::SuperRight: [[fallthrough]];
+	case Keycode::Menu:
+		return false;
+	}
+
+	return false;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::string_view to_string(const Action value) noexcept {
 	switch (value) {
 	case Action::release: return "release";
 	case Action::press: return "press";
@@ -19,7 +151,7 @@ std::string_view to_string(const Action value) {
 	return "<<invalid-Action-enum-value>>";
 }
 
-std::string_view to_string(const GamepadButton value) {
+std::string_view to_string(const GamepadButton value) noexcept {
 	switch (value) {
 	case GamepadButton::A: return "A";
 	case GamepadButton::B: return "B";
@@ -41,7 +173,7 @@ std::string_view to_string(const GamepadButton value) {
 	return "<<invalid-GamepadButton-enum-value>>";
 }
 
-std::string_view to_string(const Keycode value) {
+std::string_view to_string(const Keycode value) noexcept {
 	switch (value) {
 	case Keycode::Unknown: return "Unknown";
 	case Keycode::Space: return "Space";
@@ -169,7 +301,7 @@ std::string_view to_string(const Keycode value) {
 	return "<<invalid-Keycode-enum-value>>";
 }
 
-std::string_view to_string(const KeyState value) {
+std::string_view to_string(const KeyState value) noexcept {
 	switch (value) {
 	case KeyState::pressed: return "pressed";
 	case KeyState::released: return "released";
@@ -178,7 +310,7 @@ std::string_view to_string(const KeyState value) {
 	return "<<invalid-KeyState-enum-value>>";
 }
 
-std::string_view to_string(const MonitorEvent value) {
+std::string_view to_string(const MonitorEvent value) noexcept {
 	switch (value) {
 	case MonitorEvent::connected: return "connected";
 	case MonitorEvent::disconnected: return "disconnected";
@@ -187,7 +319,7 @@ std::string_view to_string(const MonitorEvent value) {
 	return "<<invalid-MonitorEvent-enum-value>>";
 }
 
-std::string_view to_string(const MouseButton value) {
+std::string_view to_string(const MouseButton value) noexcept {
 	switch (value) {
 	case MouseButton::Button0: static_assert(MouseButton::Button0 == MouseButton::Left, ""); return "left";
 	case MouseButton::Button1: static_assert(MouseButton::Button1 == MouseButton::Right, ""); return "right";

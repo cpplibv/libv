@@ -9,6 +9,7 @@
 
 compute-shader:
 	dx dy in compute shader: https://wickedengine.net/2022/05/08/derivatives-in-compute-shader/
+	I might not materialize the normal texture for terrain
 
 surface could use tessalation shaders:
 		https://www.youtube.com/watch?v=21gfE-zUym8
@@ -42,7 +43,7 @@ kill sprite index VBO, reuse and share one index VBO (libv.glr mesh support to a
 remember last config
 priority sorting
 
-seed a non-seeded noise : random x y offset and rotation, mat3
+seed a non-seeded noise : random x y offset and rotation with a single mat3 multiple operation
 
 sprite not smooth but discrete angle following
 \ sprite looks at eye, it should be just parallel with camera right, this would fix issues with orbit z hard clipping into each other and covering the other partially

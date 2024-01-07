@@ -2,20 +2,19 @@
 
 #pragma once
 
-// libv
 #include <libv/glr/fwd.hpp>
 #include <libv/math/vec.hpp>
-// std
-#include <functional>
-#include <memory>
-#include <span>
-// pro
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/context/context_ui.hpp> // IWYU pragma: export // For convenience
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/shader_font.hpp>
 #include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/shader_quad.hpp>
 #include <libv/ui/property/texture_2D.hpp>
+
+#include <functional>
+#include <memory>
+#include <span>
 
 
 namespace libv {

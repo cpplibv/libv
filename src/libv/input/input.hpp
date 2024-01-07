@@ -303,12 +303,14 @@ enum class Keycode : int32_t {
 
 enum class Scancode	: int32_t {};
 
-std::string_view to_string(const Action value);
-std::string_view to_string(const GamepadButton value);
-std::string_view to_string(const Keycode value);
-std::string_view to_string(const KeyState value);
-std::string_view to_string(const MonitorEvent value);
-std::string_view to_string(const MouseButton value);
+[[nodiscard]] bool isPrintableCharacterKey(const Keycode keycode) noexcept;
+
+[[nodiscard]] std::string_view to_string(const Action value) noexcept;
+[[nodiscard]] std::string_view to_string(const GamepadButton value) noexcept;
+[[nodiscard]] std::string_view to_string(const Keycode value) noexcept;
+[[nodiscard]] std::string_view to_string(const KeyState value) noexcept;
+[[nodiscard]] std::string_view to_string(const MonitorEvent value) noexcept;
+[[nodiscard]] std::string_view to_string(const MouseButton value) noexcept;
 
 // -------------------------------------------------------------------------------------------------
 

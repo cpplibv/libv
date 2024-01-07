@@ -1,46 +1,3 @@
-libv.diff: make sure every stream input respects offset (?) | for output it makes sense, but for input I need the end of it | Done with byte streams
-libv.hash: Generate md5 hash from file without needing to handle the istream
-libv.update: patch create folder
-libv.update: patch remove folder
-libv.update: Patch apply progress report
-libv.update: Patch improved logging
-libv.state: Find a state machine solution | for now boost statechart will be good enough
-libv.mt: pimpl worker_thread_pool and worker_thread
-libv.mt: common base queue for worker_thread_pool and worker_thread only difference is "run" calls (?)
-libv.mt: Add load function argument support for async_value
-ext: pulled in cppcoro, but need to work around cmake issue of WIN32 branching in lib
-ext: fork cppcoro to fix build issues
-libv.net: Implement new network handler based connection and acceptor
-libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
-libv: fix typo SERIALIAZTION -> SERIALIZATION
-libv.serialization: Rename libv.serialization to libv.serial
-libv.serialization: Rename SERIALIZATION to SERIAL
-libv.algorithm: Rename libv.algorithm to libv.algo
-libv: Result only types should be marked nodiscard
-libv.utility: input bytes on static memory should return correct amount of read bytes
-libv.serial: Add support for non stream based IO Binary archives
-libv.serial: Add support for non string based codec
-libv.update: Implement real server side version check response calculation
-libv.net: Add support for non string based connection send / receive
-libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
-libv.utility: Implement IntervalRegistry utility type
-libv.security: Move signature checking of sandbox_openssl into a new wrapper lib (public / private key)
-libv.net.mtcp: Refactor the connection internal states
-libv.net.mtcp: Refactor the connection API
-libv.net.mtcp: Single write op for header and body
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -51,12 +8,22 @@ libv.net.mtcp: Single write op for header and body
 
 
 
+!!! libv.serial: For safety the only change I should do for now, is get rid of reserves / resizes in serializers
+		This includes every:
+		cereal/types
+		libv/serial/types
+		libv/utility/entity/entity_ptr_serial
+		any *_serial file that serializes a size_type
+
+
+
+
+
+
 place.it: auto update could be assisted with the application main being in a dll? with a skeleton.exe
 
 place.it: HTTP server / REST api in C++: https://www.youtube.com/watch?v=uqPTzUdNLZk | https://github.com/kevinbcarpenter/restful-with-billions
-place.it:
-	CICD:
-		git: Commit count up to a revision: git rev-list --count HEAD
+
 
 libv.update: Resource Client
 	Single file download: Partial download recovery IDEA of an alternative approach would be to only write out the progress meta data every X seconds
@@ -102,13 +69,6 @@ libv.net: Add support for endpoint access in mtcp on_accept (passing other type 
 			| This is important, IP bans could be implemented this way
 			| ? But be careful, endpoints are only set with the connect call
 
-
-!!! libv.serial: For safety the only change I should do for now, is get rid of reserves / resizes in serializers
-		This includes every:
-		cereal/types
-		libv/serial/types
-		libv/utility/entity/entity_ptr_serial
-		any *_serial file that serializes a size_type
 
 libv.update: PAPER
 	Update file name
