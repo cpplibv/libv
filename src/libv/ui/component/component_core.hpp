@@ -52,7 +52,7 @@ class CoreComponent {
 private:
 	Flag_t flags = Flag::mask_init;
 	StyleState_t style_state_ = StyleState::none;
-	ChildID childID = 0;
+	ChildID childID_ = 0;
 	uint32_t ref_count = 0;
 
 	libv::vec2f layout_position_; /// Component position relative to parent in pixels, bottom_left corner
@@ -91,6 +91,9 @@ public:
 	CoreComponent& operator=(CoreComponent&&) = delete;
 
 	virtual ~CoreComponent();
+
+private:
+	void childID(ChildID id) noexcept;
 
 public:
 	[[nodiscard]] inline libv::observer_ref<CoreComponent> parent() const noexcept {
@@ -417,11 +420,11 @@ struct AccessEvent {
 };
 
 struct AccessParent {
-	[[nodiscard]] static inline auto& childID(CoreComponent& component) noexcept {
-		return component.childID;
+	static inline void childID(CoreComponent& component, ChildID id) noexcept {
+		component.childID(id);
 	}
 	[[nodiscard]] static inline const auto& childID(const CoreComponent& component) noexcept {
-		return component.childID;
+		return component.childID_;
 	}
 	static inline decltype(auto) isFocusableComponent(const CoreComponent& component) {
 		return component.isFocusableComponent();

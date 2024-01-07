@@ -52,7 +52,7 @@ void CorePanelBoard::doDetachChildren(libv::function_ref<bool(Component&)> callb
 		if (remove)
 			++numRemoved;
 		else
-			AccessParent::childID(child.component.core()) -= numRemoved;
+			AccessParent::childID(child.component.core(), AccessParent::childID(child.component.core()) - numRemoved);
 
 		return remove;
 	});
@@ -152,7 +152,7 @@ void PanelBoard::background(Background value) {
 
 void PanelBoard::add(Component component, libv::vec2f position, libv::vec2f size) {
 	const auto childID = static_cast<ChildID>(self().children.size());
-	AccessParent::childID(component.core()) = childID;
+	AccessParent::childID(component.core(), childID);
 
 	self().children.emplace_back(std::move(component), position, size);
 	self().flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);

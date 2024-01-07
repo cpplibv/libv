@@ -9,13 +9,6 @@
 libv.ui: Hover styles state should be auto handled
 StyleState::hover
 
-libv.ui: "State" property: mod<n> (mod2 mod3 is enough for now)
-libv.ui: "State" property: <n>th (first and last is enough for now)
-		StyleState::mod2
-		StyleState::mod3
-		StyleState::first
-		StyleState::last
-
 
 
 

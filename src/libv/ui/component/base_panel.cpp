@@ -19,7 +19,7 @@ namespace ui {
 
 void CoreBasePanel::add(Component component) {
 	const auto childID = static_cast<ChildID>(children.size());
-	AccessParent::childID(component.core()) = childID;
+	AccessParent::childID(component.core(), childID);
 
 	children.emplace_back(std::move(component));
 	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
@@ -38,7 +38,7 @@ void CoreBasePanel::add(Component component, std::size_t index) {
 	// Reassign IDs
 	int32_t id = 0;
 	for (auto i = index; i < children.size(); ++i)
-		AccessParent::childID(children[i].core()) = ChildID{id++};
+		AccessParent::childID(children[i].core(), ChildID{id++});
 
 	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
 	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
@@ -50,7 +50,7 @@ void CoreBasePanel::add_front(Component component) {
 	// Reassign IDs
 	int32_t id = 0;
 	for (auto& child : children)
-		AccessParent::childID(child.core()) = ChildID{id++};
+		AccessParent::childID(child.core(), ChildID{id++});
 
 	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
 	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
@@ -113,7 +113,7 @@ void CoreBasePanel::doDetachChildren(libv::function_ref<bool(Component&)> callba
 		if (remove)
 			++numRemoved;
 		else
-			AccessParent::childID(child.core()) -= numRemoved;
+			AccessParent::childID(child.core(), AccessParent::childID(child.core()) - numRemoved);
 
 		return remove;
 	});

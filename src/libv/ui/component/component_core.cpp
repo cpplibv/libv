@@ -68,6 +68,16 @@ CoreComponent::~CoreComponent() {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreComponent::childID(ChildID id) noexcept {
+	style_state(StyleState::first, id == 0);
+	// style_state(StyleState::last, id == parent->???); // TODO P5: child index style selector for last
+	style_state(StyleState::mod2, id % 2 == 0);
+	style_state(StyleState::mod3, id % 3 == 0);
+	childID_ = id;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 std::string CoreComponent::path() const {
 	//	std::size_t path_length = name.size() + 1;
 	//	for
@@ -92,11 +102,11 @@ std::string CoreComponent::path() const {
 
 	// ---
 
-	std::string result = std::to_string(childID) + ':' + name;
+	std::string result = std::to_string(childID_) + ':' + name;
 
 	// Iterate every component except the root
 	for (auto it = parent_; it != it->parent_; it = it->parent_)
-		result = std::to_string(it->childID) + ':' + it->name + '/' + std::move(result);
+		result = std::to_string(it->childID_) + ':' + it->name + '/' + std::move(result);
 
 	// Place the root marker in the front
 	result = '/' + std::move(result);
@@ -625,7 +635,8 @@ void CoreComponent::detach() {
 
 	doDetach();
 
-	childID = 0;
+	childID_ = 0;
+	style_state_ = StyleState::none;
 	flags = Flag::mask_init;
 	parent_ = make_observer_ref(this);
 	layout_position_ = {};
@@ -656,7 +667,7 @@ void CoreComponent::styleScan() {
 	StyleAccess sa{modeSelf, modeChild};
 	doStyle(sa);
 	if (pendingSelf && parent_ != this) // NOTE: parent_ != this Condition is required to avoid root component edge case (Root is a container and not a child of itself)
-		parent_->doStyleChild(sa, childID);
+		parent_->doStyleChild(sa, childID_);
 
 	flags.reset(Flag::pendingStyle);
 }
@@ -670,7 +681,7 @@ void CoreComponent::styleScanAll() {
 	StyleAccess sa{modeSelf, modeChild};
 	doStyle(sa);
 	if (pendingSelf && parent_ != this) // NOTE: parent_ != this Condition is required to avoid root component edge case (Root is a container and not a child of itself)
-		parent_->doStyleChild(sa, childID);
+		parent_->doStyleChild(sa, childID_);
 
 	flags.reset(Flag::pendingStyle);
 }
@@ -682,7 +693,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 	libv::observer_ref<CoreComponent> ancestor = make_observer_ref(this);
 
 	while (result == nullptr && ancestor != ancestor->parent_) {
-		result = ancestor->parent_->doFocusTraverse(context, ancestor->childID);
+		result = ancestor->parent_->doFocusTraverse(context, ancestor->childID_);
 		ancestor = ancestor->parent_;
 	}
 
