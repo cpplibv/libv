@@ -21,6 +21,7 @@
 #include <libv/ui/event/event_enable.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
+#include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_system/property_access.hpp>
 #include <libv/ui/style/style.hpp>
@@ -419,6 +420,16 @@ bool CoreComponent::isFocusableComponent() const noexcept {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void CoreComponent::eventMouseMovement(const EventMouseMovement& event) {
+	if (event.enter)
+		style_state(StyleState::hover, true);
+
+	if (event.leave)
+		style_state(StyleState::hover, false);
+
+	onMouseMovement(event);
+}
 
 void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) {
 	for (auto it = make_observer_ref(&component); true; it = it->parent_) {

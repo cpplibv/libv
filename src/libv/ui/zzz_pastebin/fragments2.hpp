@@ -303,16 +303,6 @@ struct FragmentButton : Content {
 	}
 
 	void fragmentOnMouseMovement(const EventMouseMovement& event) {
-		if (event.enter)
-			style_state(StyleState::hover, true);
-
-		if (event.leave)
-			style_state(StyleState::hover, false);
-
-		// TODO P1: style_state(StyleState::active, false); after the mouse leaves the component area (while it was active): maybe it has to acquire or soft acquire the mouse? so it can track the release (ergo deactivate) event
-		//		style_state(StyleState::active, false);
-
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 		fire(EventMouseMovement{event});
 
 		event.stop_propagation();

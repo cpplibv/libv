@@ -308,6 +308,7 @@ private:
 	[[nodiscard]] bool isFocusableComponent() const noexcept;
 
 private:
+	void eventMouseMovement(const EventMouseMovement& event);
 	static void eventChar(CoreComponent& component, const EventChar& event);
 	static void eventKey(CoreComponent& component, const EventKey& event);
 	static void focusChange(CoreComponent* componentOld, bool activeOld, CoreComponent* componentNew, bool activeNew);
@@ -412,7 +413,7 @@ struct AccessEvent {
 		return component.onMouseButton(event);
 	}
 	static inline decltype(auto) onMouseMovement(CoreComponent& component, const EventMouseMovement& event) {
-		return component.onMouseMovement(event);
+		return component.eventMouseMovement(event);
 	}
 	static inline decltype(auto) onMouseScroll(CoreComponent& component, const EventMouseScroll& event) {
 		return component.onMouseScroll(event);
