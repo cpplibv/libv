@@ -725,12 +725,20 @@ public:
 
 			if (process_state("disable", StyleState::disable)) continue;
 			if (process_state("hover", StyleState::hover)) continue;
+			if (process_state("hover-within", StyleState::hover_within)) continue;
+			if (process_state("hover_within", StyleState::hover_within)) continue;
 			if (process_state("focus", StyleState::focus)) continue;
+			if (process_state("focus-within", StyleState::focus_within)) continue;
+			if (process_state("focus_within", StyleState::focus_within)) continue;
 			if (process_state("active", StyleState::active)) continue;
 			if (process_state("select", StyleState::select)) continue;
 			if (process_state("progress", StyleState::progress)) continue;
 			if (process_state("done", StyleState::done)) continue;
 			if (process_state("error", StyleState::error)) continue;
+			if (process_state("mod2", StyleState::mod2)) continue;
+			if (process_state("mod3", StyleState::mod3)) continue;
+			if (process_state("first", StyleState::first)) continue;
+			if (process_state("last", StyleState::last)) continue;
 
 			if (process_state("custom0", StyleState::custom0)) continue;
 			if (process_state("custom1", StyleState::custom1)) continue;

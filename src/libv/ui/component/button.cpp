@@ -31,8 +31,6 @@ void CoreButton::routineSubmit() {
 void CoreButton::onFocus(const EventFocus& event) {
 	(void) event;
 	// TODO P3: listen to hotkey event (ui.select) (? aka libv.ctrl enter context)
-
-	style_state(StyleState::focus, event.gain());
 }
 
 void CoreButton::onMouseButton(const EventMouseButton& event) {

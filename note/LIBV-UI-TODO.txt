@@ -114,6 +114,7 @@ libv.ui: Improve clipping
 
 -------------------------------------------------------------------------------------------------
 
+libv.ui: Merge Flag and StyleState, but in a way where style only bits can be extracted with ease (like top/bottom N bit).
 
 libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
 

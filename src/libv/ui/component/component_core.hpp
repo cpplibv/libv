@@ -307,13 +307,13 @@ private:
 private:
 	static void eventChar(CoreComponent& component, const EventChar& event);
 	static void eventKey(CoreComponent& component, const EventKey& event);
-	static void focusGain(CoreComponent& component, bool active);
-	static void focusLoss(CoreComponent& component, bool active);
+	static void focusChange(CoreComponent* componentOld, bool activeOld, CoreComponent* componentNew, bool activeNew);
 
 private:
 	virtual void onChar(const EventChar& event);
 	virtual void onKey(const EventKey& event);
 	virtual void onFocus(const EventFocus& event);
+	virtual void onFocusWithin(const EventFocus& event);
 	virtual void onMouseButton(const EventMouseButton& event);
 	virtual void onMouseMovement(const EventMouseMovement& event);
 	virtual void onMouseScroll(const EventMouseScroll& event);
@@ -492,11 +492,8 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) styleScanAll(CoreComponent& component) {
 		return component.styleScanAll();
 	}
-	static inline decltype(auto) focusGain(CoreComponent& component, bool active) {
-		return CoreComponent::focusGain(component, active);
-	}
-	static inline decltype(auto) focusLoss(CoreComponent& component, bool active) {
-		return CoreComponent::focusLoss(component, active);
+	static inline decltype(auto) focusChange(CoreComponent* componentOld, bool activeOld, CoreComponent* componentNew, bool activeNew) {
+		return CoreComponent::focusChange(componentOld, activeOld, componentNew, activeNew);
 	}
 	static inline decltype(auto) focusTraverse(CoreComponent& component, const ContextFocusTraverse& context) {
 		return component.focusTraverse(context);

@@ -2,7 +2,10 @@
 
 // hpp
 #include <libv/ui/component/component_core.hpp>
+// ext
+#include <range/v3/view/reverse.hpp>
 // pro
+#include <libv/container/small_vector.hpp>
 #include <libv/ui/component_system/core_ptr.hpp>
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_focus.hpp>
@@ -21,7 +24,6 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_system/property_access.hpp>
 #include <libv/ui/style/style.hpp>
-
 
 namespace libv {
 namespace ui {
@@ -430,27 +432,67 @@ void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
 	}
 }
 
-void CoreComponent::focusGain(CoreComponent& component, bool active) {
-	if (!component.flags.match_any(Flag::focusableSelf))
-		return;
+void CoreComponent::focusChange(CoreComponent* componentOld, bool activeOld, CoreComponent* componentNew, bool activeNew) {
+	// Focus loss
+	if (componentOld) {
+		componentOld->flags.reset(Flag::focused);
+		componentOld->style_state(StyleState::focus, false);
 
-	component.flags.set(Flag::focused);
-	if (active) {
-		const auto event = EventFocus(true);
-		component.onFocus(event);
-		component.fire(event);
+		if (activeOld) {
+			const auto event = EventFocus(false);
+			componentOld->onFocus(event);
+			componentOld->fire(event);
+		}
 	}
-}
 
-void CoreComponent::focusLoss(CoreComponent& component, bool active) {
-	if (!component.flags.match_any(Flag::focusableSelf))
-		return;
+	// Focus-within find common ancestors
+	libv::small_vector<CoreComponent*, 32> withinNews;
+	if (componentNew) {
+		for (auto it = componentNew->parent_; true; it = it->parent_) {
+			if ((it->style_state() & StyleState::focus_within) != StyleState::none)
+				break;
+			withinNews.emplace_back(it);
+			if (it == it->parent_)
+				break;
+		}
+	}
+	const CoreComponent* commonAncestor =
+			!withinNews.empty() ? withinNews.back()->parent_ :
+			componentNew && (componentNew->style_state() & StyleState::focus_within) != StyleState::none ? componentNew :
+			componentNew ? componentNew->parent_ :
+			nullptr;
 
-	component.flags.reset(Flag::focused);
-	if (active) {
-		const auto event = EventFocus(false);
-		component.onFocus(event);
-		component.fire(event);
+	// Focus-within loss from componentOld to commonAncestors
+	if (componentOld && componentOld != commonAncestor) {
+		for (auto it = componentOld->parent_; true; it = it->parent_) {
+			if (it == commonAncestor)
+				break;
+			const auto event = EventFocus(false);
+			it->onFocusWithin(event);
+			it->style_state(StyleState::focus_within, false);
+			if (it == it->parent_)
+				break;
+		}
+	}
+
+	// Focus-within gain from commonAncestors to componentNew
+	for (const auto& it : withinNews | ranges::views::reverse) {
+		const auto event = EventFocus(true);
+		it->onFocusWithin(event);
+		it->style_state(StyleState::focus_within, true);
+	}
+
+	// Focus gain
+	if (componentNew) {
+		assert(componentNew->flags.match_any(Flag::focusableSelf));
+		componentNew->flags.set(Flag::focused);
+		componentNew->style_state(StyleState::focus, activeNew);
+
+		if (activeNew) {
+			const auto event = EventFocus(true);
+			componentNew->onFocus(event);
+			componentNew->fire(event);
+		}
 	}
 }
 
@@ -465,6 +507,10 @@ void CoreComponent::onKey(const EventKey& event) {
 }
 
 void CoreComponent::onFocus(const EventFocus& event) {
+	(void) event;
+}
+
+void CoreComponent::onFocusWithin(const EventFocus& event) {
 	(void) event;
 }
 

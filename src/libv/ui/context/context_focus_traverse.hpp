@@ -36,20 +36,6 @@ public:
 	[[nodiscard]] constexpr inline bool isBackward() const noexcept {
 		return backward;
 	}
-
-// private:
-// 	mutable bool focus_rejected_ = false; // Only relevant on focus gain
-//
-// public:
-// 	explicit constexpr inline ContextEventFocus(bool focus) noexcept : EventFocus(focus) { }
-//
-// 	constexpr inline void reject_focus() const noexcept {
-// 		focus_rejected_ = true;
-// 	}
-//
-// 	[[nodiscard]] constexpr inline bool focus_rejected() const noexcept {
-// 		return focus_rejected_;
-// 	}
 };
 
 // -------------------------------------------------------------------------------------------------

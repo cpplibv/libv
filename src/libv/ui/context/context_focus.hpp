@@ -32,7 +32,6 @@ public:
 
 public:
 	[[nodiscard]] libv::observer_ptr<CoreComponent> current() const noexcept;
-	// void focus(CoreComponent& component, FocusMode mode = FocusMode::active);
 	void clear();
 	void focus(CoreComponent& component, FocusMode mode);
 	void detachFocused(CoreComponent& component);

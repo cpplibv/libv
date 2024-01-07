@@ -105,6 +105,10 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/surface.lua")));
 
 	init_ui(devMode);
+
+	self->frame.onContextUpdate.output([this](const libv::frame::EventContextUpdate&) {
+		self->config_->update();
+	});
 }
 
 GameClient::~GameClient() {
@@ -132,8 +136,6 @@ void GameClient::register_controls() {
 		// TODO P1: A more seamless integration of UI and Controls would be nice
 		self->controls.ignore_events(event.controls_intercepted());
 	});
-
-	// self->controls.attach(self->frame);
 }
 
 void GameClient::register_nexus() {

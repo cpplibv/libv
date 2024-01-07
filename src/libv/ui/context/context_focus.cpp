@@ -23,26 +23,21 @@ public:
 
 private:
 	void changeFocus(ptr focusNew, bool activeNew) {
+		assert((focusNew != nullptr || activeNew) && "Focus cannot be cleared with passive mode");
 		const auto focusOld = currentFocus;
 		const auto activeOld = currentActive;
 
 		if (focusNew == focusOld && activeNew == activeOld)
 			return;
 
-		if (focusOld == nullptr) {
+		if (focusOld == nullptr)
 			log_ui.trace("Focus set to: {}", focusNew->path());
-			AccessRoot::focusGain(*focusNew, activeNew);
-
-		} else if (focusNew == nullptr) {
+		else if (focusNew == nullptr)
 			log_ui.trace("Focus clear from: {}", focusOld->path());
-			AccessRoot::focusLoss(*focusOld, activeOld);
-
-		} else {
+		else
 			log_ui.trace("Focus set from: {} to: {}", focusOld->path(), focusNew->path());
-			AccessRoot::focusLoss(*focusOld, activeOld);
-			AccessRoot::focusGain(*focusNew, activeNew);
-		}
 
+		AccessRoot::focusChange(focusOld, activeOld, focusNew, activeNew);
 		currentFocus = focusNew;
 	}
 

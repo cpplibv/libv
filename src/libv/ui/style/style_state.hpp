@@ -29,9 +29,9 @@ enum class StyleState : uint32_t {
 
 	disable        = 1u << 0u, //
 	hover          = 1u << 1u, //
-	// hover_within   = 1u << 2u, //
+	hover_within   = 1u << 2u, // Not yet implemented
 	focus          = 1u << 3u, //
-	// focus_within   = 1u << 4u, //
+	focus_within   = 1u << 4u, //
 
 	active         = 1u << 5u, //
 
@@ -41,10 +41,10 @@ enum class StyleState : uint32_t {
 	done           = 1u << 8u, //
 	error          = 1u << 9u, //
 
-	// mod2           = 1u << 10u, // ChildIndex % 2 == 0
-	// mod3           = 1u << 11u, // ChildIndex % 3 == 0
-	// first          = 1u << 12u, // ChildIndex == 0
-	// last           = 1u << 13u, // ChildIndex == N-1
+	mod2           = 1u << 10u, // ChildIndex % 2 == 0
+	mod3           = 1u << 11u, // ChildIndex % 3 == 0
+	first          = 1u << 12u, // ChildIndex == 0
+	last           = 1u << 13u, // ChildIndex == N-1
 	// _              = 1u << 14u,
 	// _              = 1u << 15u,
 
