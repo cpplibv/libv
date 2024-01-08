@@ -11,10 +11,14 @@
 
 
 
-requirements: multiple controls based on focus within or last interacted (within)
-have a test dummy for multi control context usecase in star
-		HAVE MULTIPLE simultaneously:
-		button -> open/closes another ui component -> additional controls should be enabled/disabled
+bug: background overflow bug in lbl if paddingcontentsize stuffy is empty
+
+
+
+Make controls and nexus intrusive_ptr2 based
+	controls can have a copy* move* ctor afterward
+
+
 
 
 issues:
@@ -41,37 +45,23 @@ issues:
 
 
 
-
-
-
-
-
-
-
-
-
-style/state
-	libv.ui: (?) hover-within new "state" property (same concept as focus-within, not sure if this is required) StyleState::hover_within
 routing
 	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traversal
 	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
-traversal
-	libv.ui: Clicks into nothingness should clear focus
-			| Callback/hook system for "unhandled" mouse click -> if noone would react to it -> clear focus
-
+	libv.ui: Clicks into nothingness should clear focus | Callback/hook system for "unhandled" mouse click -> if noone would react to it -> clear focus
 	libv.ui.focus: Focus traversal order:
 				- explicit direct link (ptr, ptr)
 				- layout driven (layout knows the orientation) (vec2f)
 				- (index) position based (forward/backward)
+
 Cleanup / Adoption
-	libv.ui.focus: Allow focus not yet attached components
 	app.star: Settings page > back: clear the focus while apply will rotate it to next | passive focus main menu top most entry
 	libv.ui: Ensure there is an easy way to trigger Focus traversal from code/events/components
-			\ star main menu focus navigation
+			\ star main menu focus navigation with arrows (? and unused tab)
 	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even-non interactive components
 			\ have a single shielding object that is non-interactive in star
 
-	Note: Ctrl contexts are driven by attach/detach/focus-within
+
 
 
 
@@ -86,78 +76,14 @@ libv.ui: Support "builtin:white" as ui texture resource
 
 
 
---- UI - Layout invalidation -----------------------------------------------------------------------
-
-Need performance data and statistics. Debug overlay for it?
-
-libv.ui: If a child in panel_anchor or panel_full has not been invalidated,
-		and the bounds of the panel did not change
-		do not layout (calculate dynamic size) that component
-		(only issue if the component does have dynamic size, in this case it must be called)
-
-scroll bar change prompts layout, why? should it?
-	| it does to recache the bar position
-Slider value change should not invalidate layout
-	(make it a float region if it must)
-	mouse context range remap might be needed!
-libv.ui: Make sure that (only) position change does not invalidate layout
-
-libv.ui: Ensure that scroll pane scrolling doent causes any layout invalidation
-	if the content of the scroll area size is Dynamic then it causes a Dynamic
-	layout query. Otherwise, its good
-
-
-
---- UI - Scroll ------------------------------------------------------------------------------------
-
-libv.ui: Slider value change should not invalidate layout
-			(make it a float region if it must)
-			mouse context range remap might be needed!
-
-Scroll pane
-	at first frame has different bar size after first move
-	bar size jumps to max
-	bar can be moved even if everything fits
-	currently 100% over-scrolling is allowed, there should be a 0..1 float properaty for it and the default should be 0
-
-libv.ui: Slider "hover" style/state should be separate for the track and the bar
-
-libv.ui: Implement scroll pane anchor behaviour
-		anchor = "top-left"
-
-libv.ui: Scroll pane should have properties: font, font_size, scroll_speed: if font is null speed = scroll_speed, otherwise speed = font.height(font_size) * scroll_speed
-
-libv.ui: Scroll pane content background is incorrect, bc content size in incorrect
-		might be layout (-1) issue | might have changed already
-
-libv.ui: scroll area in scroll area, nested rendering alters clipping, events and control
-
-libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
-libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
-
-libv.ui: To fix property init
-		| scroll bar should not calculate any fucking layout in non layout
-		| it does it so it can process mouse event
-	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
-	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
-	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
-
-libv.ui: Padding support in slider (It effects the bar and not the track) (bar could be replaced to component in future anyways)
-
-libv.ui: Create a real scroll_bar = slider + buttons
-
-libv.ui: Enable actual render clipping (debug option to reenable debug cull view?)
-		clip planes should be the most generic solution due to multidraw
-
 
 --- Resources --------------------------------------------------------------------------------------
 
 res: Skyboxes:
-		delete fluffball (acquire replacements:),
-		acquire "clear" dark cloudy
-		acquire "clear" mixed cloudy
-		acquire "clear" clear sunny
-		acquire 2 nebula / star from space
+		replace fluffball with one of the recently acquired clear sky
+		acquire an image viewer that can handle hdr dds cube (and other formats that we started to use)
+		acquire 2 simple space with stars
+		acquire 2 nebula
 libv.re: Sky equirectangular and cubemaps are misaligned and inverted (possible import issue)
 
 
@@ -184,3 +110,4 @@ place.it:
 			bubbling pass what we currently have
 			capture pass would precede it, in reverse order (top-down)
 				granting the ability to capture an event in a parent
+	libv.ui: (?) hover-within new "state" property (same concept as focus-within, not sure if this is required) StyleState::hover_within

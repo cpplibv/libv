@@ -11,6 +11,7 @@
 #include <libv/ui/component_system/bean.hpp>
 #include <libv/ui/component_system/create_scene.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
+#include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/property/background.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // pro
@@ -172,8 +173,6 @@ public:
 		timeControl(nexus),
 		parentLabel(std::move(parentLabel)),
 		controls(controls) {
-		// controls(controls) {
-		(void) nexus;
 
 		// TODO P2: Proper camera control management
 		// TODO P2: Proper control management
@@ -200,45 +199,21 @@ public:
 		// 	glr.model.scale(orientation_gizmo_size * 0.5f);
 		//
 		// 	renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
-
-		// controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 	}
 	~CanvasSurface() {
-		// controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera);
 	}
 
 private:
 	virtual void attach() override {
 		focus(libv::ui::FocusMode::active);
-		// (void) controls;
-		// TODO P1: app.space: Should not store it (?) only to bypass controls invalidation issue
-		// libv::ctrl::Controls& controls;
-		// std::optional<ControlVar> controlVar
 
-		// 	if (!controlVar)
-		// 		// TODO P1: app.space:
-		// 		controlVar.emplace(
-		// 				*this,
-		// 				playout,
-		// 				playout.simulation->universe->galaxy,
-		// //				player,
-		// 				game_session.player
-		// 		);
-		//
-		// 	controls.context_enter<CanvasControl>(&*controlVar);
-		// 	controls.context_enter<libv::sun::BaseCameraOrbit>(&camera);
 		controls.context_enter<libv::sun::BaseCameraOrbit>(&camera->tmpCameraPlayer);
 		controls.context_enter<TimeControl>(&timeControl);
 	}
 	virtual void detach() override {
+		// TODO P2: Controls guard objects for safety
 		controls.context_leave_if_matches<libv::sun::BaseCameraOrbit>(&camera->tmpCameraPlayer);
 		controls.context_leave_if_matches<TimeControl>(&timeControl);
-		// controls.context_leave_if_matches<CanvasControl>(&*controlVar);
-
-		// // TODO P2: Controls guard objects for safety
-		// auto& controls = *nexus.object_view_get<libv::ctrl::Controls>();
-		// controls.context_leave<libv::sun::BaseCameraOrbit>();
-		// controls.context_leave<SandboxState>();
 	}
 	virtual void update(libv::ui::time_duration timeDelta) override {
 		timeControl.update(timeDelta);
@@ -251,6 +226,7 @@ private:
 			parentLabel.text(fmt::format("Canvas: paused"));
 		else
 			parentLabel.text(fmt::format("Canvas: x{}", timeControl.simulationSpeed()));
+
 		// if (rotate)
 		// 	camera->tmpCameraPlayer.orbit_yaw(static_cast<float>(timeDelta.count()) * libv::tau * 0.01f);
 
@@ -273,6 +249,53 @@ private:
 		});
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Control>
+void focusControlled(libv::ui::Component& component, libv::ctrl::Controls& controls, Control* controlPtr) {
+	component.event().focus.connect([&controls, controlPtr](const libv::ui::EventFocus& event) mutable {
+		if (event.gain())
+			controls.context_enter<Control>(controlPtr);
+		else
+			controls.context_leave_if_matches<Control>(controlPtr);
+	});
+	component.event().focus_within.connect([&controls, controlPtr](const libv::ui::EventFocusWithin& event) mutable {
+		if (event.gain())
+			controls.context_enter<Control>(controlPtr);
+		else
+			controls.context_leave_if_matches<Control>(controlPtr);
+	});
+}
+
+// ---
+
+struct TestCardControl {
+	libv::ui::Label lbl;
+	int card = 0;
+	int count = 0;
+
+	static void register_controls(libv::ctrl::Controls& controls) {
+		controls.feature_action<TestCardControl>("test.add", [](libv::ctrl::arg_action, TestCardControl& state) {
+			state.lbl.text(fmt::format("Card {} counter: {}", state.card, ++state.count));
+		});
+		controls.feature_action<TestCardControl>("test.remove", [](libv::ctrl::arg_action, TestCardControl& state) {
+			state.lbl.text(fmt::format("Card {} counter: {}", state.card, --state.count));
+		});
+	}
+
+	static void bind_default_controls(libv::ctrl::Controls& controls) {
+		controls.bind("test.add", "pageup");
+		controls.bind("test.remove", "pagedown");
+	}
+};
+
+void registerSurfaceControls(libv::ctrl::Controls& controls) {
+	TestCardControl::register_controls(controls);
+	TestCardControl::bind_default_controls(controls);
+	TimeControl::register_controls(controls);
+	TimeControl::bind_default_controls(controls);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -320,23 +343,67 @@ private:
 struct SceneSurface {
 	std::string someData;
 
-	[[nodiscard]] libv::ui::PanelLine createMenu(libv::Nexus& nexus) const {
+	libv::ui::Component testBar;
+
+	struct ToggleTest {
+		bool value = false;
+	};
+
+	[[nodiscard]] libv::ui::Component createControlTestBar(libv::Nexus& nexus, libv::ctrl::Controls& controls) {
+		(void) nexus;
+		auto line = libv::ui::PanelLine::ns("controls-test-bar", "surface.test.bar");
+		line.anchor(libv::ui::Anchor::center_right);
+		line.orientation(libv::ui::Orientation::left);
+		line.spacing(10);
+
+		for (int i = 0; i < 5; ++i) {
+			auto card = line.add_ns<libv::ui::PanelLine>("test-card", "surface.test.card");
+			card.orientation(libv::ui::Orientation::up);
+			auto btnAdd = card.add_nsa<libv::ui::Button>("add", "surface.test.button", "+");
+			auto btnDel = card.add_nsa<libv::ui::Button>("remove", "surface.test.button", "-");
+			auto lblCounter = card.add_nsa<libv::ui::Label>("counter", "surface.test.counter", fmt::format("Card {} counter: {}", i, 0));
+			auto controlPtr = &libv::ui::attach_state<TestCardControl>(card)(lblCounter, i, 0);
+			focusControlled<TestCardControl>(card, controls, controlPtr);
+
+			auto testBody = libv::ui::PanelLine::s("surface.test.body");
+			btnAdd.event().submit.connect([card, testBody]() mutable {
+				testBody.add_s<libv::ui::InputField>("surface.test.input");
+				if (card.children_size() == 3)
+					card.add(testBody);
+			});
+			btnDel.event().submit.connect([card, testBody]() mutable {
+				card.remove(testBody);
+			});
+		}
+
+		return line;
+	}
+
+	[[nodiscard]] libv::ui::PanelLine createMenu(libv::Nexus& nexus) {
 		auto line = libv::ui::PanelLine::ns("menu-line", "surface.menu.line");
 		auto noop = line.add_sa<libv::ui::Button>("surface.menu.button", "Does nothing");
+		auto tglTest = line.add_sa<libv::ui::ToggleButton>("surface.menu.button", "Hide", "Show");
+		tglTest.event().submit.connect([nexus](libv::ui::ToggleButton& source) {
+			nexus.broadcast_global<ToggleTest>(ToggleTest{source.select()});
+		});
 		auto label0 = line.add_sa<libv::ui::Label>("surface.menu.label", "Surface: " + someData);
 		auto input = line.add_s<libv::ui::InputField>("surface.menu.label");
 		input.text("Test input field");
-		auto btn = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
-		btn.event().submit.connect([nexus](libv::ui::Button& source) mutable {
+		auto btnExit = line.add_sa<libv::ui::Button>("surface.menu.button", "Exit to Main Menu");
+		btnExit.event().submit.connect([nexus](libv::ui::Button& source) mutable {
 			libv::ui::switchParentScene("main", source, createSceneMainMenu(nexus));
 		});
 		return line;
 	}
 
-	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) const {
+	[[nodiscard]] libv::ui::Component createScene(libv::Nexus& nexus) {
 		auto& controls = libv::ui::requireBean<libv::ctrl::Controls>(nexus, "Surface", "Controls");
 
 		auto layers = libv::ui::PanelAnchor::n("layers");
+		const void* slot = layers.ptr();
+		layers.event().detach.connect_system([nexus, slot] mutable {
+			nexus.disconnect_slot_all(slot);
+		});
 		auto label1 = libv::ui::Label::s("surface.menu.label");
 
 		auto canvas = layers.add_na<libv::ui::CanvasAdaptorT<CanvasSurface>>("canvas", nexus, controls, label1);
@@ -346,6 +413,16 @@ struct SceneSurface {
 		auto menu = createMenu(nexus);
 		menu.add(label1, 0);
 		layers.add(menu);
+
+		nexus.connect_global<ToggleTest>(slot, [this, layers, nexus, &controls](const ToggleTest& event) mutable {
+			if (!event.value) {
+				testBar = createControlTestBar(nexus, controls);
+				layers.add(testBar);
+			} else {
+				layers.remove(testBar);
+				testBar = libv::ui::Component(nullptr);
+			}
+		});
 
 		return layers;
 	}

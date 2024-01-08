@@ -152,3 +152,68 @@ ui.style("surface.menu.button") {
 	size = "1rD, D",
 	stripped_background_interactive,
 }
+
+-- === Test ========================================================================================
+
+ui.style("surface.test") {
+	font = fonts.label,
+}
+
+ui.style("surface.test.bar") {
+	anchor = "bottom_center",
+	orientation = "left",
+	size = "1r, 500px",
+	padding = 8,
+	spacing = 4,
+	background = "#0004",
+}
+
+ui.style("surface.test.card") {
+	--anchor = "bottom_center",
+	align_vertical = "bottom",
+	orientation = "up",
+	--size = "1r, 500px",
+	--padding = 8,
+	--spacing = 4,
+	background = "#0008",
+	state ("focus-within") {
+		background = "#1218",
+	},
+}
+
+ui.style("surface.test.body") {
+	--anchor = "bottom_center",
+	orientation = "down",
+	--size = "1r, 500px",
+	--padding = 8,
+	--spacing = 4,
+	background = "#383A33FF",
+}
+
+ui.style("surface.test.input") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	caret_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	padding = {16, 2},
+	size = "1rD, D",
+	stripped_background,
+}
+
+ui.style("surface.test.button") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	padding = {16, 2},
+	size = "1rD, D",
+	stripped_background_interactive,
+}
+
+ui.style("surface.test.counter") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	padding = {16, 2},
+	size = "1rD, D",
+	--stripped_background_interactive,
+}

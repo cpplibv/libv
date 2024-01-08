@@ -11,31 +11,83 @@
 
 
 
+--- UI - Layout invalidation -----------------------------------------------------------------------
+
+Need performance data and statistics. Debug overlay for it?
+
+libv.ui: If a child in panel_anchor or panel_full has not been invalidated,
+		and the bounds of the panel did not change
+		do not layout (calculate dynamic size) that component
+		(only issue if the component does have dynamic size, in this case it must be called)
+
+scroll bar change prompts layout, why? should it?
+	| it does to recache the bar position
+Slider value change should not invalidate layout
+	(make it a float region if it must)
+	mouse context range remap might be needed!
+libv.ui: Make sure that (only) position change does not invalidate layout
+
+libv.ui: Ensure that scroll pane scrolling doent causes any layout invalidation
+	if the content of the scroll area size is Dynamic then it causes a Dynamic
+	layout query. Otherwise, its good
+
+libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
+		markInvalidLayout();
+		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
+libv.ui: Layout optimization: Some layout (like full and anchor) could handle layout invalidation independently, so if 1 child gets invalidated only that child gets to be relayouted
+libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
+libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
+libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
+libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
 
 
-=================================================================================================
 
+--- UI - Scroll ------------------------------------------------------------------------------------
 
 libv.ui: InputField might not does proper CPU culling (at least in ui sandbox legacy tab)
-libv.ui: Adopt libv.re
-libv.ui: Move libv.sun overlay_shader_error.hpp to ui
 
-Tooltip
-	libv.ui: Implement built-in support for child properties in BasePanel
-	libv.ui: Cleanup child property access in Tooltip Container
+libv.ui: Slider value change should not invalidate layout
+			(make it a float region if it must)
+			mouse context range remap might be needed!
 
-place.it: "Well behaved layout" flag bit could be also used for mouse events
+Scroll pane
+	at first frame has different bar size after first move
+	bar size jumps to max
+	bar can be moved even if everything fits
+	currently 100% over-scrolling is allowed, there should be a 0..1 float properaty for it and the default should be 0 in each dimension
 
-Layout
-	libv.ui: Layout2 could also use unlimited-ness like Layout1
-		unlimited in a dim = no anchor or alignment allowed in that dimension
-			\ fail gracefully, produce a warning and do the only doable anchor/alignment
-		and need a back channel to fetch scroll area final virtual size.
-		For simplicity a viable shortcut would be to have separate unlimited line layout
-		type only for scrollable lists
+libv.ui: Slider "hover" style/state should be separate for the track and the bar
 
-	SLC
-		libv.ui.SLC: Add anchor/layers support (to support scroll pane with overlapping scroll bar)
+libv.ui: Implement scroll pane anchor behaviour
+		anchor = "top-left"
+
+libv.ui: Scroll pane should have properties: font, font_size, scroll_speed: if font is null speed = scroll_speed, otherwise speed = font.height(font_size) * scroll_speed
+
+libv.ui: Scroll pane content background is incorrect, bc content size in incorrect
+		might be layout (-1) issue | might have changed already
+
+libv.ui: scroll area in scroll area, nested rendering alters clipping, events and control
+
+libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
+libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
+
+libv.ui: To fix property init
+		| scroll bar should not calculate any fucking layout in non layout
+		| it does it so it can process mouse event
+	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
+	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
+	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
+
+libv.ui: Padding support in slider (It effects the bar and not the track) (bar could be replaced to component in future anyways)
+
+libv.ui: Create a real scroll_bar = slider + buttons
+
+libv.ui: Enable actual render clipping (debug option to reenable debug cull view?)
+		clip planes should be the most generic solution due to multidraw
+
+libv.ui: observation: clip and scroll are two orthogonal features
+		general concept: "floating" component that effects render, mouse, (layout)
+		general concept: clip component that effects render, mouse, (layout)
 
 Pagination
 		Pagination support
@@ -86,16 +138,83 @@ Pagination
 
 		But: Pagination != Scroll size solution
 
+Notes for the real scroll bar:
+	double value; // current_line
+	double value_low; // 0
+	double value_high; // num_line
+	double value_range; // num_lines_displayed
 
-libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery
+	double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit
+	double step_button; // [button >] 1 or 3 or settings.scroll_unit
+	double step_track; // [mouse button on track] 1 or 3 or settings.scroll_unit or inf
+	double step_track_interval; // 0.3 or 1 or settings.step_button_hold_interval
+	double step_button_hold; // [button > hold per interval] 1 or 3 or settings.scroll_unit
+	double step_button_hold_interval; // 0.3 or 1 or settings.step_button_hold_interval
+	double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
+	double step_page; // [pageup/pagedown] num_lines_displayed
+
+
+
+--- UI - Tooltip -----------------------------------------------------------------------------------
+
+Tooltip
+	libv.ui: Implement built-in support for child properties in BasePanel
+	libv.ui: Cleanup child property access in Tooltip Container
+
+libv.ui: Tooltips
+		UI wide overlay
+		Options:
+			anchor:
+				relative to mouse 1..9 corner
+				relative to mouse no follow 1..9 corner
+				relative to component 1..9 corner
+				relative to screen 1..9 corner
+				relative to callback (for 3D objects) 1..9 corner
+			anchor clearance:
+				left/right/bottom/top pixel count
+				? could clearance be solved with tooltip component margin
+			alignment:
+				1..9 corner
+			edge:
+				(scroll pane) clipping space
+				window
+			edge behaviour (per axis):
+				overhang
+				clipped
+				push in axis
+				flip to opposite side
+			issue: libv.ui: Card layout doesn't call detach when switching between tabs
+			DONE issue: Tooltip doesnt relayout when owner relayouts
 
 
 
 ----------------------------------------------------------------------------------------------------
 
+libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery (libv::gui alias, libv::ui::gui object)
+libv.ui: Adopt libv.re
+libv.ui: Move libv.sun overlay_shader_error.hpp to ui
+
+place.it: "Well behaved layout" flag bit could be also used for mouse events
+
+Layout
+	libv.ui: Layout2 could also use unlimited-ness like Layout1
+		unlimited in a dim = no anchor or alignment allowed in that dimension
+			\ fail gracefully, produce a warning and do the only doable anchor/alignment
+		and need a back channel to fetch scroll area final virtual size.
+		For simplicity a viable shortcut would be to have separate unlimited line layout
+		type only for scrollable lists
+
+	SLC
+		libv.ui.SLC: Add anchor/layers support (to support scroll pane with overlapping scroll bar)
+
+libv.ui: Merge Flag and StyleState, but in a way where style only bits can be extracted with ease (like top/bottom N bit).
+
+
+
+----------------------------------------------------------------------------------------------------
 
 libv.ui: Improve clipping
-	libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI
+	libv.ui: Clip with scissor, fallback to stencil if someone want 3D UI on their on accord
 	libv.ui: Clip with stencil:
 			ui init
 				glEnable(GL_STENCIL_TEST);
@@ -112,11 +231,8 @@ libv.ui: Improve clipping
 			vertex only pass: GL_DECR the stencil on the clip region
 
 
--------------------------------------------------------------------------------------------------
 
-libv.ui: Merge Flag and StyleState, but in a way where style only bits can be extracted with ease (like top/bottom N bit).
-
-libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
+----------------------------------------------------------------------------------------------------
 
 libv.ui: static_component system (lite)
 	libv.ui: Check on the _pastebin/legacy codes for this one
@@ -135,6 +251,9 @@ properties / style
 	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not property fallback, its style sheet fallback.)
 	libv.ui.property: typed property registry
 	libv.ui.property: optimize property reset: address could be used to lookup
+
+	libv.ui: ctx.synthesize(T::handler_setter(&ToggleButton::state), ...
+
 
 
 ====================================================================================================
@@ -196,26 +315,6 @@ libv.ui: Alignment justify should not 'start' at top left but from the orientati
 
 libv.ui: Migrate grid layout to the new Margin, Padding, Spacing and Alignment formulas
 
-libv.ui: Document what Padding/Margin/Spacing is: (Maybe in a table form)
-		OUTDATED collapse rules!
-		? Interaction with border
-		Padding:
-			Part of the component but not part of the component's "content area"
-			Part of the background
-			Part of the size
-			Part of the mouse region
-		Margin:
-			Not part of the component
-			Not part of the background (Invisible)
-			Not part of the size
-			Not part of the mouse region
-		Spacing:
-			Container mandated margin (only) between elements
-			Not part of the background (Invisible)
-			Not part of the component
-			Not part of the size
-			Not part of the mouse region
-
 Cleanup / Implement
 	src/libv/ui/component/base_panel_static.*
 	src/libv/ui/component/check_box.*
@@ -250,30 +349,12 @@ libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadca
 		should be accessible via UI too
 		! There is one now for style script tracking, make it more ui-wise
 
-libv.ui: adopt libv.rev's Shader and ShaderLoader
-
-libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
-		markInvalidLayout();
-		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
-
-
 libv.ui: multithreading cooldown for ui frame iteration update callbacks. Aka: once_per_n_frame instead of X ms
 
+libv.ui: IconButton = background + image + text
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 libv.ui: implement base_line alignment: most likely will need a vec2 get_base_line() function
-
-libv.ui: observation: clip and scroll are two orthogonal features
-		general concept: "floating" component that effects render, mouse, (layout)
-		general concept: clip component that effects render, mouse, (layout)
-
-libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
-libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
-
-libv.ui.layout: size over 100% is not an error
-
-libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
-libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
 
 libv.ui: Idea: new raw texture, white with size of 1x1 px BUT on the getters it lies to 0x0 px so it would not effect layouts
 
@@ -283,10 +364,6 @@ libv.ui: overlay component layout stack highlight
 
 libv.ui: check box
 		Clickable elements with a cross in the middle that can be turned off or on.
-
-libv.ui: radio_button and/or group
-		https://github.com/cnjinhao/nana/blob/master/source/gui/widgets/checkbox.cpp
-libv.ui: toggle (toggle button)
 
 libv.ui: default style and theme set
 
@@ -301,31 +378,6 @@ libv.ui: not owning container views (list and/or table)
 
 --- libv.ui MVP checkpoint ------------
 
-libv.ui: Tooltips
-		UI wide overlay
-		Options:
-			anchor:
-				relative to mouse 1..9 corner
-				relative to mouse no follow 1..9 corner
-				relative to component 1..9 corner
-				relative to screen 1..9 corner
-				relative to callback (for 3D objects) 1..9 corner
-			anchor clearance:
-				left/right/bottom/top pixel count
-				? could clearance be solved with tooltip component margin
-			alignment:
-				1..9 corner
-			edge:
-				(scroll pane) clipping space
-				window
-			edge behaviour (per axis):
-				overhang
-				clipped
-				push in axis
-				flip to opposite side
-			issue: libv.ui: Card layout doesn't call detach when switching between tabs
-			DONE issue: Tooltip doesnt relayout when owner relayouts
-
 libv.ui: tab layout = card layout + header buttons
 libv.ui: window
 		contain other elements. They have a caption (and, just like flows, they lay out children either horizontally or vertically)
@@ -337,15 +389,11 @@ libv.ui: separator / group (bordered and captioned)
 
 --- libv.ui MVP+ checkpoint -----------
 
-
-
 libv.ui: OverlayZoom use linearized zoom (like the Camera2 in vm4viewer)
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 
 libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .core() usages wherever possible
-
-libv.ui: icon button = background + image + text
 
 libv.ui: InputMask for input field
 		struct InputMask {
@@ -363,35 +411,26 @@ libv.ui: The UI Paper
 	Host
 			Stateless event host
 
-	Notes for the real scroll bar:
-		double value; // current_line
-		double value_low; // 0
-		double value_high; // num_line
-		double value_range; // num_lines_displayed
-
-		double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit
-		double step_button; // [button >] 1 or 3 or settings.scroll_unit
-		double step_track; // [mouse button on track] 1 or 3 or settings.scroll_unit or inf
-		double step_track_interval; // 0.3 or 1 or settings.step_button_hold_interval
-		double step_button_hold; // [button > hold per interval] 1 or 3 or settings.scroll_unit
-		double step_button_hold_interval; // 0.3 or 1 or settings.step_button_hold_interval
-		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
-		double step_page; // [pageup/pagedown] num_lines_displayed
-
 	Spacing / Margin / Padding
-
-		TODO P5: ASCII diagram
-
-		Spacing
-			In a container space between elements (none on the outside borders, only between elements)
-			It's a useful 'alias' for margins
-			Space between elements
-
-		Margin
-			Space around an element
-
-		Padding
+		Padding:
 			Space between the border and the content inside an element
+			Part of the component but not part of the component's "content area"
+			Part of the background
+			Part of the size
+			Part of the mouse region
+		Margin:
+			Space around an element
+			Not part of the component
+			Not part of the background (Invisible)
+			Not part of the size
+			Not part of the mouse region
+		Spacing:
+			In a container space between elements (none on the outside borders, only between elements)
+			Container mandated margin (only) between elements
+			Not part of the background (Invisible)
+			Not part of the component
+			Not part of the size
+			Not part of the mouse region
 
 	NOTES: fragments
 		caption
@@ -412,7 +451,6 @@ libv.ui: Idea: Zombie state, instead of keeping the dying component in their con
 		What issue could it cause?
 			? Maaaaaybe something around expecting it inside parent, but, even that
 
-libv.ui: Layout optimization: Some layout (like full and anchor) could handle layout invalidation independently, so if 1 child gets invalidated only that child gets to be relayouted
 
 
 --- "The" backlog ---

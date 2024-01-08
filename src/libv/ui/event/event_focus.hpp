@@ -28,6 +28,11 @@ public:
 	}
 };
 
+class EventFocusWithin : public EventFocus {
+public:
+	using EventFocus::EventFocus;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

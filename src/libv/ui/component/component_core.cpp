@@ -488,8 +488,9 @@ void CoreComponent::focusChange(CoreComponent* componentOld, bool activeOld, Cor
 		for (auto it = componentOld->parent_; true; it = it->parent_) {
 			if (it == commonAncestor)
 				break;
-			const auto event = EventFocus(false);
+			const auto event = EventFocusWithin(false);
 			it->onFocusWithin(event);
+			it->fire(event);
 			it->style_state(StyleState::focus_within, false);
 			if (it == it->parent_)
 				break;
@@ -498,8 +499,9 @@ void CoreComponent::focusChange(CoreComponent* componentOld, bool activeOld, Cor
 
 	// Focus-within gain from commonAncestors to componentNew
 	for (const auto& it : withinNews | ranges::views::reverse) {
-		const auto event = EventFocus(true);
+		const auto event = EventFocusWithin(true);
 		it->onFocusWithin(event);
+		it->fire(event);
 		it->style_state(StyleState::focus_within, true);
 	}
 

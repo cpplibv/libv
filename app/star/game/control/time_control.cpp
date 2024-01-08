@@ -2,8 +2,7 @@
 
 #include <star/game/control/time_control.hpp>
 
-#include <libv/ctrl/binding_register.hpp>
-#include <libv/ctrl/feature_register.hpp>
+#include <libv/ctrl/controls.hpp>
 
 
 namespace star {
@@ -58,7 +57,7 @@ void TimeControl::update(libv::time_duration timeDelta) {
 
 // -------------------------------------------------------------------------------------------------
 
-void TimeControl::register_controls(libv::ctrl::FeatureRegister controls, TimeControlFeatures features) {
+void TimeControl::register_controls(libv::ctrl::Controls& controls, TimeControlFeatures features) {
 	using ControlState = TimeControl;
 
 	const auto act = [&](bool enable, std::string&& name, auto&& reqProto) {
@@ -84,7 +83,7 @@ void TimeControl::register_controls(libv::ctrl::FeatureRegister controls, TimeCo
 	act(features.stepFrame, "time.debug.step-frame", RequestTimeDebugStepFrame{});
 }
 
-void TimeControl::bind_default_controls(libv::ctrl::BindingRegister controls) {
+void TimeControl::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("time.pause-toggle", "space");
 	controls.bind("time.pause-toggle", "`");
 	controls.bind("time.speed1", "1");

@@ -2,7 +2,7 @@
 
 #pragma once
 
-// libv
+#include <libv/ctrl/fwd.hpp>
 #include <libv/ui/component/component.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 
@@ -17,6 +17,8 @@ namespace star {
 [[nodiscard]] libv::ui::Component createSceneSettings(libv::Nexus& nexus);
 [[nodiscard]] libv::ui::Component createSceneControls(libv::Nexus& nexus);
 [[nodiscard]] libv::ui::Component createSceneCredits(libv::Nexus& nexus);
+
+void registerSurfaceControls(libv::ctrl::Controls& controls);
 
 // -------------------------------------------------------------------------------------------------
 

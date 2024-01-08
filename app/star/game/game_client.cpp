@@ -27,7 +27,7 @@
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
-#include <star/game/control/time_control.hpp>
+// #include <star/game/control/time_control.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/game/version.hpp>
@@ -124,12 +124,7 @@ GameClient::~GameClient() {
 void GameClient::register_controls() {
 	libv::sun::CameraControl::register_controls(self->controls);
 	libv::sun::CameraControl::bind_default_controls(self->controls, 1);
-	TimeControl::register_controls(self->controls);
-	TimeControl::bind_default_controls(self->controls);
-//	SurfaceControl::register_controls(controls);
-//	SurfaceControl::bind_default_controls(controls);
-//	StarMapControl::register_controls(controls);
-//	StarMapControl::bind_default_controls(controls);
+	registerSurfaceControls(self->controls);
 
 	self->ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
 		log_star.info("Controls intercepted: {}", event.controls_intercepted());

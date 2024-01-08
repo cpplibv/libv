@@ -33,7 +33,7 @@ Integration, controls, ui and controls interactions
 	canvas controls
 		currently [hold] might work with immediate change
 		but what about [press]
-	scee / pause)
+	scene / pause)
 		(timeControls)
 		display pause/time control state on the ui
 	3D picking ray

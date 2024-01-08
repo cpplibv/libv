@@ -133,6 +133,7 @@ struct EventHostGeneral : EventHostGlobal<ComponentT> {
 
 	BasicEventProxy<ComponentT, EventEnable> enable{this->owner};
 	BasicEventProxy<ComponentT, EventFocus> focus{this->owner};
+	BasicEventProxy<ComponentT, EventFocusWithin> focus_within{this->owner};
 };
 
 // -------------------------------------------------------------------------------------------------

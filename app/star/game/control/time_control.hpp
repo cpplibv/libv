@@ -57,8 +57,8 @@ public:
 	}
 
 public:
-	static void register_controls(libv::ctrl::FeatureRegister controls, TimeControlFeatures features = {});
-	static void bind_default_controls(libv::ctrl::BindingRegister controls);
+	static void register_controls(libv::ctrl::Controls& controls, TimeControlFeatures features = {});
+	static void bind_default_controls(libv::ctrl::Controls& controls);
 };
 
 // -------------------------------------------------------------------------------------------------
