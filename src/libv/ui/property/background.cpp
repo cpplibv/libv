@@ -275,9 +275,9 @@ private:
 		const auto pattern_size = texture->size().cast<float>();
 
 		const auto p0 = pos;
-		const auto p1 = libv::vec::max(pos, pos + content_pos - xy(inner_padding));
-		const auto p2 = libv::vec::min(pos + size, content_pos + content_size + zw(inner_padding));
 		const auto p3 = pos + size;
+		const auto p1 = libv::vec::clamp(pos + content_pos - xy(inner_padding), p0, p3);
+		const auto p2 = libv::vec::clamp(content_pos + content_size + zw(inner_padding), p1, p3);
 
 		const auto t0 = (p0 - pos) / pattern_size;
 		const auto t1 = (p1 - pos) / pattern_size;
@@ -391,13 +391,13 @@ private:
 
 			const auto p0 = pos;
 			const auto p3 = pos + size;
-			const auto p1 = libv::vec::max(p0, pos + xy(border_extent));
-			const auto p2 = libv::vec::min(p3, pos + size - zw(border_extent));
+			const auto p1 = libv::vec::clamp(pos + xy(border_extent), p0, p3);
+			const auto p2 = libv::vec::clamp(pos + size - zw(border_extent), p1, p3);
 
 			const auto t0 = libv::vec2f{0.0f, 0.0f};
 			const auto t3 = libv::vec2f{1.0f, 1.0f};
-			const auto t1 = libv::vec::max(t0, xy(border_extent) / texture_size);
-			const auto t2 = libv::vec::min(t3, 1.0f - zw(border_extent) / texture_size);
+			const auto t1 = libv::vec::clamp(xy(border_extent) / texture_size, t0, t3);
+			const auto t2 = libv::vec::clamp(1.0f - zw(border_extent) / texture_size, t1, t3);
 
 			r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color_border);
 			r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color_border);
@@ -420,6 +420,7 @@ private:
 			r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color_border);
 
 			r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
+			// TODO P2: This pattern for jump is with index_strip is extreamly wasteful (~4 extra triangle), implement better support for jump
 			r.index_strip({3, 8}); // jump
 
 			r.index_strip({8, 4, 9, 5});
@@ -435,13 +436,13 @@ private:
 
 			const auto p0 = pattern_region_pos;
 			const auto p3 = pattern_region_pos + pattern_region_size;
-			const auto p1 = libv::vec::max(p0, content_pos - xy(inner_padding));
-			const auto p2 = libv::vec::min(p3, content_pos + content_size + zw(inner_padding));
+			const auto p1 = libv::vec::clamp(content_pos - xy(inner_padding), p0, p3);
+			const auto p2 = libv::vec::clamp(content_pos + content_size + zw(inner_padding), p1, p3);
 
 			const auto t0 = (p0 - pattern_region_pos) / pattern_texture_size;
+			const auto t1 = (p1 - pattern_region_pos) / pattern_texture_size;
+			const auto t2 = (p2 - pattern_region_pos) / pattern_texture_size;
 			const auto t3 = (p3 - pattern_region_pos) / pattern_texture_size;
-			const auto t1 = libv::vec::max(t0, (p1 - pattern_region_pos) / pattern_texture_size);
-			const auto t2 = libv::vec::min(t3, (p2 - pattern_region_pos) / pattern_texture_size);
 
 			const auto tile = libv::vec4f(pattern_texture_pos / texture_size, pattern_texture_size / texture_size);
 

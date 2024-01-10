@@ -11,9 +11,6 @@
 
 
 
-bug: background overflow bug in lbl if paddingcontentsize stuffy is empty
-
-
 
 Make controls and nexus intrusive_ptr2 based
 	controls can have a copy* move* ctor afterward
