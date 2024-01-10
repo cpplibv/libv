@@ -12,9 +12,6 @@
 
 
 
-
-
-
 issues:
 	issue 1: canvas mouse is not acquired
 		press m1 on canvas
@@ -30,12 +27,6 @@ issues:
 	issue 2: btn active state stuck
 		libv.ui: Style state active gets stuck when: toggle button pressed -> mouse moved out -> mouse released
 
-	issue 3: layout bug, I think text layout1 is incorrect in star>surface>menu>input, having a line bearly broken
-		results in incorrect line count and
-		test text that breaks it:
-			ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc...........ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc..
-		maybe a kerning issue, not sure, seams like more text make the issue worse
-				\ layout1 report smaller size then layout2
 
 
 

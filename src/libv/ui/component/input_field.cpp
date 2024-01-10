@@ -411,9 +411,7 @@ libv::vec2f CoreInputField::doLayout1(const ContextLayout1& layoutEnv) {
 	const auto dynamic_size_text = text_.content(
 				layoutEnv.minusOneIfUnlimited(layoutEnv.limit - padding_size())
 			) + padding_size();
-//	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
-//	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
 	return dynamic_size_text;
 }
 

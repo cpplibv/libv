@@ -354,10 +354,10 @@ libv::vec2f LayoutText::content(libv::vec2f newLimit) {
 
 		const auto requestedLineWidth = lineWidth + kerning.x + glyph.advance.x;
 
-		if (requestedLineWidth > newLimit.x || codepointCurrent == '\n') {
+		if (codepointCurrent == '\n' || requestedLineWidth > newLimit.x) {
 			contentWidth = std::max(contentWidth, lineWidth);
 			contentHeight += lineAdvance;
-			lineWidth = 0.0f;
+			lineWidth = glyph.advance.x;
 		} else {
 			lineWidth = requestedLineWidth;
 		}
