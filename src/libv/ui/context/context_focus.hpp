@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <libv/math/vec.hpp>
 #include <libv/ui/fwd.hpp>
 #include <libv/ui/property/focus_mode.hpp>
 #include <libv/utility/memory/observer_ptr.hpp>
@@ -30,9 +31,14 @@ public:
 	ContextFocus& operator=(const ContextFocus&) = delete;
 	ContextFocus& operator=(ContextFocus&&) = delete;
 
-public:
-	[[nodiscard]] libv::observer_ptr<CoreComponent> current() const noexcept;
+public: // Client related functions
 	void clear();
+	void traverse(libv::vec2f direction);
+	void traverseForward();
+	void traverseBackward();
+
+public: // System related functions
+	[[nodiscard]] libv::observer_ptr<CoreComponent> current() const noexcept;
 	void focus(CoreComponent& component, FocusMode mode);
 	void detachFocused(CoreComponent& component);
 	void detachFocusLinked(CoreComponent& component);

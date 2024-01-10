@@ -17,27 +17,6 @@
 
 
 
-routing
-	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traversal
-	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
-	libv.ui: Clicks into nothingness should clear focus | Callback/hook system for "unhandled" mouse click -> if noone would react to it -> clear focus
-	libv.ui.focus: Focus traversal order:
-				- explicit direct link (ptr, ptr)
-				- layout driven (layout knows the orientation) (vec2f)
-				- (index) position based (forward/backward)
-
-Cleanup / Adoption
-	app.star: Settings page > back: clear the focus while apply will rotate it to next | passive focus main menu top most entry
-	libv.ui: Ensure there is an easy way to trigger Focus traversal from code/events/components
-			\ star main menu focus navigation with arrows (? and unused tab)
-	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even-non interactive components
-			\ have a single shielding object that is non-interactive in star
-
-
-
-
-
---- UI - Style -------------------------------------------------------------------------------------
 
 libv.ui: Style import other lua files for common variables
 libv.ui: Style script loading should match the way other resources are loaded
@@ -47,6 +26,28 @@ libv.ui: Crash: background = {type = "texture", texture = "builtin:white"},
 libv.ui: Support "builtin:white" as ui texture resource
 
 
+
+
+--- UI - Focus/Event -------------------------------------------------------------------------------
+
+Cleanup / Adoption
+	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even-non interactive components
+			\ have a single shielding object that is non-interactive in star
+
+Focus/Event routing
+	libv.ui.focus: By default unhandled
+			[tab] hotkeys should trigger focus traversal
+			[esc] hotkeys should trigger focus clear
+			[arrows ⇅⇄] hotkeys should trigger focus traversal in that direction
+			[clicks into nothingness] should trigger focus clear
+
+			| what is unhandled? The controls/callback/hook system for unhandled is used but it is forwarded
+				to the Controls system.
+			| Controls needs to provide a feedback if the event was used (aka effected any pattern state)
+	libv.ui.focus: Focus traversal order variants:
+				- (direction) layout driven (layout knows the orientation) (vec2f)
+				- (forward/backward) (index) position based
+				- (linked) explicit direct link (ptr, ptr)
 
 
 --- Resources --------------------------------------------------------------------------------------

@@ -21,8 +21,8 @@ Star - System integration demo
 
 
 Settings page needs a scroll pane
-Credits page needs an 'Accordion' for every license or details
 Credits page should not directly include third party licenses, there could be another page for it from the credits
+Credits (third party licenses) page needs an 'Accordion' for every license or details (or a popup)
 
 
 --- ---------------------------------------------------------------------------------------------
@@ -69,7 +69,6 @@ libv.re integration:
 		wire in every settings
 
 
-
 -------------------------------------------------------------------------------------------------
 
 
@@ -79,6 +78,9 @@ libv.ui: Choose the null component constructor(s):
 	ComponentT{nullptr}
 	ComponentT{null_component}
 	ComponentT::null()
+
+app.star: Arrow navigation: Main Menu (and every page) focus navigation with arrows (and tab)
+	\ requires Arrow navigation from libv.ui
 
 app.star: Improve design
 	Switch to nicer colors, bye bye blue background

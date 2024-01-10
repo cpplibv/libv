@@ -41,18 +41,6 @@ private:
 		currentFocus = focusNew;
 	}
 
-	void focusTraverse(ContextFocusTraverse ctx) {
-		ptr focusNew = nullptr;
-
-		if (currentFocus) // Traverse to next
-			focusNew = AccessRoot::focusTraverse(*currentFocus, ctx);
-
-		if (focusNew == nullptr) // End reached, Loop around
-			focusNew = AccessRoot::focusTraverse(*root, ctx);
-
-		changeFocus(focusNew, true);
-	}
-
 public:
 	void clear() {
 		changeFocus(nullptr, true);
@@ -72,10 +60,22 @@ public:
 		}
 	}
 
+	void traverse(ContextFocusTraverse ctx) {
+		ptr focusNew = nullptr;
+
+		if (currentFocus) // Traverse to next
+			focusNew = AccessRoot::focusTraverse(*currentFocus, ctx);
+
+		if (focusNew == nullptr) // End reached, Loop around
+			focusNew = AccessRoot::focusTraverse(*root, ctx);
+
+		changeFocus(focusNew, true);
+	}
+
 	void detachFocused(CoreComponent& component) {
 		(void) component;
 		assert(libv::make_observer_ptr(&component) == currentFocus && "Attempted to detachFocused the not focused element");
-		focusTraverse(ContextFocusTraverse::makeForward());
+		traverse(ContextFocusTraverse::makeForward());
 	}
 
 	void detachFocusLinked(CoreComponent& component) {
@@ -101,12 +101,26 @@ ContextFocus::~ContextFocus() {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::observer_ptr<CoreComponent> ContextFocus::current() const noexcept {
-	return self->currentActive ? self->currentFocus : nullptr;
-}
-
 void ContextFocus::clear() {
 	self->clear();
+}
+
+void ContextFocus::traverse(libv::vec2f direction) {
+	self->traverse(ContextFocusTraverse::makeDirection(direction));
+}
+
+void ContextFocus::traverseForward() {
+	self->traverse(ContextFocusTraverse::makeForward());
+}
+
+void ContextFocus::traverseBackward() {
+	self->traverse(ContextFocusTraverse::makeBackward());
+}
+
+// -------------------------------------------------------------------------------------------------
+
+libv::observer_ptr<CoreComponent> ContextFocus::current() const noexcept {
+	return self->currentActive ? self->currentFocus : nullptr;
 }
 
 void ContextFocus::focus(CoreComponent& component, FocusMode mode) {

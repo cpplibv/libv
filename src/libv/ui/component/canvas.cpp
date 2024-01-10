@@ -52,8 +52,6 @@ CoreCanvasAdaptor::CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBas
 }
 
 void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
-	(void) event;
-	// event.stop_propagation();
 	focus(FocusMode::active); // Focus even on release
 
 	if (event.action != libv::input::Action::release) {
