@@ -9,6 +9,8 @@ namespace ctrl {
 // -------------------------------------------------------------------------------------------------
 
 class ImplControls;
+void increase_ref_count(ImplControls* ptr);
+void decrease_ref_count(ImplControls* ptr);
 
 class Controls;
 class BindingRegister;

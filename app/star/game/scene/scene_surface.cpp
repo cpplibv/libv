@@ -254,13 +254,13 @@ private:
 
 template <typename Control>
 void focusControlled(libv::ui::Component& component, libv::ctrl::Controls& controls, Control* controlPtr) {
-	component.event().focus.connect([&controls, controlPtr](const libv::ui::EventFocus& event) mutable {
+	component.event().focus.connect([controls, controlPtr](const libv::ui::EventFocus& event) mutable {
 		if (event.gain())
 			controls.context_enter<Control>(controlPtr);
 		else
 			controls.context_leave_if_matches<Control>(controlPtr);
 	});
-	component.event().focus_within.connect([&controls, controlPtr](const libv::ui::EventFocusWithin& event) mutable {
+	component.event().focus_within.connect([controls, controlPtr](const libv::ui::EventFocusWithin& event) mutable {
 		if (event.gain())
 			controls.context_enter<Control>(controlPtr);
 		else
@@ -414,7 +414,7 @@ struct SceneSurface {
 		menu.add(label1, 0);
 		layers.add(menu);
 
-		nexus.connect_global<ToggleTest>(slot, [this, layers, nexus, &controls](const ToggleTest& event) mutable {
+		nexus.connect_global<ToggleTest>(slot, [this, layers, nexus, controls](const ToggleTest& event) mutable {
 			if (!event.value) {
 				testBar = createControlTestBar(nexus, controls);
 				layers.add(testBar);

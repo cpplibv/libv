@@ -18,6 +18,15 @@ namespace ctrl {
 
 // -------------------------------------------------------------------------------------------------
 
+void increase_ref_count(ImplControls* ptr) {
+	libv::ref_count_access::increase_ref_count(ptr);
+}
+void decrease_ref_count(ImplControls* ptr) {
+	libv::ref_count_access::decrease_ref_count(ptr);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 namespace {
 
 struct Operation {
@@ -654,7 +663,7 @@ void ImplControls::process_time(const duration delta_time, scale_type scale) {
 
 // =================================================================================================
 
-Controls::Controls() : self(std::make_unique<ImplControls>()) {
+Controls::Controls() : self(libv::make_intrusive2_ptr<ImplControls>()) {
 	// NOTE: void context is always present and it is never passed to any feature callback
 	_context_enter(libv::type_key<void>(), nullptr);
 }

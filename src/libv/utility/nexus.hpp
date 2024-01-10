@@ -6,10 +6,10 @@
 #include <libv/utility/nexus_fwd.hpp>
 // libv
 #include <libv/meta/force_inline.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/type_key.hpp>
 #include <libv/utility/unique_function.hpp>
 // std
-#include <memory>
 #include <string>
 #include <type_traits>
 
@@ -25,9 +25,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplNexus;
-
-// NOTE: It is possible to extend or implement Nexus with an owning version: Simple 8 byte deleter function with the object pointer
+struct ImplNexus;
+void increase_ref_count(ImplNexus* ptr);
+void decrease_ref_count(ImplNexus* ptr);
 
 /// Handler type
 class Nexus {
@@ -40,16 +40,15 @@ public:
 	using object_ptr = void*;
 
 private:
-	// TODO P2: Replace with intrusive2_ptr
-	std::shared_ptr<ImplNexus> self;
+	libv::intrusive2_ptr<ImplNexus> self;
 
 public:
 	Nexus();
-	inline Nexus(const Nexus&) noexcept = default;
-	inline Nexus& operator=(const Nexus&) & noexcept = default;
-	inline Nexus(Nexus&&) noexcept = default;
-	inline Nexus& operator=(Nexus&&) & noexcept = default;
-	inline ~Nexus() = default;
+	Nexus(const Nexus&) noexcept = default;
+	Nexus& operator=(const Nexus&) & noexcept = default;
+	Nexus(Nexus&&) noexcept = default;
+	Nexus& operator=(Nexus&&) & noexcept = default;
+	~Nexus() = default;
 
 private:
 	void aux_connect(channel_ptr channel_owner, slot_ptr slot_owner, type_uid event_type, libv::unique_function<void(channel_ptr, const void*)>&& func);
@@ -64,6 +63,7 @@ private:
 	void aux_disconnect_slot_all(slot_ptr slot_owner);
 
 private:
+	// NOTE: It is possible to extend or implement Nexus with an owning object version not just views: Simple 8 byte deleter function with the object pointer (like shared_ptr)
 	void aux_object_view_set(type_uid object_type, object_ptr ptr);
 	void aux_object_view_set(std::string name, type_uid object_type, object_ptr ptr);
 	[[nodiscard]] object_ptr aux_object_view_get(type_uid object_type) const noexcept;

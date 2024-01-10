@@ -7,9 +7,9 @@
 // libv
 #include <libv/input/event_fwd.hpp>
 #include <libv/utility/function_ref.hpp>
+#include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/type_key.hpp>
 // std
-#include <memory>
 #include <string>
 #include <string_view>
 // pro
@@ -29,17 +29,17 @@ namespace ctrl {
 // -------------------------------------------------------------------------------------------------
 
 class Controls {
-	friend class FeatureRegister;
+	friend FeatureRegister;
 
 private:
-	std::unique_ptr<ImplControls> self;
+	libv::intrusive2_ptr<ImplControls> self;
 
 public:
     Controls();
     Controls(Controls&& other) = default;
     Controls& operator=(Controls&& other) & = default;
-    Controls(const Controls& other) = delete;
-    Controls& operator=(const Controls& other) & = delete;
+    Controls(const Controls& other) = default;
+    Controls& operator=(const Controls& other) & = default;
     ~Controls();
 
 private:

@@ -64,7 +64,10 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplNexus {
+struct ImplNexus : public libv::ref_count_base {
+	friend libv::ref_count_access;
+
+public:
 	using channel_ptr = Nexus::channel_ptr;
 	using slot_ptr = Nexus::slot_ptr;
 	using channel_or_slot_ptr = Nexus::channel_or_slot_ptr;
@@ -88,10 +91,17 @@ public:
 	std::unordered_map<key_type, Nexus::object_ptr, NexusObjectKeyHasher, std::equal_to<>> objects;
 };
 
+void increase_ref_count(ImplNexus* ptr) {
+	libv::ref_count_access::increase_ref_count(ptr);
+}
+void decrease_ref_count(ImplNexus* ptr) {
+	libv::ref_count_access::decrease_ref_count(ptr);
+}
+
 // =================================================================================================
 
 Nexus::Nexus() :
-	self(std::make_shared<ImplNexus>()) { }
+	self(libv::make_intrusive2_ptr<ImplNexus>()) { }
 
 // -------------------------------------------------------------------------------------------------
 
