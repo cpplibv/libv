@@ -7,6 +7,7 @@
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/event/event_focus.hpp>
 // #include <libv/ui/event/event_keyboard.hpp>
@@ -14,6 +15,7 @@
 #include <libv/ui/property_system/property_access.hpp>
 #include <libv/ui/resource/font_2D.hpp>
 #include <libv/ui/style/style_state.hpp>
+#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -36,13 +38,17 @@ void CoreButton::onFocus(const EventFocus& event) {
 void CoreButton::onMouseButton(const EventMouseButton& event) {
 	event.stop_propagation();
 
-	if (event.action == libv::input::Action::release && event.button == libv::input::MouseButton::Left)
-		style_state(StyleState::active, false);
-
-	if (event.action == libv::input::Action::press)
+	if (event.action != libv::input::Action::release) {
 		focus(property.focus_mode());
+		ui().mouse.acquire(*this);
+	} else {
+		ui().mouse.release(*this);
+	}
 
 	fire(EventMouseButton{event});
+
+	if (event.action == libv::input::Action::release && event.button == libv::input::MouseButton::Left)
+		style_state(StyleState::active, false);
 
 	// TODO P3: use hotkey event (ui.select) (even for mouse)
 	if (event.action == libv::input::Action::press && event.button == libv::input::MouseButton::Left) {

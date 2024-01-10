@@ -12,20 +12,7 @@
 
 
 
-issues:
-	issue 1: canvas mouse is not acquired
-		press m1 on canvas
-		move above interactive component
-		release m1
-		=> controls stuck with m1 "pressed"
 
-		canvas should acquire mouse if there is a mouse btn press event until
-				mouse btn release
-			(this is to allow camera movement above interactive ui components
-			when they started from the canvas)
-
-	issue 2: btn active state stuck
-		libv.ui: Style state active gets stuck when: toggle button pressed -> mouse moved out -> mouse released
 
 
 

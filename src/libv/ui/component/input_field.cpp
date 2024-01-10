@@ -9,6 +9,7 @@
 #include <libv/ui/component/component_core.hpp>
 #include <libv/ui/component/layout/layout_text.hpp>
 #include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_resource.hpp> // Only debug actions
 #include <libv/ui/context/context_state.hpp>
@@ -344,9 +345,13 @@ void CoreInputField::onFocus(const EventFocus& event) {
 void CoreInputField::onMouseButton(const EventMouseButton& event) {
 	event.stop_propagation();
 
-	if (!isFocused() && event.action == libv::input::Action::press)
+	if (event.action != libv::input::Action::release) {
 		// NOTE: This focus causes a second EventCaret, could be fixed, but not really important
 		focus(FocusMode::active);
+		ui().mouse.acquire(*this);
+	} else {
+		ui().mouse.release(*this);
+	}
 
 	if (event.action == libv::input::Action::press) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
