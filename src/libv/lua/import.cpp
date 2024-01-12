@@ -1,13 +1,13 @@
 // Project: libv.lua, File: src/libv/lua/import.cpp
 
-// hpp
 #include <libv/lua/import.hpp>
-// libv
-#include <libv/algo/slice.hpp>
-// ext
-//#include <fmt/format.h>
+
+#include <fmt/format.h>
 #include <sol/state.hpp>
-//#include <sol/usertype.hpp>
+#include <sol/state_view.hpp>
+
+#include <libv/algo/linear_contains.hpp>
+#include <libv/utility/guard.hpp>
 
 
 namespace libv {
@@ -15,78 +15,81 @@ namespace lua {
 
 // -------------------------------------------------------------------------------------------------
 
-//void Importer::map(std::string prefix, std::string directory_path) {
-//	const auto loader = [](const std::string_view path) {
-//		//		const auto script_str = libv::read_file_str_or_throw(path);
-//		//		try_catch;
-//		return LoadResult{false, "Not Implemented Yet"};
-//	};
-//	import_mapping.emplace_back(std::move(prefix), loader);
-//}
-
-void Importer::map(std::string prefix, SourceLoaderFunc loader) {
-	import_mapping.emplace_back(std::move(prefix), std::move(loader));
+void Importer::bind(sol::state& lua) {
+	lua.set_function("import", sol::protect([this](sol::this_state s, const std::string_view importName) {
+		auto lua = sol::state_view(s);
+		return this->auxImport(lua, importName);
+	}));
 }
 
-//		lua.set_function("import", [this, &lua](const std::string_view name, sol::table identifiers) {
-//          check if identifiers is a string list
-//          load name normally
-//          if the loaded/returned object is a table
-//              remove any element that is not in the identifiers list
-//          return the loaded/returned object
+void Importer::invalidateCache() {
+	loadedModules.clear();
+}
 
-void Importer::bind(sol::state& lua) {
-	lua.set_function("import", [this, &lua](const std::string_view name) {
-		const auto emplace_result = loaded_modules.emplace(name, sol::nil);
+sol::object Importer::auxImport(sol::state_view& lua, std::string_view importName) {
+	// Check import cycle
+	if (libv::linear_contains(importStack, importName)) {
+		failureInFlight = true;
+		failureStack = importStack;
+		throw sol::error("Include cycle detected");
+	}
 
-		auto& loaded_object = emplace_result.first->second;
-		const auto new_lookup = emplace_result.second;
+	// Check cache
+	const auto it = loadedModules.find(importName);
+	if (it != loadedModules.end())
+		return it->second;
 
-		if (!new_lookup)
-			return loaded_object;
-
-//		log_new_lookup;
-
-		for (const auto& mapping : import_mapping) {
-			if (!name.starts_with(mapping.prefix))
-				continue;
-
-//			const auto pure_name = libv::slice_off_view(name, mapping.prefix.size());
-			const auto pure_name = libv::slice_off_view(name, mapping.prefix.size());
-//			const auto path = std::filesystem::path(mapping.directory_path) / name + ".lua";
-//			note_import_graph;
-//
-//          detect_and_abort_cycle?
-//
-//			const auto loader_result = mapping.loader(path);
-			const auto loader_result = mapping.loader(pure_name);
-
-//			if (!loader_result.success) {
-//				generate_lua_error_on_failure;
-//			}
-
-			const auto script_str = loader_result.result;
-//			try_catch;
-//
-//			{
-				auto env = sol::environment(lua, sol::create, lua.globals());
-				auto object = lua.script(script_str, env);
-//				safe_script;
-//				try_catch;
-//				generate_lua_error_on_failure;
-//			}
-
-			loaded_object = std::move(object);
+	// Load file
+	const auto fileIdentifier = fmt::format("{}{}", importName, importName.ends_with(".lua") ? "" : ".lua");
+	std::string scriptSourceCode;
+	try {
+		scriptSourceCode = fileLoader(fileIdentifier);
+	} catch (const std::exception& e) {
+		if (!std::exchange(failureInFlight, true)) {
+			failure = std::current_exception();
+			failureStack = importStack;
 		}
+		throw sol::error("Load failure");
+	}
 
-//		if_no_mapping_matches_log_and_lua_error;
-//
-//		if (loaded_object.get_type() == sol::nil) {
-//			generate_lua_error_on_import_not_found;
-//		}
+	// Add to import stack
+	importStack.emplace_back(importName);
+	auto importStackGuard = libv::guard([&] { importStack.pop_back(); });
 
-		return loaded_object;
-	});
+	// Execute
+	sol::object result;
+	auto env = sol::environment(lua, sol::create, lua.globals());
+	try {
+		result = lua.safe_script(scriptSourceCode, env, sol::script_throw_on_error, fileIdentifier);
+	} catch (const std::exception& e) {
+		if (!std::exchange(failureInFlight, true)) {
+			failure = std::current_exception();
+			failureStack = importStack;
+			failureStack.pop_back();
+		}
+		throw sol::error("Execution failure");
+	}
+
+	// Add to cache and return
+	loadedModules.emplace(importName, result);
+	return result;
+}
+
+sol::object Importer::import(sol::state_view& lua, std::string_view importName) {
+	failureInFlight = false;
+
+	sol::object result;
+	try {
+		result = auxImport(lua, importName);
+	} catch (const std::exception& e) {
+		(void) e;
+	}
+
+	if (failureInFlight) {
+		failureInFlight = false;
+		std::rethrow_exception(failure);
+	}
+	return result;
 }
 
 // -------------------------------------------------------------------------------------------------

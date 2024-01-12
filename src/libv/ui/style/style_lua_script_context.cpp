@@ -1,17 +1,17 @@
 // Project: libv.lua, File: src/libv/ui/lua/script_style.cpp
 
 // hpp
-#include <libv/ui/lua/script_style.hpp>
+#include <libv/ui/style/style_lua_script_context.hpp>
+// ext
+#include <sol/state.hpp>
 // libv
 #include <libv/lua/convert_color.hpp>
-#include <libv/lua/lua.hpp>
-#include <libv/lua/sol_type_to_string.hpp>
-#include <libv/parse/bool.hpp>
+#include <libv/lua/to_string.hpp>
+// #include <libv/parse/bool.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/range/view_lines_string_view.hpp>
 #include <libv/utility/concat.hpp>
 #include <libv/utility/hash_string.hpp>
-#include <libv/utility/timer.hpp>
 #include <libv/algo/trim.hpp>
 // std
 #include <memory>
@@ -44,14 +44,14 @@
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/spacing.hpp>
 #include <libv/ui/property/z_index_offset.hpp>
+#include <libv/ui/style/style.hpp>
+#include <libv/ui/ui.hpp>
 //#include <libv/ui/property/font_2D.hpp>
 //#include <libv/ui/property/shader_font.hpp>
 //#include <libv/ui/property/shader_image.hpp>
 //#include <libv/ui/property/shader_quad.hpp>
 //#include <libv/ui/property/snap_to_edge.hpp>
 //#include <libv/ui/property/squish.hpp>
-#include <libv/ui/style/style.hpp>
-#include <libv/ui/ui.hpp>
 
 
 namespace libv {
@@ -595,6 +595,11 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 //			//	gradient_linear    (std::vector<GradientPoint> points)
 //			//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
 		}
+
+		// TODO P2: Better error reporting with scope tracking:
+		//			here we could produce an error message that type_str was not valid. Same goes for every member check above
+		//			This should be a major refactor
+		return std::nullopt;
 	}
 
 	return std::nullopt;
@@ -607,244 +612,59 @@ std::optional<PropertyDynamic> convert_font(UI& ui, const sol::object& object) {
 	return PropertyDynamic{ui.resource().font(object.as<std::string_view>())};
 }
 
-using load_fn = std::function<std::optional<PropertyDynamic>(UI&, const sol::object&)>;
-
 // =================================================================================================
 
-struct LoadLuaContext {
-	std::unordered_map<std::string, load_fn, libv::hash_string, std::equal_to<>> property_loaders;
-	std::unordered_map<std::string, std::string, libv::hash_string, std::equal_to<>> property_aliases;
+StyleLuaScriptContext::StyleLuaScriptContext(UI& ui, OnErrorFn onError) :
+	ui(ui),
+	onError(std::move(onError)) {
 
-	UI& ui;
+	property_loaders.emplace(pnm::align_horizontal, convert_string_parse(&libv::ui::parse_align_horizontal_optional));
+	property_loaders.emplace(pnm::align_vertical, convert_string_parse(&libv::ui::parse_align_vertical_optional));
+	property_loaders.emplace(pnm::anchor, convert_string_parse(&libv::ui::parse_anchor_optional));
+	// property_loaders.emplace(pnm::area_position, _______);
+	// property_loaders.emplace(pnm::area_size, _______);
+	property_loaders.emplace(pnm::background, convert_background);
+	property_loaders.emplace(pnm::bar_visual, convert_background);
+	// property_loaders.emplace(pnm::bar_color, conv_fn(libv::lua::convert_color));
+	// property_loaders.emplace(pnm::bar_image, conv_fn(convert_texture));
+	// property_loaders.emplace(pnm::bar_shader, _______);
+	// property_loaders.emplace(pnm::caret, _______);
+	property_loaders.emplace(pnm::caret_color, conv_fn(libv::lua::convert_color));
+	// property_loaders.emplace(pnm::caret_shader, _______);
+	property_loaders.emplace(pnm::color, conv_fn(libv::lua::convert_color));
+	property_loaders.emplace(pnm::column_count, convert_enum_value<ColumnCount>());
+	property_loaders.emplace(pnm::focus_mode, convert_string_parse(&libv::ui::parse_focus_mode_optional));
+	// property_loaders.emplace(pnm::focus_select_policy, _______);
+	property_loaders.emplace(pnm::font, convert_font);
+	// property_loaders.emplace(pnm::font_outline, convert_font_outline);
+	property_loaders.emplace(pnm::font_color, conv_fn(libv::lua::convert_color));
+	// property_loaders.emplace(pnm::font_shader, _______);
+	property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
+	property_loaders.emplace(pnm::margin, conv_fn(convert_extent));
+	property_loaders.emplace(pnm::orientation, convert_string_parse(&libv::ui::parse_orientation_optional));
+	property_loaders.emplace(pnm::orientation2, convert_string_parse(&libv::ui::parse_orientation2_optional));
+	property_loaders.emplace(pnm::padding, conv_fn(convert_extent));
+	// property_loaders.emplace(pnm::quad_shader, _______);
+	property_loaders.emplace(pnm::scroll_mode, convert_string_parse(&libv::ui::parse_scroll_mode_optional));
+	property_loaders.emplace(pnm::size, convert_string_parse(&libv::ui::parse_size_optional));
+	// property_loaders.emplace(pnm::snap_to_edge, _______);
+	property_loaders.emplace(pnm::spacing, convert_enum_value<Spacing>());
+	property_loaders.emplace(pnm::spacing2, conv_fn(convert_extent2));
+	// property_loaders.emplace(pnm::squish, _______);
+	property_loaders.emplace(pnm::z_index_offset, convert_enum_value<ZIndexOffset>());
+	// property_loaders.emplace(pnm::text, _______);
+	// property_loaders.emplace(pnm::value, _______);
+	// property_loaders.emplace(pnm::value_high, _______);
+	// property_loaders.emplace(pnm::value_low, _______);
+	// property_loaders.emplace(pnm::value_range, _______);
+	// property_loaders.emplace(pnm::value_step, _______);
 
-	StyleState current_state_mask = StyleState::none;
-	StyleState current_state_value = StyleState::none;
+	property_aliases.emplace("align", pnm::align_horizontal);
+	property_aliases.emplace("orient", pnm::orientation);
+}
 
-public:
-	explicit LoadLuaContext(UI& ui, lua::State& lua) :
-		ui(ui) {
-
-		property_loaders.emplace(pnm::align_horizontal, convert_string_parse(&libv::ui::parse_align_horizontal_optional));
-		property_loaders.emplace(pnm::align_vertical, convert_string_parse(&libv::ui::parse_align_vertical_optional));
-		property_loaders.emplace(pnm::anchor, convert_string_parse(&libv::ui::parse_anchor_optional));
-		//		property_loaders.emplace(pnm::area_position, _______);
-		//		property_loaders.emplace(pnm::area_size, _______);
-		property_loaders.emplace(pnm::background, convert_background);
-		property_loaders.emplace(pnm::bar_visual, convert_background);
-		// property_loaders.emplace(pnm::bar_color, conv_fn(libv::lua::convert_color));
-		// property_loaders.emplace(pnm::bar_image, conv_fn(convert_texture));
-//		property_loaders.emplace(pnm::bar_shader, _______);
-		//		property_loaders.emplace(pnm::caret, _______);
-		property_loaders.emplace(pnm::caret_color, conv_fn(libv::lua::convert_color));
-		//		property_loaders.emplace(pnm::caret_shader, _______);
-		property_loaders.emplace(pnm::color, conv_fn(libv::lua::convert_color));
-		property_loaders.emplace(pnm::column_count, convert_enum_value<ColumnCount>());
-		property_loaders.emplace(pnm::focus_mode, convert_string_parse(&libv::ui::parse_focus_mode_optional));
-//		property_loaders.emplace(pnm::focus_select_policy, _______);
-		property_loaders.emplace(pnm::font, convert_font);
-//		property_loaders.emplace(pnm::font_outline, convert_font_outline);
-		property_loaders.emplace(pnm::font_color, conv_fn(libv::lua::convert_color));
-//		property_loaders.emplace(pnm::font_shader, _______);
-		property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
-		property_loaders.emplace(pnm::margin, conv_fn(convert_extent));
-		property_loaders.emplace(pnm::orientation, convert_string_parse(&libv::ui::parse_orientation_optional));
-		property_loaders.emplace(pnm::orientation2, convert_string_parse(&libv::ui::parse_orientation2_optional));
-		property_loaders.emplace(pnm::padding, conv_fn(convert_extent));
-//		property_loaders.emplace(pnm::quad_shader, _______);
-		property_loaders.emplace(pnm::scroll_mode, convert_string_parse(&libv::ui::parse_scroll_mode_optional));
-		property_loaders.emplace(pnm::size, convert_string_parse(&libv::ui::parse_size_optional));
-//		property_loaders.emplace(pnm::snap_to_edge, _______);
-		property_loaders.emplace(pnm::spacing, convert_enum_value<Spacing>());
-		property_loaders.emplace(pnm::spacing2, conv_fn(convert_extent2));
-//		property_loaders.emplace(pnm::squish, _______);
-		property_loaders.emplace(pnm::z_index_offset, convert_enum_value<ZIndexOffset>());
-		//		property_loaders.emplace(pnm::text, _______);
-		//		property_loaders.emplace(pnm::value, _______);
-		//		property_loaders.emplace(pnm::value_high, _______);
-		//		property_loaders.emplace(pnm::value_low, _______);
-		//		property_loaders.emplace(pnm::value_range, _______);
-		//		property_loaders.emplace(pnm::value_step, _______);
-
-		property_loaders.emplace("test_number_3", convert_enum_value<FontSize>());
-		property_loaders.emplace("test_string_3", convert_enum_value<FontSize>());
-
-		property_aliases.emplace("align", pnm::align_horizontal);
-		property_aliases.emplace("orient", pnm::orientation);
-
-		bind(lua);
-	}
-
-	void load_style_property(Style& style, const std::string_view& lookup_key, const sol::object& value) {
-		// Map aliases
-		const auto alias_it = property_aliases.find(lookup_key);
-		const auto key = alias_it == property_aliases.end() ? lookup_key : std::string_view(alias_it->second);
-
-		// Lookup loader
-		const auto it = property_loaders.find(key);
-		if (it == property_loaders.end())
-			return log_ui.warn("Ignoring unrecognized property style {} property {} value \"{}\".",
-					style.style_name, key, value.as<std::string_view>());
-
-		// Load
-		const auto& loader = it->second;
-		auto result = loader(ui, value);
-		if (!result)
-			return log_ui.error("Failed to load style {} property {} value \"{}\"",
-					style.style_name, key, value.as<std::string_view>());
-
-		// Assign
-		style.set(current_state_mask, current_state_value, std::string(key), std::move(*result));
-	}
-
-	void process_state_mask_and_value(Style& style, std::string_view state_str) {
-		// for (const std::string_view state_str_member : std::views::split(state_str, ',')) { // GCC 12
-		// 	const auto s = libv::trim(state_str_member);
-		for (auto state_str_member : libv::view::lines_string_view(state_str, ',')) {
-			if (state_str_member.ends_with(','))
-				state_str_member.remove_suffix(1);
-			auto s = libv::trim(state_str_member);
-
-			const auto negate = s.starts_with('!');
-			if (negate) {
-				s.remove_prefix(1);
-				s = libv::trim_front(s);
-			}
-
-			const auto process_state = [&](std::string_view state_name, StyleState state_enum) {
-				if (s != state_name)
-					return false;
-
-				current_state_mask = current_state_mask | state_enum;
-				if (negate)
-					current_state_value = current_state_value & ~state_enum;
-				else
-					current_state_value = current_state_value | state_enum;
-
-				return true;
-			};
-
-			if (process_state("disable", StyleState::disable)) continue;
-			if (process_state("hover", StyleState::hover)) continue;
-			if (process_state("hover-within", StyleState::hover_within)) continue;
-			if (process_state("hover_within", StyleState::hover_within)) continue;
-			if (process_state("focus", StyleState::focus)) continue;
-			if (process_state("focus-within", StyleState::focus_within)) continue;
-			if (process_state("focus_within", StyleState::focus_within)) continue;
-			if (process_state("active", StyleState::active)) continue;
-			if (process_state("select", StyleState::select)) continue;
-			if (process_state("progress", StyleState::progress)) continue;
-			if (process_state("done", StyleState::done)) continue;
-			if (process_state("error", StyleState::error)) continue;
-			if (process_state("mod2", StyleState::mod2)) continue;
-			if (process_state("mod3", StyleState::mod3)) continue;
-			if (process_state("first", StyleState::first)) continue;
-			if (process_state("last", StyleState::last)) continue;
-
-			if (process_state("custom0", StyleState::custom0)) continue;
-			if (process_state("custom1", StyleState::custom1)) continue;
-			if (process_state("custom2", StyleState::custom2)) continue;
-			if (process_state("custom3", StyleState::custom3)) continue;
-			if (process_state("custom4", StyleState::custom4)) continue;
-			if (process_state("custom5", StyleState::custom5)) continue;
-			if (process_state("custom6", StyleState::custom6)) continue;
-			if (process_state("custom7", StyleState::custom7)) continue;
-			if (process_state("custom8", StyleState::custom8)) continue;
-			if (process_state("custom9", StyleState::custom9)) continue;
-			if (process_state("custom10", StyleState::custom10)) continue;
-			if (process_state("custom11", StyleState::custom11)) continue;
-			if (process_state("custom12", StyleState::custom12)) continue;
-			if (process_state("custom13", StyleState::custom13)) continue;
-			if (process_state("custom14", StyleState::custom14)) continue;
-			if (process_state("custom15", StyleState::custom15)) continue;
-
-			log_ui.warn("Ignoring unrecognized state {} in style {}", s, style.style_name);
-		}
-	}
-
-	void load_style_table(Style& style, const sol::table& table) {
-		// Process normal key value pairs first
-		for (const auto& [key, value] : table) {
-			if (key.get_type() != sol::type::string)
-				continue; // Skip non key-value pairs (where key is string and therefore yields a property)
-
-			const auto key_str = key.as<std::string_view>();
-
-			// Skip markers
-			if (key_str == TABLE_TAG_TYPE)
-				continue;
-			if (key_str == TABLE_TAG_STATE_CONDITION)
-				continue;
-			if (key_str == TABLE_TAG_NEST_NAME)
-				continue;
-
-			load_style_property(style, key_str, value);
-		}
-
-		// Process Sub Tables (Nested or Stated property tables or just general Lua code structuring)
-		// NOTE: These tables are loaded after the key-value pairs were already loaded on the current level
-		for (const auto& [key, value] : table) {
-			if (key.get_type() != sol::type::number)
-				continue;
-
-			const auto sub_table = sol::table(value);
-
-			const auto state_member = sub_table.get<sol::object>(TABLE_TAG_STATE_CONDITION);
-			if (state_member.valid()) {
-				if (state_member.get_type() != sol::type::string) {
-					log_ui.warn("Expected type of {} member in style sub-table of {} is a string but was {}. Processing the table without constraint", TABLE_TAG_STATE_CONDITION, style.style_name, libv::lua::lua_type_to_string(state_member.get_type()));
-					load_style_table(style, sub_table);
-					continue;
-				}
-
-				const auto old_state_mask = current_state_mask;
-				const auto old_state_value = current_state_value;
-
-				const auto state_str = state_member.as<std::string_view>();
-				process_state_mask_and_value(style, state_str);
-
-				// Recurse into the sub table
-				load_style_table(style, sub_table);
-
-				current_state_mask = old_state_mask;
-				current_state_value = old_state_value;
-
-				continue;
-			}
-
-			const auto nest_name = sub_table.get<sol::object>(TABLE_TAG_NEST_NAME);
-			if (nest_name.valid()) {
-				if (nest_name.get_type() != sol::type::string) {
-					log_ui.warn("Expected type of {} member in style sub-table of {} is a string but was {}. Processing the table without constraint", TABLE_TAG_NEST_NAME, style.style_name, libv::lua::lua_type_to_string(nest_name.get_type()));
-					load_style_table(style, sub_table);
-					continue;
-				}
-
-				// Process sub-table as a nested property set
-				const auto nest_str = nest_name.as<std::string_view>();
-				const auto nested_style_ip = ui.style().style(libv::concat(style.style_name, ">", nest_str));
-				nested_style_ip->clear();
-
-				load_style_table(*nested_style_ip, sub_table);
-
-				continue;
-			}
-
-			// Unmarked sub table, recurse into it without any extra operation
-			load_style_table(style, sub_table);
-		}
-
-		// Warn on any unexpected types
-		for (const auto& [key, value] : table) {
-			if (key.get_type() == sol::type::string || key.get_type() == sol::type::number)
-				continue;
-
-			log_ui.warn("Style's property key \"{}\" is expected to be a string. Entry ignored: Style name: {}, key: {}, value: {}",
-					key.as<std::string_view>(), style.style_name, key.as<std::string_view>(), value.as<std::string_view>());
-		}
-	}
-
-	void bind(lua::State& lua) {
-		auto ui_table = lua.create_named_table("ui");
+void StyleLuaScriptContext::bind(sol::state& lua) {
+	auto ui_table = lua.create_named_table("ui");
 
 	//	ui_table["bottom"] = "bottom";
 	//	ui_table["center"] = "center";
@@ -867,54 +687,207 @@ public:
 	//			return sol::nil;
 	//	});
 
-		ui_table.set_function("style", [this](const std::string_view style_name) mutable {
-			auto style_ip = ui.style().style(style_name);
-			return [style_ip = std::move(style_ip), this](const sol::table& table) {
-				style_ip->clear();
+	ui_table.set_function("style", [this](const std::string_view style_name) mutable {
+		auto style_ip = ui.style().style(style_name);
+		return [style_ip = std::move(style_ip), this](const sol::table& table) {
+			style_ip->clear();
 
-				load_style_table(*style_ip, table);
-			};
-		});
+			load_style_table(*style_ip, table);
+		};
+	});
 
-		lua.set_function("state", [](std::string state_string) {
-			return std::function<sol::table(sol::table)>([state_string = std::move(state_string)](sol::table table) {
-				table[TABLE_TAG_TYPE] = TABLE_TAG_STATE_CONDITION;
-				table[TABLE_TAG_STATE_CONDITION] = state_string;
-				return table;
-			});
+	lua.set_function("state", [](std::string state_string) {
+		return std::function<sol::table(sol::table)>([state_string = std::move(state_string)](sol::table table) {
+			table[TABLE_TAG_TYPE] = TABLE_TAG_STATE_CONDITION;
+			table[TABLE_TAG_STATE_CONDITION] = state_string;
+			return table;
 		});
+	});
 
-		lua.set_function("nest", [](std::string nest_name) {
-			return std::function<sol::table(sol::table)>([nest_name = std::move(nest_name)](sol::table table) {
-				table[TABLE_TAG_TYPE] = TABLE_TAG_NEST_NAME;
-				table[TABLE_TAG_NEST_NAME] = nest_name;
-				return table;
-			});
+	lua.set_function("nest", [](std::string nest_name) {
+		return std::function<sol::table(sol::table)>([nest_name = std::move(nest_name)](sol::table table) {
+			table[TABLE_TAG_TYPE] = TABLE_TAG_NEST_NAME;
+			table[TABLE_TAG_NEST_NAME] = nest_name;
+			return table;
 		});
+	});
+}
+
+void StyleLuaScriptContext::load_style_property(Style& style, const std::string_view& lookup_key, const sol::object& value) {
+	// Map aliases
+	const auto alias_it = property_aliases.find(lookup_key);
+	const auto key = alias_it == property_aliases.end() ? lookup_key : std::string_view(alias_it->second);
+
+	// Lookup loader
+	const auto it = property_loaders.find(key);
+	if (it == property_loaders.end()) {
+		error("Unrecognized property style {} property {} value \"{}\".", style.style_name, key, libv::lua::to_string(value));
+		return;
 	}
-};
 
-void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
-	libv::Timer timer;
-	LoadLuaContext context(ui, lua);
+	// Load
+	const auto& loader = it->second;
+	auto result = loader(ui, value);
+	if (!result) {
+		error("Failed to load style {} property {} value \"{}\"", style.style_name, key, libv::lua::to_string(value));
+		return;
+	}
 
-	try {
-		// TODO P1: Create a sandbox around the script execution
-		const auto result = lua.safe_script(script_str, sol::script_throw_on_error);
+	// Assign
+	style.set(current_state_mask, current_state_value, std::string(key), std::move(*result));
+}
 
-		if (!result.valid()) {
-			sol::error err = result;
-			return log_ui.error("Style script execution failed: {}", err.what());
+void StyleLuaScriptContext::process_state_mask_and_value(Style& style, std::string_view state_str) {
+	// for (const std::string_view state_str_member : std::views::split(state_str, ',')) { // GCC 12
+	// 	const auto s = libv::trim(state_str_member);
+	for (auto state_str_member : libv::view::lines_string_view(state_str, ',')) {
+		if (state_str_member.ends_with(','))
+			state_str_member.remove_suffix(1);
+		auto s = libv::trim(state_str_member);
+
+		const auto negate = s.starts_with('!');
+		if (negate) {
+			s.remove_prefix(1);
+			s = libv::trim_front(s);
 		}
 
-		if (result.get_type() != sol::type::none)
-			log_ui.warn("Style script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
+		const auto process_state = [&](std::string_view state_name, StyleState state_enum) {
+			if (s != state_name)
+				return false;
 
-		log_ui.info("Style script loading successful in {:7.3f}ms", timer.timef_ms().count());
+			current_state_mask = current_state_mask | state_enum;
+			if (negate)
+				current_state_value = current_state_value & ~state_enum;
+			else
+				current_state_value = current_state_value | state_enum;
 
-	} catch (const std::exception& e) {
-		log_ui.error("Style script execution failed: {}", e.what());
+			return true;
+		};
+
+		if (process_state("disable", StyleState::disable)) continue;
+		if (process_state("hover", StyleState::hover)) continue;
+		if (process_state("hover-within", StyleState::hover_within)) continue;
+		if (process_state("hover_within", StyleState::hover_within)) continue;
+		if (process_state("focus", StyleState::focus)) continue;
+		if (process_state("focus-within", StyleState::focus_within)) continue;
+		if (process_state("focus_within", StyleState::focus_within)) continue;
+		if (process_state("active", StyleState::active)) continue;
+		if (process_state("select", StyleState::select)) continue;
+		if (process_state("progress", StyleState::progress)) continue;
+		if (process_state("done", StyleState::done)) continue;
+		if (process_state("error", StyleState::error)) continue;
+		if (process_state("mod2", StyleState::mod2)) continue;
+		if (process_state("mod3", StyleState::mod3)) continue;
+		if (process_state("first", StyleState::first)) continue;
+		if (process_state("last", StyleState::last)) continue;
+
+		if (process_state("custom0", StyleState::custom0)) continue;
+		if (process_state("custom1", StyleState::custom1)) continue;
+		if (process_state("custom2", StyleState::custom2)) continue;
+		if (process_state("custom3", StyleState::custom3)) continue;
+		if (process_state("custom4", StyleState::custom4)) continue;
+		if (process_state("custom5", StyleState::custom5)) continue;
+		if (process_state("custom6", StyleState::custom6)) continue;
+		if (process_state("custom7", StyleState::custom7)) continue;
+		if (process_state("custom8", StyleState::custom8)) continue;
+		if (process_state("custom9", StyleState::custom9)) continue;
+		if (process_state("custom10", StyleState::custom10)) continue;
+		if (process_state("custom11", StyleState::custom11)) continue;
+		if (process_state("custom12", StyleState::custom12)) continue;
+		if (process_state("custom13", StyleState::custom13)) continue;
+		if (process_state("custom14", StyleState::custom14)) continue;
+		if (process_state("custom15", StyleState::custom15)) continue;
+
+		error("Unrecognized state {} in style {}", s, style.style_name);
 	}
+}
+
+void StyleLuaScriptContext::load_style_table(Style& style, const sol::table& table) {
+	// Process normal key value pairs first
+	for (const auto& [key, value] : table) {
+		if (key.get_type() != sol::type::string)
+			continue; // Skip non key-value pairs (where key is string and therefore yields a property)
+
+		const auto key_str = key.as<std::string_view>();
+
+		// Skip markers
+		if (key_str == TABLE_TAG_TYPE)
+			continue;
+		if (key_str == TABLE_TAG_STATE_CONDITION)
+			continue;
+		if (key_str == TABLE_TAG_NEST_NAME)
+			continue;
+
+		load_style_property(style, key_str, value);
+	}
+
+	// Process Sub Tables (Nested or Stated property tables or just general Lua code structuring)
+	// NOTE: These tables are loaded after the key-value pairs were already loaded on the current level
+	for (const auto& [key, value] : table) {
+		if (key.get_type() != sol::type::number)
+			continue;
+
+		const auto sub_table = sol::table(value);
+
+		const auto state_member = sub_table.get<sol::object>(TABLE_TAG_STATE_CONDITION);
+		if (state_member.valid()) {
+			if (state_member.get_type() != sol::type::string) {
+				error("Expected type of {} member in style sub-table of {} is a string but was {}. Processing the table without constraint", TABLE_TAG_STATE_CONDITION, style.style_name, libv::lua::to_string(state_member.get_type()));
+				load_style_table(style, sub_table);
+				continue;
+			}
+
+			const auto old_state_mask = current_state_mask;
+			const auto old_state_value = current_state_value;
+
+			const auto state_str = state_member.as<std::string_view>();
+			process_state_mask_and_value(style, state_str);
+
+			// Recurse into the sub table
+			load_style_table(style, sub_table);
+
+			current_state_mask = old_state_mask;
+			current_state_value = old_state_value;
+
+			continue;
+		}
+
+		const auto nest_name = sub_table.get<sol::object>(TABLE_TAG_NEST_NAME);
+		if (nest_name.valid()) {
+			if (nest_name.get_type() != sol::type::string) {
+				error("Expected type of {} member in style sub-table of {} is a string but was {}. Processing the table without constraint", TABLE_TAG_NEST_NAME, style.style_name, libv::lua::to_string(nest_name.get_type()));
+				load_style_table(style, sub_table);
+				continue;
+			}
+
+			// Process sub-table as a nested property set
+			const auto nest_str = nest_name.as<std::string_view>();
+			const auto nested_style_ip = ui.style().style(libv::concat(style.style_name, ">", nest_str));
+			nested_style_ip->clear();
+
+			load_style_table(*nested_style_ip, sub_table);
+
+			continue;
+		}
+
+		// Unmarked sub table, recurse into it without any extra operation
+		load_style_table(style, sub_table);
+	}
+
+	// Warn on any unexpected types
+	for (const auto& [key, value] : table) {
+		if (key.get_type() == sol::type::string || key.get_type() == sol::type::number)
+			continue;
+
+		error("Style's property key \"{}\" is expected to be a string. Entry ignored: Style name: {}, key: {}, value: {}",
+				libv::lua::to_string(key), style.style_name, libv::lua::to_string(key), libv::lua::to_string(value));
+	}
+}
+
+template <typename... Args>
+void StyleLuaScriptContext::error(const libv::with_source_location<const std::string_view> fmt, const Args&... args) {
+	log_ui.error(fmt, args...);
+	onError(fmt::format(fmt::runtime(fmt.value), args...));
 }
 
 // -------------------------------------------------------------------------------------------------

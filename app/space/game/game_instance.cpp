@@ -55,7 +55,9 @@ GameInstance::GameInstance() :
 		settings.res_shader.restrict_under_base = false; // TODO P1: Should go away with proper res folder
 		settings.res_texture.restrict_under_base = false; // TODO P1: Should go away with proper res folder
 
-		settings.track_style_scripts = true;
+		settings.resStyle.trackFiles = true;
+		settings.resStyle.resourceMappings.clear();
+		settings.resStyle.resourceMappings.emplace_back("", "");
 		return settings;
 	}()) {
 
@@ -81,8 +83,7 @@ GameInstance::GameInstance() :
 	controls.attach(frame);
 	ui.attach(frame);
 
-//	ui.load_style_script(libv::read_file_or_throw("style.lua"));
-	ui.load_style_script_file("style.lua");
+	ui.loadStyleFile("style.lua");
 }
 
 GameInstance::~GameInstance() {

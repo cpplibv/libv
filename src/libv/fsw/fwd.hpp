@@ -11,6 +11,7 @@ namespace fsw {
 class Watcher;
 
 struct Token;
+struct SafeToken;
 struct Event;
 
 // -------------------------------------------------------------------------------------------------

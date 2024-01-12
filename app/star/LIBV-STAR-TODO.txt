@@ -20,13 +20,18 @@ Star - System integration demo
 
 
 
-Settings page needs a scroll pane
-Credits page should not directly include third party licenses, there could be another page for it from the credits
-Credits (third party licenses) page needs an 'Accordion' for every license or details (or a popup)
+
+Move star surface debug UI parts into sandbox UI
 
 
---- ---------------------------------------------------------------------------------------------
 
+
+
+
+
+
+
+Organize surface scene is a mess
 
 Integration, controls, ui and controls interactions
 	camera controls
@@ -38,15 +43,15 @@ Integration, controls, ui and controls interactions
 		display pause/time control state on the ui
 	3D picking ray
 
-libv.re: improve glue layer, includes and ui integration
-
 libv.ui: controls:
 	scene controls: auto activates when the scene is part of the focus chain
 	canvas controls: auto activates when the canvas is focused
 	automated ways to register and bind defaults
 		prepared function, and a template func or class wrapper
 
-Organize surface scene is a mess
+libv.re: improve glue layer, includes and ui integration
+
+-------------------------------------------------------------------------------------------------
 
 controls / camera
 	Organize camera
@@ -79,11 +84,79 @@ libv.ui: Choose the null component constructor(s):
 	ComponentT{null_component}
 	ComponentT::null()
 
-app.star: Arrow navigation: Main Menu (and every page) focus navigation with arrows (and tab)
-	\ requires Arrow navigation from libv.ui
+ToggleButton has the extra text_ variable from Button
+!!! ToggleButton properties setters are not matching the LayoutTextLite pattern
 
-app.star: Improve design
-	Switch to nicer colors, bye bye blue background
+libv.ui: Warn whenever a UI component out lives the UI object itself
+libv.ui: Cleanup
+	LayoutTextLite Property
+	LayoutTextLite might is kinda broken or all over the place (getPositions and the rest of the API)
+	LayoutTextProperties
+
+	// PropertyLP what does LP means again ???, do font font_size need it?
+
+	get_nexus(0)
+	Nicer function dispatch for non-component event hubs
+		get_nexus(...)
+		mark_as_signal(...)
+		mark_as_slot(...)
+		is_marked_as_signal(...)
+		is_marked_as_slot(...)
+	Concept usage, in a lightweight header libv/ui/component/detail/core_ptr.hpp
+		template <typename T>
+			requires (!std::derived_from<T, Component>)
+		[[nodiscard]] constexpr inline auto get_core(const T& component_like) noexcept {
+			return component_like.ptr();
+		}
+
+
+-------------------------------------------------------------------------------------------------
+
+app.star: Settings/Config
+	app.star: Cleanup config.cpp, update became weird again
+
+	app.star: Settings
+		libv.ui: PageLayouts (card layout? tabs layout?)
+		grouping / separators / paging
+		tooltips with description
+
+	app.star: Separate "save/apply": preview and commit changes, or maybe the auto-save is fine as it is
+		star: Make save/apply buttons inactive if there is no change
+
+	app.star: Config customizations of behaviour:
+		Currently implemented:
+			on_corrupt_file::reset_to_default
+			on_missing_file::create_default
+			on_entry_change::auto_save(60s, 300s) // warmup, cooldown
+
+		on_corrupt_file::exit
+		on_corrupt_file::exit_and_alert
+		on_corrupt_file::prompt_user // reset or exit
+		on_corrupt_file::reset_to_default
+		on_corrupt_file::reset_to_default_and_alert
+
+		on_missing_file::create_default
+		on_missing_file::create_default_and_alert
+		on_missing_file::do_nothing
+		on_missing_file::exit
+		on_missing_file::exit_and_alert
+		on_missing_file::prompt_user // in-memory default, create default or exit
+
+		on_entry_change::auto_save(60s, 300s) // warmup, cooldown
+		on_entry_change::do_nothing
+
+
+app.star: Design and UI
+	app.star: Improve design
+		A decent looking UI (gameuidatabase.com for ideas)
+		Switch to nicer colors, bye bye blue background
+		Organise stylesheets, introduce color variables (prim, sec, acc)
+		app.star: UI Scale variable
+
+	app.star: Settings page needs a scroll pane
+	app.star: Credits page should not directly include third party licenses, there could be another page for it from the credits
+	app.star: Credits (third party licenses) page needs an 'Accordion' for every license or details (or a popup)
+
 
 app.star: Credits:
 		performance: text/ui rendering
@@ -154,100 +227,6 @@ app.star: Credits:
 				component bounds
 				clip bounds
 				| texture: id, layer, mode, bounds
-
----
-
-
-ToggleButton has the extra text_ variable from Button
-!!! ToggleButton properties setters are not matching the LayoutTextLite pattern
-
-
-libv.ui: Cleanup duty:
-	LayoutTextLite Property
-	LayoutTextLite might is kinda broken or all over the place (getPositions and the rest of the API)
-	LayoutTextProperties
-
-	// PropertyLP what does LP means again ???, do font font_size need it?
-
-	get_nexus(0)
-	Nicer function dispatch for non-component event hubs
-		get_nexus(...)
-		mark_as_signal(...)
-		mark_as_slot(...)
-		is_marked_as_signal(...)
-		is_marked_as_slot(...)
-	Concept usage, in a lightweight header libv/ui/component/detail/core_ptr.hpp
-		template <typename T>
-			requires (!std::derived_from<T, Component>)
-		[[nodiscard]] constexpr inline auto get_core(const T& component_like) noexcept {
-			return component_like.ptr();
-		}
-
-libv.ui: Settings: Do not clear buffer during render (Useful if there is a canvas that will do it anyways)
-
-
-----------
-
-app.star: Pretty design, ui elements, edit stylesheet
-
-libv.ui: Warn whenever a UI component out lives the UI object itself
-
-app.star: cleanup
-	config.cpp
-		update became weird again
-
-app.star: Settings
-	libv.ui: PageLayouts (card layout? tabs layout?)
-	grouping / separators / paging
-	tooltips with description
-
-star: Separate "save/apply": preview and commit changes, or maybe the auto-save is fine as it is
-	star: Make save/apply buttons inactive if there is no change
-
-app.star: Config customizations of behaviour:
-	Currently implemented:
-		on_corrupt_file::reset_to_default
-		on_missing_file::create_default
-		on_entry_change::auto_save(60s, 300s) // warmup, cooldown
-
-	on_corrupt_file::exit
-	on_corrupt_file::exit_and_alert
-	on_corrupt_file::prompt_user // reset or exit
-	on_corrupt_file::reset_to_default
-	on_corrupt_file::reset_to_default_and_alert
-
-	on_missing_file::create_default
-	on_missing_file::create_default_and_alert
-	on_missing_file::do_nothing
-	on_missing_file::exit
-	on_missing_file::exit_and_alert
-	on_missing_file::prompt_user // in-memory default, create default or exit
-
-	on_entry_change::auto_save(60s, 300s) // warmup, cooldown
-	on_entry_change::do_nothing
-
-
-=================================================================================================
-
-app.star: Self-Updater
-		on demand generation, keep last M
-		release level to indicate auto generation of patch paths
-
-place.it:
-	idea: tracked entities as "sleeping ones", not 2 but 3 update state
-		sleeping, awake, tracked
-		runs different code
-
-	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
-	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
-	Knowledge: Anisotropic filtering is useless for many textures
-	Knowledge: Mip maps are useless for some textures (UI textures dont care)
-
-	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
-
-
-
-
 
 
 

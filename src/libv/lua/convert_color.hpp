@@ -2,8 +2,10 @@
 
 #pragma once
 
+// ext
+#include <sol/object.hpp>
+#include <sol/table.hpp>
 // libv
-#include <libv/lua/lua.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/parse/color.hpp>
 

@@ -16,6 +16,12 @@ namespace fsw {
 
 // -------------------------------------------------------------------------------------------------
 
+SafeToken::~SafeToken() {
+	watcher->unsubscribe(token);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 std::ostream& operator<<(std::ostream& os, const Action& action) {
 	switch (action) {
 	case Action::create: return os << "create";
@@ -402,6 +408,10 @@ Watcher::token_type Watcher::subscribe_file(std::filesystem::path path, callback
 	return _subscribe_file(*self, std::move(path), is_relative, std::move(callback));
 }
 
+Watcher::safe_token_type Watcher::subscribe_file_safe(std::filesystem::path path, callback_type callback) {
+	return {subscribe_file(std::move(path), std::move(callback)), *this};
+}
+
 Watcher::token_type Watcher::subscribe_directory(std::filesystem::path path, callback_type callback) {
 	std::error_code ignore_ec;
 	const auto is_relative = path.is_relative();
@@ -412,6 +422,10 @@ Watcher::token_type Watcher::subscribe_directory(std::filesystem::path path, cal
 	_append_slash(path);
 
 	return _subscribe_directory(*self, std::move(path), is_relative, std::move(callback));
+}
+
+Watcher::safe_token_type Watcher::subscribe_directory_safe(std::filesystem::path path, callback_type callback) {
+	return {subscribe_directory(std::move(path), std::move(callback)), *this};
 }
 
 void Watcher::unsubscribe(token_type token) {

@@ -2,6 +2,8 @@
 
 // hpp
 #include <mimp/lua_driver.hpp>
+// ext
+#include <sol/state.hpp>
 // libv
 #include <libv/lua/lua.hpp>
 // std
@@ -199,7 +201,7 @@ struct LuaContext {
 //		}
 //
 //		if (result.get_type() != sol::type::none)
-//			log_ui.warn("Script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
+//			log_ui.warn("Script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::to_string(result.get_type()), std::string(result));
 //
 //		log_ui.info("Script loading successful in {:7.3f}ms", timer.timef_ms().count());
 
@@ -211,7 +213,7 @@ struct LuaContext {
 // -------------------------------------------------------------------------------------------------
 
 void execute_script(libv::vm4::Model& model, const std::string& script) {
-	auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+	auto lua = libv::lua::create_state(libv::lualib::basic | libv::lualib::libv_vec);
 	LuaContext lua_context{lua, model};
 	lua_context.bind();
 	lua_context.run(script);

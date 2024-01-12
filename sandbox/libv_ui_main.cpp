@@ -678,7 +678,9 @@ public:
 			Frame("UI Sandbox", 1680, 1050),
 			ui([] {
 				libv::ui::Settings settings;
-				settings.track_style_scripts = true;
+				settings.resStyle.trackFiles = true;
+				settings.resStyle.resourceMappings.clear();
+				settings.resStyle.resourceMappings.emplace_back("", "");
 				return settings;
 			}()) {
 		setPosition(FramePosition::center_current_monitor);
@@ -686,7 +688,7 @@ public:
 		setOpenGLVersion(4, 5);
 		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
-		ui.load_style_script_file("sandbox/libv_ui_main_style.lua");
+		ui.loadStyleFile("sandbox/libv_ui_main_style.lua");
 
 		tabs.addTab("Empty Tab", libv::ui::PanelLine());
 		tabs.addTab("Buttons", createTabButtons());

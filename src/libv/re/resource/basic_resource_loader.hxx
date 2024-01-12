@@ -12,8 +12,8 @@
 #include <libv/re/log.hpp>
 #include <libv/re/r.hpp>
 #include <libv/re/resource/common_resource.hpp>
-#include <libv/re/resource/common_resource_event.hpp>
 #include <libv/re/settings.hpp>
+#include <libv/res/common_resource_event.hpp>
 #include <libv/res/resource_path.hpp>
 #include <libv/utility/memory/intrusive2_ptr.hpp>
 #include <libv/utility/read_file.hpp>
@@ -131,14 +131,6 @@ struct ResourceAccess {
 
 // -------------------------------------------------------------------------------------------------
 
-struct FileLoadFailure {
-	std::vector<ResourceMappingUnmatched> unmatchedMappings;
-	std::vector<ResourceMappingError> mappingErrors;
-	std::vector<LoadFilePhysicalError> physicalErrors;
-};
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename T, typename Key>
 struct ResourceEquality {
 	using is_transparent = void;
@@ -200,7 +192,7 @@ public:
 	std::unordered_map<ResourceID, std::vector<WatchedFile>> watchedFiles;
 
 public:
-	explicit BasicResourceLoader(const ResourceLoaderSettings& settings) :
+	explicit BasicResourceLoader(const libv::res::ResourceLoaderSettings& settings) :
 		trackFiles(settings.trackFiles),
 		fswReloadDelay(settings.fswReloadDelay) { }
 
@@ -213,9 +205,9 @@ private:
 	}
 
 public:
-	std::expected<std::string, FileLoadFailure> _fs_loadFile(
+	std::expected<std::string, libv::res::FileLoadFailure> _fs_loadFile(
 			std::vector<WatchedFile>* const watchTokens,
-			const std::vector<ResourcePathMapping>& resourceMappings,
+			const std::vector<libv::res::ResourcePathMapping>& resourceMappings,
 			std::string_view fileIdentifier,
 			ResourceID id);
 
@@ -239,14 +231,14 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <typename CRTP, typename Traits>
-std::expected<std::string, FileLoadFailure> BasicResourceLoader<CRTP, Traits>::_fs_loadFile(
+std::expected<std::string, libv::res::FileLoadFailure> BasicResourceLoader<CRTP, Traits>::_fs_loadFile(
 		std::vector<WatchedFile>* const watchTokens,
-		const std::vector<ResourcePathMapping>& resourceMappings,
+		const std::vector<libv::res::ResourcePathMapping>& resourceMappings,
 		std::string_view fileIdentifier,
 		ResourceID id) {
 
-	libv::small_vector<ResourceMappingError, 8> mappingErrors;
-	libv::small_vector<LoadFilePhysicalError, 8> physicalErrors;
+	libv::small_vector<libv::res::ResourceMappingError, 8> mappingErrors;
+	libv::small_vector<libv::res::LoadFilePhysicalError, 8> physicalErrors;
 
 	for (const auto& [resourcePrefix, virtualPrefix] : resourceMappings) {
 		if (!fileIdentifier.starts_with(resourcePrefix))
@@ -284,7 +276,7 @@ std::expected<std::string, FileLoadFailure> BasicResourceLoader<CRTP, Traits>::_
 	}
 
 	// Compose and log detailed error message about the failures
-	std::vector<ResourceMappingUnmatched> unmatchedMappings;
+	std::vector<libv::res::ResourceMappingUnmatched> unmatchedMappings;
 
 	std::ostringstream errorMsg;
 	for (const auto& [resourcePrefix, virtualPrefix] : resourceMappings)
@@ -299,11 +291,10 @@ std::expected<std::string, FileLoadFailure> BasicResourceLoader<CRTP, Traits>::_
 
 	log_re.error("Failed to load {} resource file: '{}'\n{}", Traits::name_resource, fileIdentifier, std::move(errorMsg).str());
 
-	return std::unexpected(FileLoadFailure{
+	return std::unexpected(libv::res::FileLoadFailure{
 			std::move(unmatchedMappings),
-			std::vector<ResourceMappingError>{mappingErrors.begin(), mappingErrors.end()},
-			std::vector<LoadFilePhysicalError>{physicalErrors.begin(), physicalErrors.end()}
-	});
+			std::vector<libv::res::ResourceMappingError>{mappingErrors.begin(), mappingErrors.end()},
+			std::vector<libv::res::LoadFilePhysicalError>{physicalErrors.begin(), physicalErrors.end()}});
 }
 
 template <typename CRTP, typename Traits>

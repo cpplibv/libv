@@ -14,7 +14,7 @@
 #include <tuple>
 #include <type_traits>
 // pro
-#include <libv/lua/sol_type_to_string.hpp>
+#include <libv/lua/to_string.hpp>
 
 
 // =================================================================================================
@@ -705,12 +705,12 @@ struct ReportString {
 		(void) found;
 		(void) expected;
 
-//		ss << "Type mismatch: " << name << ". Expected: " << lua_type_to_string(expected) << " Found: " << lua_type_to_string(found) << "\n";
+//		ss << "Type mismatch: " << name << ". Expected: " << to_string(expected) << " Found: " << to_string(found) << "\n";
 
 		//	Candidate [Userdata]
 		//		Rejected: Type mismatch, Expected a [Userdata] but got a [String]
 		ss << "Candidate [" << name << "]\n";
-		ss << "    Rejected: Type mismatch: Expected a [" << lua_type_to_string(expected) << "] but got a [" << lua_type_to_string(found) << "]\n";
+		ss << "    Rejected: Type mismatch: Expected a [" << to_string(expected) << "] but got a [" << to_string(found) << "]\n";
 	}
 	inline void string_parse_failed(const std::string_view name, const std::string_view value) noexcept {
 //		ss << name << value;

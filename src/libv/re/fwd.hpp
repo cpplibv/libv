@@ -16,7 +16,9 @@ namespace re {
 	void increase_ref_count(TYPE* ptr); \
 	void decrease_ref_count(TYPE* ptr); \
 	using TYPE ## _ptr = libv::intrusive2_ptr<TYPE>; \
-	using TYPE ## _cptr = libv::intrusive2_ptr<const TYPE>;
+	using TYPE ## _cptr = libv::intrusive2_ptr<const TYPE>; \
+	using TYPE ## _ref = libv::intrusive2_ref<TYPE>; \
+	using TYPE ## _cref = libv::intrusive2_ref<const TYPE>;
 
 // Library
 class Settings;

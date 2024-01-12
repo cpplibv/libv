@@ -3,7 +3,7 @@
 #pragma once
 
 #include <libv/re/fwd.hpp>
-#include <libv/re/resource/common_resource_event.hpp>
+#include <libv/res/common_resource_event.hpp>
 
 #include <optional>
 #include <string>
@@ -25,9 +25,9 @@ struct ModelLoadFailure {
 	Model_ptr model;
 
 	struct IOFailure {
-		std::vector<ResourceMappingUnmatched> unmatchedMappings;
-		std::vector<ResourceMappingError> mappingErrors;
-		std::vector<LoadFilePhysicalError> physicalErrors;
+		std::vector<libv::res::ResourceMappingUnmatched> unmatchedMappings;
+		std::vector<libv::res::ResourceMappingError> mappingErrors;
+		std::vector<libv::res::LoadFilePhysicalError> physicalErrors;
 	};
 
 	std::optional<IOFailure> ioFailure;

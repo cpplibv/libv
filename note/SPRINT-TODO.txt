@@ -16,15 +16,24 @@
 
 
 
+Everything in star notes (Its not that long list, mostly integration and cleanup)
 
 
-libv.ui: Style import other lua files for common variables
-libv.ui: Style script loading should match the way other resources are loaded
-		No more: ui.load_style_script_file(wish::resource_path("res/style.lua"))
 
-libv.ui: Crash: background = {type = "texture", texture = "builtin:white"},
-libv.ui: Support "builtin:white" as ui texture resource
 
+--- Resources --------------------------------------------------------------------------------------
+
+res: Skyboxes:
+		replace fluffball with one of the recently acquired clear sky
+		acquire an image viewer that can handle (and other formats that we started to use)
+				with thumbnails
+				DDS cube
+				BC6 DDS
+				HDR
+		acquire 2 simple space with stars
+		acquire 2 nebula
+		acquire 2 in orbit (high or low)
+libv.re: Sky equirectangular and cubemaps are misaligned or inverted (possible import issue)
 
 
 
@@ -34,7 +43,7 @@ Cleanup / Adoption
 	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even-non interactive components
 			\ have a single shielding object that is non-interactive in star
 
-Focus/Event routing
+Focus/Navigation/Event routing and traversal
 	libv.ui.focus: By default unhandled
 			[tab] hotkeys should trigger focus traversal
 			[esc] hotkeys should trigger focus clear
@@ -49,34 +58,15 @@ Focus/Event routing
 				- (forward/backward) (index) position based
 				- (linked) explicit direct link (ptr, ptr)
 
-
---- Resources --------------------------------------------------------------------------------------
-
-res: Skyboxes:
-		replace fluffball with one of the recently acquired clear sky
-		acquire an image viewer that can handle hdr dds cube (and other formats that we started to use)
-		acquire 2 simple space with stars
-		acquire 2 nebula
-libv.re: Sky equirectangular and cubemaps are misaligned and inverted (possible import issue)
+app.star: Arrow navigation: Main Menu (and every page) focus navigation with arrows (and tab)
+	\ requires Arrow navigation from libv.ui
 
 
-
---- Star -------------------------------------------------------------------------------------------
-
-Everything in star notes (Its not that long list, mostly integration and cleanup)
-
-A decent looking UI (gameuidatabase.com for ideas)
-
-
-
-
-
-
-
-
---- Place Back -------------------------------------------------------------------------------------
+=== Place Back =====================================================================================
 
 place.it:
+	libv.ui: Support "builtin:white" as ui texture resource | When libv.re is used
+
 	libv.ui.event: (?) Mouse acquire should leave any over component
 	libv.ui.event: (?) Mouse release should enter any over component (respect non-pass_through)
 	libv.ui.event: Idea for event notification: Instead of a single propagation pass use 2: capture pass, bubbling(propagation) pass:
@@ -84,3 +74,67 @@ place.it:
 			capture pass would precede it, in reverse order (top-down)
 				granting the ability to capture an event in a parent
 	libv.ui: (?) hover-within new "state" property (same concept as focus-within, not sure if this is required) StyleState::hover_within
+
+	idea: tracked entities as "sleeping ones", not 2 but 3 update state
+		sleeping, awake, tracked
+		runs different code
+
+	Knowledge: Optimal vertex attribute layout: Position separate, everything else interleaved
+	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
+	Knowledge: Anisotropic filtering is useless for many textures
+	Knowledge: Mip maps are useless for some textures (UI textures dont care)
+
+	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
+
+
+sol2 Clarifications:
+	sol::function = SOL_SAFE_FUNCTION ? sol::protected_function : sol::unsafe_function
+		sol::unsafe_function - This abstraction assumes the function runs safely. If you expect your code to have errors use sol::protected_function
+				returns
+					function_result (WARNING: MUSTN'T stored, has to be converted to type and discarded)
+					unsafe_function_result
+		sol::protected_function / sol::safe_function - same as sol::function, but heavy protection and has a potential error handler for any Lua errors and C++ exceptions
+				error handler can be set with ctor, .set_error_handler() or ::set_default_handler() with signature string(string) (can be a sol::function)
+				returns
+					protected_function_result aka expected<Proxy, sol::error> like (can be stored)
+					sol::optional<T> -> loses error_handlers message
+					T -> will throw/panic on failure
+
+	state.script() =
+		state.safe_script()
+				returns sol::protected_function_result
+		state.unsafe_script()
+				returns sol::unsafe_function_result
+
+	errors in protected context are recovered at the latest recovery point
+		while unprotected errors will panic(). If there is a chance of error
+		use safe_script and safe_function
+
+	--- More:
+		script vs safe_script
+		environment
+		environment globals
+		environment create new
+
+		error handlers / error_handler
+			sol::script_pass_on_error
+			sol::script_throw_on_error
+			sol::script_default_on_error = SOL_DEFAULT_PASS_ON_ERROR ? pass : throw
+
+		SAFETIES
+		object.as<Type>(): on type mismatch throws
+				table as string = throw
+				number as string = throw
+				nil as string = throw
+		.get
+		.valid
+		.at
+		.is
+		to table aka casting
+		.type
+
+		what happens when:
+		lua error()
+		syntax error
+		invalid function call (c++ function argument dont match)
+		c++ exception in a bounded function

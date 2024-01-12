@@ -15,6 +15,15 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+void increase_ref_count(Style* ptr) {
+	libv::ref_count_access::increase_ref_count(ptr);
+}
+void decrease_ref_count(Style* ptr) {
+	libv::ref_count_access::decrease_ref_count(ptr);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Style::Style(std::string style_name) :
 	style_name(std::move(style_name)) { }
 

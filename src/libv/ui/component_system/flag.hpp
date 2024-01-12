@@ -72,7 +72,8 @@ static constexpr Flag_t mask_propagate =
 		pendingStyleChild |
 		pendingLayoutChild |
 		pendingRenderChild |
-		pendingDetachChild;
+		pendingDetachChild
+;
 
 static constexpr Flag_t mask_self =
 		render |
@@ -115,7 +116,8 @@ static constexpr Flag_t mask_init =
 		pendingCreate |
 
 		updatedSize |
-		updatedPosition;
+		updatedPosition
+;
 
 } // namespace flag
 
@@ -127,7 +129,7 @@ constexpr inline Flag_t calculatePropagateFlags(Flag_t flags) noexcept {
 	return Flag_t{propagatableSelf.value() >> 1u} | propagatableChild;
 }
 
-std::string to_string(Flag_t flags);
+[[nodiscard]] std::string to_string(Flag_t flags);
 
 // -------------------------------------------------------------------------------------------------
 

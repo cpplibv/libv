@@ -26,6 +26,8 @@ public:
 	constexpr inline function_ref() noexcept = delete;
 	constexpr inline function_ref(const function_ref<R(Args...)>& rhs) noexcept = default;
 
+	constexpr inline function_ref(std::nullptr_t) noexcept {};
+
 	template <typename F,
 			typename = std::enable_if_t<
 				!std::is_same<std::decay_t<F>, function_ref>::value &&
@@ -61,6 +63,10 @@ public:
 
 	constexpr inline R operator()(Args... args) const {
 		return callback_(obj_, std::forward<Args>(args)...);
+	}
+
+	[[nodiscard]] explicit inline operator bool() const noexcept {
+		return callback_ != nullptr;
 	}
 };
 

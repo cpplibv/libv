@@ -26,15 +26,15 @@ ui.style("info_bar") {
 	font_color = colors.text,
 	font_shader = "default",
 	font_size = 14,
-	layout = ui.layout_line(ui.ORIENT_Orientation::right),
---	layout_orient = ui.ORIENT_Orientation::right,
+	layout = ui.layout_line(ui.ORIENT_Orientation.right),
+--	layout_orient = ui.ORIENT_Orientation.right,
 	size = "1r, 20px",
 }
 
 ui.style("info_bar.left") {
 	size = "dynamic, 1r",
 	background = "#00FF007F",
-	layout = ui.layout_line(ui.ORIENT_Orientation::right),
+	layout = ui.layout_line(ui.ORIENT_Orientation.right),
 }
 
 ui.style("info_bar.balance") {
@@ -55,7 +55,7 @@ ui.style("info_bar.time_control.button") {
 ui.style("info_bar.right") {
 	size = "dynamic, 1r",
 	background = "#00FF007F",
-	layout = ui.layout_line(ui.ORIENT_Orientation::right),
+	layout = ui.layout_line(ui.ORIENT_Orientation.right),
 }
 
 ui.style("info_bar.fps") {
@@ -196,7 +196,7 @@ ui.layout_float = function () return "layout_float" end
 ui.ALIGN_CENTER_CENTER = "ALIGN_CENTER_CENTER"
 ui.ANCHOR_BOTTOM_LEFT = "ANCHOR_BOTTOM_LEFT"
 ui.ANCHOR_TOP_CENTER = "ANCHOR_TOP_CENTER"
-ui.ORIENT_Orientation::right = "ORIENT_Orientation::right"
+ui.ORIENT_Orientation.right = "ORIENT_Orientation.right"
 
 ui.component = function (tab) return tab end
 
@@ -276,7 +276,7 @@ star_map_ui:add("info_bar_top") {
 	size = "1r, 20px",
 	anchor = ui.ANCHOR_TOP_CENTER,
 	background = "image res/ui/star_map/info_bar.dds",
-	layout = ui.layout_line(ui.ORIENT_Orientation::right),
+	layout = ui.layout_line(ui.ORIENT_Orientation.right),
 	font = "courine_new.ttf",
 --	font = "courine_new.ttf ...",
 	font_size = "12px",
@@ -286,7 +286,7 @@ star_map_ui:add("info_bar_top") {
 	ui.component("left") {
 		size = "dynamic, 1r",
 		background = "#00FF007F",
-		layout = ui.layout_line(ui.ORIENT_Orientation::right),
+		layout = ui.layout_line(ui.ORIENT_Orientation.right),
 
 		ui.component {
 			name = "balance",

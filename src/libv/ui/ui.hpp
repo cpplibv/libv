@@ -66,8 +66,8 @@ private:
 
 public:
 	UI();
-	explicit UI(Settings setting);
-	UI(libv::Nexus nexus, Settings setting);
+	explicit UI(Settings settings);
+	UI(libv::Nexus nexus, Settings settings);
 	~UI();
 
 public:
@@ -86,8 +86,7 @@ public:
 	void foreach_recursive_component(libv::function_ref<void(const Component&)> func);
 
 public:
-	/// Loads a lua style script file
-	void load_style_script_file(std::string path);
+	void loadStyleFile(std::string_view fileIdentifiers);
 
 public:
 	void event(const libv::input::EventChar& event);

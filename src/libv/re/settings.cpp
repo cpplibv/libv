@@ -13,10 +13,6 @@ namespace re {
 
 // -------------------------------------------------------------------------------------------------
 
-ResourceLoaderSettings::ResourceLoaderSettings(std::string basePath) {
-	resourceMappings.emplace_back("", std::move(basePath));
-}
-
 ResourceLoaderSettingsShader::ResourceLoaderSettingsShader(std::string basePath) :
 	ResourceLoaderSettings(std::move(basePath)) {
 

@@ -1,12 +1,11 @@
 // Project: libv.sun, File: src/libv/sun/ui/overlay_resource_error.cpp
 
-// hpp
 #include <libv/sun/ui/overlay_resource_error.hpp>
-// ext
+
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/std.h> // For std::error_code
-// libv
+
 #include <libv/re/resource/model.hpp>
 #include <libv/re/resource/model_fmt.hpp>
 #include <libv/re/resource/model_load_event.hpp>
@@ -19,6 +18,9 @@
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/style/style_file_load_event.hpp>
+
+#include <ranges>
 
 
 namespace libv {
@@ -213,6 +215,77 @@ libv::ui::Component overlay_resource_error(bool useStyles) {
 	});
 
 	line.event().global.connect<libv::re::ModelUnload>([](libv::ui::PanelStatusLine& psl, const libv::re::ModelUnload& e) mutable {
+		psl.remove(e.id);
+	});
+
+	// Style -----------------------------------------------------------------------------------------
+
+	line.event().global.connect<libv::ui::StyleFileLoadSuccess>([useStyles](libv::ui::PanelStatusLine& psl, const libv::ui::StyleFileLoadSuccess& e) mutable {
+		if (e.firstLoad)
+			return; // Do not display the first load successes on program startup
+
+		auto label = libv::ui::Label::s("overlay.resource.message.success");
+		if (!useStyles) {
+			label.size(libv::ui::parse_size_or_throw("1rD, D"));
+			label.align_horizontal(libv::ui::AlignHorizontal::left);
+			label.align_vertical(libv::ui::AlignVertical::bottom);
+			label.padding(8, 4);
+			label.background(libv::ui::Background::color({0.1843f, 0.2314f, 0.1843f, 0.75f}));
+			label.font_color({.7235f, 0.9333f, 0.2433f, 1.f});
+		}
+
+		label.text(fmt::format("[{:%H:%M:%S}] Successful style file reload: {}", std::chrono::system_clock::now(), e.fileIdentifier));
+		psl.add(e.id, label, successDuration);
+	});
+
+	line.event().global.connect<libv::ui::StyleFileLoadFailure>([useStyles](libv::ui::PanelStatusLine& psl, const libv::ui::StyleFileLoadFailure& e) mutable {
+		auto label = libv::ui::Label::s("overlay.resource.message.failure");
+		if (!useStyles) {
+			label.size(libv::ui::parse_size_or_throw("1rD, D"));
+			label.align_horizontal(libv::ui::AlignHorizontal::left);
+			label.align_vertical(libv::ui::AlignVertical::bottom);
+			label.padding(8, 4);
+			label.background(libv::ui::Background::color({0.2f, 0.149f, 0.149f, 0.75f}));
+			label.font_color({.9333f, 0.8235f, 0.0078f, 1.f});
+		}
+
+		if (e.includeFailure) {
+			std::string message;
+			message += fmt::format("[{:%H:%M:%S}] Failed to load style file: {}", std::chrono::system_clock::now(), e.fileIdentifier);
+			message += fmt::format("\nFailed to include: '{}'", e.includeFailure->includePath);
+			for (const auto& file : e.includeStack | std::views::reverse)
+				message += fmt::format("\n    Included from: {}", file);
+
+			for (const auto& [resourcePrefix, virtualPrefix] : e.includeFailure->unmatchedMappings)
+				message += fmt::format("\nMapping '{}' -> '{}' - Unmatched prefix", resourcePrefix, virtualPrefix);
+			for (const auto& [virtualFilepath, ec] : e.includeFailure->mappingErrors)
+				message += fmt::format("\nVirtual '{}' - {}", virtualFilepath, libv::res::to_message(ec));
+			for (const auto& [physicalFilepath, ec] : e.includeFailure->physicalErrors)
+				message += fmt::format("\nPhysical '{}' - {} ({})", physicalFilepath, ec.message(), ec);
+
+			label.text(message);
+
+		} else if (e.luaError) {
+			std::string message;
+			message += fmt::format("[{:%H:%M:%S}] Failed to load style file: {}", std::chrono::system_clock::now(), e.fileIdentifier);
+			message += fmt::format("\n{}", e.luaError->message);
+			for (const auto& file : e.includeStack | std::views::reverse)
+				message += fmt::format("\n    Included from: {}", file);
+			label.text(message);
+
+		} else if (e.styleError) {
+			std::string message;
+			message += fmt::format("[{:%H:%M:%S}] Failed to load style file: {}", std::chrono::system_clock::now(), e.fileIdentifier);
+			message += fmt::format("\n{}", e.styleError->message);
+			for (const auto& file : e.includeStack | std::views::reverse)
+				message += fmt::format("\n    Included from: {}", file);
+			label.text(message);
+		}
+
+		psl.add(e.id, label);
+	});
+
+	line.event().global.connect<libv::ui::StyleFileUnload>([](libv::ui::PanelStatusLine& psl, const libv::ui::StyleFileUnload& e) mutable {
 		psl.remove(e.id);
 	});
 

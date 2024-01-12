@@ -106,8 +106,8 @@ struct Surface {
 
 	explicit Surface(const libv::re::Scene_ptr& scene) :
 		scene(scene) {
-		skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/epping_forest_01_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/epping_forest_01_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
+		skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY); skybox->rotateZ(libv::tau_f * 0.5f);
 		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/lago_disola_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
 		scene->add(skybox);
 

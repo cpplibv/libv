@@ -302,7 +302,7 @@ class Sandbox : public libv::Frame {
 		settings.res_shader.restrict_under_base = true;
 		settings.res_texture.base_path = "res/texture/";
 		settings.res_texture.restrict_under_base = true;
-		settings.track_style_scripts = true;
+		settings.resStyle.trackFiles = true;
 		// settings.style_scripts = { "style.lua" };
 		return settings;
 	}()};
@@ -343,7 +343,7 @@ public:
 
 		// --- UI Initialization ---
 		ui.attach(*this);
-		ui.load_style_script_file(std::string(libv::res::resource_path("res/style.lua")));
+		ui.loadStyleFile("style.lua");
 		ui.add(init_ui());
 		ui.add(overlay_version());
 		ui.add(overlay_fps());

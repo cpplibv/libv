@@ -4,6 +4,8 @@
 
 #include <libv/fsw/fwd.hpp>
 
+#include <utility>
+
 
 namespace libv {
 namespace fsw {
@@ -11,7 +13,6 @@ namespace fsw {
 // -------------------------------------------------------------------------------------------------
 
 struct Token {
-	// TODO P5: hide or use a better token | not the worst
 	void* id = nullptr;
 
 	constexpr inline Token() noexcept = default;
@@ -28,6 +29,20 @@ struct Token {
 		other.id = nullptr;
 		return *this;
 	}
+};
+
+struct SafeToken {
+private:
+	Token token;
+	Watcher* watcher = nullptr;
+
+public:
+	constexpr inline SafeToken(Token token, Watcher& watcher) : token(std::move(token)), watcher(&watcher) { }
+	constexpr inline SafeToken(const SafeToken&) = delete;
+	constexpr inline SafeToken& operator=(const SafeToken&) & = delete;
+	constexpr inline SafeToken(SafeToken&&) noexcept = default;
+	constexpr inline SafeToken& operator=(SafeToken&&) & noexcept = default;
+	~SafeToken();
 };
 
 // -------------------------------------------------------------------------------------------------

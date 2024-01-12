@@ -1,30 +1,11 @@
 -- -------------------------------------------------------------------------------------------------
 
---	font_shader = "default",
---	background = ui.stretch("ui/star_map/info_bar.dds", 0, 0, 15, 15, 30, 30, 45, 45),
-
--- -------------------------------------------------------------------------------------------------
-
-local golden = 1.618033988749894848204586834365638118
-
-local fonts = {
-	packed = "arialn.ttf",
-	label = "calibril.ttf",
-	title = "consola.ttf",
-	mono = "consola.ttf",
-}
-
-local colors = {
-	--text_light =         "hsva(  0°,  0%,  80%, 100%)",
-	--text_dark =          "hsva(  0°,  0%,  20%, 100%)",
-	--text_black =         "hsva(  0°,  0%,   0%, 100%)",
-	--hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
-}
+local globals = import("style/globals")
 
 -- === Overlay =====================================================================================
 
 -- ui.style("overlay.fps") {
--- 	font = fonts.mono,
+-- 	font = globals.fonts.mono,
 -- 	align_horizontal = "left",
 -- 	align_vertical = "bottom",
 -- 	margin = {4, 2},
@@ -32,7 +13,7 @@ local colors = {
 -- }
 --
 -- ui.style("overlay.version") {
--- 	font = fonts.mono,
+-- 	font = globals.fonts.mono,
 -- 	font_size = 12,
 -- 	align_horizontal = "right",
 -- 	align_vertical = "bottom",
@@ -41,7 +22,7 @@ local colors = {
 -- }
 
 ui.style("overlay.shader.line") {
-	font = fonts.mono,
+	font = globals.fonts.mono,
 	font_size = 12,
 	anchor = "top_left",
 	size = "D, D",
@@ -72,7 +53,7 @@ ui.style("overlay.shader.message.failure") {
 -- === Overlay =====================================================================================
 
 ui.style("overlay.fps") {
-	font = fonts.mono,
+	font = globals.fonts.mono,
 	align_horizontal = "left",
 	align_vertical = "bottom",
 	margin = {4, 2},
@@ -80,7 +61,7 @@ ui.style("overlay.fps") {
 }
 
 ui.style("overlay.version") {
-	font = fonts.mono,
+	font = globals.fonts.mono,
 	font_size = 12,
 	align_horizontal = "right",
 	align_vertical = "bottom",
@@ -89,7 +70,7 @@ ui.style("overlay.version") {
 }
 
 ui.style("overlay.resource.line") {
-	font = fonts.mono,
+	font = globals.fonts.mono,
 	font_size = 12,
 	anchor = "top_left",
 	size = "D, D",
@@ -120,7 +101,7 @@ ui.style("overlay.resource.message.failure") {
 -- === Main Menu ===================================================================================
 
 ui.style("main-menu") {
-	font = fonts.label,
+	font = globals.fonts.label,
 }
 
 ui.style("main-menu.golden-line") {
@@ -129,7 +110,7 @@ ui.style("main-menu.golden-line") {
 }
 
 ui.style("main-menu.golden-gap") {
-	size = (golden - 1) .. "r, 1r",
+	size = (globals.golden - 1) .. "r, 1r",
 }
 
 ui.style("main-menu.golden-box") {
@@ -201,7 +182,7 @@ ui.style("settings.title") {
 	size = "1r, D",
 	font_size = 20,
 	padding = {18, 6},
-	font = fonts.title,
+	font = globals.fonts.title,
 	font_color = {1, 1, 1, 1},
 	--background = "green",
 }
@@ -215,7 +196,7 @@ ui.style("settings.ctrl") {
 	size = "D, D",
 	font_size = 20,
 	padding = {28, 6},
-	font = fonts.title,
+	font = globals.fonts.title,
 	font_color = {1, 1, 1, 1},
 	margin = {0, 0, 0, 20},
 	--background = "green",
@@ -262,7 +243,7 @@ ui.style("settings.grid") {
 ui.style("settings.entry.lbl") {
 	size = "D, D",
 	anchor = "left",
-	font = fonts.label,
+	font = globals.fonts.label,
 	font_color = {1, 1, 1, 1},
 }
 
@@ -340,7 +321,7 @@ ui.style("controls.visual.board") {
 }
 
 ui.style("controls.visual.key") {
-	font = fonts.packed,
+	font = globals.fonts.packed,
 	font_color = "white",
 	font_size = 12,
 	align_horizontal = "center";
@@ -381,7 +362,7 @@ ui.style("controls.visual.key") {
 local credits_tps = 12 -- credits third party spacing
 
 ui.style("credits") {
-	font = fonts.label,
+	font = globals.fonts.label,
 	font_color = "#EEE",
 	font_size = 14,
 }

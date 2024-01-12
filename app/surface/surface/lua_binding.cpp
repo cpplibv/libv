@@ -8,7 +8,8 @@
 #include <libv/algo/linear_find.hpp>
 #include <libv/container/flat_set.hpp>
 #include <libv/lua/convert_color.hpp>
-#include <libv/lua/sol_type_to_string.hpp>
+#include <libv/lua/lua.hpp>
+#include <libv/lua/to_string.hpp>
 #include <libv/math/gradient.hpp>
 // pro
 #include <surface/surface/config.hpp>
@@ -22,7 +23,7 @@ namespace surface {
 
 [[nodiscard]] sol::table convertTable(const sol::object& object) {
 	if (object.get_type() != sol::type::table)
-		throw std::runtime_error(fmt::format("Expected a lua table but received a {}", libv::lua::lua_type_to_string(object.get_type())));
+		throw std::runtime_error(fmt::format("Expected a lua table but received a {}", libv::lua::to_string(object.get_type())));
 	return object.as<sol::table>();
 }
 
@@ -160,7 +161,7 @@ template <typename T, typename ConvertFn, typename... Args>
 		const auto value = keyValueTable.get<sol::object>(2);
 
 		if (key.get_type() != sol::type::number)
-			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::lua_type_to_string(key.get_type())));
+			throw std::runtime_error("Key of color gradient has to be a number " + std::string(libv::lua::to_string(key.get_type())));
 
 		const auto color = convertColor(value);
 		colorGrad.add(key.as<float>(), color);
@@ -182,19 +183,14 @@ void setFractalConfig(T& node, const sol::object& object) {
 // -------------------------------------------------------------------------------------------------
 
 SurfaceLuaBinding::SurfaceLuaBinding(const std::string& configFolder) {
-	lua.open_libraries(sol::lib::base);
-	lua.open_libraries(sol::lib::table);
-	lua.open_libraries(sol::lib::string);
-	lua.open_libraries(sol::lib::math);
-	lua.open_libraries(sol::lib::package);
-	libv::lua::open_libraries(lua, libv::lua::lualib::vec);
+	libv::lua::open_libraries(lua, libv::lualib::basic | libv::lualib::std_package | libv::lualib::libv_vec);
 
 	lua["package"]["path"] = lua["package"]["path"].get<std::string>() + ";" + configFolder + "?.lua";
 }
 
 Seed SurfaceLuaBinding::convertSeed(const sol::object& object, Seed seedOffset) {
 	if (object.get_type() != sol::type::number)
-		throw std::runtime_error(fmt::format("Seed has to be a number, instead it was {}", libv::lua::lua_type_to_string(object.get_type())));
+		throw std::runtime_error(fmt::format("Seed has to be a number, instead it was {}", libv::lua::to_string(object.get_type())));
 
 	return object.as<Seed>() + seedOffset;
 }

@@ -1,5 +1,7 @@
 // Project: libv, File: app/lua_runner.cpp
 
+// ext
+#include <sol/state.hpp>
 // std
 #include <iostream>
 // pro
@@ -15,7 +17,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	try {
-		auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+		auto lua = libv::lua::create_state(libv::lualib::std | libv::lualib::libv_vec);
 		lua["package"]["path"] = ";script/?.lua";
 		lua.script_file(argv[1]);
 		return EXIT_SUCCESS;

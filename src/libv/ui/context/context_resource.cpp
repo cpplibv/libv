@@ -78,7 +78,8 @@ public:
 		if (!normalized) {
 			if (self.res_settings().restrict_under_base) {
 				log_ui.error("{} request is not normalized: {}. Using fallback {}", self.resource_Name, key, self.resource_name);
-				return nullptr;
+				it->second = fallback_;
+				return fallback_;
 			} else {
 				log_ui.warn("{} request is not normalized: {}", self.resource_Name, key);
 			}
@@ -96,7 +97,8 @@ public:
 				filepath = std::filesystem::path(resolved_str);
 			} catch (const std::exception& ex) {
 				log_ui.error("{} resolve failed: {}. Using fallback {}", self.resource_Name, filepath_str, self.resource_name);
-				return nullptr;
+				it->second = fallback_;
+				return fallback_;
 			}
 		}
 

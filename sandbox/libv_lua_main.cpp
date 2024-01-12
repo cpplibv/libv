@@ -1,5 +1,7 @@
 // Project: libv.lua, File: sandbox/libv_lua_main.cpp
 
+// ext
+#include <sol/state.hpp>
 // libv
 #include <libv/log/log.hpp>
 #include <libv/math/vec.hpp>
@@ -15,7 +17,7 @@
 int main() {
 	std::cout << libv::logger_stream;
 
-	auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+	auto lua = libv::lua::create_state(libv::lualib::std | libv::lualib::libv_vec);
 
 	int i = 0;
 

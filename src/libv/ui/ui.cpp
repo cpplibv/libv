@@ -7,12 +7,9 @@
 #include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/input/event.hpp>
-#include <libv/lua/lua.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/mt/queue_concurrent.hpp>
 #include <libv/utility/histogram.hpp>
-#include <libv/utility/overload.hpp>
-#include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <mutex>
@@ -29,7 +26,6 @@
 #include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_focus.hpp>
-#include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
@@ -41,8 +37,8 @@
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/lua/script_style.hpp>
 #include <libv/ui/settings.hpp>
+#include <libv/ui/style/style_loader.hpp>
 
 
 namespace libv {
@@ -139,6 +135,9 @@ public:
 
 public:
 	libv::fsw::Watcher fsw;
+
+public:
+	StyleLoader styleLoader{ui, settings, fsw};
 
 public:
 	Root root;
@@ -558,6 +557,7 @@ UI::UI(libv::Nexus nexus, Settings settings) {
 }
 
 UI::~UI() {
+	self->styleLoader.terminate();
 	nexus().disconnect_channel_all(self.get()); // Disconnect EventGLCreate and EventGLDestroy channels
 	nexus().object_view_remove<UI>();
 }
@@ -565,7 +565,7 @@ UI::~UI() {
 void UI::add(Component component) {
 	size_t index = 0;
 	self->root.foreach_children(libv::function_ref<bool(Component&)>([&index](Component& child) -> bool {
-		/// Tooltip TODO P3: Use a generic overlay class for casting
+		/// TODO P3: Tooltip: Use a generic overlay base class for casting (and/or keep track of overlay count)
 		if(child.cast<OverlayTooltip>())
 			return false;
 		++index;
@@ -597,34 +597,8 @@ void UI::foreach_recursive_component(libv::function_ref<void(const Component&)> 
 
 // -------------------------------------------------------------------------------------------------
 
-//void UI::load_style_script(std::string_view script) {
-void UI::load_style_script_file(std::string path) {
-
-	execute_in_ui_loop([this, path] {
-		auto script = libv::read_file_str_ec(path);
-		if (script.ec)
-			return log_ui.error("Failed to reload style script {}: {}: {}", path, fmt::streamed(script.ec), script.ec.message());
-
-		// TODO P4: Persist/reuse lua state, make sure sandboxing happens
-		auto lua = libv::lua::create_state(libv::lua::lualib::base);
-		script_style(*this, lua, script.data);
-	});
-
-	if (context().settings.track_style_scripts) {
-		// TODO P1: fsw token and/or kill fsw before dtor reaches it, so handle late events during termination
-		self->fsw.subscribe_file(path, [this, path](const auto&) {
-			// TODO P4: Warmup / Cooldown for tracking reload
-			execute_in_ui_loop([this, path] {
-				auto script = libv::read_file_str_ec(path);
-				if (script.ec)
-					return log_ui.error("Failed to reload style script {}: {}: {}", path, fmt::streamed(script.ec), script.ec.message());
-
-				// TODO P4: Persist/reuse lua state, make sure sandboxing happens
-				auto lua = libv::lua::create_state(libv::lua::lualib::base);
-				script_style(*this, lua, script.data);
-			});
-		});
-	}
+void UI::loadStyleFile(std::string_view fileIdentifier) {
+	self->styleLoader.load(fileIdentifier);
 }
 
 // -------------------------------------------------------------------------------------------------

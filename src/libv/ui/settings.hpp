@@ -2,12 +2,11 @@
 
 #pragma once
 
-// std
-#include <chrono>
-#include <functional>
+#include <libv/res/settings.hpp>
+
 #include <string>
 #include <vector>
-// pro
+
 #include <libv/ui/chrono.hpp>
 
 
@@ -33,6 +32,7 @@ public:
 	ResourceSettings res_font = {"res/font/"};
 	ResourceSettings res_shader = {"res/shader/"};
 	ResourceSettings res_texture = {"res/texture/"};
+	libv::res::ResourceLoaderSettings resStyle{"res/"};
 
 public:
 	// bool enable_lcd_font = true;
@@ -52,7 +52,6 @@ public:
 	double scroll_hold_scroll = scroll_step_scroll * 10.0;
 	double scroll_hold_track = scroll_step_track * 10.0;
 
-	bool track_style_scripts = false;
 //	bool track_fonts = false;
 //	bool track_shaders = false;
 //	bool track_textures = false;

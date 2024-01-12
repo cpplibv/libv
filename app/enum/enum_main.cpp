@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <range/v3/view/reverse.hpp>
 #include <range/v3/view/transform.hpp>
+#include <sol/state.hpp>
 // std
 #include <algorithm>
 #include <iostream>
@@ -379,8 +380,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct EnumBuilderLua {
-//	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base);
-	libv::lua::State lua;
+	sol::state lua;
 	std::optional<EnumBuilder> eb;
 
 	EnumBuilderLua() {

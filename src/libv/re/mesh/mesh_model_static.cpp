@@ -36,8 +36,10 @@ MeshModelStatic::MeshModelStatic(const libv::vm4::Model& vm4) {
 		libv::vec2f uv = libv::uninitialized;
 		libv::vec3f normal = libv::uninitialized;
 		libv::vec3f tangent = libv::uninitialized;
-		// libv::vec4i boneIndices = libv::uninitialized;
-		// libv::vec4f boneWeight = libv::uninitialized;
+		// libv::vec4i boneIndices = libv::uninitialized; // uint16 would be just fine
+		// libv::vec4f boneWeight = libv::uninitialized; // unorm16 (even unorm8) would be just fine (but it needs to re-normalize)
+		// libv::vec4us boneIndices = libv::uninitialized; // uint16 would be just fine
+		// libv::vec4us boneWeight = libv::uninitialized; // unorm16 (even unorm8) would be just fine (but it needs to re-normalize)
 	};
 
 	auto position = addAttribute(libv::gl::BufferUsage::StaticDraw, attrPosition, numVertices);

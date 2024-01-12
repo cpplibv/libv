@@ -2,10 +2,11 @@
 
 #pragma once
 
-// ext
+#include <sol/forward.hpp>
 #include <sol/types.hpp>
-// std
+
 #include <cassert>
+#include <string>
 #include <string_view>
 
 
@@ -14,7 +15,7 @@ namespace lua {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] constexpr inline std::string_view lua_type_to_string(sol::type type) noexcept {
+[[nodiscard]] constexpr inline std::string_view to_string(sol::type type) noexcept {
 	switch (type) {
 	case sol::type::none: return "none";
 	case sol::type::nil: return "nil";
@@ -32,6 +33,8 @@ namespace lua {
 	assert(false && "Invalid sol::type enum value");
 	return "<unknown>";
 }
+
+[[nodiscard]] std::string to_string(sol::object object);
 
 // -------------------------------------------------------------------------------------------------
 

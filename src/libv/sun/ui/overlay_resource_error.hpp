@@ -19,6 +19,9 @@ namespace sun {
 /// 	@handle libv::re::ModelLoadSuccess
 /// 	@handle libv::re::ModelLoadFailure
 /// 	@handle libv::re::ModelUnload
+/// 	@handle libv::ui::StyleFileLoadSuccess
+/// 	@handle libv::ui::StyleFileLoadFailure
+/// 	@handle libv::ui::StyleFileUnload
 ///
 /// @param useStyles marks if the overlay's components should rely on the styles or to use manual overrides
 /// @return the shader error overlay

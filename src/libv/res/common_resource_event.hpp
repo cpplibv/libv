@@ -6,10 +6,11 @@
 
 #include <string>
 #include <system_error>
+#include <vector>
 
 
 namespace libv {
-namespace re {
+namespace res {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -28,7 +29,13 @@ struct LoadFilePhysicalError {
 	std::error_code ec;
 };
 
+struct FileLoadFailure {
+	std::vector<ResourceMappingUnmatched> unmatchedMappings;
+	std::vector<ResourceMappingError> mappingErrors;
+	std::vector<LoadFilePhysicalError> physicalErrors;
+};
+
 // -------------------------------------------------------------------------------------------------
 
-} // namespace re
+} // namespace res
 } // namespace libv

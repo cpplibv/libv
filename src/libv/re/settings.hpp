@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <chrono>
+#include <libv/res/settings.hpp>
+
 #include <string>
 #include <vector>
 
@@ -12,28 +13,7 @@ namespace re {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ResourcePathMapping {
-	std::string resourcePrefix; /// Resource identifier prefix, must contain the trailing slash (/) or be empty
-	std::string virtualPrefix; /// Relative resource path base, must contain the trailing slash (/)
-};
-
-struct ResourceLoaderSettings {
-	///// Forbid requests with absolute path
-	// bool relativePathOnly = true;
-
-	///
-	std::vector<ResourcePathMapping> resourceMappings;
-
-	/// Track every resource and reload resource upon file change
-	bool trackFiles = true;
-
-	/// Delay fsw reload. Useful to deduplicate hot-reloads when multiple dependency files edited at the same time
-	std::chrono::steady_clock::duration fswReloadDelay = std::chrono::milliseconds(0);
-
-	explicit ResourceLoaderSettings(std::string basePath);
-};
-
-struct ResourceLoaderSettingsShader : ResourceLoaderSettings {
+struct ResourceLoaderSettingsShader : libv::res::ResourceLoaderSettings {
 	std::vector<std::string> globalDefines;
 
 	explicit ResourceLoaderSettingsShader(std::string base_path);
@@ -43,8 +23,8 @@ struct ResourceLoaderSettingsShader : ResourceLoaderSettings {
 
 struct Settings {
 	ResourceLoaderSettingsShader shader{"res/"};
-	ResourceLoaderSettings texture{"res/"};
-	ResourceLoaderSettings model{"res/"};
+	libv::res::ResourceLoaderSettings texture{"res/"};
+	libv::res::ResourceLoaderSettings model{"res/"};
 };
 
 // -------------------------------------------------------------------------------------------------

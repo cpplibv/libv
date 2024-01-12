@@ -192,6 +192,7 @@ libv.ui: Tooltips
 
 libv.ui: Make UI a global var, give it init/terminate function (or be implicit inside an UI ctor), kill current context misery (libv::gui alias, libv::ui::gui object)
 libv.ui: Adopt libv.re
+libv.ui: Settings: Clear framebuffer policy: clear, invalidate, do nothing | Maybe only after libv.re adoption?
 libv.ui: Move libv.sun overlay_shader_error.hpp to ui
 
 place.it: "Well behaved layout" flag bit could be also used for mouse events

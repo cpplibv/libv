@@ -2,10 +2,11 @@
 
 #pragma once
 
-// ext
 #include <sol/forward.hpp>
 #include <sol/object.hpp>
-// std
+
+#include <libv/utility/hash_string.hpp>
+
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -19,27 +20,47 @@ namespace lua {
 
 class Importer {
 public:
-	struct [[nodiscard]] LoadResult {
-		bool success;
-		std::string result; /// Error reason or include payload
-	};
-
-	using SourceLoaderFunc = std::function<LoadResult(const std::string_view)>;
-
-	struct ImportRuleEntry {
-		std::string prefix;
-		SourceLoaderFunc loader;
-//		std::string directory_path;
-	};
+	using SourceLoaderFunc = std::function<std::string(std::string_view)>;
 
 private:
-	std::vector<ImportRuleEntry> import_mapping;
-	std::unordered_map<std::string, sol::object> loaded_modules;
+	SourceLoaderFunc fileLoader;
+	std::unordered_map<std::string, sol::object, libv::hash_string, std::equal_to<>> loadedModules;
+
+private:
+	std::vector<std::string> importStack;
+
+private:
+	std::vector<std::string> failureStack;
+	bool failureInFlight = false;
+	std::exception_ptr failure;
 
 public:
-	void map(std::string prefix, std::string directory_path);
-	void map(std::string prefix, SourceLoaderFunc loader);
+	explicit Importer(SourceLoaderFunc fileLoader) : fileLoader(std::move(fileLoader)) {}
 	void bind(sol::state& lua);
+	void invalidateCache();
+
+	[[nodiscard]] const std::vector<std::string>& currentStack() const noexcept {
+		return importStack;
+	}
+	[[nodiscard]] const std::vector<std::string>& lastFailureStack() const noexcept {
+		return failureStack;
+	}
+
+private:
+	[[nodiscard]] sol::object auxImport(sol::state_view& lua, std::string_view importName);
+
+public:
+	// import (sandbox, cache and return module object)
+	[[nodiscard]] sol::object import(sol::state_view& lua, std::string_view importName);
+	// require (no sandbox, cache and return module object)
+	// [[nodiscard]] sol::object require(sol::state_view& lua, std::string_view importName);
+	// include (no sandbox, no cached and return module object)
+	// [[nodiscard]] sol::object include(sol::state_view& lua, std::string_view importName);
+
+private:
+	// [[nodiscard]] std::string loadSourceFile(std::string_view includePath);
+	// [[nodiscard]] sol::object require(sol::state& lua, std::string_view name);
+	// [[nodiscard]] sol::object include(sol::state& lua, std::string_view name);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -49,25 +70,15 @@ public:
 
 // =================================================================================================
 // =================================================================================================
-// =================================================================================================
-
-// TODO P2: libv.lua.import: DESIGN ISSUE: Once you import a file, your import context could change (example: you import a mod, that import other mods, but the mod might not map everything the same way you do)
-// TODO P4: libv.lua.import: Shadow dev support for mods
-
-// TODO P4: libv.lua.import: Disable built-in require | OR replace it
-// TODO P4: libv.lua.import: The mod information and the Importer shall be independent
-//              (but mod loading will use an importer that is configured up by the mod info)
-// TODO P4: libv.lua.import: Generate stub files from uploaded mods
-
-// Use a separate Importer that can be bound to a State
-//		sol::state lua;
-//		libv::lua::Importer importer;
-//		importer.bind(lua);
+// === Mod support and dependecy management ========================================================
 //
-// Or just improve / create a State wrapper in libv::lua
-//		libv::lua::State lua;
-//		lua.map_import("module", folder);
-
+// TODO P4: libv.lua.import: Once you import a file, your import context could change
+//			(example: you import a mod, that import other mods, but the mod might not map everything the same way)
+// TODO P4: libv.lua.import: Shadow dev support for mods
+// TODO P4: libv.lua.import: The mod information and the Importer shall be independent
+//			(but mod loading will use an importer that is configured up by the mod info)
+// TODO P4: libv.lua.import: Generate stub files from uploaded mods
+//
 // IDEA: meta.lua file for each mod that will be loaded first in a special sandbox that will only
 //      extract the dependency information
 //
@@ -95,7 +106,6 @@ public:
 //      alias = "spy"
 //}
 //
-//
 // --- my_mod/main.lua:
 //
 //local ai = import("ai")
@@ -104,7 +114,7 @@ public:
 //local spy_a = import("ext.spy.agents")
 //--                    ^^^^^^^ Imports are based on aliases
 //local other = import("another_file_in_my_mod")
-//                      ^^^^^^^^^^^^^^^^^^^^^^ Import is also responsible for including other files in the mod
+//--                    ^^^^^^^^^^^^^^^^^^^^^^ Import is also responsible for including other files in the mod
 //-- After that normal lua rules apply, import and dependency management is only there to replace requires
 //
 //spy_a.assign_mission(ai.choose_at_random_from(spy_m.mission_list))

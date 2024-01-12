@@ -2,6 +2,8 @@
 
 // hpp
 #include <theme/engine.hpp>
+// ext
+#include <sol/state.hpp>
 // libv
 #include <libv/algo/linear_find.hpp>
 #include <libv/container/vector_2d.hpp>
@@ -159,7 +161,7 @@ public:
 	std::filesystem::path script_file;
 
 public:
-	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+	sol::state lua = libv::lua::create_state(libv::lualib::basic | libv::lualib::std_package | libv::lualib::libv_vec);
 	std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback;
 	sol::safe_function lua_main_func;
 

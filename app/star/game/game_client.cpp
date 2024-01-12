@@ -84,7 +84,9 @@ struct ImplGameClient {
 				settings.res_shader.restrict_under_base = true;
 				settings.res_texture.base_path = "res/texture/";
 				settings.res_texture.restrict_under_base = true;
-				settings.track_style_scripts = true;
+
+				// settings.resStyle.resourceMappings.emplace_back("", "res/");
+				settings.resStyle.trackFiles = true;
 				return settings;
 			}()) {
 	}
@@ -101,8 +103,10 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 
 	self->ui.attach(self->frame);
 	self->ui.attachControls(self->controls);
-	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/main.lua")));
-	self->ui.load_style_script_file(std::string(libv::res::resource_path("res/style/surface.lua")));
+	// self->ui.loadStyleFile("style/error_overlay.lua");
+	self->ui.loadStyleFile("style/main.lua");
+	self->ui.loadStyleFile("style/surface.lua");
+	// self->ui.loadStyleFile("style/missing.lua");
 
 	init_ui(devMode);
 
@@ -227,7 +231,6 @@ void GameClient::init_ui(bool devMode) {
 	self->ui.add(std::move(layers));
 	self->ui.add(overlay_version(devMode));
 	self->ui.add(overlay_fps());
-	self->ui.add(libv::sun::overlay_shader_error(true));
 	self->ui.add(libv::sun::overlay_resource_error(true));
 
 //	frame.onKey.output([&](const libv::input::EventKey& e) {

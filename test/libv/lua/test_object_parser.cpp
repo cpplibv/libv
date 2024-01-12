@@ -2,6 +2,8 @@
 
 // hpp
 #include <catch2/catch_test_macros.hpp>
+// ext
+#include <sol/state.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/parse/color.hpp>
@@ -78,7 +80,7 @@ struct Planet {
 namespace ns = libv::lua;
 
 TEST_CASE("object_parse simple types with void acts as existence bool query", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -149,7 +151,7 @@ TEST_CASE("object_parse simple types with void acts as existence bool query", "[
 }
 
 TEST_CASE("object_parse simple types", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -165,7 +167,7 @@ TEST_CASE("object_parse simple types", "[libv.lua.op]") {
 }
 
 TEST_CASE("object_parse table", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -228,7 +230,7 @@ TEST_CASE("object_parse table", "[libv.lua.op]") {
 // --- Value ---------------------------------------------------------------------------------------
 
 TEST_CASE("adaptor constant", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -238,7 +240,7 @@ TEST_CASE("adaptor constant", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor generate", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -261,7 +263,7 @@ TEST_CASE("adaptor generate", "[libv.lua.op]") {
 // --- Adaptors ------------------------------------------------------------------------------------
 
 TEST_CASE("adaptor as", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -273,7 +275,7 @@ TEST_CASE("adaptor as", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor or", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -287,7 +289,7 @@ TEST_CASE("adaptor or", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor one_of", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -310,7 +312,7 @@ TEST_CASE("adaptor one_of", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor transform", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -359,7 +361,7 @@ TEST_CASE("adaptor transform", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor string_parse", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -379,7 +381,7 @@ TEST_CASE("adaptor string_parse", "[libv.lua.op]") {
 // --- Nested Adaptors -----------------------------------------------------------------------------
 
 TEST_CASE("adaptor or nested with adaptor as", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -401,7 +403,7 @@ TEST_CASE("adaptor or nested with adaptor as", "[libv.lua.op]") {
 }
 
 TEST_CASE("adaptor or nested with adaptor transform", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
@@ -441,7 +443,7 @@ TEST_CASE("adaptor or nested with adaptor transform", "[libv.lua.op]") {
 // --- Complex -------------------------------------------------------------------------------------
 
 TEST_CASE("complex pattern: color and planet", "[libv.lua.op]") {
-	auto state = ns::create_state(ns::lualib::vec);
+	auto state = ns::create_state(ns::lib::libv_vec);
 	const auto parse = [&](const std::string& script, const auto& parser) {
 		return ns::parse(state.script("return " + script).get<sol::object>(), parser);
 	};
