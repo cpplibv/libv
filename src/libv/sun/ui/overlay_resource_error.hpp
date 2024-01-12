@@ -9,13 +9,16 @@ namespace sun {
 
 // -------------------------------------------------------------------------------------------------
 
-/// @nexus Handles ui-wise rev shader load events and displays them:
+/// @nexus Handles ui-wise resource load events and displays them:
 /// 	@handle libv::re::ShaderLoadSuccess
 /// 	@handle libv::re::ShaderLoadFailure
 /// 	@handle libv::re::ShaderUnload
 /// 	@handle libv::re::TextureLoadSuccess
 /// 	@handle libv::re::TextureLoadFailure
 /// 	@handle libv::re::TextureUnload
+/// 	@handle libv::re::ModelLoadSuccess
+/// 	@handle libv::re::ModelLoadFailure
+/// 	@handle libv::re::ModelUnload
 ///
 /// @param useStyles marks if the overlay's components should rely on the styles or to use manual overrides
 /// @return the shader error overlay

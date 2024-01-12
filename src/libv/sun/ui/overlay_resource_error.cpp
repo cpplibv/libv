@@ -7,6 +7,9 @@
 #include <fmt/format.h>
 #include <fmt/std.h> // For std::error_code
 // libv
+#include <libv/re/resource/model.hpp>
+#include <libv/re/resource/model_fmt.hpp>
+#include <libv/re/resource/model_load_event.hpp>
 #include <libv/re/resource/shader.hpp>
 #include <libv/re/resource/shader_fmt.hpp>
 #include <libv/re/resource/shader_load_event.hpp>
@@ -153,6 +156,63 @@ libv::ui::Component overlay_resource_error(bool useStyles) {
 	});
 
 	line.event().global.connect<libv::re::TextureUnload>([](libv::ui::PanelStatusLine& psl, const libv::re::TextureUnload& e) mutable {
+		psl.remove(e.id);
+	});
+
+	// Model -----------------------------------------------------------------------------------------
+
+	line.event().global.connect<libv::re::ModelLoadSuccess>([useStyles](libv::ui::PanelStatusLine& psl, const libv::re::ModelLoadSuccess& e) mutable {
+		if (e.model->loadVersion() == 0)
+			return; // Do not display the first load successes on program startup
+
+		auto label = libv::ui::Label::s("overlay.resource.message.success");
+		if (!useStyles) {
+			label.size(libv::ui::parse_size_or_throw("1rD, D"));
+			label.align_horizontal(libv::ui::AlignHorizontal::left);
+			label.align_vertical(libv::ui::AlignVertical::bottom);
+			label.padding(8, 4);
+			label.background(libv::ui::Background::color({0.1843f, 0.2314f, 0.1843f, 0.75f}));
+			label.font_color({.7235f, 0.9333f, 0.2433f, 1.f});
+		}
+
+		label.text(fmt::format("[{:%H:%M:%S}] Successful model reload: {} v{} ({})", std::chrono::system_clock::now(), *e.model, e.model->loadVersion(), e.id));
+		psl.add(e.id, label, successDuration);
+	});
+
+	line.event().global.connect<libv::re::ModelLoadFailure>([useStyles](libv::ui::PanelStatusLine& psl, const libv::re::ModelLoadFailure& e) mutable {
+		auto label = libv::ui::Label::s("overlay.resource.message.failure");
+		if (!useStyles) {
+			label.size(libv::ui::parse_size_or_throw("1rD, D"));
+			label.align_horizontal(libv::ui::AlignHorizontal::left);
+			label.align_vertical(libv::ui::AlignVertical::bottom);
+			label.padding(8, 4);
+			label.background(libv::ui::Background::color({0.2f, 0.149f, 0.149f, 0.75f}));
+			label.font_color({.9333f, 0.8235f, 0.0078f, 1.f});
+		}
+
+		const auto usingVersionStr = e.model->currentVersion() >= 0 ? fmt::format("v{}", e.model->currentVersion()) : "fallback";
+		if (e.ioFailure) {
+			std::string message;
+			message += fmt::format("[{:%H:%M:%S}] Failed to load model: {} v{} ({}) using {}", std::chrono::system_clock::now(), *e.model, e.model->loadVersion(), e.id, usingVersionStr);
+
+			for (const auto& [resourcePrefix, virtualPrefix] : e.ioFailure->unmatchedMappings)
+				message += fmt::format("\nMapping '{}' -> '{}' - Unmatched prefix", resourcePrefix, virtualPrefix);
+			for (const auto& [virtualFilepath, ec] : e.ioFailure->mappingErrors)
+				message += fmt::format("\nVirtual '{}' - {}", virtualFilepath, libv::res::to_message(ec));
+			for (const auto& [physicalFilepath, ec] : e.ioFailure->physicalErrors)
+				message += fmt::format("\nPhysical '{}' - {} ({})", physicalFilepath, ec.message(), ec);
+
+			label.text(message);
+
+		} else if (e.loadFailure) {
+			label.text(fmt::format("[{:%H:%M:%S}] Failed to load model: {} v{} ({}) using {}\n"
+					"    {}", std::chrono::system_clock::now(), *e.model, e.model->loadVersion(), e.id, usingVersionStr, *e.loadFailure));
+		}
+
+		psl.add(e.id, label);
+	});
+
+	line.event().global.connect<libv::re::ModelUnload>([](libv::ui::PanelStatusLine& psl, const libv::re::ModelUnload& e) mutable {
 		psl.remove(e.id);
 	});
 
