@@ -9,6 +9,10 @@
 
 
 
+output device selection: test if we use device ID and there is a change
+	it stays with the device
+
+
 
 
 soloud - still under evaluation!

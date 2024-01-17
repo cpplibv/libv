@@ -9,6 +9,7 @@
 
 #include <libv/audio/audio.hpp>
 #include <libv/res/resource_path.hpp>
+#include <libv/utility/random/uniform_distribution.hpp>
 
 
 #include <soloud/soloud.h>
@@ -16,6 +17,8 @@
 #include <soloud/soloud_biquadresonantfilter.h>
 // #include "soloud.h"
 // #include "soloud_wav.h"
+
+#include <random>
 
 // -------------------------------------------------------------------------------------------------
 
@@ -62,7 +65,7 @@ int main(int argc, const char* const* argv) {
 	resourceInit(argc, argv);
 	log_sandbox.info("Hello Audio!");
 
-	libv::audio::Audio audio;
+	libv::audio::AudioEngine audio;
 
 	list();
 
@@ -71,16 +74,15 @@ int main(int argc, const char* const* argv) {
 	// sandbox.join();
 
 	SoLoud::Soloud gSoloud; // SoLoud engine
+	gSoloud.init(); // Initialize SoLoud
 
 	SoLoud::Wav gWave;      // One wave file
-	gSoloud.init(); // Initialize SoLoud
 	auto result = gWave.load("res/kruplk.wav"); // Load a wave
+	SoLoud::Wav gWave2;      // One wave file
+	auto result2 = gWave2.load("res/congratulations.ogg"); // Load a wave
 	log_sandbox.info("Load result {}", result);
 
 	auto handle = gSoloud.play(gWave); // Play the wave
-
-	SoLoud::Wav gWave2;      // One wave file
-	auto result2 = gWave2.load("res/congratulations.ogg"); // Load a wave
 	auto playing2 = gSoloud.play(gWave2); // Play the wave
 
 	std::this_thread::sleep_for(std::chrono::milliseconds{300});
@@ -109,6 +111,15 @@ int main(int argc, const char* const* argv) {
 	auto playing5 = gSoloud.play(gWave2); // Play the wave
 	gSoloud.setRelativePlaySpeed(playing5, 0.8f);
 	std::this_thread::sleep_for(std::chrono::milliseconds{1000});
+
+	std::mt19937 rng;
+	auto dist = libv::make_uniform_distribution_inclusive(0.8f, 1.2f);
+
+	for (int i = 0; i < 10; ++i) {
+		auto playing5 = gSoloud.play(gWave2); // Play the wave
+		gSoloud.setRelativePlaySpeed(playing5, dist(rng));
+		std::this_thread::sleep_for(std::chrono::milliseconds{1000});
+	}
 
 	for (int i = 0; i < 10000; ++i) {
 		const auto x = static_cast<float>(i) / 300.f * 3.1415f;
