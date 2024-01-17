@@ -45,10 +45,24 @@ protected:
 	virtual void update(libv::ui::time_duration delta_time) { (void) delta_time; }
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
 	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }
+	virtual void layout() { }
 	virtual void render(libv::glr::Queue& glr) = 0;
 
 public:
 	virtual ~CanvasBase() = default;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class CanvasBaseRE : public CanvasBase {
+	friend CoreCanvasAdaptor;
+
+protected:
+	virtual void render(libv::glr::Queue& glr) final;
+	virtual void render(libv::GL& gl) = 0;
+
+public:
+	virtual ~CanvasBaseRE() = default;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -94,6 +108,14 @@ public:
 
 	inline const T& object() const noexcept {
 		return static_cast<const T&>(this->object_base());
+	}
+
+	inline T* operator->() noexcept {
+		return &object();
+	}
+
+	inline const T* operator->() const noexcept {
+		return &object();
 	}
 };
 

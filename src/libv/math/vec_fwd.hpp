@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <cstddef>
 #include <cstdint>
 
 

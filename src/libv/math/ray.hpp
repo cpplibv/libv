@@ -2,30 +2,38 @@
 
 #pragma once
 
-// pro
+#include <libv/math/ray_fwd.hpp> // IWYU pragma: export
+
 #include <libv/math/vec.hpp>
+
+#include <cassert>
 
 
 namespace libv {
-
 // -------------------------------------------------------------------------------------------------
 
-template <std::size_t N, typename T>
+template<std::size_t N, typename T>
 struct ray_t {
 	libv::vec_t<N, T> position;
 	libv::vec_t<N, T> direction;
+
+public:
+	ray_t() requires (N == 2) :
+		position(0, 0),
+		direction(1, 0) {
+	}
+
+	ray_t() requires (N == 3) :
+		position(0, 0, 0),
+		direction(1, 0, 0) {
+	}
+
+	ray_t(libv::vec_t<N, T> position, libv::vec_t<N, T> direction) :
+		position(position),
+		direction(direction) {
+		assert(direction.is_normalized());
+	}
 };
 
-// aliases -----------------------------------------------------------------------------------------
-
-template <typename T> using ray2_t = ray_t<2, T>;
-template <typename T> using ray3_t = ray_t<3, T>;
-
-using ray2f = ray2_t<float>;
-using ray3f = ray3_t<float>;
-using ray2d = ray2_t<double>;
-using ray3d = ray3_t<double>;
-
 // -------------------------------------------------------------------------------------------------
-
 } // namespace libv

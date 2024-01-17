@@ -44,15 +44,15 @@ float Skybox::intensity() const noexcept {
 	return static_cast<const MaterialSkybox&>(*material).intensity.value;
 }
 
+void Skybox::rotateZ(float value) noexcept {
+	static_cast<MaterialSkybox&>(*material).matRotateZ = libv::mat2f::create_rotate(libv::radian(value));
+}
+
 void Skybox::horizonOffset(float value) noexcept {
 	static_cast<MaterialSkybox&>(*material).horizonOffset = value;
 }
 float Skybox::horizonOffset() const noexcept {
 	return static_cast<const MaterialSkybox&>(*material).horizonOffset.value;
-}
-
-void Skybox::rotateZ(float value) noexcept {
-	static_cast<MaterialSkybox&>(*material).matRotateZ = libv::mat2f::create_rotate(libv::radian(value));
 }
 
 // -------------------------------------------------------------------------------------------------

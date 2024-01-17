@@ -2,7 +2,6 @@
 
 // libv
 #include <libv/frame/frame.hpp>
-#include <libv/log/log.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 //#include <libv/input/event.hpp>
@@ -12,6 +11,7 @@
 #include <iostream>
 // pro
 #include <libv/parse/color.hpp>
+#include <libv/res/resource_path.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/gap.hpp>
 #include <libv/ui/component/image.hpp>
@@ -36,12 +36,21 @@
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
+#include <wish/resource_mapping.hpp>
+
+#include "log.hpp"
 
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
-constexpr inline std::string_view configFilePath = "bin/sandbox.libv_ui.config";
+constexpr inline std::string_view configFilePath = "config/sandbox.libv_ui.config";
+
+// -------------------------------------------------------------------------------------------------
+
+libv::ui::Component createTabButtons();
+libv::ui::Component createTabScroll();
+libv::ui::Component createTabSurface(libv::ui::UI& ui);
+libv::ui::Component createTabTooltip(libv::ui::UI& ui);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -150,11 +159,6 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component createTabScroll();
-libv::ui::Component createTabTooltip(libv::ui::UI& ui);
-
-// -------------------------------------------------------------------------------------------------
-
 class SandboxFrame : public libv::Frame {
 private:
 	libv::ui::UI ui;
@@ -192,114 +196,6 @@ private:
 	libv::ui::PanelStatusLine status_log;
 
 	// --- Buttons -------------------------------------------------------------------------------------
-
-	auto createTabButtons() {
-		libv::ui::PanelLine card{"card-buttons-root"};
-
-		libv::ui::PanelLine line{"card-buttons-line"};
-//		line.size(libv::ui::parse_size_or_throw("250px, 300px"));
-		line.orientation(libv::ui::Orientation::down);
-		line.anchor(libv::ui::Anchor::center_center);
-		line.spacing(10);
-		line.padding(10);
-		card.add(line);
-
-//		libv::ui::Label label;
-//		label.text("Buttons");
-//		label.align_vertical(libv::ui::AlignVertical::center);
-//		label.align_horizontal(libv::ui::AlignHorizontal::center);
-//		line.add(label);
-
-		libv::ui::Button button0;
-		button0.text("Normal");
-		button0.padding(10);
-		line.add(button0);
-
-		libv::ui::ToggleButton button1;
-		button1.text_on("Toggle: ON");
-		button1.text_off("Toggle: OFF");
-		button1.padding(10);
-		line.add(button1);
-
-		// ---
-
-		libv::ui::PanelLine row0{"card-buttons-row0"};
-		row0.orientation(libv::ui::Orientation::right);
-		row0.spacing(10);
-		line.add(row0);
-
-		libv::ui::ToggleButton g1Button0;
-		g1Button0.text_on("G1 Option A: ON");
-		g1Button0.text_off("G1 Option A: OFF");
-		g1Button0.padding(10);
-		row0.add(g1Button0);
-
-		libv::ui::ToggleButton g1Button1;
-		g1Button1.text_on("G1 Option B: ON");
-		g1Button1.text_off("G1 Option B: OFF");
-		g1Button1.padding(10);
-		row0.add(g1Button1);
-
-		libv::ui::ToggleButton g1Button2;
-		g1Button2.text_on("G1 Option C: ON");
-		g1Button2.text_off("G1 Option C: OFF");
-		g1Button2.padding(10);
-		row0.add(g1Button2);
-
-		libv::ui::SelectionGroup<std::string> group1;
-		group1.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
-			log_sandbox.info_if(group.has_value(), "Group1 change: {}", group.value());
-			log_sandbox.info_if(!group.has_value(), "Group1 has no value");
-		});
-		group1.add(g1Button0, "G1:A");
-		group1.add(g1Button1, "G1:B");
-		group1.add(g1Button2, "G1:C");
-
-		// ---
-
-		libv::ui::PanelLine row1{"card-buttons-row1"};
-		row1.orientation(libv::ui::Orientation::right);
-		row1.spacing(10);
-		line.add(row1);
-
-		libv::ui::ToggleButton g2Button0;
-		g2Button0.text_on("G2 Option A: ON");
-		g2Button0.text_off("G2 Option A: OFF");
-		g2Button0.padding(10);
-		row1.add(g2Button0);
-
-		libv::ui::ToggleButton g2Button1;
-		g2Button1.text_on("G2 Option B: ON");
-		g2Button1.text_off("G2 Option B: OFF");
-		g2Button1.padding(10);
-		row1.add(g2Button1);
-
-		libv::ui::ToggleButton g2Button2;
-		g2Button2.text_on("G2 Option C: ON");
-		g2Button2.text_off("G2 Option C: OFF");
-		g2Button2.padding(10);
-		row1.add(g2Button2);
-
-		libv::ui::SelectionGroup<std::string> group2;
-		group2.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
-			log_sandbox.info_if(group.has_value(), "Group2 change: {}", group.value());
-			log_sandbox.info_if(!group.has_value(), "Group2 has no value");
-		});
-		group2.add(g2Button0, "G2:A");
-		group2.add(g2Button1, "G2:B", true);
-		group2.add(g2Button2, "G2:C");
-
-		// Overlapping selection groups are just chaos event graph wise, Skip for now
-		//		libv::ui::SelectionGroup<std::string> groupC;
-		//		group2.event().change.connect([](libv::ui::SelectionGroup<std::string>& group) {
-		//			log_sandbox.info_if(group.has_value(), "GroupC change: {}", group.value());
-		//			log_sandbox.info_if(!group.has_value(), "GroupC has no value");
-		//		});
-		//		group2.add(g1Button2, "GC:G1:C");
-		//		group2.add(g2Button2, "GC:G2:C");
-
-		return card;
-	}
 
 	// --- Cards ---------------------------------------------------------------------------------------
 
@@ -678,6 +574,10 @@ public:
 			Frame("UI Sandbox", 1680, 1050),
 			ui([] {
 				libv::ui::Settings settings;
+				settings.res_font.base_path = "../../res/font/";
+				settings.res_shader.base_path = "../../res/shader/";
+				settings.res_texture.base_path = "../../res/texture/";
+
 				settings.resStyle.trackFiles = true;
 				settings.resStyle.resourceMappings.clear();
 				settings.resStyle.resourceMappings.emplace_back("", "");
@@ -688,7 +588,7 @@ public:
 		setOpenGLVersion(4, 5);
 		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
-		ui.loadStyleFile("sandbox/libv_ui_main_style.lua");
+		ui.loadStyleFile("style/main.lua");
 
 		tabs.addTab("Empty Tab", libv::ui::PanelLine());
 		tabs.addTab("Buttons", createTabButtons());
@@ -697,6 +597,7 @@ public:
 		tabs.addTab("Tab #3", createTab3());
 		tabs.addTab("Tooltip", createTabTooltip(ui));
 		tabs.addTab("Legacy", createTabLegacy());
+		tabs.addTab("Surface", createTabSurface(ui));
 
 		ui.add(tabs.main);
 
@@ -1088,13 +989,15 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-int main(int, char**) {
-	// For CLion console
-//	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
-
+int main(int argc, char** argv) {
 	std::cout << libv::logger_stream;
 //	libv::logger_stream.allow("libv.ui");
 //	libv::logger_stream.deny();
+
+	libv::res::init_resource_mapping(wish::resource_mapping());
+	// Change the working directory to match the source directory during development or to
+	// match the executable directory for deployed packages
+	wish::change_current_path(argc, argv);
 
 	{
 		SandboxFrame frame;

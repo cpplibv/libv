@@ -34,7 +34,7 @@ struct AttachedStateProxy {
 	}
 };
 
-/// Attaches a state to ui component.
+/// Attaches a state to a ui component.
 /// The state can be created by calling the operator() of the returned proxy object.
 /// The state is destroyed when the ui component is detached. (Note: Not usable with reattachable components)
 ///

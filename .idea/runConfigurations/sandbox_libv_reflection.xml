@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="sandbox_libv_reflection" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://../.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_reflection" CONFIG_NAME="gcc-debug (1)" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_reflection">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>

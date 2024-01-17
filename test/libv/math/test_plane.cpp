@@ -28,11 +28,11 @@ template <typename K>
 } // namespace libv
 
 [[nodiscard]] constexpr inline approx make_approx(float nx, float ny, float nz, float dist) noexcept {
-	return approx::from_normal_dist(nx, ny, nz, dist);
+	return approx::from_unchecked(approx_vec3(nx, ny, nz), dist);
 }
 
 [[nodiscard]] constexpr inline approx make_approx_v(float vx, float vy, float vz, float dist) noexcept {
-	return approx::from_normal_dist(approx_vec3(vec3(vx, vy, vz).normalize()), dist);
+	return approx::from_unchecked(approx_vec3(vec3(vx, vy, vz).normalize()), dist);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include <libv/ctrl/fwd.hpp>
 #include <libv/utility/chrono.hpp>
 #include <libv/utility/nexus.hpp>
+
 #include <star/game/control/requests.hpp> // fwd would be enough
 
 
@@ -12,7 +13,7 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-struct TimeControlFeatures {
+struct TimeControllerFeatures {
 	bool pause = true;
 	bool speedControl = true;
 	bool slowMode = true;
@@ -21,7 +22,7 @@ struct TimeControlFeatures {
 	// .stepFrame = devMode,
 };
 
-struct TimeControl {
+struct TimeController {
 	bool paused = false;
 	uint32_t simulationSpeedMode = 1;
 	static constexpr float simulationSpeeds[] = { 0.f, 1.f, 2.f, 4.f };
@@ -37,8 +38,8 @@ struct TimeControl {
 	libv::Nexus nexus;
 
 public:
-	explicit TimeControl(libv::Nexus nexus);
-	~TimeControl();
+	explicit TimeController(libv::Nexus nexus);
+	~TimeController();
 
 public:
 	[[nodiscard]] CommandTimeSpeed currentCommandTimeSpeed() const;
@@ -57,7 +58,7 @@ public:
 	}
 
 public:
-	static void register_controls(libv::ctrl::Controls& controls, TimeControlFeatures features = {});
+	static void register_controls(libv::ctrl::Controls& controls, TimeControllerFeatures features = {});
 	static void bind_default_controls(libv::ctrl::Controls& controls);
 };
 

@@ -87,8 +87,9 @@ void CoreCanvasAdaptor::doLayout2(const ContextLayout2& layoutEnv) {
 	// NOTE: canvas_position is used for view porting so it has to account for global position
 	const auto global_pos = ui().mouse.get_global_position(*this);
 
-	canvas_object->canvas_position = global_pos + padding_LB();
-	canvas_object->canvas_size = layoutEnv.size - padding_size();
+	canvas_object->canvas_position = global_pos;
+	canvas_object->canvas_size = layoutEnv.size;
+	canvas_object->layout();
 }
 
 void CoreCanvasAdaptor::doCreate(Renderer& r) {
@@ -135,8 +136,8 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		const auto prev_view_size = glr.viewport_size();
 
 		glr.viewport(
-				cast<int>(round(canvas_object->canvas_position)),
-				cast<int>(round(canvas_object->canvas_size))
+				round(canvas_object->canvas_position).cast<int>(),
+				round(canvas_object->canvas_size).cast<int>()
 		);
 
 		canvas_object->render(glr);
@@ -163,7 +164,15 @@ void CanvasBase::focus(FocusMode mode) {
 	core->focus(mode);
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
+
+void CanvasBaseRE::render(libv::glr::Queue& glr) {
+	glr.callback([this](libv::GL& gl) {
+		this->render(gl);
+	});
+}
+
+// =================================================================================================
 
 core_ptr CanvasAdaptor::create_core(std::string name, std::unique_ptr<CanvasBase>&& canvas_object) {
 	return create_core_ptr<CoreType>(std::move(name), std::move(canvas_object));

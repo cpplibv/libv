@@ -558,7 +558,7 @@ UI::UI(libv::Nexus nexus, Settings settings) {
 
 UI::~UI() {
 	self->styleLoader.terminate();
-	nexus().disconnect_channel_all(self.get()); // Disconnect EventGLCreate and EventGLDestroy channels
+	nexus().disconnect_all(self.get()); // Disconnect EventGLCreate and EventGLDestroy channels
 	nexus().object_view_remove<UI>();
 }
 

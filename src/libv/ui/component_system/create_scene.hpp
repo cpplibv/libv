@@ -26,7 +26,9 @@ struct AssembleSceneProxy {
 	}
 };
 
-/// Requires a libv::ui::Component createScene(...) member function
+/// The scene is destroyed when the ui component is detached. (Note: Not usable with reattachable components)
+/// Required member functions:
+///		libv::ui::Component createScene(CreateSceneArgs...);
 /// @usage: createScene<SceneType>(SceneCtorArgs...)(CreateSceneArgs...);
 template <typename T, typename... Args>
 [[nodiscard]] inline AssembleSceneProxy<T> createScene(Args&&... args) {

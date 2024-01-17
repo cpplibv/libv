@@ -27,6 +27,8 @@ struct Approx {
 	constexpr LIBV_FORCE_INLINE Approx(libv::uninitialized_t) noexcept {};
 	constexpr LIBV_FORCE_INLINE Approx(const Approx& orig) noexcept = default;
 	constexpr LIBV_FORCE_INLINE Approx(Approx&& orig) noexcept = default;
+	constexpr LIBV_FORCE_INLINE Approx& operator=(const Approx& orig) & noexcept = default;
+	constexpr LIBV_FORCE_INLINE Approx& operator=(Approx&& orig) & noexcept = default;
 
 	constexpr LIBV_FORCE_INLINE Approx(T value) noexcept :
 		value(std::move(value)) { }
@@ -69,6 +71,10 @@ struct Approx {
 	template <typename V>
 	constexpr friend LIBV_FORCE_INLINE bool operator<(const V& lhs, const Approx& rhs) noexcept {
 		return !(rhs > lhs);
+	}
+
+	constexpr friend LIBV_FORCE_INLINE Approx operator-(const Approx& lhs, const Approx& rhs) noexcept {
+		return Approx{lhs.value - rhs.value};
 	}
 
 	template <typename OS>

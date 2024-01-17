@@ -3,10 +3,10 @@
 #pragma once
 
 #include <libv/re/fwd.hpp>
-#include <libv/utility/nexus_fwd.hpp>
-#include <libv/re/r.hpp> // Convenience include to access the libv::re::r.texture object
+#include <libv/re/r.hpp> // IWYU pragma: export // Convenience include to access the libv::re::r.texture object
 #include <libv/re/resource/common_resource.hpp>
 #include <libv/utility/function_ref.hpp>
+#include <libv/utility/nexus_fwd.hpp>
 
 #include <memory>
 #include <string_view>

@@ -349,7 +349,8 @@ void SceneInternal::render(
 			// 		(object->layers & passMaskShadowCaster).passed()
 			// 				&& shadowFrustums[].test(object.boundingSphere);
 
-			node->queue(queueContext);
+			if (node->visible()) // TODO P1: this test will has to be done in hierarchies too
+				node->queue(queueContext);
 		}
 	}
 

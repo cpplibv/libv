@@ -32,11 +32,11 @@ public:
 	void intensity(float value) noexcept;
 	[[nodiscard]] float intensity() const noexcept;
 
-	void horizonOffset(float value) noexcept;
-	[[nodiscard]] float horizonOffset() const noexcept;
-
 	void rotateZ(float value) noexcept;
 	//[[nodiscard]] float rotateZ() const noexcept;
+
+	void horizonOffset(float value) noexcept;
+	[[nodiscard]] float horizonOffset() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

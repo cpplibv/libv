@@ -414,6 +414,12 @@ struct vec_t : vec_base_t<N, T> {
 		return *this / length();
 	}
 
+	/// Checks if the vector is normalized
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE bool is_normalized() const noexcept {
+		const auto lensq = length_sq();
+		return std::abs(lensq - T{1}) <= static_cast<T>(0.0001);
+	}
+
 	/// \return The static_cast-ed vector to the requested K type
 	template <typename K>
 	[[nodiscard]] constexpr LIBV_FORCE_INLINE vec_t<N, K> cast() const noexcept {

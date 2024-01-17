@@ -3,10 +3,11 @@
 #pragma once
 
 // fwd
-#include <libv/math/plane_fwd.hpp>
+#include <libv/math/plane_fwd.hpp> // IWYU pragma: export
 // libv
 #include <libv/meta/force_inline.hpp>
 // std
+#include <cassert>
 #include <ostream>
 // pro
 #include <libv/math/vec.hpp>
@@ -57,6 +58,7 @@ public:
 	}
 
 	static constexpr LIBV_FORCE_INLINE plane_t from_normal_dist(vec3 normal, T dist) noexcept {
+		assert(normal.is_normalized());
 		return {normal, dist, nullptr}; // Access raw constructor
 	}
 
@@ -65,7 +67,12 @@ public:
 	}
 
 	static constexpr LIBV_FORCE_INLINE plane_t from_normal_point(vec3 normal, vec3 point) noexcept {
+		assert(normal.is_normalized());
 		return from_normal_dist(normal, -dot(normal, point));
+	}
+
+	static constexpr LIBV_FORCE_INLINE plane_t from_vector_dist(T vx, T vy, T vz, T dist) noexcept {
+		return from_normal_dist(vec3(vx, vy, vz).normalize(), dist);
 	}
 
 	static constexpr LIBV_FORCE_INLINE plane_t from_vector_dist(vec3 vector, T dist) noexcept {
@@ -81,6 +88,10 @@ public:
 		const auto aux1 = p1 - p2;
 		const auto aux2 = p3 - p2;
 		return from_normal_point(normalize(cross(aux2, aux1)), p2);
+	}
+
+	static constexpr LIBV_FORCE_INLINE plane_t from_unchecked(vec3 normal, T dist) noexcept {
+		return {normal, dist, nullptr}; // Access raw constructor
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -107,11 +118,6 @@ public:
 		return os << "N:" << var.normal << " D:" << var.dist;
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-using planef = plane_t<float>;
-using planed = plane_t<double>;
 
 // -------------------------------------------------------------------------------------------------
 

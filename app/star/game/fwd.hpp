@@ -13,6 +13,13 @@ using ClientConfig = Config<ClientConfigT>;
 
 class GameClient;
 
+// UI
+class ControllerContext;
+
+// Scene - Surface
+struct Surface;
+class CanvasSurface;
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace star

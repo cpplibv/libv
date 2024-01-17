@@ -3,7 +3,7 @@
 #pragma once
 
 #include <libv/re/fwd.hpp>
-#include <libv/re/r.hpp> // Convenience include to access the libv::re::r.model object
+#include <libv/re/r.hpp> // IWYU pragma: export // Convenience include to access the libv::re::r.model object
 #include <libv/re/resource/common_resource.hpp>
 #include <libv/re/resource/material_func.hpp>
 #include <libv/utility/function_ref.hpp>

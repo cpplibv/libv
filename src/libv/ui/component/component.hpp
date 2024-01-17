@@ -44,12 +44,15 @@ public:
 	explicit constexpr inline Component(std::nullptr_t) noexcept { }
 	explicit Component(core_ptr ptr_) noexcept;
 
-public:
 	Component(const Component& other) noexcept;
 	Component(Component&& other) noexcept;
 	Component& operator=(const Component& other) & noexcept;
 	Component& operator=(Component&& other) & noexcept;
 	~Component() noexcept;
+
+	[[nodiscard]] static LIBV_FORCE_INLINE Component from_core(core_ptr ptr) noexcept {
+		return Component{ptr};
+	}
 
 public:
 	[[nodiscard]] inline CoreComponent& core() noexcept {

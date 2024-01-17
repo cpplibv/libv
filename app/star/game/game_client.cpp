@@ -27,19 +27,11 @@
 // pro
 #include <star/game/config/client_config.hpp>
 #include <star/game/control/requests.hpp>
-// #include <star/game/control/time_control.hpp>
+// #include <star/game/control/time_controller.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/game/version.hpp>
 #include <star/log.hpp>
-
-
-//#include <libv/mt/worker_thread.hpp>
-//#include <libv/ui/event/event_overlay.hpp>
-//#include <libv/ui/event_hub.hpp>
-//#include <star/game/view/camera_control.hpp>
-//#include <star/game/view/canvas_control.hpp>
-//#include <libv/ui/context/context_state.hpp>
 
 // debug
 #include <libv/ui/component/button.hpp>

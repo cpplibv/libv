@@ -27,7 +27,8 @@ private:
 	friend SceneInternal;
 	static_assert(sizeof(NodeType) == 1);
 	bool updatePending = false;
-	//< 2 byte padding
+	bool visible_ = true;
+	//< 1 byte padding
 public:
 	Transform transform;
 
@@ -44,6 +45,14 @@ public:
 		nodeType(nodeType),
 		transform(position, libv::quatf::look_at(direction, up), scale) { }
 	virtual ~Node();
+
+public:
+	constexpr inline void visible(bool value) noexcept {
+		visible_ = value;
+	}
+	[[nodiscard]] constexpr inline bool visible() const noexcept {
+		return visible_;
+	}
 
 public:
 	// hierarchical:

@@ -84,8 +84,6 @@ std::vector<PersonnelDescription> makePersonnelList() {
 	std::vector<PersonnelDescription> list;
 
 	list.emplace_back("Császár Mátyás", "Vader", "Founder");
-	list.emplace_back("Császár Mátyás", "Vader", "Technology director");
-	list.emplace_back("Császár Mátyás", "Vader", "Administration");
 	list.emplace_back("Császár Mátyás", "Vader", "Programmer");
 
 	return list;
@@ -207,7 +205,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 
 			"https://github.com/dacap/clip",
 
-			"MIT license",
+			"MIT License",
 
 			"Copyright (c) 2015-2022 David Capello\n"
 			"\n"
@@ -224,7 +222,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 			"https://github.com/andreasbuhr/cppcoro\n"
 			"https://github.com/VaderY/cppcoro (Fork)",
 
-			"MIT license",
+			"MIT License",
 
 			"Copyright 2017 Lewis Baker\n"
 			"\n"
@@ -467,7 +465,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 
 			"https://howardhinnant.github.io/date/date.html",
 
-			"MIT license",
+			"MIT License",
 
 			"The source code in this project is released using the MIT License. There is no global license for the project because each file is licensed individually with different author names and/or dates.\n"
 			"\n"
@@ -490,7 +488,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 			"https://github.com/sisong/HDiffPatch\n"
 			"https://github.com/VaderY/HDiffPatch (Fork)",
 
-			"MIT license",
+			"MIT License",
 
 			"HDiffPatch\n"
 			"Copyright (c) 2012-2022 housisong\n"
@@ -518,7 +516,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 
 			"https://github.com/SpartanJ/efsw",
 
-			"MIT license",
+			"MIT License",
 
 			"Copyright (c) 2020 Martín Lucas Golini\n"
 			"\n"
@@ -537,7 +535,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 
 			"https://fmt.dev",
 
-			"MIT license (Modified)",
+			"MIT License (Modified)",
 
 			"Copyright (c) 2012 - present, Victor Zverovich\n"
 			"\n"
@@ -937,7 +935,7 @@ std::vector<ThirdPartyDescription> makeThirdPartyList() {
 
 			"https://www.lua.org",
 
-			"MIT license",
+			"MIT License",
 
 			"Copyright © 1994–2021 Lua.org, PUC-Rio.\n"
 			"\n"

@@ -1,6 +1,6 @@
 //
 
-#include <star/game/control/time_control.hpp>
+#include <star/game/control/time_controller.hpp>
 
 #include <libv/ctrl/controls.hpp>
 
@@ -9,42 +9,42 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-TimeControl::TimeControl(libv::Nexus nexus) : nexus(std::move(nexus)) {
+TimeController::TimeController(libv::Nexus nexus) : nexus(std::move(nexus)) {
 }
 
-TimeControl::~TimeControl() {
-	nexus.disconnect_channel_all(this);
+TimeController::~TimeController() {
+	nexus.disconnect_all(this);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-CommandTimeSpeed TimeControl::currentCommandTimeSpeed() const{
+CommandTimeSpeed TimeController::currentCommandTimeSpeed() const{
 	return CommandTimeSpeed{paused ? 0 : simulationSpeedMode};
 }
 
-void TimeControl::request(RequestTimeTogglePause) {
+void TimeController::request(RequestTimeTogglePause) {
 	paused = !paused;
 	nexus.broadcast_channel<CommandTimeSpeed>(this, currentCommandTimeSpeed());
 }
 
-void TimeControl::request(RequestTimeSpeed req) {
+void TimeController::request(RequestTimeSpeed req) {
 	paused = false;
 	simulationSpeedMode = std::min(req.mode, static_cast<uint32_t>(std::size(simulationSpeeds)));
 	nexus.broadcast_channel<CommandTimeSpeed>(this, CommandTimeSpeed{req.mode});
 }
 
-void TimeControl::request(RequestTimeDebugSlowMode req) {
+void TimeController::request(RequestTimeDebugSlowMode req) {
 	debugSlowMode = req.active;
 	debugSlowModeCounter = 0;
 }
 
-void TimeControl::request(RequestTimeDebugStepFrame) {
+void TimeController::request(RequestTimeDebugStepFrame) {
 	debugUnpauseNextFrame = true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void TimeControl::update(libv::time_duration timeDelta) {
+void TimeController::update(libv::time_duration timeDelta) {
 	// !!!
 	// this->timeRealFrame = ui().state.time_frame();
 	this->timeRealFrame = libv::clock::now();
@@ -57,8 +57,8 @@ void TimeControl::update(libv::time_duration timeDelta) {
 
 // -------------------------------------------------------------------------------------------------
 
-void TimeControl::register_controls(libv::ctrl::Controls& controls, TimeControlFeatures features) {
-	using ControlState = TimeControl;
+void TimeController::register_controls(libv::ctrl::Controls& controls, TimeControllerFeatures features) {
+	using ControlState = TimeController;
 
 	const auto act = [&](bool enable, std::string&& name, auto&& reqProto) {
 		if (enable) {
@@ -83,7 +83,7 @@ void TimeControl::register_controls(libv::ctrl::Controls& controls, TimeControlF
 	act(features.stepFrame, "time.debug.step-frame", RequestTimeDebugStepFrame{});
 }
 
-void TimeControl::bind_default_controls(libv::ctrl::Controls& controls) {
+void TimeController::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("time.pause-toggle", "space");
 	controls.bind("time.pause-toggle", "`");
 	controls.bind("time.speed1", "1");

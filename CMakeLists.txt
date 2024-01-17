@@ -1254,13 +1254,7 @@ wish_create_executable(
 #	LINK   libv::update libv::net libv::log
 #)
 
-wish_create_executable(
-	TARGET sandbox_libv_ui
-	SOURCE sandbox/libv_ui_main.cpp
-	SOURCE sandbox/libv_ui_scroll.cpp
-	SOURCE sandbox/libv_ui_main_tooltip.cpp
-	LINK   libv::log libv::ui libv::frame libv::utility
-)
+add_subdirectory(sandbox/ui)
 
 wish_create_executable(
 	TARGET sandbox_libv_ui_lua
