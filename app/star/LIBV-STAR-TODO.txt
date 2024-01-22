@@ -28,20 +28,11 @@ Complete integration test:
 		SceneStarmap
 			\ Starmap controller
 
-skybox selector
-		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/epping_forest_01_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		// skybox = libv::re::Skybox::create(libv::r.texture.load_async("texture/sky/lago_disola_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		// void nextSky() {
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/debug_x_front_uv_cube_srgb.dds"));
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/ambience_morning_green_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_eqrt_srgb.dds"), libv::re::SkyboxType::equirectangular);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_eqrt_hdr.dds"), libv::re::SkyboxType::equirectangular);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_cube_srgb.dds"), libv::re::SkyboxType::cubemapZXY);
-		// skybox->textureSky(libv::r.texture.load_async("texture/sky/lago_disola_cube_hdr.dds"), libv::re::SkyboxType::cubemapZXY);
-		// }
+
+
+
+
+----------------------------------------------------------------------------------------------------
 
 libv.ui: controls:
 		automated ways to register and bind defaults
@@ -63,9 +54,6 @@ Debug gizmos
 			glr.model.scale(orientation_gizmo_size * 0.5f);
 
 			renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
-
-
--------------------------------------------------------------------------------------------------
 
 controls / camera
 	Organize camera
@@ -235,6 +223,7 @@ app.star: Credits:
 
 		libv.ui: Component flag to report a component is well behaving in renders for early hierarchical culling
 				(aka no render fragment exists the component layout_position and layout_size)
+				(needs feed back from rendering)
 
 		idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
 				component bounds

@@ -245,12 +245,20 @@ Texture_ptr TextureLoader::load(std::string_view identifier, VariantID variant, 
 	return self->load(mode, self->fallback, identifier, variant);
 }
 
+Texture_ptr TextureLoader::load(std::string_view identifier, VariantID variant, LoadingMode mode, Texture_ptr fallback) {
+	return self->load(mode, fallback, identifier, variant);
+}
+
 Texture_ptr TextureLoader::load_async(std::string_view identifier, VariantID variant) {
 	return self->load(LoadingMode::async, self->fallback, identifier, variant);
 }
 
 DelayedTextureLoadGuard TextureLoader::load_delayed(std::string_view identifier, VariantID variant, LoadingMode mode) {
 	return self->load_delayed(mode, self->fallback, identifier, variant);
+}
+
+DelayedTextureLoadGuard TextureLoader::load_delayed(std::string_view identifier, VariantID variant, LoadingMode mode, Texture_ptr fallback) {
+	return self->load_delayed(mode, fallback, identifier, variant);
 }
 
 DelayedTextureLoadGuard TextureLoader::load_delayed_async(std::string_view identifier, VariantID variant) {

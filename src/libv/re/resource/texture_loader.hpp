@@ -85,10 +85,12 @@ public:
 public:
 	/// @thread any
 	Texture_ptr load(std::string_view identifier, VariantID variant = VariantID::Default, LoadingMode mode = LoadingMode::blocking);
+	Texture_ptr load(std::string_view identifier, VariantID variant, LoadingMode mode, Texture_ptr fallback);
 	/// @thread any
 	Texture_ptr load_async(std::string_view identifier, VariantID variant = VariantID::Default);
 	/// @thread any
 	DelayedTextureLoadGuard load_delayed(std::string_view identifier, VariantID variant = VariantID::Default, LoadingMode mode = LoadingMode::blocking);
+	DelayedTextureLoadGuard load_delayed(std::string_view identifier, VariantID variant, LoadingMode mode, Texture_ptr fallback);
 	/// @thread any
 	DelayedTextureLoadGuard load_delayed_async(std::string_view identifier, VariantID variant = VariantID::Default);
 

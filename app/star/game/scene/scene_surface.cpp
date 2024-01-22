@@ -75,7 +75,7 @@ CanvasSurface::CanvasSurface(libv::Nexus& nexus, Surface& surface, TimeControlle
 	camera->tmpCameraPlayer.far(50.0f); // With inf projection far is only used for linearized visualization (and camera controls)
 	camera->tmpCameraPlayer.near(0.5f);
 
-	scene->add(libv::re::EditorGrid::create());
+	scene->add(editorGrid = libv::re::EditorGrid::create());
 
 	ballMesh = libv::re::MeshSphere::create(12);
 	ballMaterial = libv::re::MaterialSolid::create(libv::vec4f{0.5f, 0.25f, 0.25f, 1.f});

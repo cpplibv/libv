@@ -23,7 +23,7 @@ namespace star {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Surface {
+struct Starmap {
 	struct Sky {
 		std::string texture;
 		libv::re::SkyboxType type = libv::re::SkyboxType::cubemapZXY;

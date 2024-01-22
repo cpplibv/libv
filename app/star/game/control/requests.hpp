@@ -38,6 +38,12 @@ struct CommandTimeSpeed {
 
 struct RequestSurfacePlaceBallUnderCursor {
 };
+struct RequestSurfaceSkyNext {
+};
+struct RequestSurfaceSkyPrev {
+};
+struct RequestSurfaceToggleGrid {
+};
 
 // -------------------------------------------------------------------------------------------------
 

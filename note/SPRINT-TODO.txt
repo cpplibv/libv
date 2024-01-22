@@ -15,7 +15,6 @@
 
 
 
-
 Everything in star notes (Its not that long list, mostly integration and cleanup)
 
 
@@ -24,16 +23,13 @@ Everything in star notes (Its not that long list, mostly integration and cleanup
 --- Resources --------------------------------------------------------------------------------------
 
 res: Skyboxes:
-		replace fluffball with one of the recently acquired clear sky
+		replace fluffball with one of the recently acquired clear skys
 		acquire an image viewer that can handle (and other formats that we started to use)
 				with thumbnails
 				DDS cube
 				BC6 DDS
 				HDR
-		acquire 2 simple space with stars
-		acquire 2 nebula
-		acquire 2 in orbit (high or low)
-libv.re: Sky equirectangular and cubemaps are misaligned or inverted (possible import issue)
+libv.re: Sky equirectangular and cubemaps are misaligned or inverted (possible import issue) or both rotated and inverted
 
 
 
