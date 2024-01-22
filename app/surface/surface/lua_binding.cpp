@@ -342,7 +342,7 @@ HeatMap SurfaceLuaBinding::convertHeatMap(const sol::object& object, Seed seedOf
 
 	HeatMap result;
 	result.name = table["name"].get<std::string>();
-	result.heightSensitivity = table["heightSensitivity"];
+	result.heightSensitivity = table["heightSensitivity"].get_or<float, float>(1.f);
 //	result.colorGrad = convertColorGradient(table.get<sol::object>("colorGrad"));
 	result.rootNode = convertNodeTree(table.get<sol::object>("nodes"), seedOffset);
 

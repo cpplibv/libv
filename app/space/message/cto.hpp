@@ -24,7 +24,7 @@ struct CTO_Introduction {
 	static constexpr libv::serial::CodecMessageID id{0};
 
 	std::string user_name;
-	uint64_t version = 0;
+	uint64_t version;
 
 	CTO_Introduction() = default;
 	explicit inline CTO_Introduction(std::string user_name, uint64_t version) : user_name(std::move(user_name)), version(version) {}
@@ -38,7 +38,7 @@ struct CTO_ClientJoined {
 	UserID userID = invalidUserID;
 	std::string user_name;
 	std::chrono::system_clock::time_point joined_at;
-	uint64_t version = 0;
+	uint64_t version;
 
 	CTO_ClientJoined() = default;
 	explicit inline CTO_ClientJoined(UserID userID, std::string user_name, std::chrono::system_clock::time_point joined_at, uint64_t version) : userID(userID), user_name(std::move(user_name)), joined_at(joined_at), version(version) {}

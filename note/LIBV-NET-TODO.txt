@@ -17,7 +17,9 @@
 
 
 
-
+https://github.com/ValveSoftware/GameNetworkingSockets
+https://partner.steamgames.com/doc/api/ISteamNetworkingSockets
+https://github.com/ValveSoftware/GameNetworkingSockets/blob/master/README_P2P.md
 
 
 place.it: auto update could be assisted with the application main being in a dll? with a skeleton.exe

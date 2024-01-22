@@ -121,7 +121,7 @@ wish_resource_mapping(
 #		RESOURCE @/res/texture/sky/debug_x_front_uv_transparent_cube.dds
 		RESOURCE @/res/texture/sky/debug_x_front_uv_transparent_cube_srgb.dds
 
-#		RESOURCE @/res/texture/sky/* # For testing skys only
+		RESOURCE @/res/texture/sky/* # For testing skys only
 
 		# Surface
 		RESOURCE @/res/texture/sky/ambience_morning_green_cube_srgb.dds

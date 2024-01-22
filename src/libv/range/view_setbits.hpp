@@ -32,13 +32,14 @@ private:
 		return it;
 	}
 	constexpr inline bool equal(ranges::default_sentinel_t) const noexcept {
-		return (integral >> it) == 0;
+		return it >= it_end;
 	}
 	constexpr inline bool equal(const setbits_view& other) const noexcept {
 		return other.it == it;
 	}
 	constexpr inline void next() noexcept {
-		it += std::countr_zero(static_cast<Rep>(integral >> (it + 1))) + 1;
+		if (it < it_end)
+			it += std::countr_zero(static_cast<Rep>(integral >> (it + 1))) + 1;
 	}
 //	constexpr inline void prev() noexcept {
 //		it -= std::countl_zero(static_cast<Rep>(integral >> it)) + 1;
@@ -46,8 +47,8 @@ private:
 
 public:
 	constexpr inline setbits_view() noexcept {}
-	constexpr inline setbits_view(const Integral integral) noexcept : integral(static_cast<Rep>(integral)) {
-		it = std::countr_zero(this->integral);
+	constexpr inline setbits_view(const Integral integral_) noexcept : integral(static_cast<Rep>(integral_)) {
+		it = std::countr_zero(integral);
 	}
 
 	constexpr inline auto size() noexcept {

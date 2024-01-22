@@ -40,10 +40,10 @@ libv::ui::Component createSceneMainMenu(libv::Nexus& nexus) {
 	auto menu_box = golden_box.add_ns<libv::ui::PanelLine>("menu_box", "main-menu.menu.panel");
 
 	menu_box.add_nsa<libv::ui::Label>("title", "main-menu.menu.title", "IRIS STAR");
-	menu_box.add(menuEntry("Surface", createSceneSurface));
-//	menu_box.add(menuEntry("Space", nullptr));
-//	menu_box.add(menuEntry("VM4 Viewer", nullptr));
-	menu_box.add(menuEntry("Single player", nullptr));
+	// menu_box.add(menuEntry("Surface", createSceneSurface));
+	// menu_box.add(menuEntry("Space", nullptr));
+	// menu_box.add(menuEntry("VM4 Viewer", nullptr));
+	menu_box.add(menuEntry("Single player", createSceneSPSession));
 	menu_box.add(menuEntry("Multiplayer", nullptr));
 	menu_box.add(menuEntry("Load", nullptr));
 	menu_box.add(menuEntry("Mods", nullptr));

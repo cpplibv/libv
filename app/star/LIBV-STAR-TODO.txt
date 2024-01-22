@@ -7,8 +7,6 @@ Star - System integration demo
 
 
 
-
-
 --- STACK ------------------------------------------------------------------------------------------
 
 
@@ -17,26 +15,14 @@ Star - System integration demo
 
 
 
-Complete integration test:
-	ESC (or F10) -> show small menu
-	SceneGameSession
-		\ Universe
-		\ Time controller
-		SceneSurface
-			\ Surface controller
-			\ Surface
-		SceneStarmap
-			\ Starmap controller
-
+cleanup skys
+	remove the 13214 sky maps, leave only a minimal set, 1 of each kind
+	rename debug x front to _cube_srgb convention
 
 
 
 
 ----------------------------------------------------------------------------------------------------
-
-libv.ui: controls:
-		automated ways to register and bind defaults
-		prepared function, and a template func or class wrapper
 
 Debug gizmos
 	- Coordinates text: renderer.text.add_debug_coordinates

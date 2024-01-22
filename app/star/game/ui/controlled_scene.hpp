@@ -6,7 +6,6 @@
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/component_system/create_scene.hpp>
 #include <libv/ui/context/context_state.hpp>
-#include <libv/utility/nexus.hpp>
 
 
 namespace star {
@@ -77,10 +76,12 @@ public:
 			ControllerContext cctx{controls, component};
 			controlledScene.controls(cctx);
 		}
-		component.event().global_before_render.connect_system([this](libv::ui::Component& comp, const libv::ui::EventBeforeRender& event) {
-			(void) event;
-			controlledScene.update(comp.ui().state.time_frame(), comp.ui().state.time_delta());
-		});
+		if constexpr (requires { &T::update; }) {
+			component.event().global_before_render.connect_system([this](libv::ui::Component& comp, const libv::ui::EventBeforeRender& event) {
+				(void) event;
+				controlledScene.update(comp.ui().state.time_frame(), comp.ui().state.time_delta());
+			});
+		}
 		return component;
 	}
 };

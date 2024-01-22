@@ -34,6 +34,7 @@ struct TimeController {
 	libv::time_point timeRealStart = libv::clock::now();
 	libv::time_point timeRealFrame = timeRealStart;
 	libv::time_duration_d timeSim{0};
+	libv::time_duration_d deltaSim{0};
 
 	libv::Nexus nexus;
 
@@ -49,7 +50,9 @@ public:
 	void request(RequestTimeDebugStepFrame);
 
 public:
-	void update(libv::time_duration timeDelta);
+	void update(libv::time_point time, libv::time_duration_d delta);
+
+public:
 	[[nodiscard]] libv::time_duration_d timeReal() const noexcept {
 		return timeRealFrame - timeRealStart;
 	}

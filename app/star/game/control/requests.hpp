@@ -45,6 +45,15 @@ struct RequestSurfaceSkyPrev {
 struct RequestSurfaceToggleGrid {
 };
 
+struct RequestStarmapPlaceBallUnderCursor {
+};
+struct RequestStarmapSkyNext {
+};
+struct RequestStarmapSkyPrev {
+};
+struct RequestStarmapToggleGrid {
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace star

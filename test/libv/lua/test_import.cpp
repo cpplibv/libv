@@ -114,7 +114,7 @@ TEST_CASE("Lua importer", "[libv.lua.import]") {
 	ImportTester test;
 
 	test.file("module0/source0.lua", R"(
-		local m1s1 = import("module1.source0")
+		local m1s1 = import("module1/source0")
 		print("module0 source0")
 		return "module0 source0"
 	)");
@@ -129,7 +129,7 @@ TEST_CASE("Lua importer", "[libv.lua.import]") {
 
 	CHECK(test.run(R"(
 		local m0s0 = import("module0/source0")
-		local m0s0 = import("module0/source0")
+		local m0s0 = import("module0/source1")
 		local m1s0 = import("module1/source0")
 
 		print("main")

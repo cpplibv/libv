@@ -391,31 +391,31 @@ struct SourceGeneratorLua {
 			gen.include_cpp(std::move(name));
 		});
 
-		lua.set_function("member_sc", [this](std::string identifier, std::string type, std::string init_value) {
+		lua.set_function("member_sc", [this](std::string identifier, std::string type, sol::object init_value) {
 			auto result = lua.create_table();
 			result["entity_type"] = "static_variable";
 			result["identifier"] = std::move(identifier);
 			result["type"] = std::move(type);
-			result["init_value"] = std::move(init_value);
+			result["init_value"] = init_value;
 			return result;
 		});
 
-		lua.set_function("member_v", [this](std::string identifier, std::string type, std::string init_value) {
+		lua.set_function("member_v", [this](std::string identifier, std::string type, sol::object init_value) {
 			auto result = lua.create_table();
 			result["entity_type"] = "variable";
 			result["identifier"] = std::move(identifier);
 			result["type"] = std::move(type);
-			result["init_value"] = std::move(init_value);
+			result["init_value"] = init_value;
 			result["use_move"] = false;
 			return result;
 		});
 
-		lua.set_function("member_mv", [this](std::string identifier, std::string type, std::string init_value) {
+		lua.set_function("member_mv", [this](std::string identifier, std::string type, sol::object init_value) {
 			auto result = lua.create_table();
 			result["entity_type"] = "variable";
 			result["identifier"] = std::move(identifier);
 			result["type"] = std::move(type);
-			result["init_value"] = std::move(init_value);
+			result["init_value"] = init_value;
 			result["use_move"] = true;
 			return result;
 		});
@@ -453,7 +453,7 @@ struct SourceGeneratorLua {
 				if (member_type == "variable") {
 					auto member_name = member_table["identifier"].get<std::string>();
 					auto member_type = member_table["type"].get<std::string>();
-					auto member_init_value = member_table["init_value"].get<std::string>();
+					auto member_init_value = member_table["init_value"].get_or<std::string>("");
 					auto member_use_move = member_table["use_move"].get<bool>();
 					clazz->members.emplace_back(
 							member_name,
@@ -465,7 +465,7 @@ struct SourceGeneratorLua {
 				} else if (member_type == "static_variable") {
 					auto member_name = member_table["identifier"].get<std::string>();
 					auto member_type = member_table["type"].get<std::string>();
-					auto member_init_value = member_table["init_value"].get<std::string>();
+					auto member_init_value = member_table["init_value"].get_or<std::string>("");
 					clazz->static_members.emplace_back(
 							member_name,
 							member_type,
@@ -494,7 +494,7 @@ struct SourceGeneratorLua {
 	[[nodiscard]] auto generate(std::string_view input_file, std::string_view source_script) {
 		auto env = sol::environment(lua, sol::create, lua.globals());
 
-		lua.script(source_script, env);
+		lua.safe_script(source_script, env);
 
 		auto result_hpp = gen.generate_hpp(input_file);
 		auto result_cpp = gen.generate_cpp(input_file);

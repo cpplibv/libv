@@ -7,6 +7,9 @@
 #include <libv/math/plane.hpp>
 
 #include <star/game/scene/scene_surface.hpp>
+#include <star/game/sim/universe.hpp>
+
+#include <libv/re/node/node.hpp>
 
 // For testings skys only:
 #include <libv/re/node/skybox.hpp>
@@ -37,7 +40,7 @@ void SurfaceController::request(RequestSurfacePlaceBallUnderCursor) {
 
 	const auto intersection = libv::intersect_ray_plane(canvas->mouseRay, plane);
 	if (!intersection)
-		return;
+		return; // Player visibile error notifiction would go here (or a nexus event)
 
 	surface->balls.emplace_back(*intersection, 0.5f);
 }
@@ -55,38 +58,38 @@ void SurfaceController::setSky(int index) {
 			{"texture/sky/lago_disola_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
 			{"texture/sky/lago_disola_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
 
-			// {"texture/sky/ambience_morning_green_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/drakensberg_solitary_mountain_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/ambience_morning_green_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/drakensberg_solitary_mountain_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
 			{"texture/sky/epping_forest_01_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/kloofendal_43d_clear_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/kloofendal_misty_morning_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/kloofendal_overcast_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/kloppenheim_02_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/kloppenheim_03_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/lago_disola_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/lenong_1_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/mpumalanga_veld_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/mud_road_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/pizzo_pernice_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/quarry_02_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/quarry_03_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/qwantani_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/sunflowers_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/table_mountain_1_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/table_mountain_1_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/wasteland_clouds_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/white_cliff_top_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
-			//
-			// {"texture/sky/tryo_nebula10_gray_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula40_white_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula60_grayblue_n_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula60_grayblue_nl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula60_grayblue_ns_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula60_grayblue_nsl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_nebula80_colorful_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_stars_l_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_stars_s_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
-			// {"texture/sky/tryo_stars_sl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/kloofendal_43d_clear_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/kloofendal_misty_morning_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/kloofendal_overcast_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/kloppenheim_02_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/kloppenheim_03_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/lago_disola_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/lenong_1_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/mpumalanga_veld_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/mud_road_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/pizzo_pernice_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/quarry_02_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/quarry_03_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/qwantani_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/sunflowers_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/table_mountain_1_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/table_mountain_1_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/wasteland_clouds_puresky_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/white_cliff_top_cube_hdr.dds", libv::re::SkyboxType::cubemapZXY},
+
+			{"texture/sky/tryo_nebula10_gray_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula40_white_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula60_grayblue_n_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula60_grayblue_nl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula60_grayblue_ns_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula60_grayblue_nsl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_nebula80_colorful_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_stars_l_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_stars_s_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
+			{"texture/sky/tryo_stars_sl_cube_srgb.dds", libv::re::SkyboxType::cubemapZXY},
 	};
 
 	const auto& sky = skys[index % skys.size()];

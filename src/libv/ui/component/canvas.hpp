@@ -30,7 +30,7 @@ private:
 
 protected:
 	libv::vec2f canvas_position;
-	libv::vec2f canvas_size;
+	libv::vec2f canvas_size{1, 1}; // Init value is 1, 1 to not break any screen picker inits during pre first layout calculations
 
 public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;

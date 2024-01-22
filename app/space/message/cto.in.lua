@@ -85,7 +85,7 @@ end
 
 local cto_struct = function (name, id, description)
 	--table.insert(description, derive_from("BaseCTO"))
-	table.insert(description, member_sc("libv::serial::CodecMessageID", "id", id))
+	table.insert(description, member_sc("libv::serial::CodecMessageID", "id", tostring(id)))
 	return struct(name, description)
 end
 

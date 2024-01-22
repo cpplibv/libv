@@ -766,7 +766,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv::res STATIC
 	SOURCE src/libv/res/*.cpp
-	LINK   ext_fmt
+	LINK   ext_fmt libv_container libv_algo libv_utility
 )
 
 wish_create_library(

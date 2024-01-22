@@ -4,11 +4,11 @@ local globals = import "style/globals"
 
 -- === Menu ========================================================================================
 
---ui.style("surface.menu") {
+--ui.style("starmap.menu") {
 --	font = globals.fonts.label,
 --}
 --
---ui.style("surface.menu.line") {
+--ui.style("starmap.menu.line") {
 --	anchor = "bottom_center",
 --	orientation = "down",
 --	size = "D, D",
@@ -17,7 +17,7 @@ local globals = import "style/globals"
 --	background = "#0006",
 --}
 --
---ui.style("surface.menu.label") {
+--ui.style("starmap.menu.label") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
@@ -27,7 +27,7 @@ local globals = import "style/globals"
 --	globals.stripped_background,
 --}
 --
---ui.style("surface.menu.button") {
+--ui.style("starmap.menu.button") {
 --	align_horizontal = "center",
 --	align_vertical = "center",
 --	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",

@@ -6,24 +6,24 @@
 
 
 
-ide.clion: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
-
-
-
-wish: Exclude generated files from clean target (add_custom_target instead of add_custom_command, and/or use depends, and/or use dummy targets/files)
-
-wish: update cmake version and use add_compile_definitions() instead of add_definitions()
-wish: target_link_directories()
-wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
-wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
-
-wish: Installer: Use whatever rnote uses https://github.com/flxzt/rnote/releases/tag/v0.7.1
 
 What do I need from libv to make a 'minimal' working iris program?
+	libv.serial
+		SAFETY: Safe container resize/reserve on deserialization
+
+	libv.vm4
+		SAFETY: Verify IDs on load
+
+	libv.random:
+		The std uniform_int_distribution and uniform_real_distribution
+		might not be portable across compilers, pick an implementation and
+		use a fix libv version of it
+
 	libv.ui
-		2 List component (and Pagination)
-		3 Scroll pane = scroll area + scroll bar + connecting them
-		5 Font outline render
+		2 List component (and pagination)
+		3 Scroll fixes
+		3 Navigation and focus fixes
+		4 Font outline render
 			freetype2 Now has an SDF render option
 			spread property set:
 				const FT_Int spread = 8;
@@ -32,11 +32,7 @@ What do I need from libv to make a 'minimal' working iris program?
 			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
 
 	libv.ctrl
-		4 Interaction with UI
 		5 Resolve analog-binary accidental collusion with time
-
-	libv.serial
-		SAFETY: Safe container resize/reserve on deserialization
 
 	libv.state
 		5 Generated source for state machines
@@ -48,14 +44,6 @@ What do I need from libv to make a 'minimal' working iris program?
 			Rate Limiting (per connection, [per group], per global)
 			NAT punching
 
-	libv.random:
-		The std uniform_int_distribution and uniform_real_distribution
-		might not be portable across compilers, pick an implementation and
-		use a fix libv version of it
-
-	libv.vm4
-		SAFETY: Verify IDs on load
-
 	libv.update
 		Resource
 			1 Working resource download protocol
@@ -66,21 +54,31 @@ What do I need from libv to make a 'minimal' working iris program?
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
 
+-------------------------------------------------------------------------------------------------
+
+
+
+ide.clion: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
+
+wish: Exclude generated files from clean target (add_custom_target instead of add_custom_command, and/or use depends, and/or use dummy targets/files)
+
+wish: update cmake version and use add_compile_definitions() instead of add_definitions()
+wish: target_link_directories()
+wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
+wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
+
+wish: Installer: Use whatever rnote uses https://github.com/flxzt/rnote/releases/tag/v0.7.1
+
 libv: Implement a dynamic library build variant (dev build type ++)
 
 
 
-ext: lexy https://github.com/foonathan/lexy
-		try out / adopt
-		Parser lib
-		https://www.youtube.com/watch?v=Cb0j6DVmwzY
-
+ext: check out lexy (parser lib) https://github.com/foonathan/lexy and https://www.youtube.com/watch?v=Cb0j6DVmwzY
 ext: adopt https://github.com/olegpublicprofile/stdfwd
 ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
 sql: instead of using lower(column) in select use the proper coalition on the column https://www.youtube.com/watch?v=ML24GRzXF9w
 
 libv: Remove friend class X; and use friend X; and ensure that X is fwd declared in the proper scope
-
 
 GCC 13.1
 	<stacktrace> with --enable-libstdcxx-backtrace=yes
@@ -135,10 +133,8 @@ C++20
 	Atomic wait and notify operations.
 	<barrier>, <latch>, and <semaphore>
 
-	Standard library header units
 
-
-This looks like a useful concepts:
+These look like useful concepts:
 	concept non_cv = std::same_as<D, std::remove_cv_t<D>>
 	concept non_cvref = std::same_as<D, std::remove_cvref_t<D>>
 

@@ -52,7 +52,6 @@ void SceneContainer::assign(Component scene) {
 		self().remove(self().currentScene);
 	self().currentScene = std::move(scene);
 	if (self().currentScene)
-//		self().add(self().currentScene);
 		self().add_front(self().currentScene);
 }
 

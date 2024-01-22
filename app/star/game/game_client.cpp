@@ -26,8 +26,8 @@
 #include <optional>
 // pro
 #include <star/game/config/client_config.hpp>
+#include <star/game/control/controllers.hpp>
 #include <star/game/control/requests.hpp>
-// #include <star/game/control/time_controller.hpp>
 #include <star/game/game_client_frame.hpp>
 #include <star/game/scene/scenes.hpp>
 #include <star/game/version.hpp>
@@ -97,8 +97,7 @@ GameClient::GameClient(bool devMode, const std::filesystem::path& configFilepath
 	self->ui.attachControls(self->controls);
 	// self->ui.loadStyleFile("style/error_overlay.lua");
 	self->ui.loadStyleFile("style/main.lua");
-	self->ui.loadStyleFile("style/surface.lua");
-	// self->ui.loadStyleFile("style/missing.lua");
+	self->ui.loadStyleFile("style/game.lua");
 
 	init_ui(devMode);
 
@@ -120,7 +119,7 @@ GameClient::~GameClient() {
 void GameClient::register_controls() {
 	libv::sun::CameraControl::register_controls(self->controls);
 	libv::sun::CameraControl::bind_default_controls(self->controls, 1);
-	registerSurfaceControls(self->controls);
+	registerSPSessionControls(self->controls);
 
 	self->ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
 		log_star.info("Controls intercepted: {}", event.controls_intercepted());
@@ -217,7 +216,8 @@ void GameClient::init_ui(bool devMode) {
 		// libv::ui::switchParentScene("main", signal, createSceneMainMenu(self->nexus_));
 		// libv::ui::switchParentScene("main", signal, createSceneCredits(self->nexus_)); // Shortcut during development
 		// libv::ui::switchParentScene("main", signal, createSceneSettings(self->nexus_)); // Shortcut during development
-		libv::ui::switchParentScene("main", signal, createSceneSurface(self->nexus_)); // Shortcut during development
+		// libv::ui::switchParentScene("main", signal, createSceneSurface(self->nexus_)); // Shortcut during development
+		libv::ui::switchParentScene("main", signal, createSceneSPSession(self->nexus_)); // Shortcut during development
 	});
 
 	self->ui.add(std::move(layers));

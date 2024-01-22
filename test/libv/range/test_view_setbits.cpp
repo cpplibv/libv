@@ -45,7 +45,7 @@ TEST_CASE("view setbits empty", "[libv.range.view_setbits]") {
 }
 
 TEST_CASE("view setbits max", "[libv.range.view_setbits]") {
-	auto view = libv::view::setbits(1 << 31);
+	auto view = libv::view::setbits(uint32_t{1u << 31u});
 	auto test = std::array{31};
 
 	CHECK(view.size() == 1);

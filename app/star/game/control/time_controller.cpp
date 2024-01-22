@@ -44,14 +44,13 @@ void TimeController::request(RequestTimeDebugStepFrame) {
 
 // -------------------------------------------------------------------------------------------------
 
-void TimeController::update(libv::time_duration timeDelta) {
-	// !!!
-	// this->timeRealFrame = ui().state.time_frame();
-	this->timeRealFrame = libv::clock::now();
+void TimeController::update(libv::time_point time, libv::time_duration_d delta) {
+	this->timeRealFrame = time;
 
 	if ((!paused && !debugSlowMode) || debugUnpauseNextFrame || (debugSlowMode && (++debugSlowModeCounter % 10) == 0)) {
 		debugUnpauseNextFrame = false;
-		timeSim += timeDelta * simulationSpeeds[simulationSpeedMode];
+		deltaSim = delta * simulationSpeeds[simulationSpeedMode];
+		timeSim += deltaSim;
 	}
 }
 

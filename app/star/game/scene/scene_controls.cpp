@@ -10,7 +10,7 @@
 // #include <libv/ui/component_system/bean.hpp>
 #include <libv/ui/component_system/switch_scene.hpp>
 // pro
-#include <star/game/scene/controls_layout.hpp>
+#include <star/game/ui/controls_layout.hpp>
 //#include <star/game/config/client_config.hpp>
 
 
