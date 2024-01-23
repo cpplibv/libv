@@ -107,7 +107,6 @@ ui.style("space.title-space") {
 	font_size = 18,
 	--background = "color: red",
 	--background = "color:" .. colors.hud_light_bg_color,
-	--background = "texture: atlas_ui_slate.png",
 	--background = "texture: hexagon_metal_0001_diffuse.dds",
 	--background = "pattern: hexagon_metal_0001_diffuse.dds",
 	--background = "texture: separator_bar_256x16.png",

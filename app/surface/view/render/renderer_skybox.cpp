@@ -20,10 +20,6 @@ RendererSkybox::RendererSkybox(RendererResourceContext& rctx) :
 		shader(rctx.loader.shader, "surface/skybox.vs", "surface/skybox.fs") {
 //		texture(rctx.loader.texture.load("sky.dds")) {
 //		texture(rctx.loader.texture.load("builtin:white")) {
-//		texture(rctx.loader.texture.load("cube_debug_transparent.dds")) {
-//		texture(rctx.loader.texture.load("cube_nebula_purple_0001.dds")) {
-//		texture(rctx.loader.texture.load("cube_fluffball.dds")) {
-//		texture(rctx.loader.texture.load("cube_redDesertNight.dds")) {
 
 	auto position = mesh.attribute(attribute_position);
 	auto index = mesh.index();

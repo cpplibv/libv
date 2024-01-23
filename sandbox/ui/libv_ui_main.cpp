@@ -303,9 +303,9 @@ private:
 		image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("separator_bar_256x16.png")));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
-		input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
-		input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
-		input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.resource().texture2D("gray256.png")));
+		input_field0.background(libv::ui::Background::color({0.5f, 0.5f, 0.5f, 1.f}));
+		input_field1.background(libv::ui::Background::color({0.5f, 0.5f, 0.5f, 1.f}));
+		input_field2.background(libv::ui::Background::color({0.5f, 0.5f, 0.5f, 1.f}));
 
 		input_field0.text("Input field 0");
 		input_field0.event().change([](auto& component, const auto&) {
@@ -597,7 +597,7 @@ public:
 		tabs.addTab("Tab #3", createTab3());
 		tabs.addTab("Tooltip", createTabTooltip(ui));
 		tabs.addTab("Legacy", createTabLegacy());
-		tabs.addTab("Surface", createTabSurface(ui));
+		// tabs.addTab("Surface", createTabSurface(ui));
 
 		ui.add(tabs.main);
 
@@ -629,7 +629,6 @@ public:
 //					font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
 //					--background = "color: red";
 //			--background = "color:" .. colors.hud_light_bg_color;
-//			--background = "texture: atlas_ui_slate.png";
 //			--background = "texture: hexagon_metal_0001_diffuse.dds";
 //			--background = "pattern: hexagon_metal_0001_diffuse.dds";
 //			--background = "texture: separator_bar_256x16.png";
@@ -691,7 +690,6 @@ public:
 //			font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
 //			--background = "color: red";
 //			--background = "color:" .. colors.hud_light_bg_color;
-//			--background = "texture: atlas_ui_slate.png";
 //			--background = "texture: hexagon_metal_0001_diffuse.dds";
 //			--background = "texture: separator_bar_256x16.png";
 //			--background = "texture: stretch_border.png";
@@ -806,7 +804,6 @@ public:
 //		quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));
 //		stretch0->image(ui.resource().texture2D("stretch_border.png"));
 //		stretch0->color(libv::parse::parse_color_or_throw("rgba(183, 190, 135, 100%)"));
-//		image0->image(ui.resource().texture2D("atlas_ui_slate.png"));
 //		image0->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 //
 //		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;

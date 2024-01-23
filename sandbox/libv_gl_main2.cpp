@@ -309,7 +309,7 @@ struct Sandbox {
 		auto imagePlane = libv::gl::load_image_or_throw(dataPlane);
 		texturePlane = libv::gl::Texture2D(imagePlane.createTexture());
 
-		auto dataSky = libv::read_file_or_throw("res/texture/cube_nebula_green_0001.dds");
+		auto dataSky = libv::read_file_or_throw("res/texture/sky/tryo_nebula80_colorful_cube_srgb.dds");
 		auto imageSky = libv::gl::load_image_or_throw(dataSky);
 		textureSky = libv::gl::TextureCube(imageSky.createTexture());
 

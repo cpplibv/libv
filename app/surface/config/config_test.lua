@@ -16,7 +16,7 @@ config = {
 	sunColor = "hsv(0, 0%, 150%)";
 	sunDirection = vec3f(0.8, 0.2, 0.6),
 
-	skyboxTexture = "cube_fluffball.dds",
+	skyboxTexture = "sky/kloppenheim_03_puresky_cube_hdr.dds",
 }
 
 biomes = {

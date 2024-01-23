@@ -433,7 +433,7 @@ std::shared_ptr<Config> SurfaceLuaBinding::convertConfig(const sol::object& obje
 	const auto skyboxTextureObj = table.get<sol::object>("skyboxTexture");
 	result->skyboxTexture = skyboxTextureObj.get_type() == sol::type::string ?
 			skyboxTextureObj.as<std::string_view>() :
-			"cube_fluffball.dds";
+			"sky/kloppenheim_03_puresky_cube_hdr.dds";
 
 	const auto fogColorOpt = libv::lua::convert_color(table.get<sol::object>("fogColor"));
 	result->fogColor = fogColorOpt ? *fogColorOpt : libv::vec4f{0.7f, 0.8f, 0.9f, 1.0f};

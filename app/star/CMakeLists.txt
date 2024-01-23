@@ -124,15 +124,11 @@ wish_resource_mapping(
 		RESOURCE @/res/texture/sky/* # For testing skys only
 
 		# Surface
-		RESOURCE @/res/texture/sky/ambience_morning_green_cube_srgb.dds
 		RESOURCE @/res/texture/sky/ambience_morning_green_cube_hdr.dds
-		RESOURCE @/res/texture/sky/ambience_morning_green_eqrt_srgb.dds
-		RESOURCE @/res/texture/sky/ambience_morning_green_eqrt_hdr.dds
 		RESOURCE @/res/texture/sky/lago_disola_cube_srgb.dds
 		RESOURCE @/res/texture/sky/lago_disola_cube_hdr.dds
 		RESOURCE @/res/texture/sky/lago_disola_eqrt_srgb.dds
 		RESOURCE @/res/texture/sky/lago_disola_eqrt_hdr.dds
-		RESOURCE @/res/texture/sky/epping_forest_01_cube_hdr.dds
 
 		# Testing only
 		RESOURCE @/res/texture/stripes_border.png

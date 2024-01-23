@@ -26,8 +26,10 @@ config = {
 	--sunDirection = vec3f(0.891186, 0.0560718, 0.450159),
 	sunDirection = vec3f(0.9, 0.06, 0.7),
 
-	skyboxTexture = "cube_fluffball.dds",
-	--skyboxTexture = "cube_redDesertNight.dds",
+	--skyboxTexture = "sky/drakensberg_solitary_mountain_puresky_cube_hdr.dds",
+	skyboxTexture = "sky/kloppenheim_03_puresky_cube_hdr.dds",
+	--skyboxTexture = "sky/mud_road_puresky_cube_hdr.dds",
+	--skyboxTexture = "sky/sunflowers_puresky_cube_hdr.dds",
 }
 
 biomes = {

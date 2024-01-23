@@ -15,7 +15,8 @@ config = {
 	sunColor = "hsv(0, 0%, 100%)";
 	sunDirection = vec3f(0.8, 0.2, 0.6),
 
-	skyboxTexture = "cube_nebula_green_0001.dds",
+	--skyboxTexture = "sky/tryo_nebula80_colorful_cube_srgb.dds",
+	skyboxTexture = "sky/tryo_stars_sl_cube_srgb.dds",
 }
 
 biomes = {

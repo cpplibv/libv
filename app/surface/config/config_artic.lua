@@ -27,8 +27,8 @@ config = {
 	fogIntensity = 0.02,
 	fogColor = "hsv(160, 70%, 75%)",
 	numVeggie = 50000,
-	skyboxTexture = "cube_nebula_green_0001.dds",
-	--skyboxTexture = "cube_redDesertNight.dds",
+	skyboxTexture = "sky/tryo_nebula80_colorful_cube_srgb.dds",
+	--skyboxTexture = "sky/qwantani_puresky_cube_hdr.dds",
 
 --                      /\
 --  COLD|BARREN        /  \ Polar

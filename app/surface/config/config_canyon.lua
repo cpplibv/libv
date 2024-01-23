@@ -15,7 +15,7 @@ config = {
 
 	sunColor = "rgb(0.9, 0.8, 0.6)";
 
-	skyboxTexture = "cube_redDesertNight.dds",
+	skyboxTexture = "sky/qwantani_puresky_cube_hdr.dds",
 }
 
 biomes = {

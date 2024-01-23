@@ -15,10 +15,6 @@ Star - System integration demo
 
 
 
-cleanup skys
-	remove the 13214 sky maps, leave only a minimal set, 1 of each kind
-	rename debug x front to _cube_srgb convention
-
 
 
 
