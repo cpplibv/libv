@@ -1,4 +1,4 @@
-// Project: libv.ui, File: sandbox/libv_ui_main.cpp
+// Project: libv.ui, File: sandbox/ui/libv_ui_main.cpp
 
 // libv
 #include <libv/frame/frame.hpp>

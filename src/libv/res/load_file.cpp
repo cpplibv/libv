@@ -1,4 +1,4 @@
-//
+// Project: libv.res, File: src/libv/res/load_file.cpp
 
 #include <libv/res/load_file.hpp>
 

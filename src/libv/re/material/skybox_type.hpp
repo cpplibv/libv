@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/material/material_skybox.hpp
+// Project: libv.re, File: src/libv/re/material/skybox_type.hpp
 
 #pragma once
 

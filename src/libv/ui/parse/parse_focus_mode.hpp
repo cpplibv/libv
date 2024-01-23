@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/ui/parse/parse_align.hpp
+// Project: libv.parse, File: src/libv/ui/parse/parse_focus_mode.hpp
 
 #pragma once
 

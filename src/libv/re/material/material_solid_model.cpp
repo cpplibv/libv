@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/material/material_solid.cpp
+// Project: libv.re, File: src/libv/re/material/material_solid_model.cpp
 
 #include <libv/re/material/material_solid_model.hpp>
 

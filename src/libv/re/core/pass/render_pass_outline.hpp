@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/pass/render_passes.hpp
+// Project: libv.re, File: src/libv/re/core/pass/render_pass_outline.hpp
 
 #pragma once
 

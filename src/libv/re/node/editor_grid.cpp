@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/node/editorGrid.cpp
+// Project: libv.re, File: src/libv/re/node/editor_grid.cpp
 
 #include <libv/re/node/editor_grid.hpp>
 

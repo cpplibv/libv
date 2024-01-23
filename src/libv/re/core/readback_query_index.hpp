@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/uniform_buffer.hpp
+// Project: libv.re, File: src/libv/re/core/readback_query_index.hpp
 
 #pragma once
 

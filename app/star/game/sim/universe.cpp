@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_game.cpp
+// Project: libv, File: app/star/game/sim/universe.cpp
 
 #include <star/game/sim/universe.hpp>
 

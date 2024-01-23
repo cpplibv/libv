@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/mesh/mesh_skybox.cpp
+// Project: libv.re, File: src/libv/re/mesh/mesh_cube.cpp
 
 #include <libv/re/mesh/mesh_cube.hpp>
 

@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/resource/style_load_event.hpp
+// Project: libv.ui, File: src/libv/ui/style/style_file_load_event.hpp
 
 #pragma once
 

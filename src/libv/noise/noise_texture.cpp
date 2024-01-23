@@ -1,4 +1,4 @@
-// Project: libv.noise, File: src/libv/noise/perlin.cpp
+// Project: libv.noise, File: src/libv/noise/noise_texture.cpp
 
 // hpp
 #include <libv/noise/noise_texture.hpp>

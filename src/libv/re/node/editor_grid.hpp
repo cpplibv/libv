@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/node/editorGrid.hpp
+// Project: libv.re, File: src/libv/re/node/editor_grid.hpp
 
 #pragma once
 

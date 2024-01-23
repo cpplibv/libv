@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/uniform_buffer.hpp
+// Project: libv.gl, File: src/libv/gl/shader_storage_buffer.hpp
 
 #pragma once
 

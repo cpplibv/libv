@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/resource/common_resource_event.hpp
+// Project: libv.res, File: src/libv/res/common_resource_event.hpp
 
 #pragma once
 

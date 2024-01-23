@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/uniform/std140_verify.hpp
+// Project: libv.re, File: src/libv/re/uniform/std140_string.hpp
 
 #pragma once
 

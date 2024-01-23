@@ -1,4 +1,4 @@
-// Project: libv.re, File: test/libv/re/test_std140_verify.cpp
+// Project: libv.re, File: test/libv/re/test_std140_string.cpp
 
 #include <catch2/catch_test_macros.hpp>
 

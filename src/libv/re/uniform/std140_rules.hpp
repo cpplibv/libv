@@ -335,7 +335,7 @@ using detail::layout_std140_stride;
 } // namespace libv
 
 // =================================================================================================
-
+//
 // Consider this alternative approach:
 //
 //struct UniformLayoutRule {
@@ -347,35 +347,35 @@ using detail::layout_std140_stride;
 //
 //inline UniformLayoutRule rule_std140(...) { static_assert }
 //
-//inline UniformLayoutRule rule_std140(identity<bool>)          { return { 4,  4}; }
-//inline UniformLayoutRule rule_std140(identity<int32_t>)       { return { 4,  4}; }
-//inline UniformLayoutRule rule_std140(identity<uint32_t>)      { return { 4,  4}; }
-//inline UniformLayoutRule rule_std140(identity<int64_t>)       { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<uint64_t>)      { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<float>)         { return { 4,  4}; }
-//inline UniformLayoutRule rule_std140(identity<double>)        { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<bool>)          noexcept { return { 4,  4}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<int32_t>)       noexcept { return { 4,  4}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<uint32_t>)      noexcept { return { 4,  4}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<int64_t>)       noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<uint64_t>)      noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<float>)         noexcept { return { 4,  4}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<double>)        noexcept { return { 8,  8}; }
 //
-//inline UniformLayoutRule rule_std140(identity<libv::vec2b>)   { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3b>)   { return {16, 12}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4b>)   { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2i>)   { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3i>)   { return {16, 12}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4i>)   { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2ui>)  { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3ui>)  { return {16, 12}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4ui>)  { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2l>)   { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3l>)   { return {32, 24}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4l>)   { return {32, 32}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2ul>)  { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3ul>)  { return {32, 24}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4ul>)  { return {32, 32}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2f>)   { return { 8,  8}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3f>)   { return {16, 12}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4f>)   { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec2d>)   { return {16, 16}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec3d>)   { return {32, 24}; }
-//inline UniformLayoutRule rule_std140(identity<libv::vec4d>)   { return {32, 32}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2b>)   noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3b>)   noexcept { return {16, 12}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4b>)   noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2i>)   noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3i>)   noexcept { return {16, 12}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4i>)   noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2ui>)  noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3ui>)  noexcept { return {16, 12}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4ui>)  noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2l>)   noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3l>)   noexcept { return {32, 24}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4l>)   noexcept { return {32, 32}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2ul>)  noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3ul>)  noexcept { return {32, 24}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4ul>)  noexcept { return {32, 32}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2f>)   noexcept { return { 8,  8}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3f>)   noexcept { return {16, 12}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4f>)   noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec2d>)   noexcept { return {16, 16}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec3d>)   noexcept { return {32, 24}; }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::vec4d>)   noexcept { return {32, 32}; }
 //
 //template <typename T, std::size_t N>
 //inline UniformLayoutRule rule_std140(identity<std::array<T, N>) {
@@ -388,23 +388,21 @@ using detail::layout_std140_stride;
 //	};
 //}
 //
-//inline UniformLayoutRule rule_std140(identity<libv::mat2f>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3f>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4f>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat2d>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3d>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4d>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat2x3f>) { return rule_std140(identity<std::array<libv::vec3f, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat2x4f>) { return rule_std140(identity<std::array<libv::vec4f, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3x2f>) { return rule_std140(identity<std::array<libv::vec2f, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3x4f>) { return rule_std140(identity<std::array<libv::vec4f, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4x2f>) { return rule_std140(identity<std::array<libv::vec2f, 4>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4x3f>) { return rule_std140(identity<std::array<libv::vec3f, 4>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat2x3d>) { return rule_std140(identity<std::array<libv::vec3d, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat2x4d>) { return rule_std140(identity<std::array<libv::vec4d, 2>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3x2d>) { return rule_std140(identity<std::array<libv::vec2d, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat3x4d>) { return rule_std140(identity<std::array<libv::vec4d, 3>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4x2d>) { return rule_std140(identity<std::array<libv::vec2d, 4>>{}); }
-//inline UniformLayoutRule rule_std140(identity<libv::mat4x3d>) { return rule_std140(identity<std::array<libv::vec3d, 4>>{}); }
-//
-//// -------------------------------------------------------------------------------------------------
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2f>)   noexcept { return rule_std140<libv::vec2f, 2>(identity<std::array<libv::vec2f, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3f>)   noexcept { return rule_std140<libv::vec3f, 3>(identity<std::array<libv::vec3f, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4f>)   noexcept { return rule_std140<libv::vec4f, 4>(identity<std::array<libv::vec4f, 4>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2d>)   noexcept { return rule_std140<libv::vec2f, 2>(identity<std::array<libv::vec2f, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3d>)   noexcept { return rule_std140<libv::vec3f, 3>(identity<std::array<libv::vec3f, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4d>)   noexcept { return rule_std140<libv::vec4f, 4>(identity<std::array<libv::vec4f, 4>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2x3f>) noexcept { return rule_std140<libv::vec3f, 2>(identity<std::array<libv::vec3f, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2x4f>) noexcept { return rule_std140<libv::vec4f, 2>(identity<std::array<libv::vec4f, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3x2f>) noexcept { return rule_std140<libv::vec2f, 3>(identity<std::array<libv::vec2f, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3x4f>) noexcept { return rule_std140<libv::vec4f, 3>(identity<std::array<libv::vec4f, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4x2f>) noexcept { return rule_std140<libv::vec2f, 4>(identity<std::array<libv::vec2f, 4>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4x3f>) noexcept { return rule_std140<libv::vec3f, 4>(identity<std::array<libv::vec3f, 4>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2x3d>) noexcept { return rule_std140<libv::vec3d, 2>(identity<std::array<libv::vec3d, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat2x4d>) noexcept { return rule_std140<libv::vec4d, 2>(identity<std::array<libv::vec4d, 2>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3x2d>) noexcept { return rule_std140<libv::vec2d, 3>(identity<std::array<libv::vec2d, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat3x4d>) noexcept { return rule_std140<libv::vec4d, 3>(identity<std::array<libv::vec4d, 3>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4x2d>) noexcept { return rule_std140<libv::vec2d, 4>(identity<std::array<libv::vec2d, 4>>{}); }
+// [[nodiscard]] static constexpr inline UniformLayoutRule rule_std140(identity<libv::mat4x3d>) noexcept { return rule_std140<libv::vec3d, 4>(identity<std::array<libv::vec3d, 4>>{}); }

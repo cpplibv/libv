@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/uniform/uniform.hpp
+// Project: libv.re, File: src/libv/re/uniform/uniform_block.hpp
 
 #pragma once
 

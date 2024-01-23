@@ -21,15 +21,15 @@ What do I need from libv to make a 'minimal' working iris program?
 
 	libv.ui
 		2 List component (and pagination)
-		3 Scroll fixes
-		3 Navigation and focus fixes
-		4 Font outline render
+		2 Font outline render
 			freetype2 Now has an SDF render option
 			spread property set:
 				const FT_Int spread = 8;
 				FT_Property_Set(library, "sdf", "spread", &spread);
 				8bit uint normalized to [+spread .. -spread]
 			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
+		3 Scroll fixes
+		3 Navigation and focus fixes
 
 	libv.ctrl
 		5 Resolve analog-binary accidental collusion with time
@@ -38,7 +38,7 @@ What do I need from libv to make a 'minimal' working iris program?
 		5 Generated source for state machines
 
 	libv.net
-		UDP Communication
+		1 UDP Communication
 			Reliable
 			QoS (Redundancy levels, and prioritization)
 			Rate Limiting (per connection, [per group], per global)
@@ -53,6 +53,8 @@ What do I need from libv to make a 'minimal' working iris program?
 			1 Marry Resource and Update
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
+
+
 
 -------------------------------------------------------------------------------------------------
 

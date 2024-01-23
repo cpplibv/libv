@@ -1,4 +1,4 @@
-//
+// Project: libv, File: app/star/game/control/starmap_controller.cpp
 
 #include <star/game/control/starmap_controller.hpp>
 

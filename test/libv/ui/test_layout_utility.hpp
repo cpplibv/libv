@@ -147,7 +147,6 @@ public:
 
 public:
 	libv::vec2f layout1(libv::vec2f limit, libv::vec2f parent) {
-		// !!!
 		// assert(limit.x != 0);
 		// assert(limit.y != 0);
 		return libv::ui::AccessRoot::layout1(this->core(), libv::ui::ContextLayout1{

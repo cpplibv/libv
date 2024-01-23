@@ -1,4 +1,4 @@
-//
+// Project: libv.ui, File: app/star/game/ui/controlled_scene.hpp
 
 #pragma once
 

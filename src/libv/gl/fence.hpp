@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/Fence.hpp
+// Project: libv.gl, File: src/libv/gl/fence.hpp
 
 #pragma once
 

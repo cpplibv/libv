@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/material/material_solid.hpp
+// Project: libv.re, File: src/libv/re/material/material_lens_flare.hpp
 
 #pragma once
 

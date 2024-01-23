@@ -1,4 +1,4 @@
-//
+// Project: libv.res, File: src/libv/res/load_file.hpp
 
 #include <libv/res/common_resource_event.hpp>
 #include <libv/res/settings.hpp>

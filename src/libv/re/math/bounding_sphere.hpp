@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/re/math/transform.hpp
+// Project: libv.math, File: src/libv/re/math/bounding_sphere.hpp
 
 #pragma once
 

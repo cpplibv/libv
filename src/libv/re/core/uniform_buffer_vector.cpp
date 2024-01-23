@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/uniform_buffer.cpp
+// Project: libv.re, File: src/libv/re/core/uniform_buffer_vector.cpp
 
 #include <libv/re/core/uniform_buffer_vector.hpp>
 

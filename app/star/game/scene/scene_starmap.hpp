@@ -1,4 +1,4 @@
-// Project: libv, File: app/star/game/scene/scene_starmap.cpp
+// Project: libv, File: app/star/game/scene/scene_starmap.hpp
 
 #pragma once
 

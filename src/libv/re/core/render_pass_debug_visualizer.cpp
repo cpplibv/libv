@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/render_pass_context.cpp
+// Project: libv.re, File: src/libv/re/core/render_pass_debug_visualizer.cpp
 
 #include <libv/re/core/render_pass_debug_visualizer.hpp>
 

@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/render_context.hpp
+// Project: libv.frame, File: src/libv/re/core/context/context_frame_gl.hpp
 
 #pragma once
 

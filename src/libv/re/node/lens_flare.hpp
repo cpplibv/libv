@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/node/lensFlare.hpp
+// Project: libv.re, File: src/libv/re/node/lens_flare.hpp
 
 #pragma once
 

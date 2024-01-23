@@ -1,4 +1,4 @@
-// Project: libv.lua, File: src/libv/lua/sol_type_to_string.hpp
+// Project: libv.lua, File: src/libv/lua/to_string.cpp
 
 #include <libv/lua/to_string.hpp>
 

@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/node/_post_process.hpp
+// Project: libv.re, File: src/libv/re/core/pass/render_pass_post_process.hpp
 
 #pragma once
 

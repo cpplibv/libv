@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/ray.hpp
+// Project: libv.math, File: src/libv/math/ray_fwd.hpp
 
 #pragma once
 

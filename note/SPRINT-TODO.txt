@@ -11,24 +11,18 @@
 
 
 
-
-
-
-
 Everything in star notes (Its not that long list, mostly integration and cleanup)
+
+
 
 
 
 
 --- Resources --------------------------------------------------------------------------------------
 
-res: Skyboxes: acquire an image viewer that can handle (and other formats that we started to use)
-			with thumbnails
-			DDS cube
-			BC6 DDS
-			HDR
+res: Skyboxes: acquire an image viewer that can handle the formats that we started to use (with thumbnails)
+			like DDS cube, BC6 DDS, HDR
 libv.re: Sky equirectangular and cubemaps are misaligned or inverted (possible import issue) or both rotated and inverted
-
 
 
 --- UI - Focus/Event -------------------------------------------------------------------------------
@@ -56,17 +50,158 @@ app.star: Arrow navigation: Main Menu (and every page) focus navigation with arr
 	\ requires Arrow navigation from libv.ui
 
 
+
+--- UI - Layout invalidation -----------------------------------------------------------------------
+
+Need performance data and statistics. Debug overlay for it?
+
+libv.ui: If a child in panel_anchor or panel_full has not been invalidated,
+		and the bounds of the panel did not change
+		do not layout (calculate dynamic size) that component
+		(only issue if the component does have dynamic size, in this case it must be called)
+
+scroll bar change prompts layout, why? should it?
+	| it does to recache the bar position
+Slider value change should not invalidate layout
+	(make it a float region if it must)
+	mouse context range remap might be needed!
+libv.ui: Make sure that (only) position change does not invalidate layout
+
+libv.ui: Ensure that scroll pane scrolling doent causes any layout invalidation
+	if the content of the scroll area size is Dynamic then it causes a Dynamic
+	layout query. Otherwise, its good
+
+libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
+		markInvalidLayout();
+		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
+libv.ui: Layout optimization: Some layout (like full and anchor) could handle layout invalidation independently, so if 1 child gets invalidated only that child gets to be relayouted
+libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
+libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
+libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
+libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
+
+
+
+--- UI - Scroll ------------------------------------------------------------------------------------
+
+libv.ui: InputField might not does proper CPU culling (at least in ui sandbox legacy tab)
+
+libv.ui: Slider value change should not invalidate layout
+			(make it a float region if it must)
+			mouse context range remap might be needed!
+
+Scroll pane
+	at first frame has different bar size after first move
+	bar size jumps to max
+	bar can be moved even if everything fits
+	currently 100% over-scrolling is allowed, there should be a 0..1 float properaty for it and the default should be 0 in each dimension
+
+libv.ui: Slider "hover" style/state should be separate for the track and the bar
+
+libv.ui: Implement scroll pane anchor behaviour
+		anchor = "top-left"
+
+libv.ui: Scroll pane should have properties: font, font_size, scroll_speed: if font is null speed = scroll_speed, otherwise speed = font.height(font_size) * scroll_speed
+
+libv.ui: Scroll pane content background is incorrect, bc content size in incorrect
+		might be layout (-1) issue | might have changed already
+
+libv.ui: scroll area in scroll area, nested rendering alters clipping, events and control
+
+libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
+libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
+
+libv.ui: To fix property init
+		| scroll bar should not calculate any fucking layout in non layout
+		| it does it so it can process mouse event
+	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
+	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
+	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
+
+libv.ui: Padding support in slider (It effects the bar and not the track) (bar could be replaced to component in future anyways)
+
+libv.ui: Create a real scroll_bar = slider + buttons
+
+libv.ui: Enable actual render clipping (debug option to reenable debug cull view?)
+		clip planes should be the most generic solution due to multidraw
+
+libv.ui: observation: clip and scroll are two orthogonal features
+		general concept: "floating" component that effects render, mouse, (layout)
+		general concept: clip component that effects render, mouse, (layout)
+
+Pagination
+		Pagination support
+
+		Pagination API
+			dynamic change of max size of the components
+				and that information should be traficed back to the scroll pane
+
+			struct MyPagedEntryComponent {
+				void on_screen();
+				void off_screen();
+
+				void assign(MyObject);
+			};
+
+			struct PaginationController {
+				using entry = MyPagedEntryComponent;
+
+				std::vector<float> entry_positions;
+				libv::vec2f position;
+				libv::vec2f size;
+
+				libv::vec2f max_extent;
+				libv::vec2f trigger_distance;
+
+				int num_loaded;
+				int num_keepalive;
+
+				virtual void trigger_load();
+				virtual void trigger_load(index);
+				virtual void trigger_unload();
+				virtual void trigger_seek();
+				virtual void trigger_visible_area_changed();
+			};
+
+			Pagination<PaginationController, MyPagedEntryComponent> list;
+
+			keep alive with a ring buffer
+
+			on variable item sizes
+				store/keep track of every item position that was already loaded
+				1 float / item
+
+			on fix item sized, jump around
+
+
+		Pagination List Component
+
+		But: Pagination != Scroll size solution
+
+Notes for the real scroll bar:
+	double value; // current_line
+	double value_low; // 0
+	double value_high; // num_line
+	double value_range; // num_lines_displayed
+
+	double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit
+	double step_button; // [button >] 1 or 3 or settings.scroll_unit
+	double step_track; // [mouse button on track] 1 or 3 or settings.scroll_unit or inf
+	double step_track_interval; // 0.3 or 1 or settings.step_button_hold_interval
+	double step_button_hold; // [button > hold per interval] 1 or 3 or settings.scroll_unit
+	double step_button_hold_interval; // 0.3 or 1 or settings.step_button_hold_interval
+	double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
+	double step_page; // [pageup/pagedown] num_lines_displayed
+
+
+
 === Place Back =====================================================================================
 
 place.it:
-	libv.ui: Support "builtin:white" as ui texture resource | When libv.re is used
+	libv.ui: Support "builtin:white" as ui texture resource | Can wait for libv.re
 
 	libv.ui.event: (?) Mouse acquire should leave any over component
 	libv.ui.event: (?) Mouse release should enter any over component (respect non-pass_through)
-	libv.ui.event: Idea for event notification: Instead of a single propagation pass use 2: capture pass, bubbling(propagation) pass:
-			bubbling pass what we currently have
-			capture pass would precede it, in reverse order (top-down)
-				granting the ability to capture an event in a parent
 	libv.ui: (?) hover-within new "state" property (same concept as focus-within, not sure if this is required) StyleState::hover_within
 
 	idea: tracked entities as "sleeping ones", not 2 but 3 update state
@@ -77,6 +212,8 @@ place.it:
 	Knowledge: Optimal texture layout: IF there is alpha testing: Make opacity separate, if there is none RGBA is fine (everything else dont care, prefer merged)
 	Knowledge: Anisotropic filtering is useless for many textures
 	Knowledge: Mip maps are useless for some textures (UI textures dont care)
+	Knowledge: OpenGL performance: http://behindthepixels.io/assets/files/High-performance,%20Low-Overhead%20Rendering%20with%20OpenGL%20and%20Vulkan%20-%20Edward%20Liu.pdf
+			You make it fast by not making any GL API calls, like bind buffer or draw, per object. Instead use multidraw*indirect, index ubo/ssbo with draw id for per object uniforms. Combine with persistently mapped buffers.
 
 	glsl noise: simplest that i have seen https://www.shadertoy.com/view/DdBGDh
 

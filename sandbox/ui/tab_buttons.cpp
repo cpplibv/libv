@@ -1,4 +1,4 @@
-// Project: libv.ui, File: sandbox/libv_ui_scroll.cpp
+// Project: libv.ui, File: sandbox/ui/tab_buttons.cpp
 
 // ext
 #include <fmt/format.h>

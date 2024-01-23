@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/uniform_buffer.hpp
+// Project: libv.re, File: src/libv/re/core/pixel_buffer.hpp
 
 #pragma once
 

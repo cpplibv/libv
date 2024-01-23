@@ -1,4 +1,4 @@
-// Created by dalma.bobula on 12/3/2022.
+// Project: libv.ui, File: src/libv/ui/component/overlay/overlay_tooltip.cpp
 
 // hpp
 #include <libv/ui/component/overlay/overlay_tooltip.hpp>

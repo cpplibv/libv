@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/indirect_comand_buffer.cpp
+// Project: libv.re, File: src/libv/re/core/indirect_comand_buffer_mapped.cpp
 
 #include <libv/re/core/indirect_comand_buffer_mapped.hpp>
 

@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/mesh/mesh_skybox.hpp
+// Project: libv.re, File: src/libv/re/mesh/mesh_cube.hpp
 
 #pragma once
 

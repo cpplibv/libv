@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/render_pass_context.hpp
+// Project: libv.re, File: src/libv/re/core/context/context_pipeline.hpp
 
 #pragma once
 

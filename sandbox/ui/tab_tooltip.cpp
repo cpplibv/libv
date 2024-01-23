@@ -1,4 +1,4 @@
-// Project: libv.ui, File: sandbox/libv_ui_main.cpp
+// Project: libv.ui, File: sandbox/ui/tab_tooltip.cpp
 
 // pro
 #include <libv/ui/component/label.hpp>

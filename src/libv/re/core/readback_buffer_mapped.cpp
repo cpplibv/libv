@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/uniform_buffer.cpp
+// Project: libv.re, File: src/libv/re/core/readback_buffer_mapped.cpp
 
 #include <libv/re/core/readback_buffer_mapped.hpp>
 

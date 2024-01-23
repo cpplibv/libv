@@ -10,7 +10,7 @@
 			},
 			"vendor": {
 				"jetbrains.com/clion": {
-				  "toolchain": "MSYS2-MinGW64"
+					"toolchain": "MSYS2-MinGW64"
 				}
 			}
 		},

@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/render_pass_context.cpp
+// Project: libv.re, File: src/libv/re/core/context/context_pipeline.cpp
 
 #include <libv/re/core/context/context_pipeline.hpp>
 

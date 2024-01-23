@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/node/lens_Flare.cpp
+// Project: libv.re, File: src/libv/re/node/lens_flare.cpp
 
 #include <libv/re/node/lens_flare.hpp>
 

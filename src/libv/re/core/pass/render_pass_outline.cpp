@@ -1,4 +1,4 @@
-// Project: libv.re, File: src/libv/re/core/pass/render_passes.cpp
+// Project: libv.re, File: src/libv/re/core/pass/render_pass_outline.cpp
 
 #include <libv/re/core/pass/render_pass_outline.hpp>
 

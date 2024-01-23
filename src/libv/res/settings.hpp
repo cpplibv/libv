@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/settings.hpp
+// Project: libv.res, File: src/libv/res/settings.hpp
 
 #pragma once
 

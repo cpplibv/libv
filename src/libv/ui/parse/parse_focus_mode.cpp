@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/ui/parse/parse_align.cpp
+// Project: libv.parse, File: src/libv/ui/parse/parse_focus_mode.cpp
 
 // hpp
 #include <libv/ui/parse/parse_focus_mode.hpp>

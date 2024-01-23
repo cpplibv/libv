@@ -7,7 +7,6 @@
 #include "test_layout_slc_utility.hpp"
 #include <libv/ui/component/layout/layout_slc.hpp>
 
-#include <iostream> // !!!
 #include <libv/log/log.hpp>
 
 
@@ -26,7 +25,6 @@ static constexpr vec2 infpar_size = {-1, -1};
 // -------------------------------------------------------------------------------------------------
 
 // TEST_CASE("zzz", "[libv.ui.SLC]") {
-// 	// !!!
 // 	std::cout << libv::logger_stream;
 // }
 
@@ -49,7 +47,6 @@ TEST_CASE("Layout SLC: test", "[libv.ui.SLC]") {
 }
 
 TEST_CASE("Layout SLC: Component", "[libv.ui.SLC]") {
-	std::cout << libv::logger_stream; libv::logger_stream.color(false); // !!!
 	const auto parent_size = vec2(1000, 1200);
 
 	SECTION("px, px") {
