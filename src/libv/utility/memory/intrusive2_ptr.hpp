@@ -15,9 +15,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 //
-// Usage:
+// --- Usage: ---
 //
-//	class Resource : public libv::ref_count_base<Resource> {
+//	class Resource : public libv::ref_count_base {
 //		friend libv::ref_count_access;
 //		// ...
 //	private:
@@ -27,14 +27,14 @@ namespace libv {
 //
 //	const auto resource = libv::make_intrusive2_ptr<Resource>();
 //
-// OR:
+// --- OR: ---
 //
 //	class ResourceIncomplete;
 // 	void increase_ref_count(ResourceIncomplete* ptr);
 // 	void decrease_ref_count(ResourceIncomplete* ptr);
 //	libv::intrusive2_ptr<ResourceIncomplete> incomplete_usage;
 //
-//	class ResourceIncomplete : public libv::ref_count_base<Resource> {
+//	class ResourceIncomplete : public libv::ref_count_base {
 //		friend libv::ref_count_access;
 //		// ...
 //	private:
@@ -47,6 +47,7 @@ namespace libv {
 // 	void decrease_ref_count(ResourceIncomplete* ptr) {
 // 		libv::ref_count_access::decrease_ref_count(ptr);
 // 	}
+//
 //	const auto resource = libv::make_intrusive2_ptr<Resource>();
 //
 // -------------------------------------------------------------------------------------------------
@@ -66,13 +67,13 @@ struct ref_count_access {
 			var->ref_count_one();
 		else if (new_ref_count == 0) {
 			var->ref_count_zero();
-			delete var;
+			T::deallocate(var); // Should call some analog to delete ptr;
 		}
 	}
 };
 
 // --- ADL Accepting customization point -----------------------------------------------------------
-// Support forward declared types with forward declared functions
+// Supports forward declared types with forward declared functions
 
 template <typename T>
 constexpr LIBV_FORCE_INLINE void increase_ref_count(T* var, ...) noexcept {
@@ -92,7 +93,7 @@ class ref_count_base {
 	friend ref_count_access;
 
 private:
-	mutable std::atomic<int32_t> ref_count_ = 0;
+	mutable std::atomic_uint32_t ref_count_ = 0;
 
 private:
 	// constexpr LIBV_FORCE_INLINE void increase_ref_count() noexcept {
@@ -111,8 +112,20 @@ private:
 		// Noop, entry point for static polymorphism
 	}
 
+	// template <typename T>
+	// static constexpr LIBV_FORCE_INLINE T* ptr allocate() noexcept {
+	// 	// Entry point for static polymorphism
+	// 	return new...;
+	// }
+
+	template <typename T>
+	static constexpr LIBV_FORCE_INLINE void deallocate(T* ptr) noexcept {
+		// Entry point for static polymorphism
+		delete ptr;
+	}
+
 public:
-	[[nodiscard]] constexpr LIBV_FORCE_INLINE int32_t ref_count() const noexcept {
+	[[nodiscard]] constexpr LIBV_FORCE_INLINE uint32_t ref_count() const noexcept {
 		return ref_count_;
 	}
 //	[[nodiscard]] constexpr inline ... make_intrusive_from_this() const noexcept {

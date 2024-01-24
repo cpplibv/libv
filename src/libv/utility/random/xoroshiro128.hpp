@@ -47,7 +47,7 @@ public:
 	}
 
 	/// Accepts low quality seeds (like IDs or Indices)
-	/// The seed cannot be {0, 0}
+	/// The seed can be {0, 0}
 	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1) noexcept :
 		s{(s0 ^ random_bits_0) | salt_bit45, (s1 ^ random_bits_1) | salt_bit49} {
 		// The seed for xoroshiro128 cannot be {0, 0} so 1-1 salt bit is forced to 1
@@ -57,7 +57,7 @@ public:
 
 private:
 	struct HighQ {};
-	/// The seed cannot be {0, 0}, Seed is required to be high quality
+	/// The seed must not be {0, 0}, Seed is required to be high quality
 	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1, HighQ) noexcept :
 		s{s0, s1} {
 		assert((s0 != 0 || s1 != 0) && "The seed for xoroshiro128 cannot be {0, 0}");

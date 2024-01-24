@@ -1,7 +1,6 @@
 // Project: libv.utility, File: src/libv/utility/entity/entity_ptr.cpp
 
-// hpp
-#include <libv/utility/entity/entity_ptr.hpp>
+#include <libv/utility/entity/entity_store.hpp>
 
 
 namespace libv {
@@ -35,6 +34,8 @@ BaseContextBlockArenaMemoryChunkInfo BaseContextBlockArena::allocateAndInitMemor
 	const auto memory_size = block_size * block_count;
 	result.memory_chunk_ptr = new(std::align_val_t(block_alignment)) std::byte[memory_size];
 	// result.memory_chunk_ptr = std::aligned_alloc(block_size_and_alignment_, memory_size);
+	assert(std::bit_cast<uintptr_t>(result.memory_chunk_ptr) % static_cast<uintptr_t>(block_alignment) == 0 &&
+			"Sanity check failed. This platform does not support over aligned allocation?");
 
 	result.chunk_capacity = block_capacity * block_count;
 

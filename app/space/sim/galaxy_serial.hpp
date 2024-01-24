@@ -7,7 +7,7 @@
 // libv
 #include <libv/serial/serial.hpp>
 //#include <libv/serial/types/std_vector.hpp>
-#include <libv/utility/entity/entity_ptr_serial.hpp>
+// #include <libv/utility/entity/entity_ptr_serial.hpp>
 // pro
 //#include <space/sim/engine/memory_store.hpp>
 #include <space/sim/fleet_serial.hpp>
