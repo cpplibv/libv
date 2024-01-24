@@ -243,7 +243,7 @@ TEST_CASE("entity_store move", "[libv.utility.entity_ptr]") {
 		CHECK(original.capacity() == block_capacity * 2);
 
 		for (const auto& fleet : bucket)
-			CHECK(&original == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+			CHECK(&original == libv::entity_store<Fleet>::store_from_pointer(fleet));
 
 		// Move the store
 		auto moved = std::move(original);
@@ -255,14 +255,14 @@ TEST_CASE("entity_store move", "[libv.utility.entity_ptr]") {
 		CHECK(moved.capacity() == block_capacity * 2);
 
 		for (const auto& fleet : bucket)
-			CHECK(&moved == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+			CHECK(&moved == libv::entity_store<Fleet>::store_from_pointer(fleet));
 
 		// Continue manipulating the moved store
 		for (auto i = 0; i < block_capacity - 1; ++i)
 			bucket.emplace_back(moved.create_secondary(i, "Long long long long long long long long long fleet name A"));
 
 		for (const auto& fleet : bucket)
-			CHECK(&moved == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+			CHECK(&moved == libv::entity_store<Fleet>::store_from_pointer(fleet));
 
 		CHECK(original.size() == 0);
 		CHECK(original.capacity() == 0);
@@ -301,7 +301,7 @@ TEST_CASE("entity_store move", "[libv.utility.entity_ptr]") {
 //		CHECK(original.capacity() == block_capacity * 2);
 //
 //		for (const auto& fleet : bucket)
-//			CHECK(&original == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+//			CHECK(&original == libv::entity_store<Fleet>::store_from_pointer(fleet));
 //	}
 //
 //	CHECK(original.size() == 0);

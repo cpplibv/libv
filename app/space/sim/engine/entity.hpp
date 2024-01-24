@@ -5,7 +5,7 @@
 // libv
 #include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
-#include <cstdint>
+#include <atomic>
 
 
 namespace space {
@@ -21,8 +21,7 @@ public:
 	using Base = Entity;
 
 private:
-	uint32_t ref_count = 0;
-//	std::atomic_uint32_t ref_count = 0;
+	std::atomic_uint32_t ref_count = 0;
 	bool dead_ = false;
 	// TODO P3: dead_ could be stored as ref_count's LSB and increase/decrease ref_count by 2 instead of 1
 	//			dead could and/or should be stored as a single bit inside ID
