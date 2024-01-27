@@ -911,8 +911,6 @@ wish_create_executable(
 #	LINK   libv::net libv::serial
 )
 
-add_subdirectory(app/star)
-
 wish_create_executable(
 	TARGET theme
 	SOURCE app/theme/*.cpp
