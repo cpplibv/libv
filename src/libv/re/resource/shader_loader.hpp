@@ -89,6 +89,11 @@ public:
 	Shader_ptr load(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
 			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
 			VariantID variant = VariantID::Default, LoadingMode mode = LoadingMode::blocking);
+	/// @thread any
+	Shader_ptr load(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
+			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+			libv::gl::ShaderType type3, std::string_view path3, VariantID variant = VariantID::Default,
+			LoadingMode mode = LoadingMode::blocking);
 
 	/// @thread any
 	Shader_ptr load_async(std::string_view path_cs, VariantID variant = VariantID::Default);
@@ -106,6 +111,10 @@ public:
 	Shader_ptr load_async(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
 			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
 			VariantID variant = VariantID::Default);
+	/// @thread any
+	Shader_ptr load_async(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
+			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+			libv::gl::ShaderType type3, std::string_view path3, VariantID variant = VariantID::Default);
 
 	/// @thread any
 	DelayedShaderLoadGuard load_delayed(
@@ -126,6 +135,11 @@ public:
 	DelayedShaderLoadGuard load_delayed(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
 			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
 			VariantID variant = VariantID::Default, LoadingMode mode = LoadingMode::blocking);
+	/// @thread any
+	DelayedShaderLoadGuard load_delayed(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
+			std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+			libv::gl::ShaderType type3, std::string_view path3, VariantID variant = VariantID::Default,
+			LoadingMode mode = LoadingMode::blocking);
 
 	/// @thread any
 	DelayedShaderLoadGuard load_delayed_async(std::string_view path_cs, VariantID variant = VariantID::Default);
@@ -145,6 +159,10 @@ public:
 	DelayedShaderLoadGuard load_delayed_async(libv::gl::ShaderType type0, std::string_view path0,
 			libv::gl::ShaderType type1, std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
 			VariantID variant = VariantID::Default);
+	/// @thread any
+	DelayedShaderLoadGuard load_delayed_async(libv::gl::ShaderType type0, std::string_view path0,
+			libv::gl::ShaderType type1, std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+			libv::gl::ShaderType type3, std::string_view path3, VariantID variant = VariantID::Default);
 
 private:
 	friend BasicResource;

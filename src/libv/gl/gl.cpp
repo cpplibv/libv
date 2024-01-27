@@ -79,6 +79,11 @@ void GL::init() {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	checkGL();
 
+	if (versionOrGreater(4, 0)) {
+		glPatchParameteri(GL_PATCH_VERTICES, 4);
+		checkGL();
+	}
+
 	// glDisable(GL_FRAMEBUFFER_SRGB);
 	// glEnable(GL_FRAMEBUFFER_SRGB);
 

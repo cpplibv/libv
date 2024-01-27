@@ -371,6 +371,13 @@ Shader_ptr ShaderLoader::load(libv::gl::ShaderType type0, std::string_view path0
 	const auto paths = std::array{path0, path1, path2};
 	return self->load(mode, self->fallbackGraphics, std::span(types), std::span(paths), variant);
 }
+Shader_ptr ShaderLoader::load(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
+		std::string_view path1, libv::gl::ShaderType type2, std::string_view path2, libv::gl::ShaderType type3,
+		std::string_view path3, VariantID variant, LoadingMode mode) {
+	const auto types = std::array{type0, type1, type2, type3};
+	const auto paths = std::array{path0, path1, path2, path3};
+	return self->load(mode, self->fallbackGraphics, std::span(types), std::span(paths), variant);
+}
 
 Shader_ptr ShaderLoader::load_async(std::string_view path_cs, VariantID variant) {
 	const auto types = std::array{libv::gl::ShaderType::Compute};
@@ -404,6 +411,13 @@ Shader_ptr ShaderLoader::load_async(libv::gl::ShaderType type0, std::string_view
 		std::string_view path1, libv::gl::ShaderType type2, std::string_view path2, VariantID variant) {
 	const auto types = std::array{type0, type1, type2};
 	const auto paths = std::array{path0, path1, path2};
+	return self->load(LoadingMode::async, self->fallbackGraphics, std::span(types), std::span(paths), variant);
+}
+Shader_ptr ShaderLoader::load_async(libv::gl::ShaderType type0, std::string_view path0, libv::gl::ShaderType type1,
+		std::string_view path1, libv::gl::ShaderType type2, std::string_view path2, libv::gl::ShaderType type3,
+		std::string_view path3, VariantID variant) {
+	const auto types = std::array{type0, type1, type2, type3};
+	const auto paths = std::array{path0, path1, path2, path3};
 	return self->load(LoadingMode::async, self->fallbackGraphics, std::span(types), std::span(paths), variant);
 }
 
@@ -444,6 +458,13 @@ DelayedShaderLoadGuard ShaderLoader::load_delayed(libv::gl::ShaderType type0, st
 	const auto paths = std::array{path0, path1, path2};
 	return self->load_delayed(mode, self->fallbackGraphics, std::span(types), std::span(paths), variant);
 }
+DelayedShaderLoadGuard ShaderLoader::load_delayed(libv::gl::ShaderType type0, std::string_view path0,
+		libv::gl::ShaderType type1, std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+		libv::gl::ShaderType type3, std::string_view path3, VariantID variant, LoadingMode mode) {
+	const auto types = std::array{type0, type1, type2, type3};
+	const auto paths = std::array{path0, path1, path2, path3};
+	return self->load_delayed(mode, self->fallbackGraphics, std::span(types), std::span(paths), variant);
+}
 
 DelayedShaderLoadGuard ShaderLoader::load_delayed_async(std::string_view path_cs, VariantID variant) {
 	const auto types = std::array{libv::gl::ShaderType::Compute};
@@ -480,6 +501,13 @@ DelayedShaderLoadGuard ShaderLoader::load_delayed_async(libv::gl::ShaderType typ
 		VariantID variant) {
 	const auto types = std::array{type0, type1, type2};
 	const auto paths = std::array{path0, path1, path2};
+	return self->load_delayed(LoadingMode::async, self->fallbackGraphics, std::span(types), std::span(paths), variant);
+}
+DelayedShaderLoadGuard ShaderLoader::load_delayed_async(libv::gl::ShaderType type0, std::string_view path0,
+		libv::gl::ShaderType type1, std::string_view path1, libv::gl::ShaderType type2, std::string_view path2,
+		libv::gl::ShaderType type3, std::string_view path3, VariantID variant) {
+	const auto types = std::array{type0, type1, type2, type3};
+	const auto paths = std::array{path0, path1, path2, path3};
 	return self->load_delayed(LoadingMode::async, self->fallbackGraphics, std::span(types), std::span(paths), variant);
 }
 

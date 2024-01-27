@@ -283,6 +283,14 @@ void Mesh::gl_renderBaseVertexBaseInstance(ContextRender& ctx, int32_t vertexOff
 	ctx.gl(vao).drawElementsInstancedBaseVertexBaseInstance(primitive, indexType, vertexOffset, indexOffset, indexCount_, instanceOffset, instanceCount);
 }
 
+void Mesh::gl_renderInstanced(ContextRender& ctx, int32_t instanceCount) {
+	assert(indexCount_ != -1);
+	assert(vertexCount_ != -1);
+
+	ctx.gl(vao).bind();
+	ctx.gl(vao).drawElementsInstancedBaseVertexBaseInstance(primitive, indexType, 0, 0, indexCount_, 0, instanceCount);
+}
+
 void Mesh::gl_renderIndirect(ContextRender& ctx, uint32_t indirectCommandBufferOffset, uint32_t indirectCommandCount) {
 	assert(indexCount_ != -1);
 	assert(vertexCount_ != -1);

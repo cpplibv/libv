@@ -150,6 +150,7 @@ public:
 	virtual void gl_render(ContextRender& ctx);
 	virtual void gl_render(ContextRender& ctx, uint32_t indexOffset, uint32_t indexCount);
 	virtual void gl_renderBaseVertexBaseInstance(ContextRender& ctx, int32_t vertexOffset, std::size_t indexOffset, int32_t indexCount, int32_t instanceOffset, int32_t instanceCount);
+	virtual void gl_renderInstanced(ContextRender& ctx, int32_t instanceCount);
 	virtual void gl_renderIndirect(ContextRender& ctx, uint32_t indirectCommandBufferOffset, uint32_t indirectCommandCount);
 };
 
